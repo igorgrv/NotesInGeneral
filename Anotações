@@ -1,4 +1,59 @@
 JAVA DESENVOLVIMENTO WEB
-
-PROFESSOR: LEONARDO
+-----------------------------------------------------------------------------------------------------------
+PROFESSOR: LEONARDO -> Coordenador, arquiteto de solução
 EMAIL: leonardo.silva@caelum.com
+
+DICAS LEONARDO
+*Relacionamentos com pessoas da área;
+*Criar linkedin, extremamente importante;
+*FOCO, fds vai estudar!
+
+ESTUDAR:
+*Banco de dados nao relacional, como MongoDB (os relacionais serao o MySql, SQLServer)
+-----------------------------------------------------------------------------------------------------------
+CAPITULO 2 - BANCO DE DADOS
+
+*Para conectar a um banco, temos algumas premissas:
+  -Driver (cada banco de dados tem um);
+    -A comunicação é feita via TCP/IP (igual a acessar a um roteador, colocando IP:PORTA)
+   
+
+*JDBC: Java DataBase Connectivity -> É O PADRÃO JAVA, todo driver deve seguir este padrão
+  - O JDBC necessita de uma interface, para que aja um padrão dentre DRIVER e o JAVA;
+  - PREMISSAS PARA O JDBC:
+    - ip
+    - porta
+    - usuario
+    - senha
+  Em resumo, -> "jdbc:mysql://ip/nome_do_banco","usuario","senha"
+
+RESUMINDO:
+*USUARIO ---> JAVA ----> Objeto Connection ----> DriverManager ---> JDBC ----> BD (TipoDeBanco + ip + porta + usuario + senha)
+
+*A partir do momento que temos uma conexão feita, criaremos a class que FABRICA CONEXOES! de forma que todas as outras classes chamem ela!
+
+*FABRICA DE CONEXOES (convencionada)
+
+//Class fabrica de conexão
+public class ConnectionFactory {
+  
+  //Connection é um tipo do Java voltado a conexoes
+  public Connection getConnection(){
+    Connection conexao = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/meuBanco","root","root");
+    return conexao;
+  }
+}
+
+
+*Para as classes que irão chamar esta conexao, sera necessario apenas utilizar este objeto
+
+//Class pesquisa
+Public class pesquisa{
+
+  public static void main (Strings[] args){
+    ConnectionFactory con = new ConnectionFactory();
+    Connection conexao = con.getConnection();
+    Sysout("Conectado");
+    conexao.close();
+  }
+}
