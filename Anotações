@@ -60,3 +60,41 @@ Public class pesquisa{
 
 
 *JAVBEANS? O javabeans é quando uma class que possui atributos (getters and setters and construct default)
+
+
+
+CODIGO PARA INSERÇÃO DE DADOS UTILIZANDO PREPARESTATEMENT
+package br.com.caelum.jdbc.teste;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Calendar;
+
+import br.com.caelum.jdbc.ConnectionFactory;
+
+public class JDBCINsere {
+
+	public static void main(String[] args) throws SQLException {
+		ConnectionFactory con = new ConnectionFactory();
+		Connection conexao = con.getConnection();
+		
+		String sql = "insert into contatos" +
+				"(nome,email,endereco,dataNascimento)" +
+				"values(?,?,?,?)";
+		PreparedStatement stmr = conexao.prepareStatement(sql);
+		
+		stmr.setString(1, "Pedro");
+		stmr.setString(2, "pedro@gmail.com");
+		stmr.setString(3, "Rua teste");
+		stmr.setDate(4, new java.sql.Date(Calendar.getInstance().getTimeInMillis()));
+		
+		stmr.execute();
+		stmr.close();
+		
+		System.out.println("Dados gravados com sucesso");
+		conexao.close();
+
+	}
+
+}
