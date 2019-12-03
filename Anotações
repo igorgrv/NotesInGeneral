@@ -10,13 +10,13 @@ DICAS LEONARDO
 
 ESTUDAR:
 *Banco de dados nao relacional, como MongoDB (os relacionais serao o MySql, SQLServer)
+*JODATIME ou o CALENDAR -> verificar, utilizado para funçoes de java
 -----------------------------------------------------------------------------------------------------------
 CAPITULO 2 - BANCO DE DADOS
 
 *Para conectar a um banco, temos algumas premissas:
   -Driver (cada banco de dados tem um);
     -A comunicação é feita via TCP/IP (igual a acessar a um roteador, colocando IP:PORTA)
-   
 
 *JDBC: Java DataBase Connectivity -> É O PADRÃO JAVA, todo driver deve seguir este padrão
   - O JDBC necessita de uma interface, para que aja um padrão dentre DRIVER e o JAVA;
@@ -28,7 +28,7 @@ CAPITULO 2 - BANCO DE DADOS
   Em resumo, -> "jdbc:mysql://ip/nome_do_banco","usuario","senha"
 
 RESUMINDO:
-*USUARIO ---> JAVA ----> Objeto Connection ----> DriverManager ---> JDBC ----> BD (TipoDeBanco + ip + porta + usuario + senha)
+*USUARIO ---> JAVA ----> Objeto Connection ----> DriverManager ---> JDBC + BD (TipoDeBanco + ip + porta + usuario + senha)
 
 *A partir do momento que temos uma conexão feita, criaremos a class que FABRICA CONEXOES! de forma que todas as outras classes chamem ela!
 
@@ -57,3 +57,6 @@ Public class pesquisa{
     conexao.close();
   }
 }
+
+
+*JAVBEANS? O javabeans é quando uma class que possui atributos (getters and setters and construct default)
