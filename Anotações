@@ -7,10 +7,17 @@ DICAS LEONARDO
 *Relacionamentos com pessoas da área;
 *Criar linkedin, extremamente importante;
 *FOCO, fds vai estudar!
+*Importando uma API -> utilizar o repositorio do Maven para procurar a API necessria -> baixa o JAR e adicionar ele através do build Path
+
+*ENTENDENDO DATE P/ MYSQL
+	Calendar vem do Util, o Date vem do Util e o Date vem do sql;
+	- Comece com um Calendar data = new Calendar.getInstance(); //Deste modo estará iniciando declarando "HOJE"
+	- Date dateUtil = new Date();
 
 ESTUDAR:
 *Banco de dados nao relacional, como MongoDB (os relacionais serao o MySql, SQLServer)
-*JODATIME ou o CALENDAR -> verificar, utilizado para funçoes de java
+*CALENDAR -> verificar, utilizado para funçoes de java
+*Estudar List
 -----------------------------------------------------------------------------------------------------------
 CAPITULO 2 - BANCO DE DADOS
 
@@ -35,66 +42,156 @@ RESUMINDO:
 *FABRICA DE CONEXOES (convencionada)
 
 //Class fabrica de conexão
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
 public class ConnectionFactory {
-  
-  //Connection é um tipo do Java voltado a conexoes
-  public Connection getConnection(){
-    Connection conexao = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/meuBanco","root","root");
-    return conexao;
-  }
+
+	public Connection getConnection() {
+		try {
+			return DriverManager.getConnection("jdbc:mysql://localhost/fj21", "root","");
+		} catch (SQLException e){
+			throw new RuntimeException(e);
+		}
+	}
+
 }
 
 
 *Para as classes que irão chamar esta conexao, sera necessario apenas utilizar este objeto
 
 //Class pesquisa
-Public class pesquisa{
+import java.sql.Connection;
+import java.sql.SQLException;
+import br.com.caelum.jdbc.ConnectionFactory;
 
-  public static void main (Strings[] args){
-    ConnectionFactory con = new ConnectionFactory();
-    Connection conexao = con.getConnection();
-    Sysout("Conectado");
-    conexao.close();
-  }
+public class TesteConexao {
+	public static void main (String[] args) throws SQLException {
+		ConnectionFactory con = new ConnectionFactory();
+		Connection conexao = con.getConnection();
+		System.out.println("conectado");
+		
+		conexao.close();
+	}
 }
+
 
 
 *JAVBEANS? O javabeans é quando uma class que possui atributos (getters and setters and construct default)
 
+*SQL INjection? Hackers? Para resolver o problema de inserssao de dados, foi criado o PrepareStatement, de forma que ele impossibilita
+que codigo SQL derrubem a base.
 
 
-CODIGO PARA INSERÇÃO DE DADOS UTILIZANDO PREPARESTATEMENT
-package br.com.caelum.jdbc.teste;
+*INSERIR (INSERT INTO)
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Calendar;
+- CODIGO PARA INSERÇÃO DE DADOS UTILIZANDO PREPARESTATEMENT
+	package br.com.caelum.jdbc.teste;
+	import java.sql.Connection;
+	import java.sql.PreparedStatement;
+	import java.sql.SQLException;
+	import java.util.Calendar;
 
-import br.com.caelum.jdbc.ConnectionFactory;
 
-public class JDBCINsere {
+	import br.com.caelum.jdbc.ConnectionFactory;
 
-	public static void main(String[] args) throws SQLException {
-		ConnectionFactory con = new ConnectionFactory();
-		Connection conexao = con.getConnection();
-		
-		String sql = "insert into contatos" +
-				"(nome,email,endereco,dataNascimento)" +
-				"values(?,?,?,?)";
-		PreparedStatement stmr = conexao.prepareStatement(sql);
-		
-		stmr.setString(1, "Pedro");
-		stmr.setString(2, "pedro@gmail.com");
-		stmr.setString(3, "Rua teste");
-		stmr.setDate(4, new java.sql.Date(Calendar.getInstance().getTimeInMillis()));
-		
-		stmr.execute();
-		stmr.close();
-		
-		System.out.println("Dados gravados com sucesso");
-		conexao.close();
+	public class TesteJDBC {
 
+		public static void main(String[] args) throws SQLException {
+			Connection con = new ConnectionFactory().getConnection();
+
+			String sql = "insert into contatos (nome,email,endereco,dataNascimento) value (?,?,?,?)";
+			PreparedStatement stmr = con.prepareStatement(sql);
+			stmr.setString(1, "teste");
+			stmr.setString(2, "teste");
+			stmr.setString(3, "teste");
+			stmr.setDate(4, new java.sql.Date(Calendar.getInstance().getTimeInMillis()));
+			stmr.execute();
+
+			stmr.close();
+			System.out.println("Dados inseridos");
+
+			con.close();
+		}
 	}
 
-}
+
+
+*Para evitar que se repitam codigos para fazer o CRUD, o ideal e se criar uma class do SQL
+	- Por exemplo, public class ContatosSQL, que irá receber todas as consultas
+	
+	public class ContatoDAO {
+		private Connection con = new ConnectionFactory().getConnection();
+		private PreparedStatement stmt;
+
+		public void adicionar(Contato contato) throws SQLException {
+			String sql = "INSERT INTO contatos (nome,email,endereco,dataNascimento) values(?,?,?,?)";
+
+			try {
+				stmt = con.prepareStatement(sql);
+				stmt.setString(1, contato.getNome());
+				stmt.setString(2, contato.getEmail());
+				stmt.setString(3, contato.getEndereco());
+				stmt.setDate(4, new Date(contato.getDataNasc().getTimeInMillis()));
+				stmt.execute();
+
+				stmt.close();
+				con.close();
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+	
+*LISTAR (SELECT) - para listar é necessrio usar um List<objeto>
+	-Por padrão, podemo seguir as premissas abaixo:
+		- Crie uma Lista vazia;
+		- Declare sua query;
+		- Prepare a query com o PrepareStatement
+		- Construa o ResultSet com o stmt.executeQuery
+		- Faça um laço (while) -> neste laço iremos criar um objeto e percorrer cada coluna da tabela
+			-Dentro do while, crie um objeto [Contato c1 = new Contato]
+			-Percorra cada coluna da tabela, com rs.getString (em caso de String)
+			-Adicione a lista (com Lista.add(c1))
+		-Retorne a Lista criada no laço;
+
+	*CODIGO PARA LISTAR
+	public List<Contato> getLista() throws SQLException {
+			List<Contato> lista = new ArrayList<Contato>();
+			String sql = "SELECT * FROM contatos";
+			stmt = con.prepareStatement(sql);
+			
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				Contato c1 = new Contato();
+				c1.setNome(rs.getString("nome"));
+				c1.setEmail(rs.getString("email"));
+				c1.setEndereco(rs.getString("endereco"));
+
+				Calendar dataCalendar = Calendar.getInstance();				
+				dataCalendar.setTime(rs.getDate("dataNascimento"));	
+				c1.setDataNasc(dataCalendar);
+				
+				lista.add(c1);
+			}
+			
+			return lista;
+	}
+	
+	*CODIGO PARA EXIBIR A LISTA
+	public static void main(String[] args) throws SQLException {
+		Contato contato = new Contato();		
+		ContatoDao dao = new ContatoDao();
+		
+		List<Contato> lista = dao.getLista();
+		for(Contato con : lista) {
+			System.out.println("---------------------------------");
+			System.out.println("Nome = " + contato.getNome());
+			System.out.println("Email = " + contato.getEmail());
+			System.out.println("Endereco = " + contato.getEndereco());
+			System.out.println("Data = " + contato.getDataNasc());
+			System.out.println("---------------------------------");
+		}	
+	}
+
