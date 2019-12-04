@@ -181,6 +181,9 @@ que codigo SQL derrubem a base.
 	
 	*CODIGO PARA EXIBIR A LISTA
 	public static void main(String[] args) throws SQLException {
+		String pattern = "dd-MM-yyyy";
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+		
 		Contato contato = new Contato();		
 		ContatoDao dao = new ContatoDao();
 		
@@ -194,4 +197,44 @@ que codigo SQL derrubem a base.
 			System.out.println("---------------------------------");
 		}	
 	}
+
+CAPITLO 3 - JAVA EE
+- O Java EE e uma especificacao, um grande PDF padronizando servidores e etc.
+
+*JSF (Java Server Faces) -> [voltado ao desktop, app de mercados]
+*JSP (Java Server Pages) -> [voltado a paginas web]
+*EJB (Enterprise Javabeans Components) -> Voltado a container, gerenciamento (aplicaçoes antigas)
+*JPA (Java Persistence API) -> Uma persistencia no PrepareStatement e um JPA
+*JAX-WS (Java API for XML Web Services)
+*JAAS (Java autentication and Authorization Service) -> API de segurança java -> SpringSecurity
+*JTA (Java Transaction API) -> Serve para barrar transações (Foi usar o cartão e deu erro, JTA ira barrar)
+*JMS (Java Message Service) -> Utilizado para passar mensagens para outra aplicações
+
+*SERÃO APRENDIDOS NO CURSO
+	- JSP, JPA, JDBC, EJB, JTA
+	
+*Servidores de Aplicaço vs SERVLET Container -> a principal diferença  que o SERVLET possui menos especificações do que um servidor de aplicação	
+
+*SERVIDORES DE APLICAÇÃO - MAIS CONHECIDOS:
+	- GlassFish (oracle) JAVA EE 7
+	- RedHat/JBoss JAVA EE 6
+	- WEBLOGIC (Oracle) JAVA EE 6
+	- WEBSPHERE (IBM) JAVA EE 6
+	
+*SERVLET CONTAINER - MAIS CONHECIDOS:
+	- TOMCAT
+	- WILDFLY
+	- JETTY
+
+*PRINCIPAIS ESPECIFICAÇES AGRUPADAS PELO SERVLET CONTAINER:
+	-Servlet
+	-JSP
+	-JSTL
+	-JSF
+
+
+
+
+
+
 
