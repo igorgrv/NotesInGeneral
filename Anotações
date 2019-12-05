@@ -18,6 +18,7 @@ ESTUDAR:
 *Banco de dados nao relacional, como MongoDB (os relacionais serao o MySql, SQLServer)
 *CALENDAR -> verificar, utilizado para funçoes de java
 *Estudar List
+*OMniFaces (templates)
 -----------------------------------------------------------------------------------------------------------
 CAPITULO 2 - BANCO DE DADOS
 
@@ -86,7 +87,11 @@ que codigo SQL derrubem a base.
 
 *INSERIR (INSERT INTO)
 
+- Antes de começar devemos criar nosso objeto, no caso "Contatos", com os atributos privados que estara no pacote "modelo"
+- Criamos o pacote "dao" e pacote "testes"
+
 - CODIGO PARA INSERÇÃO DE DADOS UTILIZANDO PREPARESTATEMENT
+
 	package br.com.caelum.jdbc.teste;
 	import java.sql.Connection;
 	import java.sql.PreparedStatement;
@@ -96,7 +101,7 @@ que codigo SQL derrubem a base.
 
 	import br.com.caelum.jdbc.ConnectionFactory;
 
-	public class TesteJDBC {
+	public class InserirJDBC {
 
 		public static void main(String[] args) throws SQLException {
 			Connection con = new ConnectionFactory().getConnection();
@@ -117,9 +122,12 @@ que codigo SQL derrubem a base.
 	}
 
 
+- CODIGO PARA INSERÇÃO DE DADOS UTILIZANDO DAO
 
 *Para evitar que se repitam codigos para fazer o CRUD, o ideal e se criar uma class do SQL
 	- Por exemplo, public class ContatosSQL, que irá receber todas as consultas
+
+	-PACKAGE br.com.caelum.dao
 	
 	public class ContatoDAO {
 		private Connection con = new ConnectionFactory().getConnection();
@@ -209,6 +217,7 @@ CAPITLO 3 - JAVA EE
 *JAAS (Java autentication and Authorization Service) -> API de segurança java -> SpringSecurity
 *JTA (Java Transaction API) -> Serve para barrar transações (Foi usar o cartão e deu erro, JTA ira barrar)
 *JMS (Java Message Service) -> Utilizado para passar mensagens para outra aplicações
+*JNDI (Java Naming and Directory Interface) -> Para diretorios, de forma que eu acesse um outro método DAO de outra aplicação
 
 *SERÃO APRENDIDOS NO CURSO
 	- JSP, JPA, JDBC, EJB, JTA
@@ -232,9 +241,78 @@ CAPITLO 3 - JAVA EE
 	-JSTL
 	-JSF
 
+*UTILIZANDO O TOMCAT
+	- O Eclipse possui um plugin para utilizar o TomCat -> chamado WTP
+	- Para mapear um servidor no Eclipse, é necessario alterar a perspectiva do Eclipse para JAVA EE
+		- Ir ate Servers -> ir para Apache -> Selecionar o TomCat X.X.X -> finish
+		
+*COMEÇANDO UM PROJETO EE!!
+	- CTRL + N -> dynamic web project
+	- Verifique se o projeto puxou o tomcat
+	- next, next, marque a opção Generate web.xml deployment
+	- Clique com direito na aba servers (tomcat) -> add and remove -> selecione o projeto
+	
+*ENTENDENDO AS PASTAS CRIADAS
+	- WebContent -> ficará todos os arquivos acessiveis (bemvindo.html)
+		- WEB-INF/web.xml -> define o nome do projeto e a lista de arquivos a serem acessados
+		- lib -> ficarao os arquivos JAR
 
+*PÁGINA DINMICA E PAGINA ESTATICA
+	- Em Java para se criar uma página dinamica (pagina que se altera conforme pedido do usuario), é necessrio criar uma classe
+		capaz de gerar um conteúdo HTML ->SERVLET e responsavel para realizar esta função
+		
+	- Para criar a Servlet:
+		- Criamos um package br.com.caelum.servlet
+		- Criamos a classe minhaClasse
+		- extendemos o HttpServlet
+		- digitamos service e ctrl + space
+		- chamamos o escritor
+		
+	
+		public class OiMundo extends HttpServlet{
 
+			@Override
+			protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+				PrintWriter out = response.getWriter();
 
+				out.println("<html>");
+				out.println("<h1>Oi mundo Servlet! </h1>");
+				out.println("</html>");
 
+			}
+		}
+
+	*1º METODO
+	- O <servlet> sera informado no web.xml
+	
+		  <servlet>
+			<servlet-name>primeiraServlet</servlet-name>
+			<servlet-class>br.com.caelum.servlet.OiMundo</servlet-class>
+		  </servlet>
+
+	- O <servlet-mapping> informara qual a class servlet e onde sera acessado na URL
+		  <servlet-mapping>
+			<servlet-name>primeiraServlet</servlet-name>
+			<url-pattern>/oi/</url-pattern>
+		  </servlet-mapping>
+		  
+	*2º METODO
+	- Implementamos a servlet diretamente na class OiMundo, utilizando @webServlet
+	
+	@WebServlet ("/oi")
+	public class OiMundo extends HttpServlet{
+
+			@Override
+			protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+				PrintWriter out = response.getWriter();
+
+				out.println("<html>");
+				out.println("<h1>Oi mundo Servlet! </h1>");
+				out.println("</html>");
+
+			}
+		}
+
+	
 
 
