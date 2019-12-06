@@ -13,6 +13,21 @@ DICAS LEONARDO
 	Calendar vem do Util, o Date vem do Util e o Date vem do sql;
 	- Comece com um Calendar data = new Calendar.getInstance(); //Deste modo estará iniciando declarando "HOJE"
 	- Date dateUtil = new Date();
+	
+	- Em caso de receber a data atravês de um formulario:
+		
+		String dataTexto = req.getParameter("dataNascimento");
+		Calendar cal = Calendar.getInstance();
+
+		try {
+			Date date = new SimpleDateFormat("dd/MM/yyyy").parse(dataTexto);
+			cal.setTime(date);
+		} catch (ParseException e1) {
+			e1.printStackTrace();
+		}
+		
+		Outro exemplo
+		<td><%=new SimpleDateFormat("dd/MM/yyyy").format(c1.getDataNascimento().getTime())%></td>
 
 ESTUDAR:
 *Banco de dados nao relacional, como MongoDB (os relacionais serao o MySql, SQLServer)
@@ -52,7 +67,7 @@ public class ConnectionFactory {
 	public Connection getConnection() {
 		try {
 			return DriverManager.getConnection("jdbc:mysql://localhost/fj21", "root","");
-		} catch (SQLException e){
+		} catch (SQLException e){		
 			throw new RuntimeException(e);
 		}
 	}
@@ -313,6 +328,107 @@ CAPITLO 3 - JAVA EE
 			}
 		}
 
+*TRABALHANDO COM FORMULARIOS
+	- Quando for criado um formulrio em HTML, o <form action = "testandoServlet"> é quem ira tratar os dados, ou seja, nosso formulario
+		"adiciona-contato.html" terá o form e minha servlet chamara "public class AdicionaContato"
+	- Na servlet devemos informar @WebServlet ("/testandoServlet")data = Calendar
+	- Para pegar os dados do formulario, devemos pegar de nosso "req"
+		- Contato c1 = new Contato();
+		- c1.setNome(req.getParameter("nome"));
+	- Para escrever uma pagina HTML, utilizamos o PrintWriter out = resp.getWriter();
+		-out.println("<html>");
+		- out.println("<body>");
+		- out.println("Usuario" + c1.getNome() + "Cadastrado");
+		- out.println("</body>");data = Calendar
+		- out.println("</html>");
 	
+	
+*Inserindo dados atraves da servlet
+package br.com.caelum.agenda.servlet;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import br.com.caelum.agenda.dao.ContatoDao;
+import br.com.caelum.agenda.modelo.Contato;
+
+@WebServlet("/adicionaContato")
+public class AdicionaContatoServlet extends HttpServlet{
+
+	@Override
+	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
+		Contato c1 = new Contato();
+		c1.setNome(req.getParameter("nome"));
+		c1.setEmail(req.getParameter("email"));
+		c1.setEndereco(req.getParameter("endereco"));
+
+		String dataTexto = req.getParameter("dataNascimento");
+		Calendar cal = Calendar.getInstance();
+
+		try {
+			Date date = new SimpleDateFormat("dd/MM/yyyy").parse(dataTexto);
+			cal.setTime(date);
+		} catch (ParseException e1) {
+			e1.printStackTrace();
+		}
+
+		c1.setDataNascimento(cal);
+		
+		ContatoDao dao = new ContatoDao();
+		dao.adiciona(c1);
+		
+		PrintWriter out = resp.getWriter();
+		
+		out.println("<html>");
+		out.println("<body>");
+		out.println("Usuario" + c1.getNome() + "Cadastrado");
+		out.println("</body>");
+		out.println("</html>");
+	}
+}
 
 
+*HTTP -> GET/POST
+	- Get -> exibe no navegador os dados passados pelo formulrio
+	
+	
+* CAPITLO 6 - JSP
+	- O JSP roda no Servidor
+	- O JSP veio para trabalhar o HTML e JAVA Juntos, de modo que no precise jogar um HTML pela servlet
+	- Como?
+		<html>
+			<%
+				Sysout("escrevendo no console");	
+			%>
+		</html>
+	- O codigo acima  chamado SCriptLet, utilizado para pequenos blocos de cdigo
+	
+	- Para exibir na tela via JSP:
+		<%=c1.getNome()%> -> necessrio utilizar o =bemvindo.jsp
+		<% out.println(c1.getNome())%> -> atravês do out.println do resp
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
