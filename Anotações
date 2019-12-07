@@ -3,11 +3,28 @@ JAVA DESENVOLVIMENTO WEB
 PROFESSOR: LEONARDO -> Coordenador, arquiteto de solução
 EMAIL: leonardo.silva@caelum.com
 
-DICAS LEONARDO
-*Relacionamentos com pessoas da área;
-*Criar linkedin, extremamente importante;
-*FOCO, fds vai estudar!
-*Importando uma API -> utilizar o repositorio do Maven para procurar a API necessria -> baixa o JAR e adicionar ele através do build Path
+*PARA REVISAR:
+	-Recriar o ConnectionFactory();
+	-Recriar o Teste da conexão();
+	-Recriar as classes Contato + ContadoDAO (inserir e listar)
+	-Criar o teste para classe DAO;
+	-Realizar conexão com TOMCAT
+	-Criar 1º projeto EE;
+	-Criar Servlet que recebe de um formulário dados e realizar a inserção;
+	-Criar uma pagina JSP para listar dados e criar as exceçes no web.xml;
+
+*DICAS LEONARDO
+	-Relacionamentos com pessoas da área;
+	-Criar linkedin, extremamente importante;
+	-FOCO, fds vai estudar!
+	-Importando uma API -> utilizar o repositorio do Maven para procurar a API necessria -> baixa o JAR e adicionar ele através do build Path
+
+
+*ESTUDAR:
+	-Banco de dados nao relacional, como MongoDB (os relacionais serao o MySql, SQLServer)
+	-CALENDAR -> verificar, utilizado para funçoes de java
+	-Estudar List
+	-OMniFaces (templates)
 
 *ENTENDENDO DATE P/ MYSQL
 	Calendar vem do Util, o Date vem do Util e o Date vem do sql;
@@ -26,14 +43,11 @@ DICAS LEONARDO
 			e1.printStackTrace();
 		}
 		
-		Outro exemplo
+		Outro exemplo quando se vem direto de um Calendar
 		<td><%=new SimpleDateFormat("dd/MM/yyyy").format(c1.getDataNascimento().getTime())%></td>
 
-ESTUDAR:
-*Banco de dados nao relacional, como MongoDB (os relacionais serao o MySql, SQLServer)
-*CALENDAR -> verificar, utilizado para funçoes de java
-*Estudar List
-*OMniFaces (templates)
+		- Dado uma String -> o/ Date -> utilizase (parse)
+
 -----------------------------------------------------------------------------------------------------------
 CAPITULO 2 - BANCO DE DADOS
 
@@ -291,7 +305,7 @@ CAPITLO 3 - JAVA EE
 				PrintWriter out = response.getWriter();
 
 				out.println("<html>");
-				out.println("<h1>Oi mundo Servlet! </h1>");
+				out.println("<h1>Oi mundo Servlet! </h1>");Banco de dados nao relacional, como MongoDB (os relacionais serao o MySql, SQLServer)
 				out.println("</html>");
 
 			}
@@ -406,6 +420,7 @@ public class AdicionaContatoServlet extends HttpServlet{
 * CAPITLO 6 - JSP
 	- O JSP roda no Servidor
 	- O JSP veio para trabalhar o HTML e JAVA Juntos, de modo que no precise jogar um HTML pela servlet
+	- Scriptlet é a tag <%
 	- Como?
 		<html>
 			<%
@@ -415,9 +430,128 @@ public class AdicionaContatoServlet extends HttpServlet{
 	- O codigo acima  chamado SCriptLet, utilizado para pequenos blocos de cdigo
 	
 	- Para exibir na tela via JSP:
-		<%=c1.getNome()%> -> necessrio utilizar o =bemvindo.jsp
-		<% out.println(c1.getNome())%> -> atravês do out.println do resp
+		1º metodo <%=c1.getNome()%> -> necessrio utilizar o '='
+		2º metodo <% out.println(c1.getNome())%> -> atravês do out.println do resp
+	- Listando itens
 	
+		<%@page import="br.com.caelum.agenda.dao.ContatoDao"%>
+		<%@page import="br.com.caelum.agenda.modelo.Contato"%>
+		<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+		
+		<!DOCTYPE html>
+		<html>
+		<head>
+		<meta charset="UTF-8">
+		<title>Listando dados com scriptlet</title>
+		</head>
+		<body>
+
+			<%
+				ContatoDao dao = new ContatoDao();
+				List<Contato> lista = dao.getLista();
+			%>
+
+			<table>
+				<tr>
+					<th>Nome</th>
+					<th>Email</th>
+					<th>Endereco</th>
+					<th>Data nascimento</th>
+				</tr>
+				<%
+					for (Contato c1 : lista) {
+				%>
+
+				<tr>
+					<td><%=c1.getNome()%></td>
+					<td><%=c1.getEmail()%></td>
+					<td><%=c1.getEndereco()%></td>
+					<td><%=new SimpleDateFormat("dd/MM/yyyy").format(c1.getDataNascimento().getTime())%></td>
+				</tr>
+				<%
+					}
+				%>
+			</table>
+		</body>
+		</html>
+
+* CAPITULO 7 - CONTINUANDO JSP (TAGLIBS) -> JSTL -> ${} -> Expression Language
+	- A taglibs vem para fazer uma linguagem só (HTML + JAVA), sem precisar escrever em duas linguagens diferentes;
+	- TAGS:
+		-CORE
+			<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+		-FMT
+			<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+	
+	- ANTES (JSP)
+	<html>
+		<@pages import="br.com.caelum.agenda.dao">
+		<% Contatodao dao = new Contatodao() %>
+
+	- DEPOIS (JSTL)
+	<html>
+		<jsp: useBean id="dao" class="br.com.caelum.agenda.dao">
+	
+	- ANTES (JSP)
+		<table>
+		<%  for (Contato c1 : lista) {	%>
+			<tr>
+			 <td><%=c1.getNome()%></td>
+			 <td><%=c1.getEmail()%></td>
+			 <td><%=c1.getEndereco()%></td>
+			 <td><%=new SimpleDateFormat("dd/MM/yyyy").format(c1.getDataNascimento().getTime())%></td>
+			</tr>
+		<% } %>
+		</table>
+		
+	- DEPOIS (JSTL)
+		<table>
+		   <c:forEach var="contato" items="${dao.lista}" varStatus="id">
+			<tr bgcolor="#${id.count % 2 == 1 ? 'ffffff' : 'eeeeee' }"
+				align="center">
+
+				<td>${id.count}</td>
+				<td>${contato.nome}</td>
+				<td>${contato.email}</td>
+				<td>${contato.endereco}</td>
+				<td><fmt:formatDate value="${contato.dataNascimento.time}" pattern="dd/MM/yyyy"/>					</td>
+			</tr>
+		   </c:forEach>
+		</table>
+	
+	
+	-TAGS IMPORTANTES
+		if:
+		  <c:if test"Sua condicional">
+			exemplo:
+			<c: if test"${not empty contato.email}">
+				<td>${contato.email} </td>
+		        </c:if>
+		
+		when:
+		  <c:while test="${not empty contato.email}">
+		  	<a href="mailto:${contato.email}"> ${contato.email} </a>
+		  </c:while>
+		  
+		switch:
+		  <c:choose>
+		      <c:otherwise>
+		      </c:otherwise>
+		  </c:choose>
+				exemplo:
+				<c:choose>
+					<c:while test="${not empty contato.email}">
+		  				<a href="mailto:${contato.email}"> ${contato.email} </a>
+		  			</c:while>
+				        <c:otherwise>
+						E-mail não informado
+				        </c:otherwise>
+				 </c:choose>
+	
+		import: (importar rodapé)
+		  <c:import url="rodape.jsp">
+
+*CAPITLO 8 - TAGFILES (criando a propria Expression Language)
 	
 	
 	
