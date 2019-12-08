@@ -35,7 +35,7 @@ EMAIL: leonardo.silva@caelum.com
 		
 		String dataTexto = req.getParameter("dataNascimento");
 		Calendar cal = Calendar.getInstance();
-
+	
 		try {
 			Date date = new SimpleDateFormat("dd/MM/yyyy").parse(dataTexto);
 			cal.setTime(date);
@@ -45,8 +45,23 @@ EMAIL: leonardo.silva@caelum.com
 		
 		Outro exemplo quando se vem direto de um Calendar
 		<td><%=new SimpleDateFormat("dd/MM/yyyy").format(c1.getDataNascimento().getTime())%></td>
+		
+		- Codigos utilizados para o SimpleDateFormat
+			- Format -> recebe um Date e transforma em String
+				SimpleDateFormat s = new SimpleDateFormat("dd/MM/yyyy");
+				//con.getDataNascimento() é um Calendar que será transformado em Date atraves do getTime
+				s.format(con.getDataNascimento().getTime()));
+			
+			- Parse -> recebe uma String e transforma em Date
+				- getTime (classe Calendar) -> repassa a data do sistema com um tipo Date (deve se utilizar com um calendar)
+					SimpleDateFormat s = new SimpleDateFormat("dd/MM/yy");
+					Calendar cal = Calendar.getInstance(); 
+					System.out.println(s.format(cal.getTime()));
 
-		- Dado uma String -> o/ Date -> utilizase (parse)
+	
+		- Transformar um Date p/ Calendar (a função setTime recebe um Date e retorna um Calendar pela palavra cal)
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(rs.getDate("dataNascimento"));
 
 -----------------------------------------------------------------------------------------------------------
 CAPITULO 2 - BANCO DE DADOS
@@ -230,7 +245,7 @@ que codigo SQL derrubem a base.
 			System.out.println("Nome = " + contato.getNome());
 			System.out.println("Email = " + contato.getEmail());
 			System.out.println("Endereco = " + contato.getEndereco());
-			System.out.println("Data = " + contato.getDataNasc());
+			System.out.println("Data = " + contato.getDataNasc().getTime());
 			System.out.println("---------------------------------");
 		}	
 	}
