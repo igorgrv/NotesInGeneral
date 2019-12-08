@@ -28,6 +28,14 @@ EMAIL: leonardo.silva@caelum.com
 
 *ENTENDENDO DATE P/ MYSQL
 	Calendar vem do Util, o Date vem do Util e o Date vem do sql;
+	*ORDEM DE DECLARAÇÃO
+		java.sql.Date (ex.: stmt.setDate)
+			∟ java.util.Date (get.time() -> função do Calendar)
+				∟ Calendar
+				
+		Calendar (cal.setTime(rs.getDate))
+		    ∟ java.util.Date
+		
 	- Comece com um Calendar data = new Calendar.getInstance(); //Deste modo estará iniciando declarando "HOJE"
 	- Date dateUtil = new Date();
 	
@@ -57,6 +65,7 @@ EMAIL: leonardo.silva@caelum.com
 					SimpleDateFormat s = new SimpleDateFormat("dd/MM/yy");
 					Calendar cal = Calendar.getInstance(); 
 					System.out.println(s.format(cal.getTime()));
+				- getTimeInMiliSegunds (classe Calendar) -> repassa um long Date
 
 	
 		- Transformar um Date p/ Calendar (a função setTime recebe um Date e retorna um Calendar pela palavra cal)
