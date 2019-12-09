@@ -18,13 +18,12 @@ EMAIL: leonardo.silva@caelum.com
 	-Criar linkedin, extremamente importante;
 	-FOCO, fds vai estudar!
 	-Importando uma API -> utilizar o repositorio do Maven para procurar a API necessria -> baixa o JAR e adicionar ele através do build Path
-
+	
 
 *ESTUDAR:
 	-Banco de dados nao relacional, como MongoDB (os relacionais serao o MySql, SQLServer)
-	-CALENDAR -> verificar, utilizado para funçoes de java
-	-Estudar List
-	-OMniFaces (templates)
+	-PrimeFaces (templates)
+	
 
 *ENTENDENDO DATE P/ MYSQL
 	Calendar vem do Util, o Date vem do Util e o Date vem do sql;
@@ -55,6 +54,16 @@ EMAIL: leonardo.silva@caelum.com
 		<td><%=new SimpleDateFormat("dd/MM/yyyy").format(c1.getDataNascimento().getTime())%></td>
 		
 		- Codigos utilizados para o SimpleDateFormat
+			String dataTexto = req.getParameter("dataNasc");
+			Calendar cal = Calendar.getInstance();
+			Date date;
+			try {
+				date = new SimpleDateFormat("dd/MM/yyyy").parse(dataTexto);
+				cal.setTime(date);
+			} catch (ParseException e) {
+				throw new RuntimeException(e);
+			}
+			
 			- Format -> recebe um Date e transforma em String
 				SimpleDateFormat s = new SimpleDateFormat("dd/MM/yyyy");
 				//con.getDataNascimento() é um Calendar que será transformado em Date atraves do getTime
@@ -104,6 +113,7 @@ public class ConnectionFactory {
 
 	public Connection getConnection() {
 		try {
+			Class.forName("com.mysql.jdbc.Driver");
 			return DriverManager.getConnection("jdbc:mysql://localhost/fj21", "root","");
 		} catch (SQLException e){		
 			throw new RuntimeException(e);
@@ -329,7 +339,7 @@ CAPITLO 3 - JAVA EE
 				PrintWriter out = response.getWriter();
 
 				out.println("<html>");
-				out.println("<h1>Oi mundo Servlet! </h1>");Banco de dados nao relacional, como MongoDB (os relacionais serao o MySql, SQLServer)
+				out.println("<h1>Oi mundo Servlet! </h1>");
 				out.println("</html>");
 
 			}
@@ -377,7 +387,7 @@ CAPITLO 3 - JAVA EE
 		-out.println("<html>");
 		- out.println("<body>");
 		- out.println("Usuario" + c1.getNome() + "Cadastrado");
-		- out.println("</body>");data = Calendar
+		- out.println("</body>");
 		- out.println("</html>");
 	
 	
