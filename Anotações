@@ -23,7 +23,13 @@ EMAIL: leonardo.silva@caelum.com
 *ESTUDAR:
 	-Banco de dados nao relacional, como MongoDB (os relacionais serao o MySql, SQLServer)
 	-PrimeFaces (templates)
-	
+	- DAO, e uma camada que possui mtodos que iram interagir com o banco de dados
+
+*REVISÃO:
+	- SERVLET
+		- O formulário recebe um action, que executará dentro de um .jsp através de um GET ou POST
+			- O .jsp ir processar o service atraves do req e resp, criando os objetos Modelo e DAO
+			- Escrevo o construtor para poder retornar ao usurio que aconteceu algo na requisição
 
 *ENTENDENDO DATE P/ MYSQL
 	Calendar vem do Util, o Date vem do Util e o Date vem do sql;
@@ -512,19 +518,18 @@ public class AdicionaContatoServlet extends HttpServlet{
 * CAPITULO 7 - CONTINUANDO JSP (TAGLIBS) -> JSTL -> ${} -> Expression Language
 	- A taglibs vem para fazer uma linguagem só (HTML + JAVA), sem precisar escrever em duas linguagens diferentes;
 	- TAGS:
-		-CORE
+		-CORE (forEach, if, while, import)
 			<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-		-FMT
+		-FMT (formatDate)
 			<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 	
 	- ANTES (JSP)
 	<html>
 		<@pages import="br.com.caelum.agenda.dao">
 		<% Contatodao dao = new Contatodao() %>
-
 	- DEPOIS (JSTL)
 	<html>
-		<jsp: useBean id="dao" class="br.com.caelum.agenda.dao">
+		<jsp:useBean id="dao" class="br.com.caelum.agenda.dao">
 	
 	- ANTES (JSP)
 		<table>
@@ -536,14 +541,12 @@ public class AdicionaContatoServlet extends HttpServlet{
 			 <td><%=new SimpleDateFormat("dd/MM/yyyy").format(c1.getDataNascimento().getTime())%></td>
 			</tr>
 		<% } %>
-		</table>
-		
+		</table>	
 	- DEPOIS (JSTL)
 		<table>
 		   <c:forEach var="contato" items="${dao.lista}" varStatus="id">
 			<tr bgcolor="#${id.count % 2 == 1 ? 'ffffff' : 'eeeeee' }"
 				align="center">
-
 				<td>${id.count}</td>
 				<td>${contato.nome}</td>
 				<td>${contato.email}</td>
@@ -586,17 +589,57 @@ public class AdicionaContatoServlet extends HttpServlet{
 		  <c:import url="rodape.jsp">
 
 *CAPITLO 8 - TAGFILES (criando a propria Expression Language)
+	- As TagFiles vieram para substituir campos repetitivos. Por ex.: se possuirmos inputs do mesmo formato, podemos utilizar
+		uma taglib própria! - Também, e muito comum se utilizar tagLibs para validações em Javascript
+	- Exemplo:
+		ANTES (por padrão se preenche sempre o id e o for:
+			<label for="nomeContato">Nome</label> 		<input type="text" name="nome" id="nomeContato">
+			<label for="nomeEmail">Email:</label> 		<input type="text" name="email" id="nomeEmail">
+			<label for="nomeEndereco">Endereco:</label> 	<input type="text" name="endereço" id="nomeEndereco">
+		DEPOIS:
+			<igor id="nomeContato"> //terá a label e o input
+			<igor id="nomeEmail">
+			<igor id="nomeEndereco">
+
+		ANTES (Utilizando um Datepicker do jQuery para cada campo):
+			<input id="dataNascimento" type="text>
+			<script>
+				$("#dataNascimento").datepicker();
+			</script>
+		DEPOIS (c/ tagFile):
+			<igor id="dataNascimento" />
 	
+	-Como criamos uma tagFile?
+		- As tagFiles devem estar dentro de WEB-INF/tags/ (se no existe a pasta tags, deve ser criada)
+		- Referenciamos de inicio <%@taglib %>
+			- Ex.: <%@taglib tagdir="/WEB-INF/tags" prefix="igor" %>
+		- Dentro da pasta tags, devemos criar nosso arquivo .tag que será usado, como:
+			- <igor:campoData> -> ou seja o arquivo chamará campoData.tag
+			
+	-Tag para o calendário (campoData.tag -> Dentro WEB-INF/tags/)
+		//Toda vez que chamarmos a tag <igor:campoData id="xxxxxx" /> 
+		//irá aparecer um input com Calendario
+		<%@ attribute name="id" required="true" %>
+		
+		<input type="text" id="${id}" name="${id}" />
+		<script>
+			$("#${id}"}.datepicker({dateFormat: 'dd/mm/yy'});
+		</script>
+	-Para página JSP
+		//Ao digitar <igor:campoData /> irá aparecer o input com o datePicker do JQuery
+		<%@taglib tagdir="/WEB-INF/tags" prefix="igor" %>
+		<form action="adicionaContato">
+			<igor:campoData id="dataNascimento" />
+		</form>
+
+*CAPITULO 9 - MVC (Model View Controller)
+	MODEL: Fica as classes DAO/BEANS
+	VIEW: Fica a resposta ao usuario	
+	CONTROLLER: Fica a Servlet
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	FLUXO:
+		CONTROLLER recebe de um formulario, que entao ira chamar as camadas DAO (logo ira chamar o MODEL) e então
+		retornará ao CONTROLLER a resposta para ser enviado a uma VIEW (tela de resposta ao usuario);
 	
 	
 	
