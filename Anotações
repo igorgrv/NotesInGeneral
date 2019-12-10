@@ -2,8 +2,10 @@ JAVA DESENVOLVIMENTO WEB
 -----------------------------------------------------------------------------------------------------------
 PROFESSOR: LEONARDO -> Coordenador, arquiteto de solução
 EMAIL: leonardo.silva@caelum.com
+http://dontpad.com/caelum-javeiros
 
 *PARA REVISAR:
+	-DAO, e uma camada que possui mtodos que iram interagir com o banco de dados
 	-Recriar o ConnectionFactory();
 	-Recriar o Teste da conexão();
 	-Recriar as classes Contato + ContadoDAO (inserir e listar)
@@ -18,13 +20,14 @@ EMAIL: leonardo.silva@caelum.com
 	-Criar linkedin, extremamente importante;
 	-FOCO, fds vai estudar!
 	-Importando uma API -> utilizar o repositorio do Maven para procurar a API necessria -> baixa o JAR e adicionar ele através do build Path
-	
 
 *ESTUDAR:
 	-Banco de dados nao relacional, como MongoDB (os relacionais serao o MySql, SQLServer)
 	-PrimeFaces (templates)
-	- DAO, e uma camada que possui mtodos que iram interagir com o banco de dados
-
+	-GoogleVision (API)
+	-Google Cloud Platform/AWS
+	-JasperReport (iReport) -> para criar PDF, WORD, XLS
+	
 *REVISÃO:
 	- SERVLET
 		- O formulário recebe um action, que executará dentro de um .jsp através de um GET ou POST
@@ -53,7 +56,7 @@ EMAIL: leonardo.silva@caelum.com
 			Date date = new SimpleDateFormat("dd/MM/yyyy").parse(dataTexto);
 			cal.setTime(date);
 		} catch (ParseException e1) {
-			e1.printStackTrace();
+			e1.printStackTrace();RemoveContatoLogic&id=9
 		}
 		
 		Outro exemplo quando se vem direto de um Calendar
@@ -74,7 +77,7 @@ EMAIL: leonardo.silva@caelum.com
 				SimpleDateFormat s = new SimpleDateFormat("dd/MM/yyyy");
 				//con.getDataNascimento() é um Calendar que será transformado em Date atraves do getTime
 				s.format(con.getDataNascimento().getTime()));
-			
+			<!--
 			- Parse -> recebe uma String e transforma em Date
 				- getTime (classe Calendar) -> repassa a data do sistema com um tipo Date (deve se utilizar com um calendar)
 					SimpleDateFormat s = new SimpleDateFormat("dd/MM/yy");
@@ -641,5 +644,46 @@ public class AdicionaContatoServlet extends HttpServlet{
 		CONTROLLER recebe de um formulario, que entao ira chamar as camadas DAO (logo ira chamar o MODEL) e então
 		retornará ao CONTROLLER a resposta para ser enviado a uma VIEW (tela de resposta ao usuario);
 	
-	
-	
+	- Exemplo do funcionamento:
+		- Uma ServLet (Controller), com códigos JAVA -> br.com.caelum.agenda.servlet -> irá mandar atraves
+			do RequestDispacher para um View (.jsp)
+		
+		//AdicionaContatoServlet.java (Controller)
+		WebServlet("/adicionaContato")
+		public class AdicionaContatoServlet extends HttpServlet{
+
+			@Override
+			protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+				Contato c1 = new Contato();
+				c1.setNome(req.getParameter("nome"));
+				c1.setEmail(req.getParameter("email"));
+				c1.setEndereco(req.getParameter("endereco"));
+
+				String dataTexto = req.getParameter("dataNascimento");
+				Calendar cal = Calendar.getInstance();
+
+				try {
+					Date date = new SimpleDateFormat("dd/MM/yyyy").parse(dataTexto);
+					cal.setTime(date);
+					c1.setDataNascimento(cal);
+				} catch (ParseException e1) {
+					e1.printStackTrace();
+				}
+
+				ContatoDao dao = new ContatoDao();
+				dao.adiciona(c1);
+				RequestDispatcher rd = req.getRequestDispatcher("/adiciona-contato-view.jsp");
+				rd.forward(req, resp);
+			}
+		}
+		
+		//View -> adiciona-contato-view.jsp -> chama atraves do param.
+		
+		<%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8"%>
+		<!DOCTYPE html>
+		<html>
+			<body>
+				<h2>Usuario ${param.nome} adicionado com sucesso!</h2>
+			</body>
+		</html>
