@@ -90,7 +90,7 @@ http://dontpad.com/caelum-javeiros
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(rs.getDate("dataNascimento"));
 
------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------
 CAPITULO 2 - BANCO DE DADOS
 
 *Para conectar a um banco, temos algumas premissas:
@@ -277,7 +277,7 @@ que codigo SQL derrubem a base.
 			System.out.println("---------------------------------");
 		}	
 	}
-
+----------------------------------------------------------------------------------------------------------------------------------------------
 CAPITLO 3 - JAVA EE
 - O Java EE e uma especificacao, um grande PDF padronizando servidores e etc.
 
@@ -459,7 +459,7 @@ public class AdicionaContatoServlet extends HttpServlet{
 *HTTP -> GET/POST
 	- Get -> exibe no navegador os dados passados pelo formulrio
 	
-	
+----------------------------------------------------------------------------------------------------------------------------------------------	
 * CAPITLO 6 - JSP
 	- O JSP roda no Servidor
 	- O JSP veio para trabalhar o HTML e JAVA Juntos, de modo que no precise jogar um HTML pela servlet
@@ -517,7 +517,7 @@ public class AdicionaContatoServlet extends HttpServlet{
 			</table>
 		</body>
 		</html>
-
+----------------------------------------------------------------------------------------------------------------------------------------------
 * CAPITULO 7 - CONTINUANDO JSP (TAGLIBS) -> JSTL -> ${} -> Expression Language
 	- A taglibs vem para fazer uma linguagem só (HTML + JAVA), sem precisar escrever em duas linguagens diferentes;
 	- TAGS:
@@ -590,7 +590,7 @@ public class AdicionaContatoServlet extends HttpServlet{
 	
 		import: (importar rodapé)
 		  <c:import url="rodape.jsp">
-
+----------------------------------------------------------------------------------------------------------------------------------------------
 *CAPITLO 8 - TAGFILES (criando a propria Expression Language)
 	- As TagFiles vieram para substituir campos repetitivos. Por ex.: se possuirmos inputs do mesmo formato, podemos utilizar
 		uma taglib própria! - Também, e muito comum se utilizar tagLibs para validações em Javascript
@@ -634,7 +634,7 @@ public class AdicionaContatoServlet extends HttpServlet{
 		<form action="adicionaContato">
 			<igor:campoData id="dataNascimento" />
 		</form>
-
+----------------------------------------------------------------------------------------------------------------------------------------------
 *CAPITULO 9 - MVC (Model View Controller)
 	MODEL: Fica as classes DAO/BEANS
 	VIEW: Fica a resposta ao usuario	
@@ -644,9 +644,9 @@ public class AdicionaContatoServlet extends HttpServlet{
 		CONTROLLER recebe de um formulario, que entao ira chamar as camadas DAO (logo ira chamar o MODEL) e então
 		retornará ao CONTROLLER a resposta para ser enviado a uma VIEW (tela de resposta ao usuario);
 	
-	- Exemplo do funcionamento:
-		- Uma ServLet (Controller), com códigos JAVA -> br.com.caelum.agenda.servlet -> irá mandar atraves
-			do RequestDispacher para um View (.jsp)
+	- 1º Exemplo do funcionamento (utilizando a servlet como Controller):
+		- Uma ServLet (Controller), com códigos JAVA (br.com.caelum.agenda.servlet) -> irá mandar atraves
+			do RequestDispacher para um View (.jsp) o resultado
 		
 		//AdicionaContatoServlet.java (Controller)
 		WebServlet("/adicionaContato")
@@ -687,3 +687,134 @@ public class AdicionaContatoServlet extends HttpServlet{
 				<h2>Usuario ${param.nome} adicionado com sucesso!</h2>
 			</body>
 		</html>
+		
+	* Temos um formulario que tera diversas opções (adicionar, remover, listar, atualizar), precisamos que funcione!
+	- 1 º Método SEM MVC:
+		- Precisariamos receber do formulario as acoes Add, Remov, List e etc e para cada acao seria possivel trata-las
+			com ifs
+
+		@webServlet("/sistema")
+		String acao = req.getParameter("logica"); //recebe do formulario
+		ContatoDAO dao = new ContatoDAO();
+
+		if(acao.equals("adicionar")){
+			//logica para Adicionar
+		} else if (acao.equals("listar") {
+			//logica para listar
+		}
+
+		- Este mtodo faz com que seja gerado muitos ifs/elseifs
+
+
+	-2º Método SEM MVC:
+		- Poderiamos criar classes (AdicionaContato, RemoveContato) com um metodo executar em todas elas (para isto criariamos uma interface)
+
+		if(acao.equals("adicionar")){
+			new AdicionaContato().executa(req, res);
+		} else if (acao.equals("listar") {
+			new ListarContato().executa(req, res);
+		}
+
+		-Este metodo ainda fara com q seja necessario diversos ifs e ainda fara com que criassemos uma servlet (Model) para cada item;
+		
+	-MELHORANDO... PARA O MVC
+		- Começaremos c/ o CONTROLLER (LogicaControllerServlet.java) -> generalizando as classes;
+			
+			String nomeDaClasse = req.getParameter("acao");
+			new nomeDaClasse().executa(req, res);																																		
+		
+		- Porem este codigo não compila, devido a nomeDaClasse ser uma String recebendo um objeto, para corrigir isto
+			podemos utilizar a classe Class com método forName (Class.forName("localizacao da classe"))
+			
+			String nomeDaClasse = "br.com.agenda.mvc.logica."+ req.getParameter("acao");
+			Class<?> classe = Class.forName(nomeDaClasse);
+		
+		- Antes de terminar nosso Controller, iremos criar nossa logica MODEL BASE LogicaModel (interface)
+		- Criando uma interface... (a interface ira ajudar a forcar nossos models a executar o codigo)
+			//A execucao deve ser uma String pois ira retornar a pagina
+			public interface Logica {--------------------------------------------------------------------------------------------------------------------------------------------
+				String executa (HttpServletRequest req, HttpServletResponse res) throws Exception;
+			}
+		
+		- Voltamos ao CONTROLLER LogicaControllerServlet.java e iremos instanciar um objeto
+		- Para instanciar o objeto "classe" iremos ter que chamar o construtor .getDeclaredConstructor().newInstance();
+			
+				LogicaModel logica = (LogicaModel) classe.getDeclaredConstructor().newInstance();
+			//pegaremos a pagina para poder repassar peo Dispatcher
+				String pagina = logica.executa(req, resp);
+			//enviando via Dispatcher
+			//podiamos enviar somente uma pagina, exemplo Adicionar, porem não teriamos algo generico
+			//req.getRequestDispatcher("adicionar-contato.jsp").forward(req, resp);
+				req.getRequestDispatcher(pagina).forward(req, resp);
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+- Temos um problema ao deixar as telas na WEbCOntent, pois o usuario pode ter acesso atraves do url
+	, para restringir isto, iremos retirar as Views e colocar em WEB-INF/JSP(criar a pasta).
+	
+	- Ao fazer isto, se o usuario tentar acessar ira retornar erro 404.
+	*Porem ao mover as jsps sera necessario alterar o caminho dos Model (return "/WEB-INF/JSP/lista-contatos-view.jsp";)
+	-No caso do remover, sera necessario passar "return "mvc?logica=ListaContatosLogic";"
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+*CAPITLO 10 - FILTROS (javax.servlet.filter)
+	-O filtro se faz muito necessário pois ele evita que o servidor fique carregado, como?
+		- A requisiçao do usuario irá chegar e antes mesmo de chegar ao Controller, ja sera barrada!
+		
+	-Como criar um filtro? Teremos de "implementar" de "Filter"
+	
+	@WebFilter("/*")
+	public class MeuFiltro implements Filter {
+		public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain){
+			//Passa pela porta e envia os dados para requisição e resposta
+			chain.doFilter(req, res);
+		}
+	}
+
+	-Lembrando que o Filter pode ser utilizado como genérico, basta alterar o @WebFilter ("/*.jsp")
+	*Relembrando
+		//getParameter é para String
+		//getAttribute é para objeto
+		
+	-Aplicando na prática
+		-Criando o Filter (br.com.caelum.agenda.filter)
+		
+			@WebFilter("/*")
+			public class FiltroConexao implements Filter{
+
+				public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+					try {
+						Connection con = new ConnectionFactory().getConnection();
+						//setAttribute insere no request ("String", object)
+						req.setAttribute("con", con);
+						chain.doFilter(req, res);
+						con.close();			
+					} catch (SQLException e) {
+						throw new RuntimeException("Erro na conexao: " + e);
+					}
+				}
+			}
+			
+		-Aplicando o Filtro em um Model (RemoverContatoLogic)
+		
+			public class RemoveContatoLogic implements LogicaModel {
+				public String executa(HttpServletRequest req, HttpServletResponse res) {
+					//parseLong para converter a String para o long
+					long id = Long.parseLong(req.getParameter("id"));
+					Contato contato = new Contato();
+					contato.setId(id);
+
+					//getParameter é para String
+					//getAttribute é para objeto
+					Connection con = (Connection) req.getAttribute("con");
+					ContatoDao dao = new ContatoDao(con);
+					dao.exclui(contato);
+
+					System.out.println("Excluindo contato... " + contato.getId());
+					return "mvc?logica=ListaContatosLogic";
+					}
+			}
+
+
+
+
+
