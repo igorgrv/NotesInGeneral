@@ -24,7 +24,7 @@ http://dontpad.com/caelum-javeiros
 *ESTUDAR:
 	-Banco de dados nao relacional, como MongoDB (os relacionais serao o MySql, SQLServer)
 	-PrimeFaces (templates)
-	-GoogleVision (API)
+	-GoogleVision (API)agendas/mvc?logica=ListaContatosLogic
 	-Google Cloud Platform/AWS
 	-JasperReport (iReport) -> para criar PDF, WORD, XLS
 	
@@ -814,7 +814,8 @@ public class AdicionaContatoServlet extends HttpServlet{
 					}
 			}
 
-
+*CAPITULO 11 - SPRING!!
+	*Codigo base
 
 
 
