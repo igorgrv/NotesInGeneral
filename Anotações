@@ -815,7 +815,106 @@ public class AdicionaContatoServlet extends HttpServlet{
 			}
 
 *CAPITULO 11 - SPRING!!
-	*Codigo base
+	*Codigo base - WEB.xml
+		
+		<servlet>
+			<servlet-name>springmvc</servlet-name>
+			<servlet-class> org.springframework.web.servlet.DispatcherServlet</servlet-class>
+			<init-param>
+				<param-name>contextConfigLocation</param-name>
+				<param-value> /WEB-INF/spring-context.xml</param-value>
+			</init-param>
+			<load-on-startup>1</load-on-startup>
+		</servlet>
+		
+		<servlet-mapping>
+				<servlet-name>springmvc</servlet-name>
+				<url-pattern>/</url-pattern>
+		</servlet-mapping>
+	
+	*Codigo base - spring-context.xml
+		<?xml version="1.0" encoding="UTF-8"?>
+		<beans xmlns="http://www.springframework.org/schema/beans"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xmlns:context="http://www.springframework.org/schema/context"
+			xmlns:mvc="http://www.springframework.org/schema/mvc" 
+			xmlns:tx="http://www.springframework.org/schema/tx"
+			xsi:schemaLocation="http://www.springframework.org/schema/mvc 
+					http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+					http://www.springframework.org/schema/beans 
+					http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+					http://www.springframework.org/schema/context 
+					http://www.springframework.org/schema/context/spring-context-4.0.xsd
+					http://www.springframework.org/schema/tx 
+					http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+					http://www.springframework.org/schema/aop
+					http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+			
+// ---------------------irá scanear onde ficará a aplicação ------------------------------
+			<context:component-scan base-package="br.com.caelum.tarefas" />
+			<mvc:annotation-driven />
+			
+// ---------------------irá dizer onde ficara as pastas ------------------------------			
+			<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+				<property name="prefix" value="/WEB-INF/views/" />
+				<property name="suffix" value=".jsp" />
+			</bean>
+		</beans>
+		
+	*Código base - Controller
+		package br.com.caelum.tarefas.controller;
+		import org.springframework.stereotype.Controller;
+		import org.springframework.web.bind.annotation.RequestMapping;
+		
+		@Controller
+		public class OlaMundoController {
+			
+			@RequestMapping("/olaMundoSpring")
+			public String execute() {
+				System.out.println("Executando a lógica com Spring MVC");
+				//Ja entende que e uma pagina .jsp
+				return "ok";
+			}
+		}
 
 
+*COmeça com o formulrio informando a action que será repassada para o controlador
+*Tendo a action, iremos criar o Controlador
+	- O controlador ira ser chamado pela tag @Controller
+	- Para mapear os métodos, utilizaremos a tag @RequestMapping("/actionDoForm")
+	- O Spring ja entende o "name" do formulario caso o name esteja igual a variavel do Modelo
+	
+-BEANVALIDATION (necessrio utilizar 4 jars)
+*Para validar formulários, utilizamos o método BEANValidation, como?
+	-Nos "modelos" (Tarefa por exemplo), temos de por a anotaço @NotNull (ou @Size(min=5)), em cima da variável.
+		- @NotNull
+		  private String text;
+	-Porem para o Construtor, precisamos informar que temos validações a serem feitas, com o @valid e BindingResult result
+		
+		public String adiciona(@valid Tarefa tarefa, BindingResult result){
+			if(result.HasFieldErrors("descricao")) {
+				return "tarefa/formulario";
+			}
+		}
+	- Outra forma, podemos validar todos os campos, exemplo
+		@NotNull
+		private String text;
+		
+		@NotNull
+		private String testando;
+		
+		*Para testar ambos, colocamos um generico, utilizando "HasErrors"
+		public String adiciona(@valid Tarefa tarefa, BindingResult result){
+			if(result.HasErrors()) {
+				return "tarefa/formulario";
+			}
+		}
+	
+	-Podemos também passar uma mensagem do erro @Size(min=5, message="Minimo de 5 caracteres")
 
+	-Dentro do .jsp(nosso html) teremos que informar onde aparecer o erro
+		<h2 style="color: red"><form:errors path="tarefa.descricao" cssStyle=""/></h2>
+		<form action="AdicionaTarefa" method="post">
+
+	-Forward = é para o lado do servidor (interno)
+	-Redirect = a view ira para o navegador
