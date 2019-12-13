@@ -878,7 +878,7 @@ public class AdicionaContatoServlet extends HttpServlet{
 		}
 
 
-*COmeça com o formulrio informando a action que será repassada para o controlador
+*Começa com o formulrio informando a action que será repassada para o controlador
 *Tendo a action, iremos criar o Controlador
 	- O controlador ira ser chamado pela tag @Controller
 	- Para mapear os métodos, utilizaremos a tag @RequestMapping("/actionDoForm")
@@ -918,3 +918,43 @@ public class AdicionaContatoServlet extends HttpServlet{
 
 	-Forward = é para o lado do servidor (interno)
 	-Redirect = a view ira para o navegador
+
+
+JQUERY (AJAX)
+	-Ele roda no navegador, encaminhando uma requisição para o servidor e retornar para o ajax um sucesso ou erro
+	
+	Relembrando JQuery
+		- Para pegar por ID $('#')
+		- Para alterar texto HTML $('#igor').HTML('testando');
+		- Esconder campo $('#igor').hide(); inverso show();
+		
+	Removendo a tr mais proxima:
+		function removeAgora(id){
+		//removeTarefa fica no Controller
+		$.post('removeTarefa',
+				{'id':id},
+				function(){
+					$('#remove_'+id).closest("tr").hide();
+				});
+		}
+	
+	Para o JQuery funcionar no navegador, precisamos que seja utilizada em cima do método Controller @ResponseBody
+	
+*CAPITULO 12 - USUARIO LOGIN/SENHA
+	- Principio é usar uma session (para isto precisa ser configurado no web.xml)
+	
+	<session-config>
+		<session-timeout>3</session-timeout>
+	</session-config>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
