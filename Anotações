@@ -998,4 +998,24 @@ public class AdicionaContatoServlet extends HttpServlet{
 		@Controller -> informa que se trata de um controlador
 	
 	
+*CAPITULO 14 - HIBERNATE E JPA
+	- O conceito de JPA surgiu com a ideia de conversar "melhor" Java com SQL, de forma que nao fosse necessario
+		ficar utilizando ResultSet e etc
+	- Uma das implementaçoes da JPA e o HIBERNATE ORM (object relational of mapping)
+	* Hibernate mantido pela redhat
+	- Para implementar o hibernate, precisamos transformar a classe de modelo em uma entidade, ou seja, ele pega uma classe
+		e cria uma tabela (especificando com @, exemplo @entity);
+		- Exemplos:
+			@Entity
+			@Id | @GeneratedValue
+			@Column(nullable = false) | @Size(min=10, max=256, message = "Deu ruim")
+			@DateTimeFOrmat(pattern="dd/MM/yyyy") | @Temporal (TemporalType.DATE)
+	
+	
+	
+	
+	
+	
+	
+	
 	
