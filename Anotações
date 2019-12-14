@@ -277,8 +277,8 @@ que codigo SQL derrubem a base.
 			System.out.println("---------------------------------");
 		}	
 	}
-----------------------------------------------------------------------------------------------------------------------------------------------
-CAPITLO 3 - JAVA EE
+	
+//----------------------------CAPITLO 3 - JAVA EE---------------------------------------------------------------------------------------------
 - O Java EE e uma especificacao, um grande PDF padronizando servidores e etc.
 
 *JSF (Java Server Faces) -> [voltado ao desktop, app de mercados]
@@ -459,8 +459,7 @@ public class AdicionaContatoServlet extends HttpServlet{
 *HTTP -> GET/POST
 	- Get -> exibe no navegador os dados passados pelo formulrio
 	
-----------------------------------------------------------------------------------------------------------------------------------------------	
-* CAPITLO 6 - JSP
+//--------------------------- CAPITLO 6 - JSP----------------------------------------------------------------------------------	
 	- O JSP roda no Servidor
 	- O JSP veio para trabalhar o HTML e JAVA Juntos, de modo que no precise jogar um HTML pela servlet
 	- Scriptlet é a tag <%
@@ -517,8 +516,8 @@ public class AdicionaContatoServlet extends HttpServlet{
 			</table>
 		</body>
 		</html>
-----------------------------------------------------------------------------------------------------------------------------------------------
-* CAPITULO 7 - CONTINUANDO JSP (TAGLIBS) -> JSTL -> ${} -> Expression Language
+//------------------- CAPITULO 7 - CONTINUANDO JSP (TAGLIBS) -> JSTL -> ${} -> Expression Language------------------------------------------------------------------
+
 	- A taglibs vem para fazer uma linguagem só (HTML + JAVA), sem precisar escrever em duas linguagens diferentes;
 	- TAGS:
 		-CORE (forEach, if, while, import)
@@ -590,8 +589,8 @@ public class AdicionaContatoServlet extends HttpServlet{
 	
 		import: (importar rodapé)
 		  <c:import url="rodape.jsp">
-----------------------------------------------------------------------------------------------------------------------------------------------
-*CAPITLO 8 - TAGFILES (criando a propria Expression Language)
+		  
+// ---------------------------*CAPITLO 8 - TAGFILES (criando a propria Expression Language)------------------------------------------------------------------------
 	- As TagFiles vieram para substituir campos repetitivos. Por ex.: se possuirmos inputs do mesmo formato, podemos utilizar
 		uma taglib própria! - Também, e muito comum se utilizar tagLibs para validações em Javascript
 	- Exemplo:
@@ -634,8 +633,8 @@ public class AdicionaContatoServlet extends HttpServlet{
 		<form action="adicionaContato">
 			<igor:campoData id="dataNascimento" />
 		</form>
-----------------------------------------------------------------------------------------------------------------------------------------------
-*CAPITULO 9 - MVC (Model View Controller)
+		
+//------------------------------*CAPITULO 9 - MVC (Model View Controller)----------------------------------------------------------------------------------------
 	MODEL: Fica as classes DAO/BEANS
 	VIEW: Fica a resposta ao usuario	
 	CONTROLLER: Fica a Servlet
@@ -732,7 +731,7 @@ public class AdicionaContatoServlet extends HttpServlet{
 		- Antes de terminar nosso Controller, iremos criar nossa logica MODEL BASE LogicaModel (interface)
 		- Criando uma interface... (a interface ira ajudar a forcar nossos models a executar o codigo)
 			//A execucao deve ser uma String pois ira retornar a pagina
-			public interface Logica {--------------------------------------------------------------------------------------------------------------------------------------------
+			public interface Logica {
 				String executa (HttpServletRequest req, HttpServletResponse res) throws Exception;
 			}
 		
@@ -755,8 +754,8 @@ public class AdicionaContatoServlet extends HttpServlet{
 	*Porem ao mover as jsps sera necessario alterar o caminho dos Model (return "/WEB-INF/JSP/lista-contatos-view.jsp";)
 	-No caso do remover, sera necessario passar "return "mvc?logica=ListaContatosLogic";"
 
-----------------------------------------------------------------------------------------------------------------------------------------------
-*CAPITLO 10 - FILTROS (javax.servlet.filter)
+
+//---------------------------*CAPITLO 10 - FILTROS (javax.servlet.filter) --------------------------------------------------------------------------------------------
 	-O filtro se faz muito necessário pois ele evita que o servidor fique carregado, como?
 		- A requisiçao do usuario irá chegar e antes mesmo de chegar ao Controller, ja sera barrada!
 		
@@ -813,8 +812,8 @@ public class AdicionaContatoServlet extends HttpServlet{
 					return "mvc?logica=ListaContatosLogic";
 					}
 			}
-
-*CAPITULO 11 - SPRING!!
+			
+// --------------------- *CAPITULO 11 - SPRING!! ----------------------------------------------------------------
 	*Codigo base - WEB.xml
 		
 		<servlet>
@@ -850,11 +849,11 @@ public class AdicionaContatoServlet extends HttpServlet{
 					http://www.springframework.org/schema/aop
 					http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
 			
-// ---------------------irá scanear onde ficará a aplicação ------------------------------
+// ---------------------irá scanear onde ficará a aplicação -----------------------------------------------------------
 			<context:component-scan base-package="br.com.caelum.tarefas" />
 			<mvc:annotation-driven />
 			
-// ---------------------irá dizer onde ficara as pastas ------------------------------			
+// ---------------------irá dizer onde ficara as pastas -------------------------------------------------------------------	
 			<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 				<property name="prefix" value="/WEB-INF/views/" />
 				<property name="suffix" value=".jsp" />
@@ -884,7 +883,7 @@ public class AdicionaContatoServlet extends HttpServlet{
 	- Para mapear os métodos, utilizaremos a tag @RequestMapping("/actionDoForm")
 	- O Spring ja entende o "name" do formulario caso o name esteja igual a variavel do Modelo
 	
--BEANVALIDATION (necessrio utilizar 4 jars)
+// ----------------------BEANVALIDATION (necessrio utilizar 4 jars) --------------------------------------------------------		
 *Para validar formulários, utilizamos o método BEANValidation, como?
 	-Nos "modelos" (Tarefa por exemplo), temos de por a anotaço @NotNull (ou @Size(min=5)), em cima da variável.
 		- @NotNull
@@ -919,8 +918,7 @@ public class AdicionaContatoServlet extends HttpServlet{
 	-Forward = é para o lado do servidor (interno)
 	-Redirect = a view ira para o navegador
 
-
-JQUERY (AJAX)
+// ---------------------- JQUERY (AJAX)-----------------------------------------------------------------------
 	-Ele roda no navegador, encaminhando uma requisição para o servidor e retornar para o ajax um sucesso ou erro
 	
 	Relembrando JQuery
@@ -940,21 +938,64 @@ JQUERY (AJAX)
 	
 	Para o JQuery funcionar no navegador, precisamos que seja utilizada em cima do método Controller @ResponseBody
 	
-*CAPITULO 12 - USUARIO LOGIN/SENHA
+// ---------------------- *CAPITULO 12 - USUARIO LOGIN/SENHA -----------------------------------------------------------------------
 	- Principio é usar uma session (para isto precisa ser configurado no web.xml)
 	
 	<session-config>
 		<session-timeout>3</session-timeout>
 	</session-config>
 	
+	- A sessão possui 3 requisitos como filtros, que extendem a classe HandlerInterceptorAdapter
+	
+	exemplo:
+	
+	public class AutorizadorInterceptor extends HandlerInterceptorAdapter {
+	
+	@Override
+	public boolean preHandle(HttpServletRequest req, HttpServletResponse res, Object controller) throws IOException {
+		
+		String uri = req.getRequestURI();
+		if (uri.endsWith("loginForm") || uri.endsWith("efetuaLogin") || uri.contains("resources")) {
+			return true;
+		}
+		
+		if(req.getSession().getAttribute("usuarioLogado") != null) {
+			return true;
+		}
+		
+		res.sendRedirect("loginForm");
+		return false;
+		}
+	}
+	
+*ACOPLAMENTO
+	- É a quantidade de vezes que chamo o código, por exemplo, uma classe chamando classe DAO
+		- Quando instanciamos uma classe com o "new"  considerado um peso 3
+	
+	- Pergunte, qual o mtodo que ele realmente necessita e veja oq ele precisa para ter esse metodo (tem intermediario?)
+		- Depois que o intermediario foi utilizado, qual a utilidade? Se nao possui, temos que acoplar, mas como?
+		- Podemos transferir o intermediario para uma classe apartada, de forma que iremos apenas chamar o metodo
+		
+		ANTES:
+		
+		public JdbcTarefaDao() {
+		try {
+			this.connection = new ConnectionFactory().getConnection();
+			} catch (Exception e) {
+				System.out.println(e);
+			}
+		}
+	
+		DEPOIS (TarefaController terá de passar o ConnectionFactory quando for chamar):
+		
+		public JdbcTarefaDao(Connection connection) {
+			this.connection = connection
+		}
 	
 	
-	
-	
-	
-	
-	
-	
+	- Anotaçoes do SPRING 
+		@Repository -> informa que e para acesso ao banco de Dados
+		@Controller -> informa que se trata de um controlador
 	
 	
 	
