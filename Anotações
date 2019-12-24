@@ -149,6 +149,9 @@ public class TesteConexao {
 	}
 }
 
+**POSSÍVEIS ERROS
+	- MySQLNonTransientConnectionException: Could not create connection -> utilizar um conector mais novo
+	- Establishing SSL connection without server's identity -> Adicione depois do banco de dados ?useTimezone=true&serverTimezone=UTC&useSSL=false
 
 
 *JAVBEANS? O javabeans é quando uma class que possui atributos (getters and setters and construct default)
