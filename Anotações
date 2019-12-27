@@ -747,7 +747,37 @@ public class AdicionaContatoServlet extends HttpServlet{
 			//enviando via Dispatcher
 			//podiamos enviar somente uma pagina, exemplo Adicionar, porem não teriamos algo generico
 			//req.getRequestDispatcher("adicionar-contato.jsp").forward(req, resp);
-				req.getRequestDispatcher(pagina).forward(req, resp);
+				req.getRequestDispatcher(pagina).forward(req, resp);]
+				
+				
+		-Controller completo
+		@WebServlet("/mvc")
+		public class ControllerContatos extends HttpServlet{
+			@Override
+			protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+					//1º recebo o parÃ¢metro (Adicionar, Remover e etc)
+				String parametro = req.getParameter("logica");
+					//2º Seleciona onde esta a classe
+				String nomeDaClasse = "br.com.caelum.agenda.mvc.Model." + parametro;
+					//3º Cria o objeto
+				try {
+					Class<?> classe = Class.forName(nomeDaClasse);
+						//ira selecionar a classe com um new
+					LogicaModel logica = (LogicaModel) classe.getDeclaredConstructor().newInstance();
+					String pagina = logica.executa(req, resp);
+					req.getRequestDispatcher(pagina).forward(req, resp);
+				} catch (Exception e) {
+					throw new ServletException("A logica de negocios causou uma exceÃ§Ã£o: " + e);
+				}
+			}
+		}
+		
+		-Interface Model
+		public interface Logica {
+			String executa(HttpServletRequest req, HttpServletResponse resp);
+		}
+		
+		
 
 ----------------------------------------------------------------------------------------------------------------------------------------------
 - Temos um problema ao deixar as telas na WEbCOntent, pois o usuario pode ter acesso atraves do url
