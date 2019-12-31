@@ -4,23 +4,19 @@ PROFESSOR: LEONARDO -> Coordenador, arquiteto de solução
 EMAIL: leonardo.silva@caelum.com
 http://dontpad.com/caelum-javeiros
 
-*PARA REVISAR:
-	-DAO, e uma camada que possui mtodos que iram interagir com o banco de dados
-	-Recriar o ConnectionFactory();
-	-Recriar o Teste da conexão();
-	-Recriar as classes Contato + ContadoDAO (inserir e listar)
-	-Criar o teste para classe DAO;
-	-Realizar conexão com TOMCAT
-	-Criar 1º projeto EE;
-	-Criar Servlet que recebe de um formulário dados e realizar a inserção;
-	-Criar uma pagina JSP para listar dados e criar as exceçes no web.xml;
+*INSTALADORES:
+	- Instalar o JAVA SDK: https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+	- Instalar o MySQL (server versão 5.7 e workbench): https://dev.mysql.com/downloads/windows/installer/5.6.html
+	- Instalar o Eclipse EE: https://www.eclipse.org/downloads/packages/
 
-*DICAS LEONARDO
-	-Relacionamentos com pessoas da área;
-	-Criar linkedin, extremamente importante;
-	-FOCO, fds vai estudar!
-	-Importando uma API -> utilizar o repositorio do Maven para procurar a API necessria -> baixa o JAR e adicionar ele através do build Path
+*Arquivos Caelum
+https://drive.google.com/drive/u/0/folders/0B0qR-YC8wtA2NWJxUlJUYUctS1U
 
+*Taglibs
+		<%@	taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"	%>
+		<%@	taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"	%>
+		<%@	taglib uri="http://www.springframework.org/tags/form" prefix="form"	%>
+		
 *ESTUDAR:
 	-Banco de dados nao relacional, como MongoDB (os relacionais serao o MySql, SQLServer)
 	-PrimeFaces (templates)
