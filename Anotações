@@ -1,11 +1,11 @@
-JAVA DESENVOLVIMENTO WEB
+FJ21 - JAVA DESENVOLVIMENTO WEB
 -----------------------------------------------------------------------------------------------------------
 PROFESSOR: LEONARDO -> Coordenador, arquiteto de solução
 EMAIL: leonardo.silva@caelum.com
 http://dontpad.com/caelum-javeiros
 
 *INSTALADORES:
-	- Instalar o JAVA SDK: https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+	- Instalar o JAVA JDK: https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 	- Instalar o MySQL (server versão 5.7 e workbench): https://dev.mysql.com/downloads/windows/installer/5.6.html
 	- Instalar o Eclipse EE: https://www.eclipse.org/downloads/packages/
 
@@ -23,6 +23,8 @@ https://drive.google.com/drive/u/0/folders/0B0qR-YC8wtA2NWJxUlJUYUctS1U
 	-GoogleVision (API)agendas/mvc?logica=ListaContatosLogic
 	-Google Cloud Platform/AWS
 	-JasperReport (iReport) -> para criar PDF, WORD, XLS
+	-XP de MESA
+	-Cerimonia de mesas ageis
 	
 *REVISÃO:
 	- SERVLET
@@ -1225,11 +1227,32 @@ public class AdicionaContatoServlet extends HttpServlet{
 			@Id | @GeneratedValue
 			@Column(nullable = false) | @Size(min=10, max=256, message = "Deu ruim")
 			@DateTimeFOrmat(pattern="dd/MM/yyyy") | @Temporal (TemporalType.DATE)
-	
-	
-	
-	
-	
+
+-----------------------------------------------------------------------------------------------------------	
+FJ22 - DESENVOLVIMENTO NA PRÁTICA COM SPRING E TESTES	
+-----------------------------------------------------------------------------------------------------------	
+CAPITULO 1 - VERSIONAMENTO DE CODIGO
+
+*Para que precisamos versionar um código? De certa forma, mexer em um projeto pode ser assustador, pois podemos mexer em algo e danificar
+outras. Porque, dependendo da mudança fica dificil voltar ao estado anterior.
+*Uma solução para as mudança é o versionamento de codigo.
+
+GIT
+- Com o GIT podemos escolher o arquivo que será comitado.
+- para WINDOWS: https://git-scm.com/download/win
+
+CODIGOS:
+	$ git init [cria um repositorio]
+	$ git status [irá demonstrar o que esta para ser alterado e etc]
+		#Changes to be committed: [estarão os arquivos que serao comitados]
+		#Changes not staged for commit: [estarão os arquivos que EXISTEM e COM ALTERAÇÃO]
+		#Untracked files: [estarao ARQUIVOS NOVOS]
+	$ git add [irá adicionar o arquivo]
+	$ git commit -m [informa a mensagem para ser adicionada]
+	$ git commit -a -m [adiciona todos]
+	$ git log
+		$ git log --oneline
+		$ git log --oneline -n 2
 	
 	
 	
