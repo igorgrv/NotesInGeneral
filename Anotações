@@ -877,10 +877,194 @@ public class AdicionaContatoServlet extends HttpServlet{
 					http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
 					http://www.springframework.org/schema/aop
 					http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
-			
 // ---------------------irá scanear onde ficará a aplicação -----------------------------------------------------------
 			<context:component-scan base-package="br.com.caelum.tarefas" />
 			<mvc:annotation-driven />
+			
+// ---------------------CONTROLLER - CRUD -----------------------------------------------------------			
+	@Controller
+	public class UsuarioControllerMvc {
+
+		@RequestMapping("showForm")
+		public String showForm () {
+			return("usuario/formulario");
+		}
+
+		@RequestMapping("addUsuario")
+		public String addUsuario (Usuario user) {
+			UsuarioDao dao = new UsuarioDao();
+			dao.adicionar(user);
+			return("usuario/userAdd");
+		}
+
+		@RequestMapping("listUsuario")
+		public String listUsuario (Model model) {
+			UsuarioDao dao = new UsuarioDao();
+			List<Usuario> lista = dao.getLista();
+			model.addAttribute("lista", lista);
+			return "usuario/listUser";
+		}
+
+		@RequestMapping("removeUser")
+		public String removeUser (Usuario user) {
+			UsuarioDao dao = new UsuarioDao();
+			dao.remove(user);
+			return "redirect: listUsuario";
+		}
+
+		@RequestMapping("mostraUser")
+		public String mostraUser (int id, Model model) {
+			UsuarioDao dao = new UsuarioDao();
+			model.addAttribute("usuario", dao.buscaId(id));
+			return "usuario/mostraUser";
+		}
+
+		@RequestMapping("alteraUsuario")
+		public String alteraUser (Usuario user) {
+			UsuarioDao dao = new UsuarioDao();
+			dao.alteraUser(user);
+			return "redirect: listUsuario";
+		}
+	}
+// ---------------------USUARIODAO -----------------------------------------------------------	
+	
+	public class UsuarioDao {
+		private Connection con = new ConnectionFactory().getConnection();
+		private PreparedStatement stmt;
+
+		public void adicionar(Usuario usuario) {
+			String sql = "INSERT INTO usuarios (nome, matricula, senha, data_cadastro) VALUES (?,?,?,?)";
+			try {
+				stmt = con.prepareStatement(sql);
+				stmt.setString(1, usuario.getNome());
+				stmt.setString(2, usuario.getMatricula());
+				stmt.setString(3, usuario.getSenha());
+				stmt.setDate(4, new java.sql.Date(System.currentTimeMillis()));
+
+				stmt.execute();
+				stmt.close();
+				con.close();
+
+			} catch (SQLException e) {
+				throw new RuntimeException("Erro na insercao " + e);
+			}
+		}
+
+		public List<Usuario> getLista () {
+			List<Usuario> lista = new ArrayList<Usuario>();
+			String sql = "SELECT * FROM usuarios";
+			try {
+				stmt=con.prepareStatement(sql);
+				ResultSet rs = stmt.executeQuery();
+
+				while(rs.next()) {
+					Usuario u1 = new Usuario();
+					u1.setId(rs.getInt("id"));
+					u1.setNome(rs.getString("nome"));
+					u1.setMatricula(rs.getString("matricula"));
+					u1.setData_cadastro(rs.getDate("data_cadastro"));
+
+					lista.add(u1);
+				}
+
+				stmt.execute();
+				rs.close();
+				stmt.close();
+				con.close();
+			} catch (SQLException e) {
+				throw new RuntimeException("Erro no list " + e);
+			}
+
+			return lista;
+		}
+
+		public void remove (Usuario usuario) {
+			String sql = "DELETE FROM usuarios WHERE id = ?";
+			try {
+				stmt=con.prepareStatement(sql);
+				stmt.setInt(1, usuario.getId());
+				stmt.execute();
+
+				stmt.close();
+				con.close();
+			} catch (SQLException e) {
+				throw new RuntimeException("Id incorreto " + e);
+			}
+		}
+
+		public boolean existeUsuario(Usuario usuario) {
+
+			if (usuario == null) {
+				throw new IllegalArgumentException("Usuario não deve ser nulo");
+			}
+
+			try {
+				stmt = con.prepareStatement("select * from usuarios where matricula = ? and senha = ?");
+				stmt.setString(1, usuario.getMatricula());
+				stmt.setString(2, usuario.getSenha());
+				ResultSet rs = stmt.executeQuery();
+
+				boolean encontrado = rs.next();
+				rs.close();
+				stmt.close();
+
+				return encontrado;
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		public Usuario buscaId (int id) {
+
+			try {
+				stmt = con.prepareStatement("SELECT * FROM usuarios WHERE id = ?");
+				stmt.setInt(1, id);
+				ResultSet rs = stmt.executeQuery();
+
+				if(rs.next()) {
+					return populaTarefa (rs);
+				}			
+				rs.close();
+				stmt.close();
+
+				return null;
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		private Usuario populaTarefa(ResultSet rs) throws SQLException {
+			Usuario user = new Usuario();
+
+			// popula o objeto tarefa
+			user.setId(rs.getInt("id"));
+			user.setNome(rs.getString("nome"));
+			user.setMatricula(rs.getString("matricula"));
+			user.setSenha(rs.getString("senha"));
+
+			return user;
+		}
+
+		public void alteraUser (Usuario usuario) {
+			String sql = "UPDATE usuarios SET nome = ?, matricula=?, senha = ? where id = ?";
+			try {
+				stmt=con.prepareStatement(sql);
+				stmt.setString(1, usuario.getNome());
+				stmt.setString(2, usuario.getMatricula());
+				stmt.setString(3, usuario.getSenha());
+				stmt.setInt(4, usuario.getId());
+
+				stmt.execute();
+				stmt.close();
+				con.close();
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+			
+
 			
 // ---------------------irá dizer onde ficara as pastas -------------------------------------------------------------------	
 			<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -949,6 +1133,8 @@ public class AdicionaContatoServlet extends HttpServlet{
 
 // ---------------------- JQUERY (AJAX)-----------------------------------------------------------------------
 	-Ele roda no navegador, encaminhando uma requisição para o servidor e retornar para o ajax um sucesso ou erro
+	*Para utilizar o AJAX com o Spring MVC
+	
 	
 	Relembrando JQuery
 		- Para pegar por ID $('#')
