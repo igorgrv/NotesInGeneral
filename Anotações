@@ -1248,7 +1248,7 @@ CODIGOS:
 		
 	
 	$ git init [cria um repositorio]
-	$ git clone git://endereco.git [cria um clone diretorio para o local]
+	$ git clone git://endereco.git [cria um clone do diretorio informado para a maquina local, ir fazer o downlaod]
 	$ git status [irá demonstrar o que esta para ser alterado e etc]
 		#Changes to be committed: [estarão os arquivos que serao comitados]
 		#Changes not staged for commit: [estarão os arquivos que EXISTEM e COM ALTERAÇÃO]
@@ -1256,9 +1256,21 @@ CODIGOS:
 	$ git add seunome.txt[irá adicionar o arquivo SEUNOME]
 	$ git commit -m [informa a mensagem para ser adicionada]
 	$ git commit -a -m [adiciona todos]
-	$ git log
+	$ git log [ira exibir os commites feitos]
 		$ git log --oneline
-		$ git log --oneline -n 2
+		$ git log --oneline -n 2 [ira exibir os 2 commits]
+	$ git branch [lista os branches existentes do repositorio]
+		$ git branch work [irá criar o branch work]
+		$ git checkout work [seleciona a branch]
+		
+BRANCH:
+Toda aplicação possui uma branch MASTER, onde fica o cdigo em producao.
+	-Ex.: O joão esta desenvolvendo o cadastro de usuario, sendo assim ele ira criar a branch cadastro.
+		$ git branch cadastro
+		$ git checkout cadastro
+		
+	      Apos joao ter criado o projeto, precisa adicionar o projeto a Master
+	        $ git merge work
 -----------------------------------------------------------------------------------------------------------	
 CAPITLO 1B - MAVEN
 
