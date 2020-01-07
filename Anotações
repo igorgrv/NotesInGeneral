@@ -1261,6 +1261,9 @@ CAPITLO 1B - MAVEN
 *O maven veio para melhorar o gerenciamento do projeto, de forma que não seja necessário adicionar as libs manualmente.
 *Pense encaminhar um projeto algum outro dev? teriamos que passar todos .jars
 
+-UTILIDADES:
+	- Testa || empacota || verifica qualidade do código || baixa as dependencias localmente
+
 - ARQUIVO DE CONFIGURAÇÃO [onde será inserido todas as dependências/plugins]: pom.xml
 - ENTENDO A ESTRUTURA
 	<project xmlns=.... --> ficará a estrutura base do projeto
