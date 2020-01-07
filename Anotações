@@ -1235,19 +1235,21 @@ CAPITULO 1 - VERSIONAMENTO DE CODIGO
 
 *Para que precisamos versionar um código? De certa forma, mexer em um projeto pode ser assustador, pois podemos mexer em algo e danificar
 outras. Porque, dependendo da mudança fica dificil voltar ao estado anterior.
+*Um versionador e o sistema que ira gerenciar as versoes do projeto
 *Uma solução para as mudança é o versionamento de codigo.
 
 GIT
 - Com o GIT podemos escolher o arquivo que será comitado.
-- para WINDOWS: https://git-scm.com/download/win
+- DOWNLOAD para WINDOWS: https://git-scm.com/download/win
 
 CODIGOS:
 	$ git init [cria um repositorio]
+	$ git clone git://endereco.git [cria um clone diretorio para o local]
 	$ git status [irá demonstrar o que esta para ser alterado e etc]
 		#Changes to be committed: [estarão os arquivos que serao comitados]
 		#Changes not staged for commit: [estarão os arquivos que EXISTEM e COM ALTERAÇÃO]
 		#Untracked files: [estarao ARQUIVOS NOVOS]
-	$ git add [irá adicionar o arquivo]
+	$ git add seunome.txt[irá adicionar o arquivo SEUNOME]
 	$ git commit -m [informa a mensagem para ser adicionada]
 	$ git commit -a -m [adiciona todos]
 	$ git log
