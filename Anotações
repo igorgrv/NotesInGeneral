@@ -1255,7 +1255,26 @@ CODIGOS:
 	$ git log
 		$ git log --oneline
 		$ git log --oneline -n 2
+-----------------------------------------------------------------------------------------------------------	
+CAPITLO 1B - MAVEN
+
+*O maven veio para melhorar o gerenciamento do projeto, de forma que não seja necessário adicionar as libs manualmente.
+*Pense encaminhar um projeto algum outro dev? teriamos que passar todos .jars
+
+- ARQUIVO DE CONFIGURAÇÃO [onde será inserido todas as dependências/plugins]: pom.xml
+- ENTENDO A ESTRUTURA
+	<project xmlns=.... --> ficará a estrutura base do projeto
+		<groupID> br.com.igor </groupID> -->Nome do pacote
+		<artifactId> meuProjeto </artifactId> -->Nome do projeto
+		<version> 1.0 </version> --> versao do projeto
+		
+		<dependencies> --> ira ficar as dependencias,
+			<dependency>
+			    <groupId>org.springframework</groupId>
+			    <artifactId>spring-webmvc</artifactId>
+			    <version>5.2.2.RELEASE</version>
+			</dependency>
+		</dependencies>
+	</project>
 	
-	
-	
-	
+!!ATENÇAO A ESTRUTURA DE PASTA
