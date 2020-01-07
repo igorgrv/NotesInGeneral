@@ -1243,6 +1243,10 @@ GIT
 - DOWNLOAD para WINDOWS: https://git-scm.com/download/win
 
 CODIGOS:
+	cd [permite que acesse o repositorio]
+		- cd Caelum [irá acessar o repositorio Caelum]
+		
+	
 	$ git init [cria um repositorio]
 	$ git clone git://endereco.git [cria um clone diretorio para o local]
 	$ git status [irá demonstrar o que esta para ser alterado e etc]
