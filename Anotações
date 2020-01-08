@@ -3,6 +3,8 @@ FJ21 - JAVA DESENVOLVIMENTO WEB
 PROFESSOR: LEONARDO -> Coordenador, arquiteto de solução
 EMAIL: leonardo.silva@caelum.com
 http://dontpad.com/caelum-javeiros
+http://dontpad.com/java-e-vida-8679
+
 
 *INSTALADORES:
 	- Instalar o JAVA JDK: https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
@@ -1256,6 +1258,7 @@ CODIGOS:
 	$ git add seunome.txt[irá adicionar o arquivo SEUNOME]
 	$ git commit -m [informa a mensagem para ser adicionada]
 	$ git commit -a -m [adiciona todos]
+	$ git push [ira adicionar ao GITHUB]
 	$ git log [ira exibir os commites feitos]
 		$ git log --oneline
 		$ git log --oneline -n 2 [ira exibir os 2 commits]
@@ -1263,6 +1266,7 @@ CODIGOS:
 		$ git branch work [irá criar o branch work]
 		$ git checkout work [seleciona a branch]
 		$ git merge work [ira atualizar baseado no branch master]
+		$ git branch -d work [ira apagar a branch]
 		
 BRANCH:
 Toda aplicação possui uma branch MASTER, onde fica o cdigo em producao.
@@ -1273,8 +1277,16 @@ Toda aplicação possui uma branch MASTER, onde fica o cdigo em producao.
 	      Apos joao ter criado o projeto, precisa adicionar o projeto a Master, porém antes precisamos do branch master atualizado
 	        $ git checkout cadastro
 		$ git merge master
+		
+		//apos ter atualizado branch cadastro com as att de master, esta na hora de atualizar a master com as novas inf. da branch cadastro
 		$ git checkout master
 		$ git merge cadastro
+		
+	      João não precisa mais da branch cadastro, podera deletar
+	        $ git branch -d work
+	      
+	      Basta agora atualziar o github
+	        $ git push
 
 -----------------------------------------------------------------------------------------------------------	
 CAPITLO 1B - MAVEN
