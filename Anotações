@@ -1239,8 +1239,8 @@ outras. Porque, dependendo da mudança fica dificil voltar ao estado anterior.
 *Uma solução para as mudança é o versionamento de codigo.
 
 GIT
-- Com o GIT podemos escolher o arquivo que será comitado.
-- DOWNLOAD para WINDOWS: https://git-scm.com/download/win
+	- Com o GIT podemos escolher o arquivo que será comitado.
+	- DOWNLOAD para WINDOWS: https://git-scm.com/download/win
 
 CODIGOS:
 	cd [permite que acesse o repositorio]
@@ -1262,6 +1262,7 @@ CODIGOS:
 	$ git branch [lista os branches existentes do repositorio]
 		$ git branch work [irá criar o branch work]
 		$ git checkout work [seleciona a branch]
+		$ git merge work [ira atualizar baseado no branch master]
 		
 BRANCH:
 Toda aplicação possui uma branch MASTER, onde fica o cdigo em producao.
@@ -1269,8 +1270,12 @@ Toda aplicação possui uma branch MASTER, onde fica o cdigo em producao.
 		$ git branch cadastro
 		$ git checkout cadastro
 		
-	      Apos joao ter criado o projeto, precisa adicionar o projeto a Master
-	        $ git merge work
+	      Apos joao ter criado o projeto, precisa adicionar o projeto a Master, porém antes precisamos do branch master atualizado
+	        $ git checkout cadastro
+		$ git merge master
+		$ git checkout master
+		$ git merge cadastro
+
 -----------------------------------------------------------------------------------------------------------	
 CAPITLO 1B - MAVEN
 
@@ -1296,4 +1301,4 @@ CAPITLO 1B - MAVEN
 		</dependencies>
 	</project>
 	
-!!ATENÇAO A ESTRUTURA DE PASTA
+!!ATENÇAO A ESTRUTURA DE PASTA DO MAVEN
