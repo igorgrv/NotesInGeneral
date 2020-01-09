@@ -1333,3 +1333,9 @@ CRIANDO O CONTROLLER SESSAO
 @PersistenceContext -> irá carrega os dados do spring-contexts, parte de conexao
 	@PersistenceContext
 	private EntityManager manager;
+
+Para realizar validações antes de inserir dentro de um banco de dados, o ideal  criar um GERENCIADOR.
+No caso de Sessões, um GerenciadorDeSessões, onde nele irão conter os ifs de forma que não altere o Controller
+
+
+
