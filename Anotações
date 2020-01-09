@@ -1320,8 +1320,16 @@ CRIANDO O CONTROLLER SESSAO
 
 @getMapping("") --> so recebe GET de um formulario (nao pode POST)
 @requestParam("id") --> serve para solicitar algum parametro do formulario (como um ID)
-@autowired --> gerencia os atributos no controller
+@autowired --> gerencia os atributos no controller (utilizado para declarar os privates SessaoDao)
 
+*MODELO (criará a tabela)
+@Entity --> para ser uma tabela em um banco de dados
+@id --> Informa ao hibernate que se trata de um id
+@GeneratedValue(strategy=GenerationType.IDENTITY) --> declara o auto_incremento
+@ManytoOne
 
-
-
+*DAO
+@Repository -> informa que sera responsavel por realizar uma conexao
+@PersistenceContext -> irá carrega os dados do spring-contexts, parte de conexao
+	@PersistenceContext
+	private EntityManager manager;
