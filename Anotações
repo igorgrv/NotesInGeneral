@@ -90,6 +90,8 @@ https://drive.google.com/drive/u/0/folders/0B0qR-YC8wtA2NWJxUlJUYUctS1U
 		- Transformar um Date p/ Calendar (a função setTime recebe um Date e retorna um Calendar pela palavra cal)
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(rs.getDate("dataNascimento"));
+*TRABALHANDO COM SOMAS:
+	- Para utilizar somas, o ideal é usar o tipo BigDecimal
 
 ----------------------------------------------------------------------------------------------------------------------------------------------
 CAPITULO 2 - BANCO DE DADOS
@@ -1318,6 +1320,9 @@ CAPITLO 1B - MAVEN
 -----------------------------------------------------------------------------------------------------------
 CRIANDO O CONTROLLER SESSAO
 
+*Tudo começa com a necessidade de passar 3 paparametros de 3 tabelas diferentes... 
+	como um unico objeto poderia passar os 3 parametros a um Controller?
+
 @getMapping("") --> so recebe GET de um formulario (nao pode POST)
 @requestParam("id") --> serve para solicitar algum parametro do formulario (como um ID)
 @autowired --> gerencia os atributos no controller (utilizado para declarar os privates SessaoDao)
@@ -1333,6 +1338,8 @@ CRIANDO O CONTROLLER SESSAO
 @PersistenceContext -> irá carrega os dados do spring-contexts, parte de conexao
 	@PersistenceContext
 	private EntityManager manager;
+
+
 
 Para realizar validações antes de inserir dentro de um banco de dados, o ideal  criar um GERENCIADOR.
 No caso de Sessões, um GerenciadorDeSessões, onde nele irão conter os ifs de forma que não altere o Controller
