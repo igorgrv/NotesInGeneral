@@ -1337,5 +1337,20 @@ CRIANDO O CONTROLLER SESSAO
 Para realizar validações antes de inserir dentro de um banco de dados, o ideal  criar um GERENCIADOR.
 No caso de Sessões, um GerenciadorDeSessões, onde nele irão conter os ifs de forma que não altere o Controller
 
+-----------------------------------------------------------------------------------------------------------
+JUnit
+
+Passamos o resultado para o metodo e ele ir verificar se de fato aquele metodo é valido, ou seja, ele testa para ver
+se esta funcionando
+
+*Lembre-se de adicionar a depeendencia no Maven
+<dependency>
+	<groupId>junit</groupId>
+	<artifactId>junit</artifactId>
+	<version>4.12</version>
+</dependency>
+
+
+
 
 
