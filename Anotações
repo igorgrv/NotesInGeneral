@@ -1246,7 +1246,7 @@ public class AdicionaContatoServlet extends HttpServlet{
   - O conceito de JPA surgiu com a ideia de conversar "melhor" Java com SQL, de forma que nao fosse necessario ficar utilizando ResultSet e etc
 
 * DOWNLOAD: https://sourceforge.net/projects/hibernate/ --> BAIXE O ZIP --> EXTRAI-A --> utilize os arquivos requred e jpa
-* CONFIGURAÇÃO (persistence.xml) --> deve ficar na pasta META-INF
+* CONFIGURAÇÃO (persistence.xml) --> deve ficar na pasta src/META-INF/persistence.xml
 
     <persistence xmlns="http://java.sun.com/xml/ns/persistence"
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
