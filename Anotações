@@ -889,6 +889,21 @@ public class AdicionaContatoServlet extends HttpServlet{
 			<mvc:annotation-driven />
 			
 // ---------------------CONTROLLER - CRUD -----------------------------------------------------------			
+*REVISANDO SPRING MVC:
+	*Todos métodos retornam uma String
+	
+	- Lista (Model model): 
+		- Instancia-se o Dao
+		- Cria-se List que recebe dao.lista
+		- model.addAttribute para encaminhar a lista para o request
+		- retorna a view
+	
+	- Adicionar (Usuario user):
+		- Instancia-se o Dao
+		- dao.adiciona(user(
+		- retorna a view
+	
+	
 	@Controller
 	public class UsuarioControllerMvc {
 
@@ -1219,19 +1234,69 @@ public class AdicionaContatoServlet extends HttpServlet{
 		@Repository -> informa que e para acesso ao banco de Dados
 		@Controller -> informa que se trata de um controlador
 	
-	
+-----------------------------------------------------------------------------------------------------------	
 *CAPITULO 14 - HIBERNATE E JPA
-	- O conceito de JPA surgiu com a ideia de conversar "melhor" Java com SQL, de forma que nao fosse necessario
-		ficar utilizando ResultSet e etc
-	- Uma das implementaçoes da JPA e o HIBERNATE ORM (object relational of mapping)
-	* Hibernate mantido pela redhat
-	- Para implementar o hibernate, precisamos transformar a classe de modelo em uma entidade, ou seja, ele pega uma classe
-		e cria uma tabela (especificando com @, exemplo @entity);
-		- Exemplos:
-			@Entity
-			@Id | @GeneratedValue
-			@Column(nullable = false) | @Size(min=10, max=256, message = "Deu ruim")
-			@DateTimeFOrmat(pattern="dd/MM/yyyy") | @Temporal (TemporalType.DATE)
+* PARA QUE SERVE HIBERNATE?
+  - Dependendo do fabricante, temos diferenças significativas no modo de executar nossos comando SQL;
+  - Por padrão o banco trabalha com tabelas e colunas, como fazer quando utilizamos objetos? A todo momento precisamos transformar
+    objetos em registro e registro em objetos
+  - Para isto foi criado ferramentas de mapeamento objeto-relacional (ORM)
+  - O Hibernate inspirou a criação da JPA, ou seja, nasceu sem JPA, porém como toda especificação, ela deve possuir implementações, entre as mais comuns estão:
+	 - Hibernate da RedHat, EclipseLink da Eclipse.
+  - O conceito de JPA surgiu com a ideia de conversar "melhor" Java com SQL, de forma que nao fosse necessario ficar utilizando ResultSet e etc
+
+* DOWNLOAD: https://sourceforge.net/projects/hibernate/ --> BAIXE O ZIP --> EXTRAI-A --> utilize os arquivos requred e jpa
+* CONFIGURAÇÃO (persistence.xml) --> deve ficar na pasta META-INF
+
+    <persistence xmlns="http://java.sun.com/xml/ns/persistence"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+			http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+			version="2.0">
+			
+      <persistence-unit	name="tarefas">
+            
+	    <!--	provedor/implementacao	do	JPA	-->
+            <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+            
+	    <!--	entidade	mapeada	-->
+            <class>br.com.caelum.tarefas.modelo.Tarefa</class>
+            
+	    <properties>
+		      <!--	dados	da	conexao	-->
+		      <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+		      <property	name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/fj21" />
+		      <property	name="javax.persistence.jdbc.user" value="root"	/>
+		      <property	name="javax.persistence.jdbc.password" value=" <SENHA DO BANCO AQUI>" />
+
+		      <!--		propriedades	do	hibernate	-->
+		      <property	name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
+		      <property	name="hibernate.show_sql" value="true" />
+		      <property	name="hibernate.format_sql" value="true" />
+
+		      <!--		atualiza	o	banco,	gera	as	tabelas	se	for	preciso	-->
+		      <property	name="hibernate.hbm2ddl.auto" value="update" />
+            </properties>
+	    
+      </persistence-unit>
+</persistence>
+
+* IMPLEMENTAÇÃO:
+	- CÓDIGOS UTILIZADOS NOS MODELOS:
+	      - CÓDIGO BASE:
+	      @Entity --> indica o objeto para se tornar persistível
+	      @Table(name="tarefas") --> indica que será a Tabela com nome XXXX
+	      @Id --> indica que aquele atributo é um ID
+		@GeneratedValue --> serve para referenciar o ID como AUTO_INCREMENT
+
+	      - P/ COLUNAS:
+	      @Column(nullable = false) --> Indica que não pode ser nulo
+	      @Column(name = "nomeDaColuna", nullable = false) --> irá criar a coluna com este nome
+
+	      @Size(min=10, max=256, message = "Deu ruim")
+	      @DateTimeFormat(pattern="dd/MM/yyyy")
+	      @Temporal(TemporalType.DATE)  --> Temporal utilizado para datas / TemporalType indica o tipo de dado
+	      @Temporal(TemporalType.TIME)  --> TemporalType, retorna o horário
 
 -----------------------------------------------------------------------------------------------------------	
 FJ22 - DESENVOLVIMENTO NA PRÁTICA COM SPRING E TESTES	
@@ -1245,7 +1310,8 @@ outras. Porque, dependendo da mudança fica dificil voltar ao estado anterior.
 
 GIT
 	- Com o GIT podemos escolher o arquivo que será comitado.
-	- DOWNLOAD para WINDOWS: https://git-scm.com/download/win
+	- DOWNLOAD para WINDOWS: 
+
 
 CODIGOS:
 	cd [permite que acesse o repositorio]
