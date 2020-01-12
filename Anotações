@@ -1281,6 +1281,16 @@ public class AdicionaContatoServlet extends HttpServlet{
       </persistence-unit>
 </persistence>
 
+*GERANDO TABELAS:
+  - Para gerar as tabelas é necessário que seja criado uma class com código abaixo, referenciando a tabela
+  
+  public class GeraTabelas {
+	public static void main(String[] args) {
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("tarefas");
+		factory.close();
+    }
+  }
+
 * IMPLEMENTAÇÃO:
 	- CÓDIGOS UTILIZADOS NOS MODELOS:
 	      - CÓDIGO BASE:
