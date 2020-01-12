@@ -1291,6 +1291,18 @@ public class AdicionaContatoServlet extends HttpServlet{
     }
   }
 
+  - Para se trabalhar com objetos é necessário criar um Gerenciador/Manager
+  
+  public class GeraTabelas {
+	public static void main(String[] args) {
+		EntityManagerFactory	factory	=	Persistence.createEntityManagerFactory("tarefas");
+    EntityManager	manager	=	factory.createEntityManager();
+    manager.close();
+    factory.close();
+    }
+  }
+  	
+
 * IMPLEMENTAÇÃO:
 	- CÓDIGOS UTILIZADOS NOS MODELOS:
 	      - CÓDIGO BASE:
