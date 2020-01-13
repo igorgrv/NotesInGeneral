@@ -1281,6 +1281,10 @@ public class AdicionaContatoServlet extends HttpServlet{
       </persistence-unit>
 </persistence>
 
+*CONFIGURANDO O LOG4
+	//Para gerar as informações do hibernate no console
+	log4j.logger.org.hibernate=info
+
 *GERANDO TABELAS:
   - Para gerar as tabelas é necessário que seja criado uma class com código abaixo, referenciando a tabela
   
