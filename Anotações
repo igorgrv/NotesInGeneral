@@ -1234,8 +1234,7 @@ public class AdicionaContatoServlet extends HttpServlet{
 		@Repository -> informa que e para acesso ao banco de Dados
 		@Controller -> informa que se trata de um controlador
 	
------------------------------------------------------------------------------------------------------------	
-*CAPITULO 14 - HIBERNATE E JPA
+// ------------------------- CAPITULO 14 - HIBERNATE E JPA --------------------------------------------------
 * PARA QUE SERVE HIBERNATE?
   - Dependendo do fabricante, temos diferenças significativas no modo de executar nossos comando SQL;
   - Por padrão o banco trabalha com tabelas e colunas, como fazer quando utilizamos objetos? A todo momento precisamos transformar
@@ -1246,7 +1245,9 @@ public class AdicionaContatoServlet extends HttpServlet{
   - O conceito de JPA surgiu com a ideia de conversar "melhor" Java com SQL, de forma que nao fosse necessario ficar utilizando ResultSet e etc
 
 * DOWNLOAD: https://sourceforge.net/projects/hibernate/ --> BAIXE O ZIP --> EXTRAI-A --> utilize os arquivos requred e jpa
-* CONFIGURAÇÃO (persistence.xml) --> deve ficar na pasta src/META-INF/persistence.xml
+
+
+* 1º MODO CONFIGURAÇÃO [sem utilizar o SPRING] (persistence.xml) --> deve ficar na pasta src/META-INF/persistence.xml
 
     <persistence xmlns="http://java.sun.com/xml/ns/persistence"
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -1279,41 +1280,141 @@ public class AdicionaContatoServlet extends HttpServlet{
             </properties>
 	    
       </persistence-unit>
-</persistence>
+    </persistence>
 
-*CONFIGURANDO O LOG4
-	//Para gerar as informações do hibernate no console
-	log4j.logger.org.hibernate=info
+* 2º MODO CONFIGURAÇÃO [COM SPRING]:
+  *necessário utilizar os JARs,		commons-dbcp-x.x.jar		e		commons-pool-x.x.jar
+  - spring-context.xml
+    <bean id="mysqlDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+      <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+      <property name="url" value="jdbc:mysql://localhost/portal_rv" />
+      <property name="username" value="root" />
+      <property name="password" value="" />
+    </bean>
+    
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+      <property name="dataSource" ref="mysqlDataSource" />
+      <property name="jpaVendorAdapter">
+    <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+      </property>
+    </bean>
+    
+  - persistence.xml:
+ 
+    <?xml version="1.0" encoding="UTF-8"?>
+    <persistence xmlns="http://java.sun.com/xml/ns/persistence"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+        http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+        version="2.0">
+        
+        <persistence-unit	name="tarefas">
+              
+        <!--	provedor/implementacao	do	JPA	-->
+              <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+              
+        <!--	entidade	mapeada	-->
+              <class>br.com.portalrv.modelo.Tarefa</class>
+              
+        <properties>
+            <!--	SEM	as	propriedades	URL,	login,	senha	e	driver	-->
+
+            <!--		propriedades	do	hibernate	-->
+            <property	name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
+            <property	name="hibernate.show_sql" value="true" />
+            <property	name="hibernate.format_sql" value="true" />
+
+            <!--		atualiza	o	banco,	gera	as	tabelas	se	for	preciso	-->
+            <property	name="hibernate.hbm2ddl.auto" value="update" />
+        </properties>
+        
+        </persistence-unit>
+  </persistence>
+
+*MÉTODOS PERSISTE/HIBERNATE:
+  - find --> pode-se utilizar como WHERE [Tarefa localizaPorId = manager.find(Tarefa.class, 1L)]
+  - remove --> utilizado como DELETE
+  - merge --> utilizado como UPDATE
+  - persist --> utilizado como INSERT [manager.persist(tarefa);]
 
 *GERANDO TABELAS:
-  - Para gerar as tabelas é necessário que seja criado uma class com código abaixo, referenciando a tabela
-  
-  public class GeraTabelas {
-	public static void main(String[] args) {
-		EntityManagerFactory factory = Persistence.createEntityManagerFactory("tarefas");
+  - Para gerar as tabelas é necessário que seja criado uma fabrica de Conexão:
+    EntityManagerFactory factory = Persistence.createEntityManagerFactory("tarefas");
 		factory.close();
-    }
-  }
-
-  - Para se trabalhar com objetos é necessário criar um Gerenciador/Manager
   
-  public class GeraTabelas {
-	public static void main(String[] args) {
-		EntityManagerFactory	factory	=	Persistence.createEntityManagerFactory("tarefas");
+ 
+  - Para se trabalhar com objetos é necessário criar um Gerenciador/Manager
     EntityManager	manager	=	factory.createEntityManager();
     manager.close();
-    factory.close();
+    
+    
+  - EXEMPLO DE INSERÇÃO:
+    public class GeraTabelas {
+      public static void main(String[] args) {
+        Tarefa tarefa = new Tarefa();
+        tarefa.setDescricao("Estudar JPA");
+        tarefa.setFinalizado(true);
+        tarefa.setDataFinalizacao(Calendar.getinstance());
+        
+        EntityManagerFactory	factory	=	Persistence.createEntityManagerFactory("tarefas");
+        EntityManager	manager	=	factory.createEntityManager();
+        
+        manager.getTransaction().begin();
+        manager.persist(tarefa);
+        manager.getTransaction().commit();
+        
+        Syste.out.println("ID da tarefa: " + tarefa.getId());
+        
+        manager.close();
+        factory.close();
+        }
     }
-  }
   	
+   - EXEMPLO DE BUSCA COM CHAVE [find]:
+     EntityManagerFactory factory = Persistence.createEntityManagerFactory("tarefas");
+     EntityManager manager = factory.createEntityManager();
+     
+     Tarefa localizaPorId = manager.find(Tarefa.class, 1L);
+     Syste.out.println(localizaPorId.getDescricao());
+   
+   - EXEMPLO DE UPDATE COM CHAVE [merge]:
+      Tarefa tarefa = new Tarefa();
+      tarefa.setId(Long.parseLong("2"));
+      tarefa.setDescricao("Estudando JPA e Hibernatee");
+      tarefa.setFinalizado(false);
+      tarefa.setDataFinalizacao(Calendar.getInstance());
+      
+      manager.getTransaction().begin();
+      manager.merge(tarefa);
+      manager.getTransaction().commit();
+	
+   - EXEMPLO DE DELETE [remove]:
+      EntityManager	manager	=	//abrir	um	EntityManager
+      Tarefa	encontrada	=	manager.find(Tarefa.class,	1L);
+      manager.getTransaction().begin();
+      manager.remove(encontrada);
+      manager.getTransaction().commit();
+
+   - LISTANDO TABELAS COM HIBERNATE:
+      Query query = manager.createQuery("SELECT t FROM Tarefa as t WHERE t.finalizado = :paramFinalizado");
+      query.setParameter("paramFinalizado", true);
+      
+      List<Tarefa> lista = query.getResultList();
+      
+      for (Tarefa t : lista) {
+        System.out.println(t.getDescricao());
+        System.out.println(t.getId());
+      }
+      manager.close();
 
 * IMPLEMENTAÇÃO:
+
 	- CÓDIGOS UTILIZADOS NOS MODELOS:
 	      - CÓDIGO BASE:
 	      @Entity --> indica o objeto para se tornar persistível
 	      @Table(name="tarefas") --> indica que será a Tabela com nome XXXX
 	      @Id --> indica que aquele atributo é um ID
-		@GeneratedValue --> serve para referenciar o ID como AUTO_INCREMENT
+        @GeneratedValue --> serve para referenciar o ID como AUTO_INCREMENT
 
 	      - P/ COLUNAS:
 	      @Column(nullable = false) --> Indica que não pode ser nulo
@@ -1323,7 +1424,40 @@ public class AdicionaContatoServlet extends HttpServlet{
 	      @DateTimeFormat(pattern="dd/MM/yyyy")
 	      @Temporal(TemporalType.DATE)  --> Temporal utilizado para datas / TemporalType indica o tipo de dado
 	      @Temporal(TemporalType.TIME)  --> TemporalType, retorna o horário
+	      
+	- CÓDIGO NOS DAOS:
+        - CÓDIGO BASE:
+        @Repository --> declara a classe como componente
+        @Autowired --> é a anotação para amarrar o construtor do Controller com o Dao
 
+*NA PRÁTICA [EXEMPLO]:
+        
+    *UsuarioController: [para esta classe devemos tirar todos new UsuarioDao dos métodos]
+
+      @Controller
+      public class UsuarioControllerMvc {
+
+        @Autowired
+        private UsuarioDao dao;
+         
+        @RequestMapping("showForm")
+        public String showForm () {
+          return("usuario/formulario");
+        }
+        
+        @RequestMapping("addUsuario")
+        public String addUsuario (Usuario user) {
+          dao.adicionar(user);
+          return("usuario/userAdd");
+        }
+        
+        @RequestMapping("listUsuario")
+        public String listUsuario (Model model) {
+          List<Usuario> lista = dao.getLista();
+          model.addAttribute("lista", lista);
+          return "usuario/listUser";
+        }
+      }
 -----------------------------------------------------------------------------------------------------------	
 FJ22 - DESENVOLVIMENTO NA PRÁTICA COM SPRING E TESTES	
 -----------------------------------------------------------------------------------------------------------	
