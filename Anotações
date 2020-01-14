@@ -21,13 +21,14 @@ https://drive.google.com/drive/u/0/folders/0B0qR-YC8wtA2NWJxUlJUYUctS1U
 		
 *ESTUDAR:
 	-Banco de dados nao relacional, como MongoDB (os relacionais serao o MySql, SQLServer)
-	-PrimeFaces (templates)
-	-GoogleVision (API)agendas/mvc?logica=ListaContatosLogic
+	-PrimeFaces (templates p/ JSF)
+	-GoogleVision (API que informa o objeto atraves da imagem)
 	-Google Cloud Platform/AWS
 	-JasperReport (iReport) -> para criar PDF, WORD, XLS
-	-XP de MESA
-	-Cerimonia de mesas ageis
+	-XP de MESA AGIL
+		-Cerimonia de mesas ageis
 	-GitKraken (demonstra de forma melhor os logs do GIT)
+	-JCIFS (usuario do windows)
 	
 *REVISÃO:
 	- SERVLET
@@ -1494,6 +1495,8 @@ CODIGOS:
 	$ git branch [lista os branches existentes do repositorio]
 		$ git branch work [irá criar o branch work]
 		$ git checkout work [seleciona a branch]
+		$ git merge master [atualiza a branch work com o ultimo master]
+		$ git checkout master [seleciona o master]
 		$ git merge work [ira atualizar baseado no branch master]
 		$ git branch -d work [ira apagar a branch]
 		
@@ -1548,10 +1551,23 @@ CRIANDO O CONTROLLER SESSAO
 
 *Tudo começa com a necessidade de passar 3 paparametros de 3 tabelas diferentes... 
 	como um unico objeto poderia passar os 3 parametros a um Controller?
+	
+	- Necessário criar um formulrio que recera responsavel por passar os 3 objetos diferentes
+	
+	1º Criamos nosso SessaoController
+		-  @Autowired em todos os Daos que serao utilizados
+		- Ira receber via @getMapping da sessao o caminho [@GetMapping("/admin/sessao")]
+		- Nossa sessao deve receber o ID da Sala e a LISTA DE FILMES
+			- Com @requestParam("id") receberemos o ID da Sala e criamos nosso metodo
+			- Como queremos popular o input, devemos utilizar o ModelAndView;
+				mv.addObject("sala", salaDao.findOne(salaId));
+				mv.addObject("filmes", filmeDao.findAll());
+			- retornamos nosso mv;
+			
+	
 
 @getMapping("") --> so recebe GET de um formulario (nao pode POST)
 @requestParam("id") --> serve para solicitar algum parametro do formulario (como um ID)
-@autowired --> gerencia os atributos no controller (utilizado para declarar os privates SessaoDao)
 
 *MODELO (criará a tabela)
 @Entity --> para ser uma tabela em um banco de dados
