@@ -889,6 +889,11 @@ public class AdicionaContatoServlet extends HttpServlet{
 			<context:component-scan base-package="br.com.caelum.tarefas" />
 			<mvc:annotation-driven />
 			
+			<bean	
+				class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+				<property	name="prefix" value="/WEB-INF/views/"/>
+				<property	name="suffix" value=".jsp"/>
+			</bean>
 // ---------------------CONTROLLER - CRUD -----------------------------------------------------------			
 *REVISANDO SPRING MVC:
 	*Todos métodos retornam uma String
