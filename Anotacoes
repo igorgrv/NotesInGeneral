@@ -21,13 +21,14 @@ https://drive.google.com/drive/u/0/folders/0B0qR-YC8wtA2NWJxUlJUYUctS1U
 		
 *ESTUDAR:
 	-Banco de dados nao relacional, como MongoDB (os relacionais serao o MySql, SQLServer)
-	-PrimeFaces (templates)
-	-GoogleVision (API)agendas/mvc?logica=ListaContatosLogic
+	-PrimeFaces (templates p/ JSF)
+	-GoogleVision (API que informa o objeto atraves da imagem)
 	-Google Cloud Platform/AWS
 	-JasperReport (iReport) -> para criar PDF, WORD, XLS
-	-XP de MESA
-	-Cerimonia de mesas ageis
+	-XP de MESA AGIL
+		-Cerimonia de mesas ageis
 	-GitKraken (demonstra de forma melhor os logs do GIT)
+	-JCIFS (usuario do windows)
 	
 *REVISÃO:
 	- SERVLET
@@ -123,16 +124,13 @@ import java.sql.SQLException;
 
 public class ConnectionFactory {
 
-	public Connection getConnection() throws SQLException {
-		System.out.println("conectando ...");
-
+	public Connection getConnection() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-		} catch (ClassNotFoundException e) {
-			throw new SQLException(e);
+			return DriverManager.getConnection("jdbc:mysql://localhost/fj21?useTimezone=true&serverTimezone=UTC&useSSL=false", "root","");
+		} catch (SQLException e){		
+			throw new RuntimeException(e);
 		}
-
-		return DriverManager.getConnection("jdbc:mysql://localhost/portal_rv?useTimezone=true&serverTimezone=UTC&useSSL=false", "root","root");
 	}
 
 }
@@ -890,12 +888,12 @@ public class AdicionaContatoServlet extends HttpServlet{
 // ---------------------irá scanear onde ficará a aplicação -----------------------------------------------------------
 			<context:component-scan base-package="br.com.caelum.tarefas" />
 			<mvc:annotation-driven />
+			
 			<bean	
 				class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 				<property	name="prefix" value="/WEB-INF/views/"/>
 				<property	name="suffix" value=".jsp"/>
-      </bean>
-    </beans>
+			</bean>
 // ---------------------CONTROLLER - CRUD -----------------------------------------------------------			
 *REVISANDO SPRING MVC:
 	*Todos métodos retornam uma String
@@ -1242,7 +1240,6 @@ public class AdicionaContatoServlet extends HttpServlet{
 		@Repository -> informa que e para acesso ao banco de Dados
 		@Controller -> informa que se trata de um controlador
 	
-
 // ------------------------- CAPITULO 14 - HIBERNATE E JPA --------------------------------------------------
 * PARA QUE SERVE HIBERNATE?
   - Dependendo do fabricante, temos diferenças significativas no modo de executar nossos comando SQL;
@@ -1467,8 +1464,6 @@ public class AdicionaContatoServlet extends HttpServlet{
           return "usuario/listUser";
         }
       }
-        
-
 -----------------------------------------------------------------------------------------------------------	
 FJ22 - DESENVOLVIMENTO NA PRÁTICA COM SPRING E TESTES	
 -----------------------------------------------------------------------------------------------------------	
@@ -1505,6 +1500,8 @@ CODIGOS:
 	$ git branch [lista os branches existentes do repositorio]
 		$ git branch work [irá criar o branch work]
 		$ git checkout work [seleciona a branch]
+		$ git merge master [atualiza a branch work com o ultimo master]
+		$ git checkout master [seleciona o master]
 		$ git merge work [ira atualizar baseado no branch master]
 		$ git branch -d work [ira apagar a branch]
 		
@@ -1559,10 +1556,23 @@ CRIANDO O CONTROLLER SESSAO
 
 *Tudo começa com a necessidade de passar 3 paparametros de 3 tabelas diferentes... 
 	como um unico objeto poderia passar os 3 parametros a um Controller?
+	
+	- Necessário criar um formulrio que recera responsavel por passar os 3 objetos diferentes
+	
+	1º Criamos nosso SessaoController
+		-  @Autowired em todos os Daos que serao utilizados
+		- Ira receber via @getMapping da sessao o caminho [@GetMapping("/admin/sessao")]
+		- Nossa sessao deve receber o ID da Sala e a LISTA DE FILMES
+			- Com @requestParam("id") receberemos o ID da Sala e criamos nosso metodo
+			- Como queremos popular o input, devemos utilizar o ModelAndView;
+				mv.addObject("sala", salaDao.findOne(salaId));
+				mv.addObject("filmes", filmeDao.findAll());
+			- retornamos nosso mv;
+			
+	
 
 @getMapping("") --> so recebe GET de um formulario (nao pode POST)
 @requestParam("id") --> serve para solicitar algum parametro do formulario (como um ID)
-@autowired --> gerencia os atributos no controller (utilizado para declarar os privates SessaoDao)
 
 *MODELO (criará a tabela)
 @Entity --> para ser uma tabela em um banco de dados
