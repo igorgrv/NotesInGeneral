@@ -83,16 +83,20 @@ ARQUIVOS A SEREM CONFIGURADOS:
       <property name="suffix" value=".jsp" />
     </bean>
     
--------- SPRING-CONTEXT.XML PARA O JPA HIBERNATE ------------
-    
-    <bean id="mysqlDataSource" class="org.apache.commons.dbcp.BasicDataSource"> --> para o JPA declarar dados d banco
+-------- SPRING-CONTEXT.XML PARA O SPRING GERENCIAR O JPA HIBERNATE ------------
+--> para o SPRING declarar dados d banco
+
+    <bean id="mysqlDataSource" class="org.apache.commons.dbcp.BasicDataSource"> 
       <property name="driverClassName" value="com.mysql.jdbc.Driver" />
       <property name="url" value="jdbc:mysql://localhost/portal_rv" />
       <property name="username" value="root" />
       <property name="password" value="" />
     </bean>
     
-    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"> --> criar as conexões sem precisar dar commit
+-------- SPRING-CONTEXT.XML PARA O JPA HIBERNATE ------------
+--> criar as conexões sem precisar dar commit
+
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"> 
       <property name="dataSource" ref="mysqlDataSource" />
       <property name="jpaVendorAdapter">
     <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
@@ -100,12 +104,13 @@ ARQUIVOS A SEREM CONFIGURADOS:
     </bean>
     
 -------- SPRING-CONTEXT.XML PARA O TRANSACTIONAL ------------
-    <tx:annotation-driven/>
-    
+        
     <bean	id="transactionManager"
 												class="org.springframework.orm.jpa.JpaTransactionManager">
 				<property	name="entityManagerFactory" ref="entityManagerFactory"/>
     </bean>
+    
+    <tx:annotation-driven/>
     
 ----------------------------------------------------------------
 
@@ -147,6 +152,8 @@ ARQUIVOS A SEREM CONFIGURADOS:
     jboss-logging
     jboss-logging-annotations
     jboss-transaction-api
+
+*CRIE O XML NA PASTA --> src/META-INF/persistence.xml
 
 ----------------------------------------------------
 *CODIGOS UTILIZADOS:
