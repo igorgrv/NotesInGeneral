@@ -1,0 +1,230 @@
+CONFIGURANDO O SPRING + JPA + TRANSACTIONAL
+-----------------------------------------------------------------------------------------------------------
+ARQUIVOS A SEREM CONFIGURADOS:
+  - web.xml
+  - spring-context.xml
+  - persistence.xml
+
+---------------- WEB.XML -------------------------------
+*ARQUIVO RESPONSÁVEL POR:
+  - Direcionar a pagina ao entrar;
+  - Declarar o spring
+  
+*CODIGOS UTILIZADOS
+  <display-name>  --> responsavel pelo nome d projeto;
+    <display-name>fj21review</display-name>
+    
+  <welcome-file-list> --> declara a lista de pag. que ao acessar o nome d proj. ira aparecer
+    <welcome-file-list>
+      <welcome-file>index.html</welcome-file>
+      <welcome-file>index.htm</welcome-file>
+      <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+    
+  <session-config> --> configura tempo de uma sessão aberta
+  	<session-timeout>3</session-timeout>
+  </session-config>
+  
+ 
+*DECLARANDO NO WEB.xml --> https://spring.io/blog/2011/01/04/green-beans-getting-started-with-spring-mvc/
+  <servlet>
+		<servlet-name>springmvc</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/spring-context.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>springmvc</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+	
+---------------- SPRING-CONTEXT.XML -------------------------------------------------------------------------
+*ARQUIVO RESPONSÁVEL POR:
+  - Gerenciar os BEANS d SPRING
+  - Controla o Spring
+  - Declara local das packages
+  - Declara local das views
+
+*ADD OS JARS: --> VERIFICAR VERSÃO DO JAR, PARA NÃO DAR ERRO SERVIDOR
+    spring-context.jar
+    spring-web
+    spring-core
+    spring-beans
+    spring-webmvc
+    spring-aop
+    spring-orm
+    spring-jdbc
+    spring-expression
+    
+    JARS PARA JPA + SPRING
+    aopalliance
+    spring-orm
+    spring-tx
+    commons-dbcp-x.x
+    commons-pool-x.x
+    
+
+  
+*CODIGOS UTILIZADOS:
+  <beans xmlns=....></beans> --> responsável por listar todos os beans d projeto
+    ***Dentro de beans xmlns = "o hhtp dos jars"
+    
+  <context:component-scan base-package="" /> --> indica a base d pacote
+  
+  <mvc:annotation-driven /> --> habilita o @Controller
+
+  <bean class=""></bean> --> sera declarado as dependencias
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"> --> para declarar as views
+      <property name="prefix" value="/WEB-INF/views/" />
+      <property name="suffix" value=".jsp" />
+    </bean>
+    
+-------- SPRING-CONTEXT.XML PARA O JPA HIBERNATE ------------
+    
+    <bean id="mysqlDataSource" class="org.apache.commons.dbcp.BasicDataSource"> --> para o JPA declarar dados d banco
+      <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+      <property name="url" value="jdbc:mysql://localhost/portal_rv" />
+      <property name="username" value="root" />
+      <property name="password" value="" />
+    </bean>
+    
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"> --> criar as conexões sem precisar dar commit
+      <property name="dataSource" ref="mysqlDataSource" />
+      <property name="jpaVendorAdapter">
+    <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+      </property>
+    </bean>
+    
+-------- SPRING-CONTEXT.XML PARA O TRANSACTIONAL ------------
+    <tx:annotation-driven/>
+    
+    <bean	id="transactionManager"
+												class="org.springframework.orm.jpa.JpaTransactionManager">
+				<property	name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+    
+----------------------------------------------------------------
+
+*CODIGO BASE:
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc 
+					http://www.springframework.org/schema/beans 
+					http://www.springframework.org/schema/context 
+					http://www.springframework.org/schema/tx 
+					http://www.springframework.org/schema/aop">
+	<context:component-scan base-package="br.com.fj21review" />
+
+	<mvc:annotation-driven />
+	
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+</beans>
+
+---------------- PERSISTENCE.XML -------------------------------------------------------------------------
+*ARQUIVO RESPONSÁVEL POR:
+  - Criar a tabelas
+  - Gerencias o Hibernate
+
+*ADD OS JARS: --> VERIFICAR VERSÃO DO JAR, PARA NÃO DAR ERRO SERVIDOR
+    antlr
+    dom4j
+    hibernate-commons-annotations
+    hibernate-core
+    hibernate-entitymanager
+    hibernate-jpa-2.1-api
+    jandex
+    javassist
+    jboss-logging
+    jboss-logging-annotations
+    jboss-transaction-api
+
+----------------------------------------------------
+*CODIGOS UTILIZADOS:
+
+1º MODO CONFIGURAÇÃO [sem utilizar o SPRING] (persistence.xml) --> deve ficar na pasta src/META-INF/persistence.xml
+
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+	version="2.0">
+
+	<persistence-unit name="cursos">
+
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+		<class>com.fj21review.modelo.Cursos</class>
+
+		<properties>
+
+			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/portal_rv" />
+			<property name="javax.persistence.jdbc.user" value="root" />
+			<property name="javax.persistence.jdbc.password" value="" />
+
+			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
+			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.format_sql" value="true" />
+
+			<property name="hibernate.hbm2ddl.auto" value="update" />
+			
+		</properties>
+		
+  </persistence-unit>
+</persistence>
+
+----------------------------------------------------
+* 2º MODO CONFIGURAÇÃO [COM SPRING]:
+  *necessário utilizar os JARs,		
+  - spring-context.xml
+    <bean id="mysqlDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+      <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+      <property name="url" value="jdbc:mysql://localhost/portal_rv" />
+      <property name="username" value="root" />
+      <property name="password" value="" />
+    </bean>
+    
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+      <property name="dataSource" ref="mysqlDataSource" />
+      <property name="jpaVendorAdapter">
+    <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+      </property>
+    </bean>
+    
+  - persistence.xml:
+ 
+  <?xml version="1.0" encoding="UTF-8"?>
+  <persistence xmlns="http://java.sun.com/xml/ns/persistence"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+        http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+        version="2.0">
+        
+    <persistence-unit	name="tarefas">
+          
+      <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+      
+      <class>br.com.portalrv.modelo.Tarefa</class>
+          
+      <properties>
+        
+          <property	name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
+          <property	name="hibernate.show_sql" value="true" />
+          <property	name="hibernate.format_sql" value="true" />
+
+          <property	name="hibernate.hbm2ddl.auto" value="update" />
+          
+      </properties>
+          
+    </persistence-unit>
+  </persistence>
+
