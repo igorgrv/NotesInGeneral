@@ -1436,7 +1436,7 @@ public class AdicionaContatoServlet extends HttpServlet{
         @Repository --> declara a classe como componente
         @Autowired --> é a anotação para amarrar o construtor do Controller com o Dao
 
-*NA PRÁTICA [EXEMPLO]:
+*NA PRÁTICA [EXEMPLO COM SPRING GERENCIANDO O JPA]:
         
     *UsuarioController: [para esta classe devemos tirar todos new UsuarioDao dos métodos]
 

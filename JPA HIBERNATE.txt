@@ -1,0 +1,159 @@
+ANOTACOES JPA HIBERNATE
+-----------------------------------------------------------------------------------------------------------
+ARQUIVOS BASE:
+  - persistence.xml
+  
+ -------------------- MÉTODOS PERSISTE/HIBERNATE ------------------------------------------------------
+  - find --> pode-se utilizar como WHERE [Tarefa localizaPorId = manager.find(Tarefa.class, 1L)]
+  - remove --> utilizado como DELETE
+  - merge --> utilizado como UPDATE
+  - persist --> utilizado como INSERT [manager.persist(tarefa);]
+  
+------------------ GERANDO TABELAS ------------------------------------------------------
+*Para gerar as tabelas é necessário que seja criado uma fabrica de Conexão:
+  
+  EntityManagerFactory factory = Persistence.createEntityManagerFactory("tarefas");
+  factory.close();
+  
+*Para se trabalhar com objetos é necessário criar um Gerenciador/Manager
+  
+  EntityManager	manager	=	fact
+  ory.createEntityManager();
+  manager.close();
+
+------------------ CÓDIGOS UTILIZADOS NOS MODELOS ------------------------------------------------------
+CÓDIGO BASE:
+  @Entity --> indica o objeto para se tornar persistível (MODELO)
+  @Table(name="tarefas") --> indica que será a Tabela com nome XXXX
+  
+P/ COLUNAS:
+  @Id --> indica que aquele atributo é um ID
+  @GeneratedValue --> serve para referenciar o ID como AUTO_INCREMENT
+  @Column(nullable = false) --> Indica que não pode ser nulo
+  @Column(name = "nomeDaColuna", nullable = false) --> irá criar a coluna com este nome
+
+  @Size(min=10, max=256, message = "Deu ruim")
+  @DateTimeFormat(pattern="dd/MM/yyyy")
+  @Temporal(TemporalType.DATE)  --> Temporal utilizado para datas / TemporalType indica o tipo de dado
+  @Temporal(TemporalType.TIME)  --> TemporalType, retorna o horário
+	      
+CÓDIGO NOS DAOS:
+  @Repository --> declara a classe como componente
+  @Autowired --> é a anotação para amarrar o construtor d Controller com o Dao
+
+------------------ EXEMPLOS SEM O SPRING ------------------------------------------------------
+public class AdicionaCurso {
+
+	public static void main(String[] args) {
+		Cursos curso = new Cursos();
+		curso.setNome("Java");
+		curso.setDataCriacao(Calendar.getInstance());
+		
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("cursos");
+		EntityManager manager = factory.createEntityManager();
+		
+		manager.getTransaction().begin();;
+		manager.persist(curso);
+		manager.getTransaction().commit();
+		
+		System.out.println("Usuario " + curso.getNome() + " inserido no banco de dados");
+		
+		manager.close();
+	}
+}
+
+public class RemoveCurso {
+
+	public static void main(String[] args) {
+		
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("cursos");
+		EntityManager manager = factory.createEntityManager();
+		
+		Cursos curso = manager.find(Cursos.class, 2);
+		
+		manager.getTransaction().begin();
+		manager.remove(curso);
+		manager.getTransaction().commit();
+		
+		System.out.println("Removendo o curso " + curso.getNome() + " - ID: " + curso.getId());
+		
+		manager.close();
+
+	}
+}
+
+public class EncontraCurso {
+
+	public static void main(String[] args) {
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("cursos");
+		EntityManager manager = factory.createEntityManager();
+		
+		Cursos curso = manager.find(Cursos.class, 1);
+		
+		System.out.println("Curso " + curso.getNome() + " Localizado, com ID: " + curso.getId());
+
+	}
+}
+
+public class AtualizaCurso {
+
+	public static void main(String[] args) {
+		Cursos curso = new Cursos();
+		curso.setId(1);
+		curso.setNome("Java Spring");
+		curso.setDataCriacao(Calendar.getInstance());
+		
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("cursos");
+		EntityManager manager = factory.createEntityManager();
+		
+		manager.getTransaction().begin();
+		manager.merge(curso);
+		manager.getTransaction().commit();
+		
+		System.out.println("Curso " + curso.getNome() + " atualizado!");
+		
+		manager.close();
+
+	}
+}
+
+public class ListaCurso {
+
+	public static void main(String[] args) {
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("cursos");
+		EntityManager manager = factory.createEntityManager();
+		
+		Query query = manager.createQuery("select t from Cursos as t");
+		
+		List<Cursos> curso = query.getResultList();
+		
+		for (Cursos cursos : curso) {
+			System.out.println(cursos.getNome());
+		}
+	}
+}
+
+public class ListaCursoWithWhere {
+
+	public static void main(String[] args) {
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("cursos");
+		EntityManager manager = factory.createEntityManager();
+		
+		Query query = manager.createQuery("select t from Cursos as t where t.dataCriacao = :paramData");
+		query.setParameter("paramData", Calendar.getInstance());
+		
+		List<Cursos> curso = query.getResultList();
+		
+		for (Cursos cursos : curso) {
+			System.out.println(cursos.getNome());
+		}
+	}
+}
+
+
+
+  
+  
+  
+  
+  
