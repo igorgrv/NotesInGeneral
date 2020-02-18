@@ -9,7 +9,7 @@ http://dontpad.com/java-e-vida-8679
 *INSTALADORES:
 	- Instalar o JAVA JDK: https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 	- Instalar o MySQL (server versão 5.7 e workbench): https://dev.mysql.com/downloads/windows/installer/5.6.html
-	- Instalar o Eclipse EE: https://www.eclipse.org/downloads/packages/
+	- Instalar o Eclipse EE: https://www.eclipse.org/fdownloads/packages/
 
 *Arquivos Caelum
 https://drive.google.com/drive/u/0/folders/0B0qR-YC8wtA2NWJxUlJUYUctS1U
@@ -58,7 +58,7 @@ https://drive.google.com/drive/u/0/folders/0B0qR-YC8wtA2NWJxUlJUYUctS1U
 			Date date = new SimpleDateFormat("dd/MM/yyyy").parse(dataTexto);
 			cal.setTime(date);
 		} catch (ParseException e1) {
-			e1.printStackTrace();RemoveContatoLogic&id=9
+			e1.printStackTrace();
 		}
 		
 		Outro exemplo quando se vem direto de um Calendar
@@ -91,6 +91,8 @@ https://drive.google.com/drive/u/0/folders/0B0qR-YC8wtA2NWJxUlJUYUctS1U
 		- Transformar um Date p/ Calendar (a função setTime recebe um Date e retorna um Calendar pela palavra cal)
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(rs.getDate("dataNascimento"));
+
+
 *TRABALHANDO COM SOMAS:
 	- Para utilizar somas, o ideal é usar o tipo BigDecimal
 
@@ -1160,26 +1162,49 @@ public class AdicionaContatoServlet extends HttpServlet{
 	-Redirect = a view ira para o navegador
 
 // ---------------------- JQUERY (AJAX)-----------------------------------------------------------------------
-	-Ele roda no navegador, encaminhando uma requisição para o servidor e retornar para o ajax um sucesso ou erro
-	*Para utilizar o AJAX com o Spring MVC
+	* AJAX = 	Asynchronous	Javascript	and	XML
+	- Ele roda no navegador, encaminhando uma requisição para o servidor e retornar para o ajax um sucesso ou erro
 	
+	*COMO UTILIZAR NO SPRING?
+    -> spring-context.xml --> inserir 	<mvc:default-servlet-handler/>
+    -> em cima dos métodos @RequestMapping --> colocar @ResponseBody
+      @ResponseBody
+      @RequestMapping("finalizaAgora")
+      
+    -> no HTML --> <script	type="text/javascript" src="resources/js/jquery.js"></script>
 	
-	Relembrando JQuery
+	*Para trabalhar com JQuery, se utilizam 2 métodos:
+    -$.post || $.get
+    
+    $.get("suaRequisicao", {'id' : id}, function (){
+      //A ação para quando a função retornar sucesso
+      //Geralmente se pega o ID
+    });
+    
+	
+	*Relembrando JQuery
 		- Para pegar por ID $('#')
 		- Para alterar texto HTML $('#igor').HTML('testando');
 		- Esconder campo $('#igor').hide(); inverso show();
 		
-	Removendo a tr mais proxima:
-		function removeAgora(id){
-		//removeTarefa fica no Controller
-		$.post('removeTarefa',
-				{'id':id},
-				function(){
-					$('#remove_'+id).closest("tr").hide();
-				});
-		}
+
+------------------ EXEMPLOS ------------------------------------------------------  
+<script type="text/javascript">
+  function finalizeAgora(id){
+    $.post("finalizaCurso", {'id':id}, function() {
+      //	Selecionando o elemento HTML através do ID e alterando o HTML
+      $("#ativo_"+id).html("ATIVO");
+    });
+  }
+  
+  function removeAgora(id){
+    $.post("removeCurso", {'id':id}, function(){
+      $("#remove_"+id).closest("tr").hide();
+    });
+  }
+</script>
 	
-	Para o JQuery funcionar no navegador, precisamos que seja utilizada em cima do método Controller @ResponseBody
+
 	
 // ---------------------- *CAPITULO 12 - USUARIO LOGIN/SENHA -----------------------------------------------------------------------
 	- Principio é usar uma session (para isto precisa ser configurado no web.xml)

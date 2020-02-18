@@ -132,7 +132,6 @@ public class ListaCurso {
 		}
 	}
 }
-
 public class ListaCursoWithWhere {
 
 	public static void main(String[] args) {
@@ -149,10 +148,95 @@ public class ListaCursoWithWhere {
 		}
 	}
 }
+------------------ EXEMPLOS COM O SPRING ------------------------------------------------------
+@Repository
+public class CursoDao {
 
+	@PersistenceContext
+	private EntityManager manager;
+	
+	public void addCurso (Cursos curso) {
+		manager.persist(curso);
+	}
+	
+	public void updateCurso (Cursos curso) {
+		manager.merge(curso);
+	}
+	
+	public Cursos getId (long id) {
+		return manager.find(Cursos.class, id);
+	}
+	
+	public void remove (long id) {
+		Cursos curso = getId(id);
+		manager.remove(curso);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Cursos> list (){
+		return manager.createQuery("SELECT c FROM Cursos as c").getResultList();
+	}
+	
+	public boolean existeUsuario(Usuario usuario) {
+		TypedQuery<Usuario> query = manager.createQuery("SELECT u FROM Usuario as u WHERE u.login = :paramLogin AND u.senha = :paramSenha", Usuario.class);
+		query.setParameter("paramLogin", usuario.getLogin());
+		query.setParameter("paramSenha", usuario.getSenha());
+		
+		Usuario user = query.getSingleResult();
+		
+		if(user == null) {
+			return false;
+		} else {
+			return true;
+		}
+		//List<Usuario> list = query.getResultList();
+	}
+	
+}
 
+@Controller
+@Transactional
+public class CursoController {
 
-  
+	@Autowired
+	private CursoDao dao;
+	
+	@RequestMapping("/formCurso")
+	public String formCurso () {
+		return "curso/formCurso";
+	}
+	
+	@RequestMapping("/listCurso")
+	public String listCurso (Model model) {
+		model.addAttribute("curso", dao.list());
+		return "curso/listCurso";
+	}
+	
+	@RequestMapping("addCurso")
+	public String addCurso (Cursos curso) {
+		dao.addCurso(curso);
+		return "redirect: listCurso";
+	}
+	
+	@RequestMapping("removeCurso")
+	public String removeCurso (Long id) {
+		dao.remove(id);
+		return "redirect: listCurso";
+	}
+	
+	@RequestMapping("editCurso")
+	public String editForm (Model model, Long id) {
+		model.addAttribute("curso", dao.getId(id));
+		return "curso/editForm";
+	}
+	
+	@RequestMapping("updateCurso")
+	public String updateCurso (Cursos curso) {
+		dao.updateCurso(curso);
+		return "redirect: listCurso" ;
+	}
+}
+
   
   
   

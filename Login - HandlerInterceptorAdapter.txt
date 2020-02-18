@@ -1,0 +1,123 @@
+ANOTACOES LOGIN -> HandlerInterceptorAdapter
+-----------------------------------------------------------------------------------------------------------
+ARQUIVOS BASE:
+  spring-context.xml
+  web.xml
+  
+  com.fj21.controller
+    - UsuarioController
+  
+  com.fj21.dao
+    - UsuarioDao
+  
+  com.fj21.intercptor
+    - AutorizadorInterceptor
+    
+  index.jsp
+  loginForm.jsp
+    
+------------------ SPRING-CONTEXT || WEB.XML ---------------------------------------
+Spring.xml:
+  <mvc:interceptors>
+		<bean class="com.fj21review.interceptor.AutorizadorInterceptor" />
+	</mvc:interceptors>
+	
+web.xml:
+
+  <session-config>
+    <session-timeout>2</session-timeout>
+  </session-config>
+    
+------------------ UsuarioDao ------------------------------------------------------
+@Repository
+public class UsuarioDao {
+
+	@PersistenceContext
+	private EntityManager manager;
+	
+	public boolean existeUsuario(Usuario usuario) {
+		TypedQuery<Usuario> query = manager.createQuery("SELECT u FROM Usuario as u WHERE u.login = :paramLogin AND u.senha = :paramSenha", Usuario.class);
+		query.setParameter("paramLogin", usuario.getLogin());
+		query.setParameter("paramSenha", usuario.getSenha());
+		
+		Usuario user = query.getSingleResult();
+		
+		if(user == null) {
+			return false;
+		} else {
+			return true;
+		}
+		//List<Usuario> list = query.getResultList();
+	}
+	
+}
+
+------------------ UsuarioController ---------------------------------------------------
+@Controller
+public class LoginController {
+
+	@Autowired
+	private UsuarioDao dao;
+	
+	@RequestMapping("login")
+	public String loginForm() {
+		return "loginForm";
+	}
+	
+	@RequestMapping("efetuaLogin")
+	public String efetuaLogin(Usuario usuario, HttpSession session) {
+		if(dao.existeUsuario(usuario)) {
+		//setAttribute irá salvar na string "usuarioLogado" o objeto usuario
+		session.setAttribute("usuarioLogado", usuario);
+		return "index";
+		} else {
+			return "redirect: login";
+		}
+	}
+	
+	@RequestMapping("logout")
+	public String logout(HttpSession session) {
+		session.invalidate();
+		return "redirect: login";
+	}
+}
+
+------------------ AutorizadorInterceptor ------------------------------------------------
+public class AutorizadorInterceptor extends HandlerInterceptorAdapter{
+
+	public boolean preHandle (HttpServletRequest req, HttpServletResponse res, Object controller) throws IOException {
+		String uri = req.getRequestURI();
+		if(uri.endsWith("login") || uri.endsWith("efetuaLogin") || uri.contains("resources")) {
+			return true;
+		}
+		if(req.getSession().getAttribute("usuarioLogado") != null) {
+			return true;
+		}
+		res.sendRedirect("login");
+		return false;
+	}
+}
+
+------------------ INDEX.JSP ----------------------------------------------------------
+<body>
+	<div align="right">
+		<a href="logout">Logout</a>
+	</div>
+	<H2>Bem Vindo, ${usuarioLogado.login}!</H2><hr>
+	<a href="listCurso">Clique aqui</a> para acessar a lista de Cursos Cadastrados!
+</body>
+
+------------------ LOGINFORM.JSP ----------------------------------------------------------
+<body>
+	<h2>Pagina de Login</h2><hr>
+	
+	<form action="efetuaLogin" method="post">
+		Login: <input type="text" name="login"> <br>
+		Senha: <input type="password" name="senha"> <br><br>
+		<input type="submit" value="Entrar">
+	</form>
+</body>
+
+
+
+
