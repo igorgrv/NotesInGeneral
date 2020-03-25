@@ -237,7 +237,15 @@ public class CursoController {
 	}
 }
 
-  
-  
+//---------------- VIEWS-----------------------------
+
+<h2>Alterando o curso ${curso.nome} - ID: ${curso.id}</h2>
+<form action="updateCurso" method="POST">
+  <input type="hidden" name="id" value="${curso.id}">
+  Nome Curso: <input type="text" name="nome" value="${curso.nome}"> <br>
+  Curso ativo: <input type="checkbox" name="ativo" value="true" ${curso.ativo? 'checked' : ''}> <br>
+  Data início turma: <input type="text" name="dataInicio" value='<fmt:formatDate value="${curso.dataInicio.time}" pattern="dd/MM/yyyy" />'> <br>
+  <input type="submit" value="Atualiza Curso">
+</form>
   
   

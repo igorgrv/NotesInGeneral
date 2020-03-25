@@ -1,0 +1,66 @@
+VERSIONAMENTO DE CODIGO
+
+*Para que precisamos versionar um código? De certa forma, mexer em um projeto pode ser assustador, pois podemos mexer em algo e danificar
+outras. Porque, dependendo da mudança fica dificil voltar ao estado anterior.
+*Um versionador e o sistema que ira gerenciar as versoes do projeto
+*Uma solução para as mudança é o versionamento de codigo.
+
+GIT
+	- Com o GIT podemos escolher o arquivo que será comitado.
+	- DOWNLOAD para WINDOWS: 
+
+
+CODIGOS:
+	cd [permite que acesse o repositorio]
+		- cd Caelum [irá acessar o repositorio Caelum]
+		
+	
+	$ git init [cria um repositorio]
+	$ git clone git://endereco.git [cria um clone do diretorio informado para a maquina local, ir fazer o downlaod]
+	$ git status [irá demonstrar o que esta para ser alterado e etc]
+		#Changes to be committed: [estarão os arquivos que serao comitados]
+		#Changes not staged for commit: [estarão os arquivos que EXISTEM e COM ALTERAÇÃO]
+		#Untracked files: [estarao ARQUIVOS NOVOS]
+	$ git add seunome.txt[irá adicionar o arquivo SEUNOME]
+	$ git commit -m [informa a mensagem para ser adicionada]
+	$ git commit -a -m [adiciona todos]
+	$ git push [ira adicionar ao GITHUB]
+	$ git log [ira exibir os commites feitos]
+		$ git log --oneline
+		$ git log --oneline -n 2 [ira exibir os 2 commits]
+	$ git branch [lista os branches existentes do repositorio]
+		$ git branch work [irá criar o branch work]
+		$ git checkout work [seleciona a branch]
+		$ git merge master [atualiza a branch work com o ultimo master]
+		$ git checkout master [seleciona o master]
+		$ git merge work [ira atualizar baseado no branch master]
+		$ git branch -d work [ira apagar a branch]
+	
+PADRÃO PARA ATUALIZAR MASTER E INCLUIR A WORK:
+  $ git checkout master
+  $ git pull
+  $ git checkout work
+  $ git rebase master
+  $ git checkout master
+  $ git merge work
+  $ git branch -d work
+		
+BRANCH:
+Toda aplicação possui uma branch MASTER, onde fica o cdigo em producao.
+	-Ex.: O joão esta desenvolvendo o cadastro de usuario, sendo assim ele ira criar a branch cadastro.
+		$ git branch cadastro
+		$ git checkout cadastro
+		
+	      Apos joao ter criado o projeto, precisa adicionar o projeto a Master, porém antes precisamos do branch master atualizado
+	        $ git checkout cadastro
+		$ git merge master
+		
+		//apos ter atualizado branch cadastro com as att de master, esta na hora de atualizar a master com as novas inf. da branch cadastro
+		$ git checkout master
+		$ git merge cadastro
+		
+	      João não precisa mais da branch cadastro, podera deletar
+	        $ git branch -d work
+	      
+	      Basta agora atualziar o github
+	        $ git push

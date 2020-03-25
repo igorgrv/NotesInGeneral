@@ -1,0 +1,70 @@
+JUnit - Java Unitário
+------------------------------------------------------------------------------------
+VANTAGENS:
+  •Permite a criação rápida de código de teste enquanto possibilita um aumento na qualidade do sistema sendo desenvolvido e testado;
+  •Não é necessário escrever o próprio framework;
+  •Amplamente utilizado pelos desenvolvedores da comunidade código-aberto, possuindo um grande número de exemplos;
+  •Uma vez escritos, os testes são executados rapidamente sem que, para isso, seja interrompido o processo de desenvolvimento;
+  •JUnit checa os resultados dos testes e fornece uma resposta imediata;
+  •Pode-se criar uma hierarquia de testes que permitirá testar apenas uma parte do sistema ou todo ele;
+  •Escrever testes com JUnit permite que o programador perca menos tempo depurando seu código;
+  •JUnit é LIVRE.
+  
+DECLARANDO MAVEN:
+  <dependency>
+    <groupId>junit</groupId>
+    <artifactId>junit</artifactId>
+    <version>4.12</version>
+  </dependency>
+  
+FAZENDO OS PRIMEIROS TESTES:
+  O intuito dos teste unitarios, sao testar os metodos de validacao do projeto!
+  
+  1º comecar replicando o pacote que possui validacoes
+    - Por padrao se o metodo chama "Gerenciador", no JUnit chamara "GerenciadorTest"
+  2º mapear o que sera possivel e nao possivel
+    - Ex.: 
+        - Nao podemos ter uma sessao no mesmo horario de comeco da outra;
+        - Nao podemos criar uma sessao que gere conflito com horario da proxima sessao;
+        - Podemos adicionar caso nao tenha nenhuma sessao (List = null);
+        - Podemos adicionar se o horario nao for conflitante;
+        - Podemos adicionar se nao houve conflito de horarios nas sessoes;
+  3º Para criar cenarios de teste, devemos colocar a anotacao @Test nos metodos:
+    - Ex.:
+        @Test
+        public void deveAdicionarSeListaDaSessaoEstiverVazia(){
+        }
+  4º Com a anotacao @Before, podemos deixar as informacoes padroes de teste para o JUnit,
+    desta forma podemos testar chamando somente anotacoes
+    - Ex.:
+        public class GerenciadorDeSessaoTest {
+
+          private Filme rogueOne;
+          private Sala sala3D;
+          private Sessao sessaoDasDez;
+          private Sessao sessaoDasTreze;
+          private Sessao sessaoDasDezoito;
+          
+          @Before
+          public void preparaSessao() {
+            this.rogueOne = new Filme("Rogue One", Duration.ofMinutes(120), "Acao");
+            this.sala3D = new Sala("sala 3D");
+            
+            this.sessaoDasDez = new Sessao(LocalTime.parse("10:00:00"), rogueOne, sala3D);
+            this.sessaoDasTreze = new Sessao(LocalTime.parse("13:00:00"), rogueOne, sala3D);
+            this.sessaoDasDezoito = new Sessao(LocalTime.parse("18:00:00"), rogueOne, sala3D);
+          }
+        }
+  
+  5º Para verificar se ira "poder" ou "nao poder", utilizamos a classe Assert
+    - Ex.:
+        @Test
+        public void deveAdicionarSeListaDaSessaoEstiverVazia(){
+          boolean cabe = gerenciador.cabe(sessao);
+            //Espereamos que retorn true neste caso
+          Assert.assertTrue(cabe);
+        }
+  
+EXEMPLO PRATICO COM O GERENCIADOR DE SESSOES:
+  
+  

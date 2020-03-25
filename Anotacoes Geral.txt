@@ -19,6 +19,16 @@ https://drive.google.com/drive/u/0/folders/0B0qR-YC8wtA2NWJxUlJUYUctS1U
 		<%@	taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"	%>
 		<%@	taglib uri="http://www.springframework.org/tags/form" prefix="form"	%>
 		
+*Iniciando MAVEN com JETTY
+  - Baixar o maven (http://maven.apache.org/download.cgi) -> Binary File
+  - Extrair e colar em um diretório -> configurar o path %M2_HOME%
+  - Verificar se está funcionando com -> mvn -v
+  - Executar os comandos:
+    - $ mvn dependency:resolve
+    - $ mvn dependency:tree
+    - $ mvn package jetty:run (caso de erro, rode em outra porta "mvn -Djetty.port=8888 jetty:run")
+    - Verifique se rodou utilizando o "localhost/8080"
+		
 *ESTUDAR:
 	-Banco de dados nao relacional, como MongoDB (os relacionais serao o MySql, SQLServer)
 	-PrimeFaces (templates p/ JSF)

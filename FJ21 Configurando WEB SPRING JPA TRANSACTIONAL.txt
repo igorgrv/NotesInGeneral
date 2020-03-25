@@ -38,7 +38,8 @@ ARQUIVOS A SEREM CONFIGURADOS:
       <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
     
-  <session-config> --> configura tempo de uma sessão aberta
+  <!-- configura tempo de uma sessão aberta --> 
+  <session-config> 
   	<session-timeout>3</session-timeout>
   </session-config>
   	
@@ -160,6 +161,11 @@ ARQUIVOS A SEREM CONFIGURADOS:
     </bean>
     
     <tx:annotation-driven/>
+    
+-------- SPRING-CONTEXT.XML PARA O LOGIN INTERCPTOR ------------
+  <mvc:interceptors>
+		<bean class="com.fj21review.interceptor.AutorizadorInterceptor" />
+	</mvc:interceptors>
     
 ----------------------------------------------------------------
 
