@@ -1,0 +1,32 @@
+UML - Linguagem de Modelagem Unificada
+-----------------------------------------------------------------
+O QUE É?
+  A UML se baseia na Orientação a Objetos, onde seu objetivo é comunicação clara e simples
+  do projeto!
+  
+LIVROS RECOMENDADOS:
+  • UML - Guia do usuário (Rumbaugh, James; Booch, Grady; Jacobson, Ivar)
+  • UML 2 - Uma Abordagem Prática (Gilleanes T. A. Guedes)
+  • UML 2.5 Com Enterprise Architect 10 - Modelagem Visual de Projetos Orientada A Objetos (Teixeira de Carvalho, José Henrique)
+  • UML Essencial (Martin Fowler)
+  
+PROGRAMAS UTILIZADOS: 
+  • ASTAH - http://astah.net/editions/community
+  • ArgoUML - http://argouml.tigris.org/
+  • Enterprise Architect - http://www.sparxsystems.com/
+  • DRAW[ONLINE] - http://draw.io
+  
+
+---------------- COMEÇANDO A MODELAGEM ---------------------
+1º DIAGRAMA "Caso de uso"
+  • Este diagrama consistente em pensar em tudo que o Usuario precisa/Tudo o que tera no Sistema
+  • POREM - ATENTAR AS PRINCIPAIS FUNCIONALIDADES (Genérico)
+  • Por exemplo, E-LEARNING:
+    • Principais funções:
+      • Comprar Curso; [ator: Aluno]
+      • Assistir video; [ator: Aluno]
+      • Responder Exercicio: [ator: Professor]
+      • Revisar exercicio;[ator: Professor]
+    • Atores [serao aqueles que iram executar as funções):
+      • Aluno;
+      • Professor;

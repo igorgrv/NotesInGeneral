@@ -832,15 +832,146 @@ Características:
         
         }
 
+/*
+------------- STREAM ----------------
+*/
 
+• O método STREAM consistente em simplificar algumas funções, como foreach, ifs e arrays, por exemplo.
+• COMO FUNCIONA:
 
+              | Operações intermediarias|    |Operação Final|
+  |Source| -> |Filter| -> |Sort| -> |Map| -> |Collect|
+  
+  Source: pode ser criada por Collections, Lists, Sets, ints
+  
+  Operações intermediarias: Zero ou mais operadores sao permitidos!
+    1º filtro -> 2º Ordenar ou mapear
+    
+    Exemplo métodos Operações intermediarias:
+      anyMatch();   flatmap();
+      distinct();   map();
+      filter();     skip();
+      findFirst();  sorted();
+  
+  Operação Final: uma operação é permitida, podendo ser 
+    • FOREACH [aplica o metodo para cada elemento da Lista]  
+    • COLLECT [sava o elemento na collection]
+    • Outras opções reduzem a stream para um elemento único:
+        count();  reduce();
+        max();    summaryStatistics();
+        min();
 
+EXEMPLOS:
+  
+  • RETORNAR O MENOR NUMERO DE UM ARRAY
+    
+    ANTES:
+      int[] numbers = {4,1,13,90,16,2,0};
+      
+      int min = numbers[0];
 
+      for (int i = 1; i < numbers.length; i++) {
+        if(min > numbers[i]) {
+          min = numbers[i];
+        }
+      }
+      System.out.println("O menor numero: " + min);
 
+    DEPOIS:
+      int[] numbers = {4,1,13,90,16,2,0};
+		
+      int min = IntStream.of(numbers).min().getAsInt();
+      System.out.println("O menor numero: " + min);
+      
+      //ou c/ lambda      
+      IntStream.of(numbers).min()
+        .ifPresent(min -> System.out.println("O menor numero: " + min));
+        
+      //ou s/ lambda
+      IntStream.of(numbers).min().ifPresent(System.out::println);
+      
+    
+------------- *IMPLEMENTACÕES DO STREAM ---------------    
+  IntStream.of(numbers).distinct(); //numeros distintos
+  IntStream.of(numbers).sorted();   //ordena
+                       .sorted(Comparator.comparing(Funcionarios::getSalario).reversed) //ordena baseado no salario
+  IntStream.of(numbers).limit(3);   //limita a 3
+  IntStream.of(numbers).skip(3);    // pula os 3 primeiros
+  IntStream.of(numbers).filter(num -> num%2 == 0); //retornaria os pares
+  IntStream.of(numbers).map(num -> num*2);  //O map ira trabalhar por elementos, neste caso dobrara cada numero
+                       .map(Funcionarios::getNome)  //Retorna somente os nomes
+  IntStream.of(numbers).skip(3);  //converte cada numero em Integer
+  
+  IntStream.of(numbers).anyMatch(num -> num % 2 == 1); //tem algum numero impar?
+  IntStream.of(numbers).allMatch(num -> num % 2 == 1); //todos são numeros impares?
+  IntStream.of(numbers).noneMatch(num -> num % 2 == 1); //nenhum numero impar?
+  
+  IntStream.range(1,100).forEach(System.out::println); //print 1 a 99
+  IntStream.range(1,100).toArray(); //Cria array de 1 a 99
+  IntStream.range(1,100).boxed().collect(Collectors.toList()); //Cria lista
+  
+  IntStream.of(numbers).max();
+    IntStream.of(numbers).max().ifPresent(max -> System.out.println("O maior: " + max));
+  IntStream.of(numbers).average();
+  
+  IntStream.of(numbers).count();
+    long count = IntStream.of(numbers).count();
+    System.out.println(count);
+    
+  IntStream.of(numbers).sum();
+  
+  IntSummaryStatistics stats = IntStream.of(numbers).summaryStatistics();
+  int max = stats.getMax();
+  int min = stats.getMin();
+  int count = (int) stats.getCount();
+  int media = (int) stats.getAverage();
+  int soma = (int) stats.getSum();		
+  System.out.println(max + " - " + min + " - " +  count + " - " +  media + " - " +  soma);
+  
+  
+  • RETORNAR O 3 MENORES NUMEROS DISTINTOS
+      IntStream.of(numbers)
+				.distinct()
+				.sorted()
+				.limit(3)
+				.forEach(c-> System.out.println("numero: "+c));
+			//.forEach(System.out::println);
+			
+  • SOMAR OS 3 PRIMEIROS NUMEROS   
+      IntStream.of(numbers)
+				.distinct()
+				.sorted()
+				.limit(3)
+				.sum();
 
+  • RETORNAR NOME DAS 3 PESSOAS COM MENOR SALARIO A PARTIR DE 2000.00
+    
+    Funcionarios f1 = new Funcionarios("Igor", 3000.00);
+		Funcionarios f2 = new Funcionarios("Andre", 1000.00);
+		Funcionarios f3 = new Funcionarios("Joao", 2000.00);
+		Funcionarios f4 = new Funcionarios("Paulo", 4000.00);
+		
+		List<Funcionarios> listFuncionarios = Arrays.asList(f1,f2,f3,f4);
+		
+		listFuncionarios.stream()
+                    .filter(f -> f.getSalario() >= 2000.00)
+                    .sorted(Comparator.comparing(Funcionarios::getSalario))
+                    .limit(3)
+                    .map(Funcionarios::getNome)
+                    .forEach(System.out::println);
 
-
-
+  • RETORNAR UMA LISTA DE INGRESSOS (onde o Ingresso, é composto por uma Sessao, Lugar e Tipo de Ingresso)
+  
+    private List<Ingresso> ingressos;
+  
+    public List<Ingresso> toIngressos(SessaoDao sessaoDao, LugarDao lugarDao){
+      return this.ingressos.stream().map(ingresso -> {
+        Sessao sessao = sessaoDao.findOne(ingresso.getSessao().getId());
+        Lugar lugar = lugarDao.findOne(ingresso.getLugar().getId());
+        TipoIngresso tipo = ingresso.getTipoDeIngresso();
+        return new Ingresso(sessao,lugar,tipo);
+      }).collect(Collectors.toList());
+    }
 
 
 

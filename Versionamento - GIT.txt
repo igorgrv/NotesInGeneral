@@ -28,19 +28,21 @@ CODIGOS:
 	$ git log [ira exibir os commites feitos]
 		$ git log --oneline
 		$ git log --oneline -n 2 [ira exibir os 2 commits]
+      [PARA SAIR DO GIT LOG PRESSIONE O BOTAO 'Q']
 	$ git branch [lista os branches existentes do repositorio]
-		$ git branch work [irá criar o branch work]
-		$ git checkout work [seleciona a branch]
-		$ git merge master [atualiza a branch work com o ultimo master]
-		$ git checkout master [seleciona o master]
-		$ git merge work [ira atualizar baseado no branch master]
-		$ git branch -d work [ira apagar a branch]
-	
+
+PADRÃO PARA LIMPAR UNTRACKED FILES:
+  $ git clean -n [ira exibir oq sera excluido]
+  $ git clean -f [ira remover todos untracked]
+
 PADRÃO PARA ATUALIZAR MASTER E INCLUIR A WORK:
   $ git checkout -b sessao
-	'realiza as alterações necessaria
+  'realiza as alterações necessaria
+    $ git add -A
+    $ git commit -am "atualizacoes na branch"
+  $ git checkout master
   $ git pull
-	$ git checkout sessao
+  $ git checkout sessao
   $ git rebase master
   $ git checkout master
   $ git merge sessao 
@@ -54,6 +56,10 @@ PADRÃO PARA VOLTAR A UMA VERSÃO MAIS ANTIGA:
   
   $ git reset -hard b173970
   'b173970 é o numero do commit
+  
+  ou
+  
+  $ git checkout b173970 [selecione o commit que deseja voltar]
 		
 BRANCH:
 Toda aplicação possui uma branch MASTER, onde fica o cdigo em producao.

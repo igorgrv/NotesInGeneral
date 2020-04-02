@@ -28,7 +28,13 @@ CÓDIGO BASE:
   
 P/ COLUNAS:
   @Id --> indica que aquele atributo é um ID
-  @GeneratedValue --> serve para referenciar o ID como AUTO_INCREMENT
+    @GeneratedValue --> serve para deixar o Hibernate responsavel por gerenciar o ID
+      GenerationType.AUTO -> Valor padrão, deixa com o provedor de persistência a escolha da estratégia mais adequada 
+        de acordo com o banco de dados.
+      
+      GenerationType.IDENTITY -> Identificador único serão gerados pela coluna de auto incremento do banco de dados.
+      
+      
   @Column(nullable = false) --> Indica que não pode ser nulo
   @Column(name = "nomeDaColuna", nullable = false) --> irá criar a coluna com este nome
 

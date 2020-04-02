@@ -40,4 +40,7 @@
   }
 </script>
 	
+*Na JSP devemos colocar dentro da tag <td> o ID
+  *Ex.:
+    <td id="remove_${id}"> </td>
 	

@@ -134,7 +134,14 @@ public class GerenciadorDeSessao {
 ------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------
-USO DE INTERFACES
+USO DE INTERFACES e ENUMS
+*Interfaces: utilize as interfaces quando forem estipulados metodos padroes
+*Enum: quando os atributos forem padroes
+
+*Interface+enum = o ENUM utilizara os metodos das Interface, como um nome "atalho" para cada metodo
+
+
+----------------------- INTERFACES -----------------------
 
 public interface Desconto {
 
@@ -167,24 +174,77 @@ public class DescontoZero implements Desconto{
 
 }
 
-INGRESSO UTILIZARÁ O DESCONTO
-public class Ingresso {
 
-	private Sessao sessao;
-	private BigDecimal preco;	
+---------------------- ENUM -----------------------------
+
+public enum TipoDeIngresso {
+
+	INTEIRO(new DescontoNulo()),
+	ESTUDANTE(new DescontoEstudante());
 	
-	/**
-	 * @deprecated hibernate only
-	 */
-	public Ingresso() {
+	private final Desconto desconto;
+	
+	TipoDeIngresso(Desconto desconto) {
+		this.desconto = desconto;
 	}
 	
+	public BigDecimal aplicaDesconto(BigDecimal preco) {
+		return desconto.aplicaDescontoSobre(preco);
+	}
 	
-	public Ingresso(Sessao sessao, Desconto desconto) {
-		this.sessao = sessao;
-		this.preco = desconto.aplicarDescontoSobre(sessao.getPreco());
+	public String getDescricao() {
+		return desconto.getDescricao();
 	}
 }
+
+------------------- CLASSE IMPLEMENTADA ------------------
+
+@Entity
+public class Ingresso {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+	
+	@ManyToOne
+	private Sessao sessao;
+	
+	@ManyToOne
+	private Lugar lugar;
+	
+	@Enumerated(EnumType.STRING)
+	private TipoDeIngresso tipoDeingresso;
+	
+	private BigDecimal preco;
+	
+	/**
+	 * @deprecated
+	 */
+	public Ingresso() {}
+
+	public Ingresso(Sessao sessao, TipoDeIngresso tipoDeIngresso, Lugar lugar) {
+		this.sessao = sessao;
+		this.tipoDeingresso = tipoDeIngresso;
+		this.lugar = lugar;
+		this.preco = this.tipoDeingresso.aplicaDesconto(sessao.getPreco());
+	}
+	
+------------------- CONTROLLER IMPLEMENTADO ------------------
+	
+	
+  @GetMapping("/sessao/{id}/lugares")
+	public ModelAndView lugares(@PathVariable("id") Integer id) {
+		ModelAndView mv = new ModelAndView("sessao/lugares");
+		Sessao sessao = sessaoDao.findOne(id);
+		mv.addObject("sessao", sessao);
+		Optional<DetalhesFilme> detalheFilme = client.requisicao(sessao.getFilme());
+		mv.addObject("imagemCapa", detalheFilme.orElse(new DetalhesFilme()));
+		
+		//Ira passar os valores dos ENUMs que utilizem a Interface
+		mv.addObject("tiposDeIngressos", TipoDeIngresso.values());
+		return mv;
+	}
+	
 ------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------
@@ -315,6 +375,9 @@ CRIAR CLASSE/MODELO QUE RECEBERA AS REQUISIÇÕES:
 
     @JsonProperty("Poster")
     private String imagem;
+    
+    
+    GETTERS E SETTERS!
   }
 
 CRIAR CLIENT - QUE IRÁ MANDAR A REQUISIÇÃO E RECEBE-LA
@@ -332,8 +395,10 @@ CRIAR CLIENT - QUE IRÁ MANDAR A REQUISIÇÃO E RECEBE-LA
   * Se coloca, a requição dentro de um TRY/CATCH, onde o catch irá retornar um optional.empty();
   *
   */
+  
+  @Component
   public class OmdbClient {
-    public Optional<DetalhesDoFilme> requisicao(Filme filme){
+    public Optional<DetalhesFilme> requisicao(Filme filme){
         String titulo = filme.getNome().replace(" ","+");
         String URL = "https://omdb-fj22.herokuapp.com/movie?title=%s";
         String concatenar = String.format(URL, titulo);
@@ -341,15 +406,20 @@ CRIAR CLIENT - QUE IRÁ MANDAR A REQUISIÇÃO E RECEBE-LA
         RestTemplate client = new RestTemplate();
         
         Try{
-          DetalhesDoFilme detalheDoFilme = client.getForObject(concatenar, DetalheDoFilme.class);
-          return Optional.ofnullable(detalheDofilme);
+          DetalhesFilme detalheDoFilme = client.getForObject(concatenar, DetalheDoFilme.class);
+          return Optional.ofNullable(detalheDoFilme);
         Catch (RestExcepection e){
-          return Optinal.empty();
+          System.out.println(concatenar + " - erro: " + e);
+          return Optional.empty();
         }        
     }
   }
   
 CONTROLLER
+  
+    @Autowired
+    private OmdbClient client;
+
     @GetMapping("/filme/{id}/detalhe")
     public ModelAndView detalheFilme(@PathVariable("id") Integer id) {
     	ModelAndView mv = new ModelAndView("filme/detalhe");
@@ -375,9 +445,39 @@ VIEW
           <span id="diretores">${detalhes.diretores}</span>
       </div>
     </div>
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+CONVERSORES
 
+*Para o SPRING Reconhecer um conversor é necessario informar no spring-context.xml
 
+<mvc:annotation-driven conversion-service="conversionService" />
+	<bean id="conversionService"
+		class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+		<property name="converters">
+			<set>
+				<bean
+					class="br.com.caelum.ingresso.converter.YearMonthConverter" />
+			</set>
+		</property>
+	</bean>
 
+CLASSE
+
+public class YearMonthConverter implements Converter<String, YearMonth>{
+
+	@Override
+	public YearMonth convert(String text) {
+		return YearMonth.parse(text, DateTimeFormatter.ofPattern("MM/yyyy"));
+	}
+
+}
 
 
 
