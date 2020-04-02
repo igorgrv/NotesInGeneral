@@ -1,0 +1,2 @@
+# NotesInGeneral
+JAVA
