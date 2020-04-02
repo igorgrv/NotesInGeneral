@@ -1,22 +1,22 @@
 # This is "the Header" with '#' - by Igor
 
 This is a sample readme file for our GitHub Example repo. I'm learning MarkDown!<br>
-For pratice, we can use this link -[ stackedit.io](https://stackedit.io/app)<BR>
-`<#>`  for "H1 Headers"
-`#`  for "H1 Headers"
-`##`  for "H2 Header"
-`###`  for "H3 Header"
-`*` for "Topics"
-`---` to creat a line
-`>` for blockQuots
-`<br>` for breakLines
-`[sua frase](http://)` for "Links"
+For pratice, we can use this link -[ stackedit.io](https://stackedit.io/app)<br>
+`<#>`  for "H1 Headers"<br>
+`#`  for "H1 Headers"<br>
+`##`  for "H2 Header"<br>
+`###`  for "H3 Header"<br>
+`*` for "Topics"<br>
+`---` to creat a line<br>
+`>` for blockQuots<br>
+`<br>` for breakLines<br>
+`[sua frase](http://)` for "Links"<br>
 
 ---
 # Examples
 ## Text
-`*italic*` -> *italic*
-`**bold**` -> **bold**
+`*italic*` -> *italic*<br>
+`**bold**` -> **bold**<br>
 `**_bold_**` -> **_bold & italic_**
 
 ## Mark
