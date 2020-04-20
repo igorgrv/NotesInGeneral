@@ -1,0 +1,1645 @@
+FJ21 - JAVA DESENVOLVIMENTO WEB
+-----------------------------------------------------------------------------------------------------------
+PROFESSOR: LEONARDO -> Coordenador, arquiteto de solução
+EMAIL: leonardo.silva@caelum.com
+http://dontpad.com/caelum-javeiros
+http://dontpad.com/java-e-vida-8679
+
+
+*INSTALADORES:
+	- Instalar o JAVA JDK: https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+	- Instalar o MySQL (server versão 5.7 e workbench): https://dev.mysql.com/downloads/windows/installer/5.6.html
+	- Instalar o Eclipse EE: https://www.eclipse.org/fdownloads/packages/
+
+*Arquivos Caelum
+https://drive.google.com/drive/u/0/folders/0B0qR-YC8wtA2NWJxUlJUYUctS1U
+
+*Taglibs
+		<%@	taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"	%>
+		<%@	taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"	%>
+		<%@	taglib uri="http://www.springframework.org/tags/form" prefix="form"	%>
+		
+*Iniciando MAVEN com JETTY
+  - Baixar o maven (http://maven.apache.org/download.cgi) -> Binary File
+  - Extrair e colar em um diretório -> configurar o path %M2_HOME%
+  - Verificar se está funcionando com -> mvn -v
+  - Executar os comandos:
+    - $ mvn dependency:resolve
+    - $ mvn dependency:tree
+    - $ mvn package jetty:run (caso de erro, rode em outra porta "mvn -Djetty.port=8888 jetty:run")
+    - Verifique se rodou utilizando o "localhost/8080"
+		
+*ESTUDAR:
+	-Banco de dados nao relacional, como MongoDB (os relacionais serao o MySql, SQLServer)
+	-PrimeFaces (templates p/ JSF)
+	-GoogleVision (API que informa o objeto atraves da imagem)
+	-Google Cloud Platform/AWS
+	-JasperReport (iReport) -> para criar PDF, WORD, XLS
+	-XP de MESA AGIL
+		-Cerimonia de mesas ageis
+	-GitKraken (demonstra de forma melhor os logs do GIT)
+	-JCIFS (usuario do windows)
+	
+*REVISÃO:
+	- SERVLET
+		- O formulário recebe um action, que executará dentro de um .jsp através de um GET ou POST
+			- O .jsp ir processar o service atraves do req e resp, criando os objetos Modelo e DAO
+			- Escrevo o construtor para poder retornar ao usurio que aconteceu algo na requisição
+
+*ENTENDENDO DATE P/ MYSQL
+	Calendar vem do Util, o Date vem do Util e o Date vem do sql;
+	*ORDEM DE DECLARAÇÃO
+		java.sql.Date (ex.: stmt.setDate)
+			∟ java.util.Date (get.time() -> função do Calendar)
+				∟ Calendar
+				
+		Calendar (cal.setTime(rs.getDate))
+		    ∟ java.util.Date
+		
+	- Comece com um Calendar data = new Calendar.getInstance(); //Deste modo estará iniciando declarando "HOJE"
+	- Date dateUtil = new Date();
+	
+	- Em caso de receber a data atravês de um formulario:
+		
+		String dataTexto = req.getParameter("dataNascimento");
+		Calendar cal = Calendar.getInstance();
+	
+		try {
+			Date date = new SimpleDateFormat("dd/MM/yyyy").parse(dataTexto);
+			cal.setTime(date);
+		} catch (ParseException e1) {
+			e1.printStackTrace();
+		}
+		
+		Outro exemplo quando se vem direto de um Calendar
+		<td><%=new SimpleDateFormat("dd/MM/yyyy").format(c1.getDataNascimento().getTime())%></td>
+		
+		- Codigos utilizados para o SimpleDateFormat
+			String dataTexto = req.getParameter("dataNasc");
+			Calendar cal = Calendar.getInstance();
+			Date date;
+			try {
+				date = new SimpleDateFormat("dd/MM/yyyy").parse(dataTexto);
+				cal.setTime(date);
+			} catch (ParseException e) {
+				throw new RuntimeException(e);
+			}
+			
+			- Format -> recebe um Date e transforma em String
+				SimpleDateFormat s = new SimpleDateFormat("dd/MM/yyyy");
+				//con.getDataNascimento() é um Calendar que será transformado em Date atraves do getTime
+				s.format(con.getDataNascimento().getTime()));
+			<!--
+			- Parse -> recebe uma String e transforma em Date
+				- getTime (classe Calendar) -> repassa a data do sistema com um tipo Date (deve se utilizar com um calendar)
+					SimpleDateFormat s = new SimpleDateFormat("dd/MM/yy");
+					Calendar cal = Calendar.getInstance(); 
+					System.out.println(s.format(cal.getTime()));
+				- getTimeInMiliSegunds (classe Calendar) -> repassa um long Date
+
+	
+		- Transformar um Date p/ Calendar (a função setTime recebe um Date e retorna um Calendar pela palavra cal)
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(rs.getDate("dataNascimento"));
+
+
+*TRABALHANDO COM SOMAS:
+	- Para utilizar somas, o ideal é usar o tipo BigDecimal
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+CAPITULO 2 - BANCO DE DADOS
+
+*Para conectar a um banco, temos algumas premissas:
+  -Driver (cada banco de dados tem um);
+    -A comunicação é feita via TCP/IP (igual a acessar a um roteador, colocando IP:PORTA)
+
+*JDBC: Java DataBase Connectivity -> É O PADRÃO JAVA, todo driver deve seguir este padrão
+  - O JDBC necessita de uma interface, para que aja um padrão dentre DRIVER e o JAVA;
+  - PREMISSAS PARA O JDBC:
+    - ip
+    - porta
+    - usuario
+    - senha
+  Em resumo, -> "jdbc:mysql://ip/nome_do_banco","usuario","senha"
+
+RESUMINDO:
+*USUARIO ---> JAVA ----> Objeto Connection ----> DriverManager ---> JDBC + BD (TipoDeBanco + ip + porta + usuario + senha)
+
+*A partir do momento que temos uma conexão feita, criaremos a class que FABRICA CONEXOES! de forma que todas as outras classes chamem ela!
+
+*FABRICA DE CONEXOES (convencionada)
+
+//Class fabrica de conexão
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class ConnectionFactory {
+
+	public Connection getConnection() {
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			return DriverManager.getConnection("jdbc:mysql://localhost/fj21?useTimezone=true&serverTimezone=UTC&useSSL=false", "root","");
+		} catch (SQLException e){		
+			throw new RuntimeException(e);
+		}
+	}
+
+}
+
+
+*Para as classes que irão chamar esta conexao, sera necessario apenas utilizar este objeto
+
+//Class pesquisa
+import java.sql.Connection;
+import java.sql.SQLException;
+import br.com.caelum.jdbc.ConnectionFactory;
+
+public class TesteConexao {
+	public static void main (String[] args) throws SQLException {
+		ConnectionFactory con = new ConnectionFactory();
+		Connection conexao = con.getConnection();
+		System.out.println("conectado");
+		
+		conexao.close();
+	}
+}
+
+**POSSÍVEIS ERROS
+	- MySQLNonTransientConnectionException: Could not create connection -> utilizar um conector mais novo
+	- Establishing SSL connection without server's identity -> Adicione depois do banco de dados ?useTimezone=true&serverTimezone=UTC&useSSL=false
+
+
+*JAVBEANS? O javabeans é quando uma class que possui atributos (getters and setters and construct default)
+
+*SQL INjection? Hackers? Para resolver o problema de inserssao de dados, foi criado o PrepareStatement, de forma que ele impossibilita
+que codigo SQL derrubem a base.
+
+
+*INSERIR (INSERT INTO)
+
+- Antes de começar devemos criar nosso objeto, no caso "Contatos", com os atributos privados que estara no pacote "modelo"
+- Criamos o pacote "dao" e pacote "testes"
+
+- CODIGO PARA INSERÇÃO DE DADOS UTILIZANDO PREPARESTATEMENT
+
+	package br.com.caelum.jdbc.teste;
+	import java.sql.Connection;
+	import java.sql.PreparedStatement;
+	import java.sql.SQLException;
+	import java.util.Calendar;
+
+
+	import br.com.caelum.jdbc.ConnectionFactory;
+
+	public class InserirJDBC {
+
+		public static void main(String[] args) throws SQLException {
+			Connection con = new ConnectionFactory().getConnection();
+
+			String sql = "insert into contatos (nome,email,endereco,dataNascimento) value (?,?,?,?)";
+			PreparedStatement stmr = con.prepareStatement(sql);
+			stmr.setString(1, "teste");
+			stmr.setString(2, "teste");
+			stmr.setString(3, "teste");
+			stmr.setDate(4, new java.sql.Date(Calendar.getInstance().getTimeInMillis()));
+			stmr.execute();
+
+			stmr.close();
+			System.out.println("Dados inseridos");
+
+			con.close();
+		}
+	}
+
+
+- CODIGO PARA INSERÇÃO DE DADOS UTILIZANDO DAO
+
+*Para evitar que se repitam codigos para fazer o CRUD, o ideal e se criar uma class do SQL
+	- Por exemplo, public class ContatosSQL, que irá receber todas as consultas
+
+	-PACKAGE br.com.caelum.dao
+	
+	public class ContatoDAO {
+		private Connection con = new ConnectionFactory().getConnection();
+		private PreparedStatement stmt;
+
+		public void adicionar(Contato contato) throws SQLException {
+			String sql = "INSERT INTO contatos (nome,email,endereco,dataNascimento) values(?,?,?,?)";
+
+			try {
+				stmt = con.prepareStatement(sql);
+				stmt.setString(1, contato.getNome());
+				stmt.setString(2, contato.getEmail());
+				stmt.setString(3, contato.getEndereco());
+				stmt.setDate(4, new Date(contato.getDataNasc().getTimeInMillis()));
+				stmt.execute();
+
+				stmt.close();
+				con.close();
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+	
+*LISTAR (SELECT) - para listar é necessrio usar um List<objeto>
+	-Por padrão, podemo seguir as premissas abaixo:
+		- Crie uma Lista vazia;
+		- Declare sua query;
+		- Prepare a query com o PrepareStatement
+		- Construa o ResultSet com o stmt.executeQuery
+		- Faça um laço (while) -> neste laço iremos criar um objeto e percorrer cada coluna da tabela
+			-Dentro do while, crie um objeto [Contato c1 = new Contato]
+			-Percorra cada coluna da tabela, com rs.getString (em caso de String)
+			-Adicione a lista (com Lista.add(c1))
+		-Retorne a Lista criada no laço;
+
+	*CODIGO PARA LISTAR
+	public List<Contato> getLista() throws SQLException {
+			List<Contato> lista = new ArrayList<Contato>();
+			String sql = "SELECT * FROM contatos";
+			stmt = con.prepareStatement(sql);
+			
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				Contato c1 = new Contato();
+				c1.setNome(rs.getString("nome"));
+				c1.setEmail(rs.getString("email"));
+				c1.setEndereco(rs.getString("endereco"));
+
+				Calendar dataCalendar = Calendar.getInstance();				
+				dataCalendar.setTime(rs.getDate("dataNascimento"));	
+				c1.setDataNasc(dataCalendar);
+				
+				lista.add(c1);
+			}
+			
+			return lista;
+	}
+	
+	*CODIGO PARA EXIBIR A LISTA
+	public static void main(String[] args) throws SQLException {
+		String pattern = "dd-MM-yyyy";
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+		
+		Contato contato = new Contato();		
+		ContatoDao dao = new ContatoDao();
+		
+		List<Contato> lista = dao.getLista();
+		for(Contato con : lista) {
+			System.out.println("---------------------------------");
+			System.out.println("Nome = " + contato.getNome());
+			System.out.println("Email = " + contato.getEmail());
+			System.out.println("Endereco = " + contato.getEndereco());
+			System.out.println("Data = " + contato.getDataNasc().getTime());
+			System.out.println("---------------------------------");
+		}	
+	}
+	
+//----------------------------CAPITLO 3 - JAVA EE---------------------------------------------------------------------------------------------
+- O Java EE e uma especificacao, um grande PDF padronizando servidores e etc.
+
+*JSF (Java Server Faces) -> [voltado ao desktop, app de mercados]
+*JSP (Java Server Pages) -> [voltado a paginas web]
+*EJB (Enterprise Javabeans Components) -> Voltado a container, gerenciamento (aplicaçoes antigas)
+*JPA (Java Persistence API) -> Uma persistencia no PrepareStatement e um JPA
+*JAX-WS (Java API for XML Web Services)
+*JAAS (Java autentication and Authorization Service) -> API de segurança java -> SpringSecurity
+*JTA (Java Transaction API) -> Serve para barrar transações (Foi usar o cartão e deu erro, JTA ira barrar)
+*JMS (Java Message Service) -> Utilizado para passar mensagens para outra aplicações
+*JNDI (Java Naming and Directory Interface) -> Para diretorios, de forma que eu acesse um outro método DAO de outra aplicação
+
+*SERÃO APRENDIDOS NO CURSO
+	- JSP, JPA, JDBC, EJB, JTA
+	
+*Servidores de Aplicaço vs SERVLET Container -> a principal diferença  que o SERVLET possui menos especificações do que um servidor de aplicação	
+
+*SERVIDORES DE APLICAÇÃO - MAIS CONHECIDOS:
+	- GlassFish (oracle) JAVA EE 7
+	- RedHat/JBoss JAVA EE 6
+	- WEBLOGIC (Oracle) JAVA EE 6
+	- WEBSPHERE (IBM) JAVA EE 6
+	
+*SERVLET CONTAINER - MAIS CONHECIDOS:
+	- TOMCAT
+	- WILDFLY
+	- JETTY
+
+*PRINCIPAIS ESPECIFICAÇES AGRUPADAS PELO SERVLET CONTAINER:
+	-Servlet
+	-JSP
+	-JSTL
+	-JSF
+
+*UTILIZANDO O TOMCAT
+	- O Eclipse possui um plugin para utilizar o TomCat -> chamado WTP
+	- Para mapear um servidor no Eclipse, é necessario alterar a perspectiva do Eclipse para JAVA EE
+		- Ir ate Servers -> ir para Apache -> Selecionar o TomCat X.X.X -> finish
+		
+*COMEÇANDO UM PROJETO EE!!
+	- CTRL + N -> dynamic web project
+	- Verifique se o projeto puxou o tomcat
+	- next, next, marque a opção Generate web.xml deployment
+	- Clique com direito na aba servers (tomcat) -> add and remove -> selecione o projeto
+	
+*ENTENDENDO AS PASTAS CRIADAS
+	- WebContent -> ficará todos os arquivos acessiveis (bemvindo.html)
+		- WEB-INF/web.xml -> define o nome do projeto e a lista de arquivos a serem acessados
+		- lib -> ficarao os arquivos JAR
+
+*PÁGINA DINMICA E PAGINA ESTATICA
+	- Em Java para se criar uma página dinamica (pagina que se altera conforme pedido do usuario), é necessrio criar uma classe
+		capaz de gerar um conteúdo HTML ->SERVLET e responsavel para realizar esta função
+		
+	- Para criar a Servlet:
+		- Criamos um package br.com.caelum.servlet
+		- Criamos a classe minhaClasse
+		- extendemos o HttpServlet
+		- digitamos service e ctrl + space
+		- chamamos o escritor
+		
+	
+		public class OiMundo extends HttpServlet{
+
+			@Override
+			protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+				PrintWriter out = response.getWriter();
+
+				out.println("<html>");
+				out.println("<h1>Oi mundo Servlet! </h1>");
+				out.println("</html>");
+
+			}
+		}
+
+	*1º METODO
+	- O <servlet> sera informado no web.xml
+	
+		  <servlet>
+			<servlet-name>primeiraServlet</servlet-name>
+			<servlet-class>br.com.caelum.servlet.OiMundo</servlet-class>
+		  </servlet>
+
+	- O <servlet-mapping> informara qual a class servlet e onde sera acessado na URL
+		  <servlet-mapping>
+			<servlet-name>primeiraServlet</servlet-name>
+			<url-pattern>/oi/</url-pattern>
+		  </servlet-mapping>
+		  
+	*2º METODO
+	- Implementamos a servlet diretamente na class OiMundo, utilizando @webServlet
+	
+	@WebServlet ("/oi")
+	public class OiMundo extends HttpServlet{
+
+			@Override
+			protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+				PrintWriter out = response.getWriter();
+
+				out.println("<html>");
+				out.println("<h1>Oi mundo Servlet! </h1>");
+				out.println("</html>");
+
+			}
+		}
+
+*TRABALHANDO COM FORMULARIOS
+	- Quando for criado um formulrio em HTML, o <form action = "testandoServlet"> é quem ira tratar os dados, ou seja, nosso formulario
+		"adiciona-contato.html" terá o form e minha servlet chamara "public class AdicionaContato"
+	- Na servlet devemos informar @WebServlet ("/testandoServlet")data = Calendar
+	- Para pegar os dados do formulario, devemos pegar de nosso "req"
+		- Contato c1 = new Contato();
+		- c1.setNome(req.getParameter("nome"));
+	- Para escrever uma pagina HTML, utilizamos o PrintWriter out = resp.getWriter();
+		-out.println("<html>");
+		- out.println("<body>");
+		- out.println("Usuario" + c1.getNome() + "Cadastrado");
+		- out.println("</body>");
+		- out.println("</html>");
+	
+	
+*Inserindo dados atraves da servlet
+package br.com.caelum.agenda.servlet;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import br.com.caelum.agenda.dao.ContatoDao;
+import br.com.caelum.agenda.modelo.Contato;
+
+@WebServlet("/adicionaContato")
+public class AdicionaContatoServlet extends HttpServlet{
+
+	@Override
+	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
+		Contato c1 = new Contato();
+		c1.setNome(req.getParameter("nome"));
+		c1.setEmail(req.getParameter("email"));
+		c1.setEndereco(req.getParameter("endereco"));
+
+		String dataTexto = req.getParameter("dataNascimento");
+		Calendar cal = Calendar.getInstance();
+
+		try {
+			Date date = new SimpleDateFormat("dd/MM/yyyy").parse(dataTexto);
+			cal.setTime(date);
+		} catch (ParseException e1) {
+			e1.printStackTrace();
+		}
+
+		c1.setDataNascimento(cal);
+		
+		ContatoDao dao = new ContatoDao();
+		dao.adiciona(c1);
+		
+		PrintWriter out = resp.getWriter();
+		
+		out.println("<html>");
+		out.println("<body>");
+		out.println("Usuario" + c1.getNome() + "Cadastrado");
+		out.println("</body>");
+		out.println("</html>");
+	}
+}
+
+
+*HTTP -> GET/POST
+	- Get -> exibe no navegador os dados passados pelo formulrio
+	
+//--------------------------- CAPITLO 6 - JSP----------------------------------------------------------------------------------	
+	- O JSP roda no Servidor
+	- O JSP veio para trabalhar o HTML e JAVA Juntos, de modo que no precise jogar um HTML pela servlet
+	- Scriptlet é a tag <%
+	- Como?
+		<html>
+			<%
+				Sysout("escrevendo no console");	
+			%>
+		</html>
+	- O codigo acima  chamado SCriptLet, utilizado para pequenos blocos de cdigo
+	
+	- Para exibir na tela via JSP:
+		1º metodo <%=c1.getNome()%> -> necessrio utilizar o '='
+		2º metodo <% out.println(c1.getNome())%> -> atravês do out.println do resp
+	- Listando itens
+	
+		<%@page import="br.com.caelum.agenda.dao.ContatoDao"%>
+		<%@page import="br.com.caelum.agenda.modelo.Contato"%>
+		<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+		
+		<!DOCTYPE html>
+		<html>
+		<head>
+		<meta charset="UTF-8">
+		<title>Listando dados com scriptlet</title>
+		</head>
+		<body>
+
+			<%
+				ContatoDao dao = new ContatoDao();
+				List<Contato> lista = dao.getLista();
+			%>
+
+			<table>
+				<tr>
+					<th>Nome</th>
+					<th>Email</th>
+					<th>Endereco</th>
+					<th>Data nascimento</th>
+				</tr>
+				<%
+					for (Contato c1 : lista) {
+				%>
+
+				<tr>
+					<td><%=c1.getNome()%></td>
+					<td><%=c1.getEmail()%></td>
+					<td><%=c1.getEndereco()%></td>
+					<td><%=new SimpleDateFormat("dd/MM/yyyy").format(c1.getDataNascimento().getTime())%></td>
+				</tr>
+				<%
+					}
+				%>
+			</table>
+		</body>
+		</html>
+//------------------- CAPITULO 7 - CONTINUANDO JSP (TAGLIBS) -> JSTL -> ${} -> Expression Language------------------------------------------------------------------
+
+	- A taglibs vem para fazer uma linguagem só (HTML + JAVA), sem precisar escrever em duas linguagens diferentes;
+	- TAGS:
+		-CORE (forEach, if, while, import)
+			<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+		-FMT (formatDate)
+			<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+	
+	- ANTES (JSP)
+	<html>
+		<@pages import="br.com.caelum.agenda.dao">
+		<% Contatodao dao = new Contatodao() %>
+	- DEPOIS (JSTL)
+	<html>
+		<jsp:useBean id="dao" class="br.com.caelum.agenda.dao">
+	
+	- ANTES (JSP)
+		<table>
+		<%  for (Contato c1 : lista) {	%>
+			<tr>
+			 <td><%=c1.getNome()%></td>
+			 <td><%=c1.getEmail()%></td>
+			 <td><%=c1.getEndereco()%></td>
+			 <td><%=new SimpleDateFormat("dd/MM/yyyy").format(c1.getDataNascimento().getTime())%></td>
+			</tr>
+		<% } %>
+		</table>	
+	- DEPOIS (JSTL)
+		<table>
+		   <c:forEach var="contato" items="${dao.lista}" varStatus="id">
+			<tr bgcolor="#${id.count % 2 == 1 ? 'ffffff' : 'eeeeee' }"
+				align="center">
+				<td>${id.count}</td>
+				<td>${contato.nome}</td>
+				<td>${contato.email}</td>
+				<td>${contato.endereco}</td>
+				<td><fmt:formatDate value="${contato.dataNascimento.time}" pattern="dd/MM/yyyy"/>					</td>
+			</tr>
+		   </c:forEach>
+		</table>
+	
+	
+	-TAGS IMPORTANTES
+		if:
+		  <c:if test"Sua condicional">
+			exemplo:
+			<c: if test"${not empty contato.email}">
+				<td>${contato.email} </td>
+		        </c:if>
+		
+		when:
+		  <c:while test="${not empty contato.email}">
+		  	<a href="mailto:${contato.email}"> ${contato.email} </a>
+		  </c:while>
+		  
+		switch:
+		  <c:choose>
+		      <c:otherwise>
+		      </c:otherwise>
+		  </c:choose>
+				exemplo:
+				<c:choose>
+					<c:while test="${not empty contato.email}">
+		  				<a href="mailto:${contato.email}"> ${contato.email} </a>
+		  			</c:while>
+				        <c:otherwise>
+						E-mail não informado
+				        </c:otherwise>
+				 </c:choose>
+	
+		import: (importar rodapé)
+		  <c:import url="rodape.jsp">
+		  
+// ---------------------------*CAPITLO 8 - TAGFILES (criando a propria Expression Language)------------------------------------------------------------------------
+	- As TagFiles vieram para substituir campos repetitivos. Por ex.: se possuirmos inputs do mesmo formato, podemos utilizar
+		uma taglib própria! - Também, e muito comum se utilizar tagLibs para validações em Javascript
+	- Exemplo:
+		ANTES (por padrão se preenche sempre o id e o for:
+			<label for="nomeContato">Nome</label> 		<input type="text" name="nome" id="nomeContato">
+			<label for="nomeEmail">Email:</label> 		<input type="text" name="email" id="nomeEmail">
+			<label for="nomeEndereco">Endereco:</label> 	<input type="text" name="endereço" id="nomeEndereco">
+		DEPOIS:
+			<igor id="nomeContato"> //terá a label e o input
+			<igor id="nomeEmail">
+			<igor id="nomeEndereco">
+
+		ANTES (Utilizando um Datepicker do jQuery para cada campo):
+			<input id="dataNascimento" type="text>
+			<script>
+				$("#dataNascimento").datepicker();
+			</script>
+		DEPOIS (c/ tagFile):
+			<igor id="dataNascimento" />
+	
+	-Como criamos uma tagFile?
+		- As tagFiles devem estar dentro de WEB-INF/tags/ (se no existe a pasta tags, deve ser criada)
+		- Referenciamos de inicio <%@taglib %>
+			- Ex.: <%@taglib tagdir="/WEB-INF/tags" prefix="igor" %>
+		- Dentro da pasta tags, devemos criar nosso arquivo .tag que será usado, como:
+			- <igor:campoData> -> ou seja o arquivo chamará campoData.tag
+			
+	-Tag para o calendário (campoData.tag -> Dentro WEB-INF/tags/)
+		//Toda vez que chamarmos a tag <igor:campoData id="xxxxxx" /> 
+		//irá aparecer um input com Calendario
+		<%@ attribute name="id" required="true" %>
+		
+		<input type="text" id="${id}" name="${id}" />
+		<script>
+			$("#${id}"}.datepicker({dateFormat: 'dd/mm/yy'});
+		</script>
+	-Para página JSP
+		//Ao digitar <igor:campoData /> irá aparecer o input com o datePicker do JQuery
+		<%@taglib tagdir="/WEB-INF/tags" prefix="igor" %>
+		<form action="adicionaContato">
+			<igor:campoData id="dataNascimento" />
+		</form>
+		
+//------------------------------*CAPITULO 9 - MVC (Model View Controller)----------------------------------------------------------------------------------------
+	MODEL: Fica as classes DAO/BEANS
+	VIEW: Fica a resposta ao usuario	
+	CONTROLLER: Fica a Servlet
+	
+	FLUXO:
+		CONTROLLER recebe de um formulario, que entao ira chamar as camadas DAO (logo ira chamar o MODEL) e então
+		retornará ao CONTROLLER a resposta para ser enviado a uma VIEW (tela de resposta ao usuario);
+	
+	- 1º Exemplo do funcionamento (utilizando a servlet como Controller):
+		- Uma ServLet (Controller), com códigos JAVA (br.com.caelum.agenda.servlet) -> irá mandar atraves
+			do RequestDispacher para um View (.jsp) o resultado
+		
+		//AdicionaContatoServlet.java (Controller)
+		WebServlet("/adicionaContato")
+		public class AdicionaContatoServlet extends HttpServlet{
+
+			@Override
+			protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+				Contato c1 = new Contato();
+				c1.setNome(req.getParameter("nome"));
+				c1.setEmail(req.getParameter("email"));
+				c1.setEndereco(req.getParameter("endereco"));
+
+				String dataTexto = req.getParameter("dataNascimento");
+				Calendar cal = Calendar.getInstance();
+
+				try {
+					Date date = new SimpleDateFormat("dd/MM/yyyy").parse(dataTexto);
+					cal.setTime(date);
+					c1.setDataNascimento(cal);
+				} catch (ParseException e1) {
+					e1.printStackTrace();
+				}
+
+				ContatoDao dao = new ContatoDao();
+				dao.adiciona(c1);
+				RequestDispatcher rd = req.getRequestDispatcher("/adiciona-contato-view.jsp");
+				rd.forward(req, resp);
+			}
+		}
+		
+		//View -> adiciona-contato-view.jsp -> chama atraves do param.
+		
+		<%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8"%>
+		<!DOCTYPE html>
+		<html>
+			<body>
+				<h2>Usuario ${param.nome} adicionado com sucesso!</h2>
+			</body>
+		</html>
+		
+	* Temos um formulario que tera diversas opções (adicionar, remover, listar, atualizar), precisamos que funcione!
+	- 1 º Método SEM MVC:
+		- Precisariamos receber do formulario as acoes Add, Remov, List e etc e para cada acao seria possivel trata-las
+			com ifs
+
+		@webServlet("/sistema")
+		String acao = req.getParameter("logica"); //recebe do formulario
+		ContatoDAO dao = new ContatoDAO();
+
+		if(acao.equals("adicionar")){
+			//logica para Adicionar
+		} else if (acao.equals("listar") {
+			//logica para listar
+		}
+
+		- Este mtodo faz com que seja gerado muitos ifs/elseifs
+
+
+	-2º Método SEM MVC:
+		- Poderiamos criar classes (AdicionaContato, RemoveContato) com um metodo executar em todas elas (para isto criariamos uma interface)
+
+		if(acao.equals("adicionar")){
+			new AdicionaContato().executa(req, res);
+		} else if (acao.equals("listar") {
+			new ListarContato().executa(req, res);
+		}
+
+		-Este metodo ainda fara com q seja necessario diversos ifs e ainda fara com que criassemos uma servlet (Model) para cada item;
+		
+	-MELHORANDO... PARA O MVC
+		- Começaremos c/ o CONTROLLER (LogicaControllerServlet.java) -> generalizando as classes;
+			
+			String nomeDaClasse = req.getParameter("acao");
+			new nomeDaClasse().executa(req, res);																																		
+		
+		- Porem este codigo não compila, devido a nomeDaClasse ser uma String recebendo um objeto, para corrigir isto
+			podemos utilizar a classe Class com método forName (Class.forName("localizacao da classe"))
+			
+			String nomeDaClasse = "br.com.agenda.mvc.logica."+ req.getParameter("acao");
+			Class<?> classe = Class.forName(nomeDaClasse);
+		
+		- Antes de terminar nosso Controller, iremos criar nossa logica MODEL BASE LogicaModel (interface)
+		- Criando uma interface... (a interface ira ajudar a forcar nossos models a executar o codigo)
+			//A execucao deve ser uma String pois ira retornar a pagina
+			public interface Logica {
+				String executa (HttpServletRequest req, HttpServletResponse res) throws Exception;
+			}
+		
+		- Voltamos ao CONTROLLER LogicaControllerServlet.java e iremos instanciar um objeto
+		- Para instanciar o objeto "classe" iremos ter que chamar o construtor .getDeclaredConstructor().newInstance();
+			
+				LogicaModel logica = (LogicaModel) classe.getDeclaredConstructor().newInstance();
+			//pegaremos a pagina para poder repassar peo Dispatcher
+				String pagina = logica.executa(req, resp);
+			//enviando via Dispatcher
+			//podiamos enviar somente uma pagina, exemplo Adicionar, porem não teriamos algo generico
+			//req.getRequestDispatcher("adicionar-contato.jsp").forward(req, resp);
+				req.getRequestDispatcher(pagina).forward(req, resp);]
+				
+				
+		-Controller completo
+		@WebServlet("/mvc")
+		public class ControllerContatos extends HttpServlet{
+			@Override
+			protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+					//1º recebo o parÃ¢metro (Adicionar, Remover e etc)
+				String parametro = req.getParameter("logica");
+					//2º Seleciona onde esta a classe
+				String nomeDaClasse = "br.com.caelum.agenda.mvc.Model." + parametro;
+					//3º Cria o objeto
+				try {
+					Class<?> classe = Class.forName(nomeDaClasse);
+						//ira selecionar a classe com um new
+					LogicaModel logica = (LogicaModel) classe.getDeclaredConstructor().newInstance();
+					String pagina = logica.executa(req, resp);
+					req.getRequestDispatcher(pagina).forward(req, resp);
+				} catch (Exception e) {
+					throw new ServletException("A logica de negocios causou uma exceÃ§Ã£o: " + e);
+				}
+			}
+		}
+		
+		-Interface Model
+		public interface Logica {
+			String executa(HttpServletRequest req, HttpServletResponse resp);
+		}
+		
+		
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+- Temos um problema ao deixar as telas na WEbCOntent, pois o usuario pode ter acesso atraves do url
+	, para restringir isto, iremos retirar as Views e colocar em WEB-INF/JSP(criar a pasta).
+	
+	- Ao fazer isto, se o usuario tentar acessar ira retornar erro 404.
+	*Porem ao mover as jsps sera necessario alterar o caminho dos Model (return "/WEB-INF/JSP/lista-contatos-view.jsp";)
+	-No caso do remover, sera necessario passar "return "mvc?logica=ListaContatosLogic";"
+
+
+//---------------------------*CAPITLO 10 - FILTROS (javax.servlet.filter) --------------------------------------------------------------------------------------------
+	-O filtro se faz muito necessário pois ele evita que o servidor fique carregado, como?
+		- A requisiçao do usuario irá chegar e antes mesmo de chegar ao Controller, ja sera barrada!
+		
+	-Como criar um filtro? Teremos de "implementar" de "Filter"
+	
+	@WebFilter("/*")
+	public class MeuFiltro implements Filter {
+		public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain){
+			//Passa pela porta e envia os dados para requisição e resposta
+			chain.doFilter(req, res);
+		}
+	}
+
+	-Lembrando que o Filter pode ser utilizado como genérico, basta alterar o @WebFilter ("/*.jsp")
+	*Relembrando
+		//getParameter é para String
+		//getAttribute é para objeto
+		
+	-Aplicando na prática
+		-Criando o Filter (br.com.caelum.agenda.filter)
+		
+			@WebFilter("/*")
+			public class FiltroConexao implements Filter{
+
+				public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+					try {
+						Connection con = new ConnectionFactory().getConnection();
+						//setAttribute insere no request ("String", object)
+						req.setAttribute("con", con);
+						chain.doFilter(req, res);
+						con.close();			
+					} catch (SQLException e) {
+						throw new RuntimeException("Erro na conexao: " + e);
+					}
+				}
+			}
+			
+		-Aplicando o Filtro em um Model (RemoverContatoLogic)
+		
+			public class RemoveContatoLogic implements LogicaModel {
+				public String executa(HttpServletRequest req, HttpServletResponse res) {
+					//parseLong para converter a String para o long
+					long id = Long.parseLong(req.getParameter("id"));
+					Contato contato = new Contato();
+					contato.setId(id);
+
+					//getParameter é para String
+					//getAttribute é para objeto
+					Connection con = (Connection) req.getAttribute("con");
+					ContatoDao dao = new ContatoDao(con);
+					dao.exclui(contato);
+
+					System.out.println("Excluindo contato... " + contato.getId());
+					return "mvc?logica=ListaContatosLogic";
+					}
+			}
+			
+// --------------------- *CAPITULO 11 - SPRING!! ----------------------------------------------------------------
+	*Codigo base - WEB.xml
+		
+		<servlet>
+			<servlet-name>springmvc</servlet-name>
+			<servlet-class> org.springframework.web.servlet.DispatcherServlet</servlet-class>
+			<init-param>
+				<param-name>contextConfigLocation</param-name>
+				<param-value> /WEB-INF/spring-context.xml</param-value>
+			</init-param>
+			<load-on-startup>1</load-on-startup>
+		</servlet>
+		
+		<servlet-mapping>
+				<servlet-name>springmvc</servlet-name>
+				<url-pattern>/</url-pattern>
+		</servlet-mapping>
+	
+	*Codigo base - spring-context.xml
+		<?xml version="1.0" encoding="UTF-8"?>
+		<beans xmlns="http://www.springframework.org/schema/beans"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xmlns:context="http://www.springframework.org/schema/context"
+			xmlns:mvc="http://www.springframework.org/schema/mvc" 
+			xmlns:tx="http://www.springframework.org/schema/tx"
+			xsi:schemaLocation="http://www.springframework.org/schema/mvc 
+					http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+					http://www.springframework.org/schema/beans 
+					http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+					http://www.springframework.org/schema/context 
+					http://www.springframework.org/schema/context/spring-context-4.0.xsd
+					http://www.springframework.org/schema/tx 
+					http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+					http://www.springframework.org/schema/aop
+					http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+// ---------------------irá scanear onde ficará a aplicação -----------------------------------------------------------
+			<context:component-scan base-package="br.com.caelum.tarefas" />
+			<mvc:annotation-driven />
+			
+			<bean	
+				class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+				<property	name="prefix" value="/WEB-INF/views/"/>
+				<property	name="suffix" value=".jsp"/>
+			</bean>
+// ---------------------CONTROLLER - CRUD -----------------------------------------------------------			
+*REVISANDO SPRING MVC:
+	*Todos métodos retornam uma String
+	
+	- Lista (Model model): 
+		- Instancia-se o Dao
+		- Cria-se List que recebe dao.lista
+		- model.addAttribute para encaminhar a lista para o request
+		- retorna a view
+	
+	- Adicionar (Usuario user):
+		- Instancia-se o Dao
+		- dao.adiciona(user(
+		- retorna a view
+	
+	
+	@Controller
+	public class UsuarioControllerMvc {
+
+		@RequestMapping("showForm")
+		public String showForm () {
+			return("usuario/formulario");
+		}
+
+		@RequestMapping("addUsuario")
+		public String addUsuario (Usuario user) {
+			UsuarioDao dao = new UsuarioDao();
+			dao.adicionar(user);
+			return("usuario/userAdd");
+		}
+
+		@RequestMapping("listUsuario")
+		public String listUsuario (Model model) {
+			UsuarioDao dao = new UsuarioDao();
+			List<Usuario> lista = dao.getLista();
+			model.addAttribute("lista", lista);
+			return "usuario/listUser";
+		}
+
+		@RequestMapping("removeUser")
+		public String removeUser (Usuario user) {
+			UsuarioDao dao = new UsuarioDao();
+			dao.remove(user);
+			return "redirect: listUsuario";
+		}
+
+		@RequestMapping("mostraUser")
+		public String mostraUser (int id, Model model) {
+			UsuarioDao dao = new UsuarioDao();
+			model.addAttribute("usuario", dao.buscaId(id));
+			return "usuario/mostraUser";
+		}
+
+		@RequestMapping("alteraUsuario")
+		public String alteraUser (Usuario user) {
+			UsuarioDao dao = new UsuarioDao();
+			dao.alteraUser(user);
+			return "redirect: listUsuario";
+		}
+	}
+// ---------------------USUARIODAO -----------------------------------------------------------	
+	
+	public class UsuarioDao {
+		private Connection con = new ConnectionFactory().getConnection();
+		private PreparedStatement stmt;
+
+		public void adicionar(Usuario usuario) {
+			String sql = "INSERT INTO usuarios (nome, matricula, senha, data_cadastro) VALUES (?,?,?,?)";
+			try {
+				stmt = con.prepareStatement(sql);
+				stmt.setString(1, usuario.getNome());
+				stmt.setString(2, usuario.getMatricula());
+				stmt.setString(3, usuario.getSenha());
+				stmt.setDate(4, new java.sql.Date(System.currentTimeMillis()));
+
+				stmt.execute();
+				stmt.close();
+				con.close();
+
+			} catch (SQLException e) {
+				throw new RuntimeException("Erro na insercao " + e);
+			}
+		}
+
+		public List<Usuario> getLista () {
+			List<Usuario> lista = new ArrayList<Usuario>();
+			String sql = "SELECT * FROM usuarios";
+			try {
+				stmt=con.prepareStatement(sql);
+				ResultSet rs = stmt.executeQuery();
+
+				while(rs.next()) {
+					Usuario u1 = new Usuario();
+					u1.setId(rs.getInt("id"));
+					u1.setNome(rs.getString("nome"));
+					u1.setMatricula(rs.getString("matricula"));
+					u1.setData_cadastro(rs.getDate("data_cadastro"));
+
+					lista.add(u1);
+				}
+
+				stmt.execute();
+				rs.close();
+				stmt.close();
+				con.close();
+			} catch (SQLException e) {
+				throw new RuntimeException("Erro no list " + e);
+			}
+
+			return lista;
+		}
+
+		public void remove (Usuario usuario) {
+			String sql = "DELETE FROM usuarios WHERE id = ?";
+			try {
+				stmt=con.prepareStatement(sql);
+				stmt.setInt(1, usuario.getId());
+				stmt.execute();
+
+				stmt.close();
+				con.close();
+			} catch (SQLException e) {
+				throw new RuntimeException("Id incorreto " + e);
+			}
+		}
+
+		public boolean existeUsuario(Usuario usuario) {
+
+			if (usuario == null) {
+				throw new IllegalArgumentException("Usuario não deve ser nulo");
+			}
+
+			try {
+				stmt = con.prepareStatement("select * from usuarios where matricula = ? and senha = ?");
+				stmt.setString(1, usuario.getMatricula());
+				stmt.setString(2, usuario.getSenha());
+				ResultSet rs = stmt.executeQuery();
+
+				boolean encontrado = rs.next();
+				rs.close();
+				stmt.close();
+
+				return encontrado;
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		public Usuario buscaId (int id) {
+
+			try {
+				stmt = con.prepareStatement("SELECT * FROM usuarios WHERE id = ?");
+				stmt.setInt(1, id);
+				ResultSet rs = stmt.executeQuery();
+
+				if(rs.next()) {
+					return populaTarefa (rs);
+				}			
+				rs.close();
+				stmt.close();
+
+				return null;
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		private Usuario populaTarefa(ResultSet rs) throws SQLException {
+			Usuario user = new Usuario();
+
+			// popula o objeto tarefa
+			user.setId(rs.getInt("id"));
+			user.setNome(rs.getString("nome"));
+			user.setMatricula(rs.getString("matricula"));
+			user.setSenha(rs.getString("senha"));
+
+			return user;
+		}
+
+		public void alteraUser (Usuario usuario) {
+			String sql = "UPDATE usuarios SET nome = ?, matricula=?, senha = ? where id = ?";
+			try {
+				stmt=con.prepareStatement(sql);
+				stmt.setString(1, usuario.getNome());
+				stmt.setString(2, usuario.getMatricula());
+				stmt.setString(3, usuario.getSenha());
+				stmt.setInt(4, usuario.getId());
+
+				stmt.execute();
+				stmt.close();
+				con.close();
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+			
+
+			
+// ---------------------irá dizer onde ficara as pastas -------------------------------------------------------------------	
+			<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+				<property name="prefix" value="/WEB-INF/views/" />
+				<property name="suffix" value=".jsp" />
+			</bean>
+		</beans>
+		
+	*Código base - Controller
+		package br.com.caelum.tarefas.controller;
+		import org.springframework.stereotype.Controller;
+		import org.springframework.web.bind.annotation.RequestMapping;
+		
+		@Controller
+		public class OlaMundoController {
+			
+			@RequestMapping("/olaMundoSpring")
+			public String execute() {
+				System.out.println("Executando a lógica com Spring MVC");
+				//Ja entende que e uma pagina .jsp
+				return "ok";
+			}
+		}
+
+
+*Começa com o formulrio informando a action que será repassada para o controlador
+*Tendo a action, iremos criar o Controlador
+	- O controlador ira ser chamado pela tag @Controller
+	- Para mapear os métodos, utilizaremos a tag @RequestMapping("/actionDoForm")
+	- O Spring ja entende o "name" do formulario caso o name esteja igual a variavel do Modelo
+	
+// ----------------------BEANVALIDATION (necessrio utilizar 4 jars) --------------------------------------------------------		
+*Para validar formulários, utilizamos o método BEANValidation, como?
+	-Nos "modelos" (Tarefa por exemplo), temos de por a anotaço @NotNull (ou @Size(min=5)), em cima da variável.
+		- @NotNull
+		  private String text;
+	-Porem para o Construtor, precisamos informar que temos validações a serem feitas, com o @valid e BindingResult result
+		
+		public String adiciona(@valid Tarefa tarefa, BindingResult result){
+			if(result.HasFieldErrors("descricao")) {
+				return "tarefa/formulario";
+			}
+		}
+	- Outra forma, podemos validar todos os campos, exemplo
+		@NotNull
+		private String text;
+		
+		@NotNull
+		private String testando;
+		
+		*Para testar ambos, colocamos um generico, utilizando "HasErrors"
+		public String adiciona(@valid Tarefa tarefa, BindingResult result){
+			if(result.HasErrors()) {
+				return "tarefa/formulario";
+			}
+		}
+	
+	-Podemos também passar uma mensagem do erro @Size(min=5, message="Minimo de 5 caracteres")
+
+	-Dentro do .jsp(nosso html) teremos que informar onde aparecer o erro
+		<h2 style="color: red"><form:errors path="tarefa.descricao" cssStyle=""/></h2>
+		<form action="AdicionaTarefa" method="post">
+
+	-Forward = é para o lado do servidor (interno)
+	-Redirect = a view ira para o navegador
+
+// ---------------------- JQUERY (AJAX)-----------------------------------------------------------------------
+	* AJAX = 	Asynchronous	Javascript	and	XML
+	- Ele roda no navegador, encaminhando uma requisição para o servidor e retornar para o ajax um sucesso ou erro
+	
+	*COMO UTILIZAR NO SPRING?
+    -> spring-context.xml --> inserir 	<mvc:default-servlet-handler/>
+    -> em cima dos métodos @RequestMapping --> colocar @ResponseBody
+      @ResponseBody
+      @RequestMapping("finalizaAgora")
+      
+    -> no HTML --> <script	type="text/javascript" src="resources/js/jquery.js"></script>
+	
+	*Para trabalhar com JQuery, se utilizam 2 métodos:
+    -$.post || $.get
+    
+    $.get("suaRequisicao", {'id' : id}, function (){
+      //A ação para quando a função retornar sucesso
+      //Geralmente se pega o ID
+    });
+    
+	
+	*Relembrando JQuery
+		- Para pegar por ID $('#')
+		- Para alterar texto HTML $('#igor').HTML('testando');
+		- Esconder campo $('#igor').hide(); inverso show();
+		
+
+------------------ EXEMPLOS ------------------------------------------------------  
+<script type="text/javascript">
+  function finalizeAgora(id){
+    $.post("finalizaCurso", {'id':id}, function() {
+      //	Selecionando o elemento HTML através do ID e alterando o HTML
+      $("#ativo_"+id).html("ATIVO");
+    });
+  }
+  
+  function removeAgora(id){
+    $.post("removeCurso", {'id':id}, function(){
+      $("#remove_"+id).closest("tr").hide();
+    });
+  }
+</script>
+	
+
+	
+// ---------------------- *CAPITULO 12 - USUARIO LOGIN/SENHA -----------------------------------------------------------------------
+	- Principio é usar uma session (para isto precisa ser configurado no web.xml)
+	
+	<session-config>
+		<session-timeout>3</session-timeout>
+	</session-config>
+	
+	- A sessão possui 3 requisitos como filtros, que extendem a classe HandlerInterceptorAdapter
+	
+	exemplo:
+	
+	public class AutorizadorInterceptor extends HandlerInterceptorAdapter {
+	
+	@Override
+	public boolean preHandle(HttpServletRequest req, HttpServletResponse res, Object controller) throws IOException {
+		
+		String uri = req.getRequestURI();
+		if (uri.endsWith("loginForm") || uri.endsWith("efetuaLogin") || uri.contains("resources")) {
+			return true;
+		}
+		
+		if(req.getSession().getAttribute("usuarioLogado") != null) {
+			return true;
+		}
+		
+		res.sendRedirect("loginForm");
+		return false;
+		}
+	}
+	
+*ACOPLAMENTO
+	- É a quantidade de vezes que chamo o código, por exemplo, uma classe chamando classe DAO
+		- Quando instanciamos uma classe com o "new"  considerado um peso 3
+	
+	- Pergunte, qual o mtodo que ele realmente necessita e veja oq ele precisa para ter esse metodo (tem intermediario?)
+		- Depois que o intermediario foi utilizado, qual a utilidade? Se nao possui, temos que acoplar, mas como?
+		- Podemos transferir o intermediario para uma classe apartada, de forma que iremos apenas chamar o metodo
+		
+		ANTES:
+		
+		public JdbcTarefaDao() {
+		try {
+			this.connection = new ConnectionFactory().getConnection();
+			} catch (Exception e) {
+				System.out.println(e);
+			}
+		}
+	
+		DEPOIS (TarefaController terá de passar o ConnectionFactory quando for chamar):
+		
+		public JdbcTarefaDao(Connection connection) {
+			this.connection = connection
+		}
+	
+	
+	- Anotaçoes do SPRING 
+		@Repository -> informa que e para acesso ao banco de Dados
+		@Controller -> informa que se trata de um controlador
+	
+// ------------------------- CAPITULO 14 - HIBERNATE E JPA --------------------------------------------------
+* PARA QUE SERVE HIBERNATE?
+  - Dependendo do fabricante, temos diferenças significativas no modo de executar nossos comando SQL;
+  - Por padrão o banco trabalha com tabelas e colunas, como fazer quando utilizamos objetos? A todo momento precisamos transformar
+    objetos em registro e registro em objetos
+  - Para isto foi criado ferramentas de mapeamento objeto-relacional (ORM)
+  - O Hibernate inspirou a criação da JPA, ou seja, nasceu sem JPA, porém como toda especificação, ela deve possuir implementações, entre as mais comuns estão:
+	 - Hibernate da RedHat, EclipseLink da Eclipse.
+  - O conceito de JPA surgiu com a ideia de conversar "melhor" Java com SQL, de forma que nao fosse necessario ficar utilizando ResultSet e etc
+
+* DOWNLOAD: https://sourceforge.net/projects/hibernate/ --> BAIXE O ZIP --> EXTRAI-A --> utilize os arquivos requred e jpa
+
+
+* 1º MODO CONFIGURAÇÃO [sem utilizar o SPRING] (persistence.xml) --> deve ficar na pasta src/META-INF/persistence.xml
+
+    <persistence xmlns="http://java.sun.com/xml/ns/persistence"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+			http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+			version="2.0">
+			
+      <persistence-unit	name="tarefas">
+            
+	    <!--	provedor/implementacao	do	JPA	-->
+            <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+            
+	    <!--	entidade	mapeada	-->
+            <class>br.com.caelum.tarefas.modelo.Tarefa</class>
+            
+	    <properties>
+		      <!--	dados	da	conexao	-->
+		      <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+		      <property	name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/fj21" />
+		      <property	name="javax.persistence.jdbc.user" value="root"	/>
+		      <property	name="javax.persistence.jdbc.password" value=" <SENHA DO BANCO AQUI>" />
+
+		      <!--		propriedades	do	hibernate	-->
+		      <property	name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
+		      <property	name="hibernate.show_sql" value="true" />
+		      <property	name="hibernate.format_sql" value="true" />
+
+		      <!--		atualiza	o	banco,	gera	as	tabelas	se	for	preciso	-->
+		      <property	name="hibernate.hbm2ddl.auto" value="update" />
+            </properties>
+	    
+      </persistence-unit>
+    </persistence>
+
+* 2º MODO CONFIGURAÇÃO [COM SPRING]:
+  *necessário utilizar os JARs,		commons-dbcp-x.x.jar		e		commons-pool-x.x.jar
+  - spring-context.xml
+    <bean id="mysqlDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+      <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+      <property name="url" value="jdbc:mysql://localhost/portal_rv" />
+      <property name="username" value="root" />
+      <property name="password" value="" />
+    </bean>
+    
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+      <property name="dataSource" ref="mysqlDataSource" />
+      <property name="jpaVendorAdapter">
+    <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+      </property>
+    </bean>
+    
+  - persistence.xml:
+ 
+    <?xml version="1.0" encoding="UTF-8"?>
+    <persistence xmlns="http://java.sun.com/xml/ns/persistence"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+        http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+        version="2.0">
+        
+        <persistence-unit	name="tarefas">
+              
+        <!--	provedor/implementacao	do	JPA	-->
+              <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+              
+        <!--	entidade	mapeada	-->
+              <class>br.com.portalrv.modelo.Tarefa</class>
+              
+        <properties>
+            <!--	SEM	as	propriedades	URL,	login,	senha	e	driver	-->
+
+            <!--		propriedades	do	hibernate	-->
+            <property	name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
+            <property	name="hibernate.show_sql" value="true" />
+            <property	name="hibernate.format_sql" value="true" />
+
+            <!--		atualiza	o	banco,	gera	as	tabelas	se	for	preciso	-->
+            <property	name="hibernate.hbm2ddl.auto" value="update" />
+        </properties>
+        
+        </persistence-unit>
+  </persistence>
+
+*MÉTODOS PERSISTE/HIBERNATE:
+  - find --> pode-se utilizar como WHERE [Tarefa localizaPorId = manager.find(Tarefa.class, 1L)]
+  - remove --> utilizado como DELETE
+  - merge --> utilizado como UPDATE
+  - persist --> utilizado como INSERT [manager.persist(tarefa);]
+
+*GERANDO TABELAS:
+  - Para gerar as tabelas é necessário que seja criado uma fabrica de Conexão:
+    EntityManagerFactory factory = Persistence.createEntityManagerFactory("tarefas");
+		factory.close();
+  
+ 
+  - Para se trabalhar com objetos é necessário criar um Gerenciador/Manager
+    EntityManager	manager	=	factory.createEntityManager();
+    manager.close();
+    
+    
+  - EXEMPLO DE INSERÇÃO:
+    public class GeraTabelas {
+      public static void main(String[] args) {
+        Tarefa tarefa = new Tarefa();
+        tarefa.setDescricao("Estudar JPA");
+        tarefa.setFinalizado(true);
+        tarefa.setDataFinalizacao(Calendar.getinstance());
+        
+        EntityManagerFactory	factory	=	Persistence.createEntityManagerFactory("tarefas");
+        EntityManager	manager	=	factory.createEntityManager();
+        
+        manager.getTransaction().begin();
+        manager.persist(tarefa);
+        manager.getTransaction().commit();
+        
+        Syste.out.println("ID da tarefa: " + tarefa.getId());
+        
+        manager.close();
+        factory.close();
+        }
+    }
+  	
+   - EXEMPLO DE BUSCA COM CHAVE [find]:
+     EntityManagerFactory factory = Persistence.createEntityManagerFactory("tarefas");
+     EntityManager manager = factory.createEntityManager();
+     
+     Tarefa localizaPorId = manager.find(Tarefa.class, 1L);
+     Syste.out.println(localizaPorId.getDescricao());
+   
+   - EXEMPLO DE UPDATE COM CHAVE [merge]:
+      Tarefa tarefa = new Tarefa();
+      tarefa.setId(Long.parseLong("2"));
+      tarefa.setDescricao("Estudando JPA e Hibernatee");
+      tarefa.setFinalizado(false);
+      tarefa.setDataFinalizacao(Calendar.getInstance());
+      
+      manager.getTransaction().begin();
+      manager.merge(tarefa);
+      manager.getTransaction().commit();
+	
+   - EXEMPLO DE DELETE [remove]:
+      EntityManager	manager	=	//abrir	um	EntityManager
+      Tarefa	encontrada	=	manager.find(Tarefa.class,	1L);
+      manager.getTransaction().begin();
+      manager.remove(encontrada);
+      manager.getTransaction().commit();
+
+   - LISTANDO TABELAS COM HIBERNATE:
+      Query query = manager.createQuery("SELECT t FROM Tarefa as t WHERE t.finalizado = :paramFinalizado");
+      query.setParameter("paramFinalizado", true);
+      
+      List<Tarefa> lista = query.getResultList();
+      
+      for (Tarefa t : lista) {
+        System.out.println(t.getDescricao());
+        System.out.println(t.getId());
+      }
+      manager.close();
+
+* IMPLEMENTAÇÃO:
+
+	- CÓDIGOS UTILIZADOS NOS MODELOS:
+	      - CÓDIGO BASE:
+	      @Entity --> indica o objeto para se tornar persistível
+	      @Table(name="tarefas") --> indica que será a Tabela com nome XXXX
+	      @Id --> indica que aquele atributo é um ID
+        @GeneratedValue --> serve para referenciar o ID como AUTO_INCREMENT
+
+	      - P/ COLUNAS:
+	      @Column(nullable = false) --> Indica que não pode ser nulo
+	      @Column(name = "nomeDaColuna", nullable = false) --> irá criar a coluna com este nome
+
+	      @Size(min=10, max=256, message = "Deu ruim")
+	      @DateTimeFormat(pattern="dd/MM/yyyy")
+	      @Temporal(TemporalType.DATE)  --> Temporal utilizado para datas / TemporalType indica o tipo de dado
+	      @Temporal(TemporalType.TIME)  --> TemporalType, retorna o horário
+	      
+	- CÓDIGO NOS DAOS:
+        - CÓDIGO BASE:
+        @Repository --> declara a classe como componente
+        @Autowired --> é a anotação para amarrar o construtor do Controller com o Dao
+
+*NA PRÁTICA [EXEMPLO COM SPRING GERENCIANDO O JPA]:
+        
+    *UsuarioController: [para esta classe devemos tirar todos new UsuarioDao dos métodos]
+
+      @Controller
+      public class UsuarioControllerMvc {
+
+        @Autowired
+        private UsuarioDao dao;
+         
+        @RequestMapping("showForm")
+        public String showForm () {
+          return("usuario/formulario");
+        }
+        
+        @RequestMapping("addUsuario")
+        public String addUsuario (Usuario user) {
+          dao.adicionar(user);
+          return("usuario/userAdd");
+        }
+        
+        @RequestMapping("listUsuario")
+        public String listUsuario (Model model) {
+          List<Usuario> lista = dao.getLista();
+          model.addAttribute("lista", lista);
+          return "usuario/listUser";
+        }
+      }
+-----------------------------------------------------------------------------------------------------------	
+FJ22 - DESENVOLVIMENTO NA PRÁTICA COM SPRING E TESTES	
+-----------------------------------------------------------------------------------------------------------	
+CAPITULO 1 - VERSIONAMENTO DE CODIGO
+
+*Para que precisamos versionar um código? De certa forma, mexer em um projeto pode ser assustador, pois podemos mexer em algo e danificar
+outras. Porque, dependendo da mudança fica dificil voltar ao estado anterior.
+*Um versionador e o sistema que ira gerenciar as versoes do projeto
+*Uma solução para as mudança é o versionamento de codigo.
+
+GIT
+	- Com o GIT podemos escolher o arquivo que será comitado.
+	- DOWNLOAD para WINDOWS: 
+
+
+CODIGOS:
+	cd [permite que acesse o repositorio]
+		- cd Caelum [irá acessar o repositorio Caelum]
+		
+	
+	$ git init [cria um repositorio]
+	$ git clone git://endereco.git [cria um clone do diretorio informado para a maquina local, ir fazer o downlaod]
+	$ git status [irá demonstrar o que esta para ser alterado e etc]
+		#Changes to be committed: [estarão os arquivos que serao comitados]
+		#Changes not staged for commit: [estarão os arquivos que EXISTEM e COM ALTERAÇÃO]
+		#Untracked files: [estarao ARQUIVOS NOVOS]
+	$ git add seunome.txt[irá adicionar o arquivo SEUNOME]
+	$ git commit -m [informa a mensagem para ser adicionada]
+	$ git commit -a -m [adiciona todos]
+	$ git push [ira adicionar ao GITHUB]
+	$ git log [ira exibir os commites feitos]
+		$ git log --oneline
+		$ git log --oneline -n 2 [ira exibir os 2 commits]
+	$ git branch [lista os branches existentes do repositorio]
+		$ git branch work [irá criar o branch work]
+		$ git checkout work [seleciona a branch]
+		$ git merge master [atualiza a branch work com o ultimo master]
+		$ git checkout master [seleciona o master]
+		$ git merge work [ira atualizar baseado no branch master]
+		$ git branch -d work [ira apagar a branch]
+		
+BRANCH:
+Toda aplicação possui uma branch MASTER, onde fica o cdigo em producao.
+	-Ex.: O joão esta desenvolvendo o cadastro de usuario, sendo assim ele ira criar a branch cadastro.
+		$ git branch cadastro
+		$ git checkout cadastro
+		
+	      Apos joao ter criado o projeto, precisa adicionar o projeto a Master, porém antes precisamos do branch master atualizado
+	        $ git checkout cadastro
+		$ git merge master
+		
+		//apos ter atualizado branch cadastro com as att de master, esta na hora de atualizar a master com as novas inf. da branch cadastro
+		$ git checkout master
+		$ git merge cadastro
+		
+	      João não precisa mais da branch cadastro, podera deletar
+	        $ git branch -d work
+	      
+	      Basta agora atualziar o github
+	        $ git push
+
+-----------------------------------------------------------------------------------------------------------	
+CAPITLO 1B - MAVEN
+
+*O maven veio para melhorar o gerenciamento do projeto, de forma que não seja necessário adicionar as libs manualmente.
+*Pense encaminhar um projeto algum outro dev? teriamos que passar todos .jars
+
+-UTILIDADES:
+	- Testa || empacota || verifica qualidade do código || baixa as dependencias localmente
+
+- ARQUIVO DE CONFIGURAÇÃO [onde será inserido todas as dependências/plugins]: pom.xml
+- ENTENDO A ESTRUTURA
+	<project xmlns=.... --> ficará a estrutura base do projeto
+		<groupID> br.com.igor </groupID> -->Nome do pacote
+		<artifactId> meuProjeto </artifactId> -->Nome do projeto
+		<version> 1.0 </version> --> versao do projeto
+		
+		<dependencies> --> ira ficar as dependencias,
+			<dependency>
+			    <groupId>org.springframework</groupId>
+			    <artifactId>spring-webmvc</artifactId>
+			    <version>5.2.2.RELEASE</version>
+			</dependency>
+		</dependencies>
+	</project>
+	
+!!ATENÇAO A ESTRUTURA DE PASTA DO MAVEN
+-----------------------------------------------------------------------------------------------------------
+CRIANDO O CONTROLLER SESSAO
+
+*Tudo começa com a necessidade de passar 3 paparametros de 3 tabelas diferentes... 
+	como um unico objeto poderia passar os 3 parametros a um Controller?
+	
+	- Necessário criar um formulrio que recera responsavel por passar os 3 objetos diferentes
+	
+	1º Criamos nosso SessaoController
+		-  @Autowired em todos os Daos que serao utilizados
+		- Ira receber via @getMapping da sessao o caminho [@GetMapping("/admin/sessao")]
+		- Nossa sessao deve receber o ID da Sala e a LISTA DE FILMES
+			- Com @requestParam("id") receberemos o ID da Sala e criamos nosso metodo
+			- Como queremos popular o input, devemos utilizar o ModelAndView;
+				mv.addObject("sala", salaDao.findOne(salaId));
+				mv.addObject("filmes", filmeDao.findAll());
+			- retornamos nosso mv;
+			
+	
+
+@getMapping("") --> so recebe GET de um formulario (nao pode POST)
+@requestParam("id") --> serve para solicitar algum parametro do formulario (como um ID)
+
+*MODELO (criará a tabela)
+@Entity --> para ser uma tabela em um banco de dados
+@id --> Informa ao hibernate que se trata de um id
+@GeneratedValue(strategy=GenerationType.IDENTITY) --> declara o auto_incremento
+@ManytoOne
+
+*DAO
+@Repository -> informa que sera responsavel por realizar uma conexao
+@PersistenceContext -> irá carrega os dados do spring-contexts, parte de conexao
+	@PersistenceContext
+	private EntityManager manager;
+
+
+
+Para realizar validações antes de inserir dentro de um banco de dados, o ideal  criar um GERENCIADOR.
+No caso de Sessões, um GerenciadorDeSessões, onde nele irão conter os ifs de forma que não altere o Controller
+
+-----------------------------------------------------------------------------------------------------------
+JUnit
+
+Passamos o resultado para o metodo e ele ir verificar se de fato aquele metodo é valido, ou seja, ele testa para ver
+se esta funcionando
+
+*Lembre-se de adicionar a depeendencia no Maven
+<dependency>
+	<groupId>junit</groupId>
+	<artifactId>junit</artifactId>
+	<version>4.12</version>
+</dependency>
+
+
+
+
+

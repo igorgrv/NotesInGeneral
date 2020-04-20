@@ -1,0 +1,46 @@
+// ---------------------- JQUERY (AJAX)-----------------------------------------------------------------------
+	* AJAX = 	Asynchronous	Javascript	and	XML
+	- Ele roda no navegador, encaminhando uma requisição para o servidor e retornar para o ajax um sucesso ou erro
+	
+	*COMO UTILIZAR NO SPRING?
+    -> spring-context.xml --> inserir 	<mvc:default-servlet-handler/>
+    -> em cima dos métodos @RequestMapping --> colocar @ResponseBody
+      @ResponseBody
+      @RequestMapping("finalizaAgora")
+      
+    -> no HTML --> <script	type="text/javascript" src="resources/js/jquery.js"></script>
+	
+	*Para trabalhar com JQuery, se utilizam 2 métodos:
+    -$.post || $.get
+    
+    $.get("suaRequisicao", {'id' : id}, function (){
+      //A ação para quando a função retornar sucesso
+      //Geralmente se pega o ID
+    });
+    
+	
+	*Relembrando JQuery
+		- Para pegar por ID $('#')
+		- Para alterar texto HTML $('#igor').HTML('testando');
+		- Esconder campo $('#igor').hide(); inverso show();
+		
+------------------ EXEMPLOS ------------------------------------------------------  
+<script type="text/javascript">
+  function finalizeAgora(id){
+    $.post("finalizaCurso", {'id':id}, function() {
+      //	Selecionando o elemento HTML através do ID e alterando o HTML
+      $("#ativo_"+id).html("ATIVO");
+    });
+  }
+  
+  function removeAgora(id){
+    $.post("removeCurso", {'id':id}, function(){
+      $("#remove_"+id).closest("tr").hide();
+    });
+  }
+</script>
+	
+*Na JSP devemos colocar dentro da tag <td> o ID
+  *Ex.:
+    <td id="remove_${id}"> </td>
+	

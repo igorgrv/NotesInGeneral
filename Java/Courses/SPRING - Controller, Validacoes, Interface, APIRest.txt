@@ -1,0 +1,496 @@
+SPRING - CONTROLLER
+-----------------------------------------------------------------------------------------------------------
+ANOTAÇÕES SPRING // MÉTODOS
+
+@GetMapping --> Funciona como o RequestMapping, porém específico para method GET
+*Atenção ao que se espera RECEBER no método
+  @GetMapping("/admin/sessao")
+  @GetMapping("/admin/{id}/sessao")
+  
+@PostMapping --> Específico para o method POST
+*Atenção ao que se espera PASSAR no método
+  @PostMapping("/admin/sessao")
+
+@RequestParam --> Captura o que esta sendo passada na URL
+  ex.: 
+    URL: http://localhost:8080/topicos?curso=Java
+    
+    public ModelAndView form (@RequestParam ("salaId") Integer id){
+    }
+
+
+@PathVariable --> serve para pegar um trecho da url que geralmente é dinâmico
+  ex.:
+    URL: http://localhost:8080/topicos/java 
+    (Agora como não tem o padrão ?nomeParametro=valorParametro na url, o /java não é mais um parâmetro de query, 
+     mas sim parte da própria url, e para recuperá-lo devemos utilizar a anotação @PathVariable)
+    
+    public ModelAndView form (@PathVariable ("salaId") Integer id){
+    }
+  
+  
+ModelAndView --> Parecido com a String, porém irá retornar a String + objeto (antes utilizamos o Model)
+  @GetMapping("/admin/sessao")
+	public ModelAndView form(@RequestParam("salaId") Integer salaId) {
+		ModelAndView mv = new ModelAndView("sessao/sessao");
+		mv.addObject("sala", salaDao.findOne(salaId));
+		mv.addObject("filme", filmeDao.findAll());
+		return mv;
+	}
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+Exemplo de validação em uma classe separada
+
+/**
+ * 
+ * @author igorg
+ * As regras para Sessao serao:
+ * Nao pode terminar uma sessao no outro dia (a considerar a duracao do filme + abertura da sessao)
+ * Uma sala nao pode ter duas sessoes no mesmo horario, portanto, SE: 
+ * 	o TERMINO da sessao A for ANTES do inicio sessao B -> return true;
+ *  o TERMINO da sessao B for ANTES do inicio da sessao B -> return true;
+ *  
+ *  Se uma das duas afirmações forem verdadeiras, nao ira criar a sessao
+ */
+
+public class GerenciadorDeSessao {
+
+	//Nosso gerenciador tera sempre de receber a lista de sessoes para ele avaliar
+	private List<Sessao> sessoesDaSala;
+
+	public GerenciadorDeSessao(List<Sessao> sessoesDaSala) {
+		this.sessoesDaSala = sessoesDaSala;
+	}
+	
+	public boolean cabe(Sessao sessaoNova) {
+		if(terminaAmanha(sessaoNova)) {
+			return false;
+		}
+		
+		/**
+		 * Stream e igual a um for com um if, exemplo:
+		 * for(Sessao sessaoExistente : sessoesDaSala) {
+		 * 	if(horarioIsConflitante(sessaoExistente, sessaoNova)){
+		 * 		return false;
+		 * 	}
+		 * }
+		 * 
+		 * O noneMatch da Stream ira retornar true se todas as comparacoes forem falsas e false se uma for verdadeira
+		 */
+		return sessoesDaSala.stream().noneMatch(sessaoExistente -> horarioIsConflitante(sessaoExistente, sessaoNova));		
+	}
+
+	private boolean horarioIsConflitante(Sessao sessaoExistente, Sessao sessaoNova) {
+		LocalDateTime inicioSessaoExistente = getInicioDaSessaoComDiaDeHoje (sessaoExistente);
+		LocalDateTime terminoSessaoExistente = getTerminoDaSessaoComDiaDeHoje(sessaoExistente);
+		LocalDateTime inicioSessaoNova = getInicioDaSessaoComDiaDeHoje(sessaoNova);
+		LocalDateTime terminoSessaoNova = getTerminoDaSessaoComDiaDeHoje(sessaoNova);
+		
+		//Se o termino da sessao nova for antes do inicio da sessao existente, ira permitir
+		boolean sessaoNovaTerminaAntesDaExistente = terminoSessaoNova.isBefore(inicioSessaoExistente);
+		
+		//Se o termino da sessao existente for antes do inicio da nova, ira permitir
+		boolean sessaoNovaComecaDepoisDaExistente = terminoSessaoExistente.isBefore(inicioSessaoNova);
+		
+		//Se uma das condicoes derem falsas, ira ser um horario conflitante
+		if(sessaoNovaComecaDepoisDaExistente || sessaoNovaTerminaAntesDaExistente) {
+			return false;
+		}
+		
+		return true;
+	}
+
+	private LocalDateTime getTerminoDaSessaoComDiaDeHoje(Sessao sessao) {
+		LocalDateTime inicioSessaoNova = getInicioDaSessaoComDiaDeHoje(sessao);
+		
+		//Ira somar ao inicio da sessao + duracao do filme
+		return inicioSessaoNova.plus(sessao.getFilme().getDuracao());
+	}
+
+	private LocalDateTime getInicioDaSessaoComDiaDeHoje(Sessao sessao) {
+    LocalDate hoje = LocalDate.now();
+		
+		//atDate ira adicionar o dia de hoje ao horario, formando um LocalDateTime
+		return sessao.getHorario().atDate(hoje);
+	}
+
+	private boolean terminaAmanha(Sessao sessaoNova) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+}
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+USO DE INTERFACES e ENUMS
+*Interfaces: utilize as interfaces quando forem estipulados metodos padroes
+*Enum: quando os atributos forem padroes
+
+*Interface+enum = o ENUM utilizara os metodos das Interface, como um nome "atalho" para cada metodo
+
+
+----------------------- INTERFACES -----------------------
+
+public interface Desconto {
+
+	public BigDecimal aplicarDescontoSobre(BigDecimal precoOriginal);
+}
+
+
+public class DescontoParaEstudantes implements Desconto{
+	
+	@Override
+	public BigDecimal aplicarDescontoSobre(BigDecimal precoOriginal) {
+		return precoOriginal.divide(new BigDecimal("2.0"));
+	}
+
+}
+public class DescontoParaBancos implements Desconto{
+
+	@Override
+	public BigDecimal aplicarDescontoSobre(BigDecimal precoOriginal) {
+		return precoOriginal.multiply(new BigDecimal("0.3"));
+	}
+
+}
+public class DescontoZero implements Desconto{
+
+	@Override
+	public BigDecimal aplicarDescontoSobre(BigDecimal precoOriginal) {
+		return precoOriginal;
+	}
+
+}
+
+
+---------------------- ENUM -----------------------------
+
+public enum TipoDeIngresso {
+
+	INTEIRO(new DescontoNulo()),
+	ESTUDANTE(new DescontoEstudante());
+	
+	private final Desconto desconto;
+	
+	TipoDeIngresso(Desconto desconto) {
+		this.desconto = desconto;
+	}
+	
+	public BigDecimal aplicaDesconto(BigDecimal preco) {
+		return desconto.aplicaDescontoSobre(preco);
+	}
+	
+	public String getDescricao() {
+		return desconto.getDescricao();
+	}
+}
+
+------------------- CLASSE IMPLEMENTADA ------------------
+
+@Entity
+public class Ingresso {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+	
+	@ManyToOne
+	private Sessao sessao;
+	
+	@ManyToOne
+	private Lugar lugar;
+	
+	@Enumerated(EnumType.STRING)
+	private TipoDeIngresso tipoDeingresso;
+	
+	private BigDecimal preco;
+	
+	/**
+	 * @deprecated
+	 */
+	public Ingresso() {}
+
+	public Ingresso(Sessao sessao, TipoDeIngresso tipoDeIngresso, Lugar lugar) {
+		this.sessao = sessao;
+		this.tipoDeingresso = tipoDeIngresso;
+		this.lugar = lugar;
+		this.preco = this.tipoDeingresso.aplicaDesconto(sessao.getPreco());
+	}
+	
+------------------- CONTROLLER IMPLEMENTADO ------------------
+	
+	
+  @GetMapping("/sessao/{id}/lugares")
+	public ModelAndView lugares(@PathVariable("id") Integer id) {
+		ModelAndView mv = new ModelAndView("sessao/lugares");
+		Sessao sessao = sessaoDao.findOne(id);
+		mv.addObject("sessao", sessao);
+		Optional<DetalhesFilme> detalheFilme = client.requisicao(sessao.getFilme());
+		mv.addObject("imagemCapa", detalheFilme.orElse(new DetalhesFilme()));
+		
+		//Ira passar os valores dos ENUMs que utilizem a Interface
+		mv.addObject("tiposDeIngressos", TipoDeIngresso.values());
+		return mv;
+	}
+	
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+API, REST E RESTFUL????
+
+Porque chegou a existência destes termos?
+  - Empresas precisando alimentar seus dados com softwares com dados, a todo momento e usuários
+    navegando cada vez mais e fazendo 'requisições';
+    
+  -Basicamente, o funcionamento dessas aplicações baseava-se em fornecer um ponto de acesso entre a 
+  aplicação e seu cliente, seja ele um usuário ou uma outra aplicação;
+  
+API [Application Programming Interface - Interface de Programação de Aplicações]:
+  - Trata-se de um padrão e rotinas estabelecidos, de uma aplicação X, onde outras aplicações
+  poderão acessar esta aplicação X sem precisar conhecer detalhes da implementação;
+  
+  - O software que pretende acessar as funcionalidades e capacidades de uma API é descrito como “call”, 
+  já o software que cria a API é descrito como “publish”.
+  
+  - As representações abaixo, serve como exemplo de padrão utilizado para comunicação entre aplicações
+    Representação XML:
+    <endereco>
+      <rua>Rua Recife</rua>
+      <cidade>Paulo Afonso</cidade>
+    </endereco>
+    
+    Representação JSON
+    { 
+      endereco: {
+        rua: Rua Recife,
+        cidade: Paulo Afonso
+      }
+    }
+  
+  - Uma API RestFul é uma aplicação que utiliza requisições HTTP
+  
+REST [Representational State Transfer - Transferência de Estado Representacional]:
+  *Rest se trata de um modelo de arquitetura, utilizado na evolução d protocolo HTTP,
+  com uma representação padronizada de verbos e métodos usados;
+  
+  *Toda aplicação REST gerencia algo, chamada de 
+  RECURSOS:
+    por exemplo, um E-commerce, gerencia produtos, clientes e vendas.
+    O recurso nada mais é d q uma abstração de uma determinada de informaçao que deve ser UNICA;
+    
+  *IDENTIFICAÇÃO - Como a aplicação irá saber qual o recurso utilizado?
+    A identificação d recurso deve ser feita atraves da URI
+      exemplo:
+        http://servicorest.com.br/produtos (plural);
+        http://servicorest.com.br/clientes;
+        http://servicorest.com.br/clientes/57 (singular - especifico);
+        http://servicorest.com.br/vendas.
+        
+  *MANIPULAÇÃO - Todo RECURSO pode sofrer algum tipo de manipulação, como CRUD;
+    Exemplo:
+      http://servicorest.com.br/produtos/cadastrar;
+      http://servicorest.com.br/clientes/10/excluir;
+      http://servicorest.com.br/vendas/34/atualizar.
+    
+    EVITE COLOCAR A MANIPULAÇÃO COM FORMATOS URI!!
+    Exemplo:
+      GET http://www.meusite.com/usuarios
+      DELETE http://www.meusite.com/usuarios/jackson
+      POST http://www.meusite.com/usuarios –data {nome: joaquim}
+  
+      [Estes métodos GET DELETE POST pertencem ao REST]
+      
+    PADRÃO:
+    GET	/clientes	Recuperar os dados de todos os clientes.
+    GET	/clientes/id	Recuperar os dados de um determinado cliente.
+    POST	/clientes	Criar um novo cliente.
+    PUT	/clientes/id	Atualizar os dados de um determinado cliente.
+    DELETE	/clientes/id	Excluir um determinado cliente.
+    
+  *REPRESENTAÇÕES:
+    Os três principais formatos suportados pela maioria dos serviços REST são:
+      HTML;
+      XML;
+      JSON;
+    
+    O ideal é que uma aplicação não fique limitada a um tipo de formato!
+    
+    Quando um sistema possui mais de uma representação, No REST, essa negociação d formato da 
+    representação dos recursos é chamada de CONTENT NEGOCIATION e no mundo Web ela deve ser feita 
+    via um cabeçalho HTTP, conhecido como accept.
+  
+  *Surgiu como uma alternativa ao SOAP
+  
+  - Sistemas que utilizam os princípios REST são chamados de RESTful.
+
+  REST: conjunto de princípios de arquitetura.
+  RESTful: capacidade de determinado sistema aplicar os princípios de REST.
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------  
+TRABALHANDO COM REQUISIÇÕES - JSON
+
+Pom.xml:
+  <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.8.5</version>
+  </dependency>
+  
+CRIAR CLASSE/MODELO QUE RECEBERA AS REQUISIÇÕES:
+
+  /**
+  * JsonProperty irá pedir qual o título do Json
+  * {"Title":"Ted","Year":"2012","Rated":"R"}
+  */
+  public class DetalhesDoFilme {
+
+    @JsonProperty("Title")
+    private String titulo;
+
+    @JsonProperty("Year")
+    private String ano;
+
+    @JsonProperty("Poster")
+    private String imagem;
+    
+    
+    GETTERS E SETTERS!
+  }
+
+CRIAR CLIENT - QUE IRÁ MANDAR A REQUISIÇÃO E RECEBE-LA
+  
+  /**
+  * Class irá receber o título (recurso necessário para solicitar as infs.)
+  * Receber esse título dentro de uma String titulo, substituindo os espaços por '+'
+  * Anotar a URL que possui o json -> https://omdb-fj22.herokuapp.com/movie?title
+  * Concatenar a URL utilizando o String.format
+  * Iniciar o objeto RestTemplate
+  * O objeto RestTemplate, possui um metodo getForObject que faz a requisicao a URL e grava o retorno em outro objeto
+  *
+  * Para evitar excessões ao fazer uma requisição, utilizamos a classe OPTIONAL
+  * Optinal, possui Método OFNULLABLE -> evita exceções de nullpointer
+  * Se coloca, a requição dentro de um TRY/CATCH, onde o catch irá retornar um optional.empty();
+  *
+  */
+  
+  @Component
+  public class OmdbClient {
+    public Optional<DetalhesFilme> requisicao(Filme filme){
+        String titulo = filme.getNome().replace(" ","+");
+        String URL = "https://omdb-fj22.herokuapp.com/movie?title=%s";
+        String concatenar = String.format(URL, titulo);
+        
+        RestTemplate client = new RestTemplate();
+        
+        Try{
+          DetalhesFilme detalheDoFilme = client.getForObject(concatenar, DetalheDoFilme.class);
+          return Optional.ofNullable(detalheDoFilme);
+        Catch (RestExcepection e){
+          System.out.println(concatenar + " - erro: " + e);
+          return Optional.empty();
+        }        
+    }
+  }
+  
+CONTROLLER
+  
+    @Autowired
+    private OmdbClient client;
+
+    @GetMapping("/filme/{id}/detalhe")
+    public ModelAndView detalheFilme(@PathVariable("id") Integer id) {
+    	ModelAndView mv = new ModelAndView("filme/detalhe");
+    	Filme filme = filmeDao.findOne(id);
+    	mv.addObject("sessoes", sessaoDao.listaDeSessoesFilme(filme));
+    	Optional<DetalhesDoFilme> detalhesDoFilme = client.request(filme);
+    	mv.addObject("detalhes", detalhesDoFilme.orElse(new DetalhesDoFilme()));
+    	return mv;
+    }
+
+VIEW
+    <div class=" col-md-6 col-md-offset-3">
+      <h1>${detalhes.titulo}</h1>
+      <image src="${detalhes.imagem}" />
+
+      <div>
+          <label for="ano">Ano</label>
+          <span id="ano">${detalhes.ano}</span>
+      </div>
+
+      <div>
+          <label for="diretores">Diretores</label>
+          <span id="diretores">${detalhes.diretores}</span>
+      </div>
+    </div>
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+CONVERSORES
+
+*Para o SPRING Reconhecer um conversor é necessario informar no spring-context.xml
+
+<mvc:annotation-driven conversion-service="conversionService" />
+	<bean id="conversionService"
+		class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+		<property name="converters">
+			<set>
+				<bean
+					class="br.com.caelum.ingresso.converter.YearMonthConverter" />
+			</set>
+		</property>
+	</bean>
+
+CLASSE
+
+public class YearMonthConverter implements Converter<String, YearMonth>{
+
+	@Override
+	public YearMonth convert(String text) {
+		return YearMonth.parse(text, DateTimeFormatter.ofPattern("MM/yyyy"));
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

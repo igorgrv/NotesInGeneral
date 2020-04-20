@@ -1,0 +1,430 @@
+ANOTACOES LOGIN -> HandlerInterceptorAdapter
+-----------------------------------------------------------------------------------------------------------
+ARQUIVOS BASE:
+  spring-context.xml
+  web.xml
+  
+  com.fj21.controller
+    - UsuarioController
+  
+  com.fj21.dao
+    - UsuarioDao
+  
+  com.fj21.intercptor
+    - AutorizadorInterceptor
+    
+  index.jsp
+  loginForm.jsp
+    
+------------------ SPRING-CONTEXT || WEB.XML ---------------------------------------
+Spring.xml:
+  <mvc:interceptors>
+		<bean class="com.fj21review.interceptor.AutorizadorInterceptor" />
+	</mvc:interceptors>
+	
+web.xml:
+
+  <session-config>
+    <session-timeout>2</session-timeout>
+  </session-config>
+    
+------------------ UsuarioDao ------------------------------------------------------
+@Repository
+public class UsuarioDao {
+
+	@PersistenceContext
+	private EntityManager manager;
+	
+	public boolean existeUsuario(Usuario usuario) {
+		TypedQuery<Usuario> query = manager.createQuery("SELECT u FROM Usuario as u WHERE u.login = :paramLogin AND u.senha = :paramSenha", Usuario.class);
+		query.setParameter("paramLogin", usuario.getLogin());
+		query.setParameter("paramSenha", usuario.getSenha());
+		
+		Usuario user = query.getSingleResult();
+		
+		if(user == null) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+}
+
+------------------ UsuarioController ---------------------------------------------------
+@Controller
+public class LoginController {
+
+	@Autowired
+	private UsuarioDao dao;
+	
+	@RequestMapping("login")
+	public String loginForm() {
+		return "loginForm";
+	}
+	
+	@RequestMapping("efetuaLogin")
+	public String efetuaLogin(Usuario usuario, HttpSession session) {
+		if(dao.existeUsuario(usuario)) {
+		//setAttribute irá salvar na string "usuarioLogado" o objeto usuario
+		session.setAttribute("usuarioLogado", usuario);
+		return "index";
+		} else {
+			return "redirect: login";
+		}
+	}
+	
+	@RequestMapping("logout")
+	public String logout(HttpSession session) {
+		session.invalidate();
+		return "redirect: login";
+	}
+}
+
+------------------ AutorizadorInterceptor ------------------------------------------------
+public class AutorizadorInterceptor implements HandlerInterceptor{
+
+	@Override
+	public void afterCompletion(HttpServletRequest arg0, HttpServletResponse arg1, Object arg2, Exception arg3)
+			throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void postHandle(HttpServletRequest arg0, HttpServletResponse arg1, Object arg2, ModelAndView arg3)
+			throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean preHandle(HttpServletRequest req, HttpServletResponse res, Object controller) throws Exception {
+		String uri = req.getRequestURI();
+		if(uri.endsWith("login") || uri.endsWith("efetuaLogin") || uri.contains("resource")) {
+			return true;
+		}
+		if(req.getSession().getAttribute("usuarioLogado") != null) {
+			return true;
+		} else {
+			res.sendRedirect("login");
+			return false;
+		}
+	}
+
+	
+}
+
+------------------ INDEX.JSP ----------------------------------------------------------
+<body>
+	<div align="right">
+		<a href="logout">Logout</a>
+	</div>
+	<H2>Bem Vindo, ${usuarioLogado.login}!</H2><hr>
+	<a href="listCurso">Clique aqui</a> para acessar a lista de Cursos Cadastrados!
+</body>
+
+------------------ LOGINFORM.JSP ----------------------------------------------------------
+<body>
+	<h2>Pagina de Login</h2><hr>
+	
+	<form action="efetuaLogin" method="post">
+		Login: <input type="text" name="login"> <br>
+		Senha: <input type="password" name="senha"> <br><br>
+		<input type="submit" value="Entrar">
+	</form>
+</body>
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+SPRING SECURITY
+-----------------------------------------------------------------------------------------------------------
+*O SpringSecurity é um dos frameworks responsaveis pela seguranca da aplicacao
+  *Outro framework conhecido é o KeyCloak.
+  
+*FUNCAO:
+  *Proteger para que somente pessoas autorizadas tenham acesso a URIs especificas
+  *A cada request verificar qual URI esta sendo acessado
+    *Caso exija, verificar se o usuario esta logado e se o usuario tem as permissoes necessarias;
+
+------------------ COMEÇANDO A CONFIGURAÇÃO SPRINGSECURITY ----------------------------------
+--------- POM.XML ---------------------------------------------------------------------------
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-web</artifactId>
+    <version>4.2.1.RELEASE</version>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-config</artifactId>
+    <version>4.2.1.RELEASE</version>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-taglibs</artifactId>
+    <version>4.2.1.RELEASE</version>
+</dependency>
+
+
+
+*O SpringSecurity exige duas classes:
+  *@Configuration - SecurityInitializer - extends AbstractSecurityWebApplicationInitializer
+  *@EnableWebSecurity && @ImportResource - SecurityConfiguration - extends WebSecurityConfigurerAdapter
+    *@Autowired - UserDetailsServie
+  
+*Dois modelos para permissao - necessarios para informar o Spring onde pegar as info. login, senha e permissao
+  *@Entity - Permissao - implements GrantedAuthority
+    *String nome (tipo de permissao)
+  *@Entity - Usuario - implements UserDetails
+    *Integer id
+    *String email;
+    *String password (criptografia);
+    
+*Um repositorio DAO para fazer a verificacao login e senha
+  *@Repository - LoginDao - implements UserDetailsService
+
+--------- MODELO - PERMISSAO ---------------------------------------------------------------------------
+*A classe Permissao  e responsavel por receber as permissoes e implementar GrantedAuthority, para utiliza-la
+  é necessario:
+  *Cria dentro package modelo (Permissao);
+  *implements GrantedAuthority;
+  *Aplique os metodos solicitados;
+  *Crie o construtor que receba a String nome e um construtor vazio p/ hibernate;
+  
+  ex.:
+  
+  @Entity
+  public class Permissao implements GrantedAuthority {
+
+    @Id
+    private String nome;
+    
+    public Permissao(String nome) {
+      this.nome = nome;
+    }
+    
+    /**
+     * @deprecated
+     */
+    public Permissao() {
+    }
+
+    @Override
+    public String getAuthority() {
+      return nome;
+    }
+  }
+--------- MODELO - USUARIO ---------------------------------------------------------------------------
+*A classe Usuario e responsavel por receber o login e senha e implementar DetailsUser, para utiliza-la
+  é necessario:
+  *Cria dentro package modelo (Permissao);
+  *implements Deta;
+  *Aplique os metodos solicitados;
+  *Crie o construtor que receba a String nome e um construtor vazio p/ hibernate;
+
+  *Ex.:
+  @Entity
+  public class Usuario implements UserDetails{
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    
+    private String email, password;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Set<Permissao> permissoes = new HashSet<>();
+
+    public Usuario(String email, String password, Set<Permissao> permissoes) {
+      super();
+      this.email = email;
+      this.password = password;
+      this.permissoes = permissoes;
+    }
+    
+    /**
+     * @deprecated
+     */
+    public Usuario() {
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+      return permissoes;
+    }
+
+    @Override
+    public String getUsername() {
+      return email;
+    }
+
+    @Override
+    public String getPassword() {
+      return password;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+      return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+      return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+      return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+      return true;
+    }
+  }
+--------- REPOSITORY - LOGINDAO ---------------------------------------------------------------------------
+*Este repositorio e responsavel por fazer a validacao de usuario e senha informados
+
+--------- SECURITYINITIALIZER ---------------------------------------------------------------------------
+*A Classe SecurityInitializer é responsavel por registar o filtro e observar as request, para o Spring reconhece-la
+  é necessario:
+  * Crie um package (configuracao);
+  * Utilizar a anotacao @Configuration;
+  * Carregar a classe de configuracao (SecurityConfiguration);
+    ex.:
+    
+    @Configuration
+    public class SecurityInitializer extends AbstractSecurityWebApplicationInitializer{
+      public SecurityInitializer() {
+        super(SecurityConfiguration.class); //SecurityConfiguration e a classe responsavel pelas permissoes e etc
+      }
+    }
+
+--------- SECURITYCONFIGURATION ---------------------------------------------------------------------------
+*A Classe SecurityConfiguration é responsavel pela configuracao das regras de acessos, BASEADA NAS URIs, para utiliza-la
+  e necessario:
+  *Esta dentro package (configuracao);
+  *Sobrepor (@Override) o metodo public void configure (HttpSecurity http);
+  *Iniciar protegendo as URIs, aplicando as regras por tipo de permissao (admin, comprador, usuario, all);
+  *Informar qual a tela de login e logout;
+  *Sobrepor outro metodo configure, para permitir acesso aos assets;
+  *Ter um Controller que redireciona para pagina de login!
+
+  *Ex.:
+  
+  @EnableWebSecurity
+  @ImportResource("/WEB-INF/spring-context.xml")
+  public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
+    
+    //UTILIZADO PARA CRIPTOGRAFAR A SENHA
+    @Autowired
+    private UserDetailsService userDetailsService;
+    
+    @Override
+    public void configure(HttpSecurity http) throws Exception {
+      http
+        .csrf().disable().authorizeRequests() //csrf e um tipo de ataque, que necessita de input hidden com token aleatorio
+        .antMatchers("/admin/**").hasRole("ADMIN")
+        .antMatchers("/compra/**").hasRole("COMPRADOR")
+        .antMatchers("/filme/**").permitAll()
+        .antMatchers("/sessao/**/lugares").permitAll()
+        .antMatchers("/").permitAll()
+      .anyRequest()
+        .authenticated()
+      .and()  //configuração para tela de login e logout
+        .formLogin()
+          .usernameParameter("email")
+          .loginPage("/login")
+          .permitAll()
+      .and()
+        .logout()
+          .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+          .permitAll();
+    }
+    
+    /**
+    *   UTILIZADO PARA HABILITAR O ASSETS
+    */
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+      web.ignoring().antMatchers("/assets/**");
+    }
+    
+    @Override
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+      auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+    }
+  }
+
+
+--------- CONTROLLER - LOGIN ---------------------------------------------------------------------------
+  @Controller
+  public class LoginController {
+
+    @GetMapping("/login")
+    public String login() {
+      return "login";
+    }
+  }
+
+--------- VIEW ---------------------------------------------------------------------------
+JSP -> MOSTRAR CAMPOS CONFORME USUARIO LOGADO OU NAO
+
+  <li><a href="/admin/filmes">Filmes</a></li>
+  <li><a href="/admin/salas">Salas</a></li>
+  <li><a href="/filme/em-cartaz">Comprar</a></li>																							
+
+  <sec:authorize access="!isAuthenticated()">
+    <li><a href="/login">Login</a></li>
+  </sec:authorize>
+
+  <sec:authorize access="isAuthenticated()">
+    <li><a href="/logout">Logout</a></li>
+  </sec:authorize>
+
+  <sec:authorize access="isAnonymous() Or hasRole('COMPRADOR')">
+    <li><a href="/compra">Comprar</a></li>
+  </sec:authorize>
+
+  <sec:authorize access="hasRole('COMPRADOR')">
+    <li><a href="/usuario/compras">Minhas Compras</a></li>
+  </sec:authorize>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
