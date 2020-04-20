@@ -1,2 +1,0 @@
-# NotesInGeneral
-JAVA
