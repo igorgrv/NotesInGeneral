@@ -16,6 +16,13 @@ A plataforma Java é:
 	* [Casting](#casting)
 6. [Condicionais](#condicionais)
 7. [Orientação a objetos](#oo)
+	* [O que é](#oqueeoo)
+	* [Objeto/Instância](#classe)
+		* [Referência vs Objeto](#refvsob)
+	* [Associação/Composição](#composicao)
+	* [Encapsulamento & visibilidade](#encapsul)
+	* [Construtores](#construtores)
+	* [Static](#static)
 
 
 ## <a name="historia"></a>Um pouco sobre a historia...
@@ -301,10 +308,10 @@ for(int multiplo = 1; multiplo <= 100; multiplo ++) {
 ```
 
 ## <a name="oo"></a>Orientação a objetos
-###  O que é a orientação a objetos?
+### <a name="oqueeoo"></a> O que é a orientação a objetos?
 A orientação a objetos veio para resolver problemas de repetibilidade de códigos. <br>_Ex.: imagine que um sistema, com **10 desenvolvedores**, possui diversos formulários que utilizam o CPF do cliente. Em um sistema **procedural** será necessário copiar e colar o mesmo trecho de código para que seja utilizado o campo CPF. Agora, imagine se inves do CPF for utilizado um CNPJ... terá de ser alterado **todas as linhas de código** que utilizam CPF e todos desenvolvedores terão de se atentar!_<br> A proposta da **O.O.** é de fazer **dados/atributos** e **métodos/comportamentos** andarem juntos!
 
-###  Classe
+### <a name="classe"></a> Classe
 A classe é um **_Tipo_**, ou seja, é a especificação de algo, onde este Tipo conterá atributos e comportamentos.<br>
 Ex.: A classe Conta, possui **_atributos_** como:
 * saldo;
@@ -316,7 +323,7 @@ Ex.: A classe Conta, possui **_atributos_** como:
 * sacar;
 * depositar;
 
-### Objeto/Instância
+### <a name="objeto"></a>Objeto/Instância
 O objeto é uma derivação de uma classe, ou seja, dado uma classe Conta, podemos ter **N objetos/instâncias do tipo Conta**.<br> <br>Como instanciar/criar um objeto e atribuir valores aos atributos?
 ```java
 public class Conta {
@@ -339,7 +346,7 @@ public class criandoObjeto {
 ```
 * Utilizando classes os valores **default** para cada atributo será 0 para um int, 0.0 para double e false para boolean - é possível alterar os valores default;
 
-### Referência/Objeto
+### <a name="refvsob"></a>Referência vs Objeto
 Quando um objeto é criado, a variável que é atribuida aquele objeto é chamada **referência**, ou seja, aquela variável não é especificamente um objeto.<br>Podemos perceber esta diferença quando atribuimos outra referência ao mesmo objeto!
 ```java
 Conta primeiraConta = new Conta();
@@ -354,3 +361,147 @@ sysout("O saldo da SEGUNDA conta e: " + segundaConta.saldo); //600
 ```
 
 <img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/referencia.png?raw=true" widht=500 height=200>
+
+### <a name="composicao"></a>Associação/Composição de Classes
+A associação de classes é feita com a **junção de uma classe dentro de outra**, por exemplo, a classe Conta irá possuir como atributo a **classe Cliente**;
+```java
+public class Conta {
+
+	 double saldo;
+	 int agencia, numero;
+	 Cliente titular; //atributo do tipo Cliente
+}
+```
+* ATENÇÃO AO **NullPointerException**
+```java
+public static void main(String[] args) {
+	Conta primeiraConta = new Conta();
+	Cliente igor = new Cliente();
+	igor.nome = "igor";
+	
+	System.out.println("O nome do titulo da conta e: " + primeiraConta.titular.nome);
+	// irá gerar um nullpointer porque não foi "falado" ao Java que a referência "primeiraConta" possui o objeto "igor"
+}
+
+//Maneira correta
+public static void main(String[] args) {
+		Conta primeiraConta = new Conta();
+		primeiraConta.titular = new Cliente();
+		primeiraConta.titular.nome = "Igor";
+		
+		System.out.println("O nome do titulo da conta e: " + primeiraConta.titular.nome);
+	}
+```
+### <a name="encapsul"></a>Encapsulamento/Visibilidade
+O ideal é que os atributos não sejam acessados diretamente, devem ser acessados através de métodos, isto é feito através do **Encapsulamento**, utilizando **Getters/Setters**! Para correta utilização, os atributos terão a **Visibilidade privada** e os métodos  terão a **Visibilidade pública**!<br> Ex.: Imagine que uma pessoa que dirige um carro ter que saber detalhes do carro, como qual a quantidade de cilindros do carro, não faz sentido. O usuário só precisa saber dirigir! ou seja, detalhes do carro serão **escondidos**!
+
+```java
+public class Conta {
+
+	 private double saldo;
+	 private int agencia, numero;
+	 private Cliente titular;
+
+	// GETTERS AND SETTERS
+	public double getSaldo() {
+		return saldo;
+	}
+	public void setSaldo(double saldo) {
+		this.saldo = saldo;
+	}
+	public int getAgencia() {
+		return agencia;
+	}
+	public void setAgencia(int agencia) {
+		this.agencia = agencia;
+	}
+	public int getNumero() {
+		return numero;
+	}
+	public void setNumero(int numero) {
+		this.numero = numero;
+	}
+	public Cliente getTitular() {
+		return titular;
+	}
+	public void setTitular(Cliente titular) {
+		this.titular = titular;
+	}
+	 
+}
+```
+* CUIDADO COM GETTERS/SETTERS: veja sempre se será necessário, ou se não seria melhor utilizar métodos.<br>No exemplo acima, o saldo possui métodos para  `depositar()` e `sacar()`, ou seja, não precisaria do `setSaldo()`;
+
+* Outro método de saber se irá ser utilizado getters/setters é saber se o parâmetro será "eterno", ou seja, uma vez criado (pelo construtor) não será mais alterado
+### <a name="construtores"></a>Construtores
+* Por padrão o java instancia um construtor padrão em "branco".
+	```java
+	public Conta (){
+	}
+	```
+* O Construtor é uma rotina, que é executada uma única vez na construção de um objeto;
+* Utilizamos o construtor quando queremos obrigar a utilizar parâmetros na criação de um objeto, como por exemplo, obrigar que _"uma conta só poderá existir se tiver agencia e número"_;
+	* Quando criamos um construtor com parâmetros, o **_construtor default_**  deixa de existir! Caso queira utilizar, é necessário cria-lo.
+	```java
+	//Construtor com parâmetros
+	public Conta(int agencia, int numero) {
+		this.agencia = agencia;
+		this.numero = numero;
+	}
+	```
+### <a name="static"></a>Static
+Em um cenário que queremos saber o **total de contas** criadas, ou seja, **total de objetos** instanciados, como fariamos?<br>
+Ex.: Utilizando o construtor:
+```java
+public class Conta {
+	private int total;
+	
+	//Adicionando ao construtor a soma ao iniciar um objeto...
+	public Conta(int agencia, int numero) {
+		this.total ++; //pertence ao objeto
+		sysout("O total de classes instanciadas e: " + total);
+		this.agencia = agencia;
+		this.numero = numero;
+	}
+}
+
+//Quando o atributo não é estático, ele pertencerá ao OBJETO, sendo assim toda vez que for criada uma classe, o total será SEMPRE 1, pois pertence ao OBJETO
+```
+* Os atributos **estáticos** quando implementados em uma classe pertence **A CLASSE** e não mais **AO OBJETO**;
+	```java
+	public class Conta {
+		private static int total;
+		
+		//Adicionando ao construtor a soma ao iniciar um objeto...
+		public Conta(int agencia, int numero) {
+			Conta.total ++; //pertence a conta
+			sysout("O total de classes instanciadas e: " + total);
+			this.agencia = agencia;
+			this.numero = numero;
+		}
+	}
+	```
+	* porém para devolver a quantidade de classes instanciadas nesse caso, iremos precisar utilizar o **public static getTotal()** - ou seja, para que seja retornar a quantidade, o **o método tem que ser statico também!**
+```java
+public class Conta {
+
+	//atributos omitidos
+	private static int total;
+
+	public Conta(int agencia, int numero) {
+		total++;
+		//atributos omitidos
+	}
+	
+	public static int getTotal() {
+		return Conta.total;
+	}
+}
+
+public static void main(String[] args) {
+	Conta primeiraConta = new Conta(123, 12345);
+	Conta segundaConta = new Conta(123, 54321);	
+	
+	System.out.println("O total de contas e: " + Conta.getTotal());
+}
+```
