@@ -272,12 +272,6 @@ for(int linha = 1; linha <= 10; linha ++) {
 	}
 	System.out.println();
 }
-
-*
-**
-***
-****
-*****...
 ```
 Ex.: imprima no lugar dos asteriscos os números na sequencia.
 ```java
@@ -296,11 +290,6 @@ for (int linha = 0; linha < 10; linha++) {
 	}
 	System.out.println();
 }
-1
-12
-123
-1234
-12345...
 ```
 Ex.: Utilize um laço do tipo for para imprimir todos os múltiplos de 3, entre 1 e 100.
 ```java
@@ -309,10 +298,59 @@ for(int multiplo = 1; multiplo <= 100; multiplo ++) {
 		System.out.println(multiplo);
 	}
 }
-3
-6
-9
-12...
 ```
 
 ## <a name="oo"></a>Orientação a objetos
+###  O que é a orientação a objetos?
+A orientação a objetos veio para resolver problemas de repetibilidade de códigos. <br>_Ex.: imagine que um sistema, com **10 desenvolvedores**, possui diversos formulários que utilizam o CPF do cliente. Em um sistema **procedural** será necessário copiar e colar o mesmo trecho de código para que seja utilizado o campo CPF. Agora, imagine se inves do CPF for utilizado um CNPJ... terá de ser alterado **todas as linhas de código** que utilizam CPF e todos desenvolvedores terão de se atentar!_<br> A proposta da **O.O.** é de fazer **dados/atributos** e **métodos/comportamentos** andarem juntos!
+
+###  Classe
+A classe é um **_Tipo_**, ou seja, é a especificação de algo, onde este Tipo conterá atributos e comportamentos.<br>
+Ex.: A classe Conta, possui **_atributos_** como:
+* saldo;
+* agencia;
+* numero;
+* titular;
+
+**_comportamentos_**, como:
+* sacar;
+* depositar;
+
+### Objeto/Instância
+O objeto é uma derivação de uma classe, ou seja, dado uma classe Conta, podemos ter **N objetos/instâncias do tipo Conta**.<br> <br>Como instanciar/criar um objeto e atribuir valores aos atributos?
+```java
+public class Conta {
+	//não poderá ser private neste exemplo, pois não temos getters/setters
+	 double saldo;
+	 int agencia, numero;
+	 String titular;
+}
+
+public class criandoObjeto {
+
+	public static void main(String[] args) {
+		Conta primeiraConta = new Conta();
+		primeiraConta.saldo = 300.0;
+		System.out.println("O saldo da conta e: " + primeiraConta.saldo);
+	}
+
+}
+
+```
+* Utilizando classes os valores **default** para cada atributo será 0 para um int, 0.0 para double e false para boolean - é possível alterar os valores default;
+
+### Referência/Objeto
+Quando um objeto é criado, a variável que é atribuida aquele objeto é chamada **referência**, ou seja, aquela variável não é especificamente um objeto.<br>Podemos perceber esta diferença quando atribuimos outra referência ao mesmo objeto!
+```java
+Conta primeiraConta = new Conta();
+primeiraConta.saldo = 500.0;
+
+Conta segundaConta = primeiraConta;
+segundaConta.saldo += 100.0;
+sysout("O saldo da PRIMEIRA conta e: " + primeiraConta.saldo); //600
+sysout("O saldo da SEGUNDA conta e: " + segundaConta.saldo); //600
+
+//isto ocorre pois temos DUAS REFERENCIAS ao mesmo objeto.
+```
+
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/referencia.png?raw=true" widht=500 height=200>
