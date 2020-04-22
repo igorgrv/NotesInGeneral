@@ -505,3 +505,315 @@ public static void main(String[] args) {
 	System.out.println("O total de contas e: " + Conta.getTotal());
 }
 ```
+
+## Herença
+Imagine uma classe que represente o tipo `Funcionario`:
+```java
+public class Funcionario {
+	private String nome, CPF;
+	private double salario;
+
+	public double getBonificao(){
+		return this.salario * 0.1;
+	}
+	//construtores + getter/setters
+}
+```
+Após o sistema estar funcionando, surge a classe do tipo `Gerente`
+```java
+public class Gerente{
+	private String nome, CPF;
+	private double salario;
+
+	public double getBonificao(){
+		return this.salario * 0.3;
+	}
+	//construtores + getter/setters
+}
+```
+* Note que a única diferença está no método `getBonificao`, ou seja, os **atributos** são idênticos! <br> Mas afinal, o `Gerente` não é também um `Funcionario` ?
+
+Utilizando o conceito de herança o `Funcionario` será a classe chamada de **Classe mãe/Base class/Super class** que irá ter os atributos `nome, CPF e salario` e desta forma as classes chamadas, **classes filhas**, HERDARÃO os atributos da classe mãe! <br>Sendo assim, o `Gerente`irá **_extender_** `Funcionario`!
+```java
+public class Gerente extends Funcionario{
+
+	public double getBonificao(){
+		return this.salario * 0.3;
+	}
+	//construtores + getter/setters
+	//será herdado getters/setters da classe Funcionario também!
+}
+```
+* Obs.: se a classe começar ter muitos `ifs` está na hora de criar uma classe!
+* **_Atributos e Métodos_** são herdados juntos, PORÉM o **_construtor_** não! Se faz necessário chamar o construtor manualmente - tem que se ter atenção ao extender uma classe que possua um construtor pré definido!
+	```java
+	public class Funcionario {
+
+		private String nome, CPF;
+		private double salario;
+		
+		public Funcionario(String nome, String CPF, double salario) {
+			super();
+			this.nome = nome;
+			CPF = cPF;
+			this.salario = salario;
+		}
+		//Getters e Setters
+	}
+
+	public class Gerente extends Funcionario {
+		//IDE irá informar que será necessário criar o construtor de Gerente com os mesmo atributos
+		public Gerente(String nome, String CPF, double salario) {
+			super(nome, CPF, salario);
+		}
+	}
+	```
+
+### super. ou this.?
+Quando trabalhamos com a herença, notamos que os atributos e métodos são herdados para a classe filha, porém existem alguns padrões a serem seguidos. <br> Quando estamos na classe _filha_ utilizando atributos da classe _mãe_, invés de utilizar o **_this_** temos de usar o **_super_** que irá indicar que aquele atributo que está "acima". Isto vale **não só para atributos, mas para métodos também!**<br> Ex.:
+```java
+public class Funcionario{
+	
+	private double salario; //o protected significa que poderá ser acessado pelas classes filhas;	
+
+	public double getBonificacao(){
+		return this.salario * 0.1;
+	}
+	//construtores + getter/setters
+}
+
+
+public class Gerente extends Funcionario{
+	
+	public double getBonificao(){
+		return super.getBonificacao + super.getSalario;
+	}
+	//construtores + getter/setters
+}
+```
+
+
+## Polimorfismo
+
+O polimorfismo nada mais é do que a **sobrescrita** de um método em diferentes classes. Sendo amplamente utilizado para deixar de forma "genérica" os métodos, sem ter a necessidade de repetir métodos em várias classes<br>Ex.:
+```java
+public class Veiculo {
+    public void liga() {
+        System.out.println("Ligando Veiculo");
+    }
+}
+
+class Carro extends Veiculo {
+    public void liga() {
+        System.out.println("Ligando Carro");
+    }
+}
+
+class Moto extends Veiculo {
+    public void liga() {
+        System.out.println("Ligando Moto");
+    }
+}
+
+
+public static void main(String[] args) {
+    Veiculo m = new Moto();
+    m.liga();
+
+    Veiculo c = new Carro(); 
+    c.liga();
+} 
+
+//Irá imprimir:
+	//Ligando Moto
+	//Ligando Carro
+```
+### Sobrecarga de métodos
+A sobrecarga de um método é como se fosse uma **outra versão do método**! <br> Ex.:
+```java
+public class Gerente extends Funcionario {
+
+    private int senha;
+
+    public boolean autentica(int senha) {
+        if(this.senha == senha) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //novo método, recebendo dois params
+    public boolean autentica(String login, int senha) {
+        //implementacao omitida
+    }
+
+    //outros métodos omitidos
+}
+
+//Desta forma podemos utilizar o método AUTENTICA passando a senha OU passando senha e login
+```
+
+## Classes Abstratas
+As **classes abstratas** tem como padrão ser uma classe de **conceito**, por exemplo, em uma empresa se tem `Funcionarios`, onde dentro de funcionarios, teremos: 
+* Gerentes;
+* Analistas;
+* Editores de vídeo e etc;
+
+O funcionário poderia ser uma classe abstrata, porque é uma classe que carrega o conceito do que é um funcionário, ou seja, **é correto criar um objeto chamado Funcionario?** NÃO! Os funcionários precisam ser específicos!
+```java
+//No cenário acima, não queremos permitir que a classe FUNCIONARIO seja instanciada, mas como?
+
+Funcionario funcionario = new Funcionario(); //ERRADO
+Gerente gerente = new Gerente();
+Analistas analistas= new Analistas();
+```
+Para transformar uma classe abstrata, basta informar o `abstract` antes do `class`
+```java
+public abstract class Funcionario {}
+
+//desta forma não será mais possível instancia-lo
+Funcionario funcionario = new Funcionario(); //n funcionara
+```
+
+#### Métodos Abstratos
+Assim como classes abstratas, podemos ter **métodos abstratos**! <br>
+Quando implementamos um método abstrato em uma classe, este método **se torna OBRIGATÓRIO** para as **classes filhas**!
+*	Os métodos abstratos não possuem corpo! - não há implementação;
+*	A classe deve ser abstrata!
+```java
+public abstract class Funcionario { Funcionario
+	public abstract double getBonificacao()
+}
+
+public class Gerente extends Funcionario {
+	public double getBonificacao(){
+		sysout("Bonificacao do gerente");
+		return 200.0;
+	}	
+}
+
+public class Analistas extends Funcionario {
+	public double getBonificacao(){
+		sysout("Bonificacao do gerente");
+		return 100.0;		
+	}	
+}
+```
+#### Classe Abstrata extends Classe Abstrata?
+Imagine o cenário em que a classe abstrata `Funcionario` possui 4 classes filhas, sendo: `Gerente, Diretor, Editor e Analista` e dessas classes filhas, somente o **Gerente e Diretor** possuem uma senha mestre, como implementariamos?
+ 1. Uma das maneiras seria implementar dentro das classes Gerente e Diretor o método `autenticaFuncionario()`, porém ambas classes teriam o MESMO MÉTODO - **quando classes possuem o mesmo método É SINAL DE REPETIÇÃO**!
+ 2. Outra maneira seria **cria uma outra classe abstrata** que conteria o método a `autenticaFuncionario()` para que então o Gerente e Diretor extendesse esta classe abstrata e não mais a classe abstrata Funcionário!
+
+## Interface
+Enquanto uma **classe abstrata** pode ter métodos abstratos **ou nao abstratos**, as interfaces possuem **TODOS os métodos abstratos.**
+* As interfaces são conhecidas como **_Contratos_**, onde é atribuido métodos que todas as classes que a **_implemente_** tenha os métodos!
+* A classe é possível **_extender e implementar_**!
+* A classe pode **implementar mais de uma interface** - `public class teste implements interfaceUm, interfaceDois`
+* A interface **não pode ter atributos**!
+
+```java
+public abstract interface Autenticavel {
+	public abstract void setSenha(int senha);
+	public abstract boolean autentica(int senha);
+}
+
+public class Cliente implements Autenticavel {
+	private int senha;
+	
+	@Override
+	public abstract void setSenha(int senha){
+		this.senha = senha;
+	}
+	
+	public abstract boolean autentica(int senha){
+		if(this.senha == senha){
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+
+//É POSSÍVEL USAR HERENÇA COM INTERFACE
+public class Gerente extends Funcionario implements Autenticavel {
+	private int senha;
+
+	private double getBonificao(){
+		return super.getSalario();
+	}
+	
+	@Override
+	public abstract void setSenha(int senha){
+		this.senha = senha;
+	}
+	
+	@Override
+	public abstract boolean autentica(int senha){
+		if(this.senha == senha){
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+```
+* Note que apesar de termos implementar a interface, os métodos `autentica` e senha `setSenha` estão com códigos repetidos, o que também é uma má prática! Como resolver?
+	* Quando repetimos código, o segredo é criar uma classe que represente este código! e então podemos chamar esta classe no construtor e utilizar os métodos! ex.:
+```java
+//Interface
+public abstract interface Autenticavel {
+	public abstract void setSenha(int senha);
+	public abstract boolean autentica(int senha);
+}
+//-----------------------------------------------------
+//Classe Generica
+public class AutenticaGeneric {
+	private int senha;
+	
+	public abstract void setSenha(int senha){
+		this.senha = senha;
+	}
+	
+	public abstract boolean autentica(int senha){
+		if(this.senha == senha){
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+//-----------------------------------------------------
+//Classes Gerente e Cliente
+public class Gerente extends Funcionario implements Autenticavel {
+	
+	private AutenticaGeneric autenticador;
+	
+	public Gerente (){
+		this.autenticador = new AutenticaGeneric();
+	}
+	
+	public abstract void setSenha(int senha){
+		this.autenticador,setSenha(senha);
+	}
+	public abstract boolean autentica(int senha){
+		this.autenticador,autentica(senha);
+	}
+}
+//-----------------------------------------------------
+public class Cliente implements Autenticavel {
+	
+	private AutenticaGeneric autenticador;
+	
+	public Cliente  (){
+		this.autenticador = new AutenticaGeneric();
+	}
+	
+	public abstract void setSenha(int senha){
+		this.autenticador,setSenha(senha);
+	}
+	public abstract boolean autentica(int senha){
+		this.autenticador,autentica(senha);
+	}
+}
+```
