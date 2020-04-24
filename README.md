@@ -817,3 +817,266 @@ public class Cliente implements Autenticavel {
 	}
 }
 ```
+## Exceções
+### Pilha (stack)
+A Pilha(stack) é utilizada pela JVM para poder controlar a ordem dos métodos a serem executados!
+* A pilha começa com o código `main`!
+```java
+public class Fluxo {
+
+    public static void main(String[] args) {
+        System.out.println("Ini do main");
+        metodo1();
+        System.out.println("Fim do main");
+    }
+
+    private static void metodo1() {
+        System.out.println("Ini do metodo1");
+        metodo2();
+        System.out.println("Fim do metodo1");
+    }
+
+    private static void metodo2() {
+        System.out.println("Ini do metodo2");
+        for(int i = 1; i <= 5; i++) {
+            System.out.println(i);
+        }
+        System.out.println("Fim do metodo2");        
+    }
+}
+```
+Através do **Debugger** é possível acompanhar as execuções do Java, seguindo a pilha!
+* F5 entra dentro do método;
+	* Cuidado com classes como o `sysout` pois irá entrar dentro da classe System;
+* F6 executa o método;
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/stack.png?raw=true" widht=400 height=400>
+
+### Tratando exceções
+Imagine as exceções como `ifs`, onde a exceção é gerada quando **não previmos** um problema, tais como:
+* _NullpointerException_;
+* _ArithmeticException_ (divisão por zero por exemplo);
+
+```java
+private static void metodo2() {
+	System.out.println("Ini do metodo2");
+	for (int i = 1; i <= 5; i++) {
+		System.out.println(i);
+		int a = i/0;
+	}
+	System.out.println("Fim do metodo2");
+}
+```
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/arithmetic.png?raw=true" widht=400 height=300>
+
+### Try/Catch/Finally
+Um meio de tratar as exceções é utilizando o bloco `Try{} Catch(Excepction){}`!
+1. Dentro do **_Try_** o código irá tentar executar o código e em caso de erro irá para o **_Catch_** ;
+2. O Catch espera receber um **tipo de exceção** que ele deve tratar e caso ocorra a exceção, devemos avisar o java o que fazer!
+	```java
+	try {
+		int a = i/0;
+	} catch (ArithmeticException e) {
+		System.out.println("Deu erro na conta: " + e);
+	}
+	```
+	O código não parou mais, apenas informou que houve uma exceção
+	<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/trycatch.png?raw=true" widht=400 height=300>
+	* Um módo de não ficar esse monte de código de exceção, é utilizar o `e.getMessage()` - ira apenas aparecer `ArithmeticException / by zero`!
+
+* Podemos ter **mais de um catch**! Basta adicionar um 'pipe' ao lado da exceção
+	```java
+	try {
+		int a = i/0;
+	} catch (ArithmeticException | NullPointerException e) {
+		System.out.println("Deu erro na conta: " + e);
+	}
+	```
+#### Finally
+O finally é utilizado como um bloco que será **sempre** executado, **não importa** se entrou no **Catch**. Um bom exemplo é quando abrimos e fechamos a conexão com o banco de dados!
+
+```java
+Conexao con = null;
+try {
+	con = new Conexao();
+	con.leDados();
+} catch (IllegalStateException e) {
+	System.out.println("Deu erro na conexao: " + e);
+} finally {
+	con.close();
+}
+```
+
+### Como lançar exceções?
+Comumente através do bloco `Catch` é lançada a exceção através do código `throw`! Desta forma o método que esta sendo executado **termina** , como um **break**!
+```java
+throw new ArithmeticException("Deu erro na conta").
+```
+O código acima, irá fazer o mesmo que o bloco abaixo:
+```java
+ catch (ArithmeticException | NullPointerException e) {
+	System.out.println("Deu erro na conta: " + e);
+}
+```
+
+## Packages
+O pacote vem com o intuito de organizar as classes, para que não fique tudo misturado/bagunçado!
+#### Como criar?
+Basta selecionar a pasta `src` e clicar com o botão direito > new > package!
+* Quando um package é criado, as classes que **não estão** no mesmo package irão pedir para realizar um `import`!
+* Por convenção, os pacotes são iniciados como sites: **_br.com.igor.projetox_**!
+* Quando classes estão no pacote **_default package_**, apenas classes do mesmo pacote podem acessar as informações;
+
+#### Modificador de acesso - package
+Assim como os modificadores, `private e public`, existe o modificador de acesso `package`.
+* Se uma classe esta dentro de um pacote, por padrão **se não informarmos** o modificador o modificador será `package` - porém este modificador não permite que outros pacotes tenham acesso **nem mesmo se extender**!
+
+## JavaDoc
+O JavaDoc é complemento do Java responsável por gerar uma documentação do projeto, baseado nas anotações que são feitas!
+
+#### Como gerar?
+* Caso não tenha anotações no projeto não irá aparecer a opção!
+```java
+/**
+* @author igor
+*/
+public class xxxxxx {}
+```
+* Somente classes/membros públicos são possíveis de serem contemplados!
+
+No Eclipse -> Project -> Generate JavaDoc -> selecione o projeto -> finish!
+Será criado uma pasta `doc`, com um **index.html**
+
+#### Anotações
+-   `@author`  (usado na classe ou interface)
+-   `@version`  (usado na classe ou interface)
+-   `@param`  (usado no método e construtor)
+-   `@return`  (usado apenas no método)
+-   `@exception`  ou  `@throws`  (no método ou construtor)
+-   `@see`
+-   `@since`
+-   `@serial`
+-   `@deprecated`
+
+## Jar
+Imagine que queremos passar o projeto para outra equipe, teriamos que sair **copiando e colando?** Não! O `.jar` - **_java archive_** - é um código copilado, ou seja, em um único arquivo terão todos as classes e etc...
+
+#### Como exportar/gerar o Jar?
+Clique com o botão direito no **projeto** > Export > Java > Jar file > Selecionar o conteudo que desejar > finish.
+
+#### Como importar/usar o Jar?
+Importe o .jar para a pasta lib > clique com direito no .jar > build path > add to the build path!
+Desta forma será possível utilizar as classes e etc...
+
+## Java.lang
+O java.lang é p **único pacote** do java não é importado! É um dos **mais importantes** pacoste dos java! 
+* As classes `String` e `System` pertence, a ele - utilizada no **método main**.
+* Exceções também vem dele - `Exception`, `RuntimeException`, `NullPointerException` ou `ArithmeticException`.
+
+
+### String
+A primeira dúvida ao começar usar a classe String, é **porque não damos `new` na String?** Sendo que é uma classe e damos uma referência?<br> O java fez desta forma para **facilitar** nossa vida, porém seria a mesma:
+```java
+String nome = "Java";
+String nome = new String("Java");
+```
+
+**Métodos importantes** (os métodos podem ser encontrados no JavaDoc):<br>
+* **String não pode ser alterada**, para que seja alterada, é necessário **criar outra String** referenciando a antiga!
+	* `replace(char old, char new)` - substitui;
+		```java
+		String nome = "Java";
+		String newNome = nome.replace('v', 'c');
+		System.out.println(newNome); //Jaca
+		```
+	* `toUpperCase()` - maísculo
+		```java
+		String nome = "Java";
+		String nomeMaisculo = nome.toUpperCase();
+		System.out.println(nomeMaisculo); //JAVA
+		```
+	* `charAt(int x)` - retorna posição caracter selecionado
+		```java
+		String nome = "Java";
+		char charAt = nome.charAt(1);
+		System.out.println(charAt); //a
+		```
+	* `indexOf(int x)` - inverso do charAt, devolve a posição
+		```java
+		String nome = "Java";
+		int indexOf = nome.indexOf("v");
+		System.out.println(indexOf); //2
+		```
+	* `substring(int x)` - retorna o resto da String a partir da posição selecionada
+		```java
+		String nome = "Treinando Java";
+		String substring = nome.substring(5);
+		System.out.println(substring); //ando Java
+		```
+	* `lenght()` - retorna a quantidade de caracteres
+		```java
+		String nome = "Treinando Java";
+		System.out.println(nome.length()); //14
+		
+		for (int i = 0; i < nome.length(); i++) {
+			System.out.println(nome.charAt(i));
+		}
+		/**
+		*A
+		*L
+		*U
+		*R
+		*A
+		*/
+		```
+	* `isEmpty()` - retorna um boolean se está vazio ou não
+		```java
+		String nome = "";
+		System.out.println(nome.isEmpty()); //true
+		```		
+	* `trim()` - retira espaços desnecessários, como " "
+		```java
+		String nome = " Igor    ";
+		String nomeSemEspaco = nome.trim();
+		System.out.println(nomeSemEspaco); //Alura
+		```		
+	* `contains(String x)` - retorna boolean p /verificar se contém a String
+		```java
+		String nome = " Igor   ";
+		System.out.println(nome.contains("Ig"); //true
+		```		
+
+	**StringBuilder**
+	O StringBuilder é utilizado para concatenar Strings
+	```java
+	StringBuilder builder = new StringBuilder("Igor");
+	builder.append(" Gomes");
+	builder.append(" Romero");
+	builder.append(" Vilela");
+	String texto = builder.toString();
+	System.out.println(texto); //Igor Gomes Romero Vilela
+	```
+
+### Object
+A classe Object, é **CLASSE MÃE**, todas as classes do Java provém dela! 
+* A classe Object é utilizada como um padrão  **generico!** , ou seja se definirmos que um método recebe um tipo `Object`, significa que qualquer tipo poderá ser utilizado!
+	* o método `System.out.println()` recebe um Object, pois nele podemos declarar qualquer tipo de referência!
+
+**Método importante** :
+* `toString()` - este método retorna uma String que se refere a Classe!
+	```java
+	public class Conta {
+		private int numero, conta;
+		
+		@Override
+		public String toString(){
+			return "A conta: " + this.numero + " tem dinheiro";
+		}
+	}
+
+	public static void main(String[] args) {
+		Conta cc = new Conta();
+		cc.setNumero = 123;
+		sysout(cc);
+		//A conta: 123 tem dinheiro
+	}
+	```
