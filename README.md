@@ -506,7 +506,7 @@ public static void main(String[] args) {
 }
 ```
 
-## Herença
+## <a name="herenca"></a>Herença
 Imagine uma classe que represente o tipo `Funcionario`:
 ```java
 public class Funcionario {
@@ -569,7 +569,7 @@ public class Gerente extends Funcionario{
 	}
 	```
 
-### super. ou this.?
+### <a name="super"></a>super. ou this.?
 Quando trabalhamos com a herença, notamos que os atributos e métodos são herdados para a classe filha, porém existem alguns padrões a serem seguidos. <br> Quando estamos na classe _filha_ utilizando atributos da classe _mãe_, invés de utilizar o **_this_** temos de usar o **_super_** que irá indicar que aquele atributo que está "acima". Isto vale **não só para atributos, mas para métodos também!**<br> Ex.:
 ```java
 public class Funcionario{
@@ -593,7 +593,7 @@ public class Gerente extends Funcionario{
 ```
 
 
-## Polimorfismo
+## <a name="polimorfismo"></a>Polimorfismo
 
 O polimorfismo nada mais é do que a **sobrescrita** de um método em diferentes classes. Sendo amplamente utilizado para deixar de forma "genérica" os métodos, sem ter a necessidade de repetir métodos em várias classes<br>Ex.:
 ```java
@@ -654,7 +654,7 @@ public class Gerente extends Funcionario {
 //Desta forma podemos utilizar o método AUTENTICA passando a senha OU passando senha e login
 ```
 
-## Classes Abstratas
+## <a name="abstrata"></a>Classes Abstratas
 As **classes abstratas** tem como padrão ser uma classe de **conceito**, por exemplo, em uma empresa se tem `Funcionarios`, onde dentro de funcionarios, teremos: 
 * Gerentes;
 * Analistas;
@@ -705,7 +705,7 @@ Imagine o cenário em que a classe abstrata `Funcionario` possui 4 classes filha
  1. Uma das maneiras seria implementar dentro das classes Gerente e Diretor o método `autenticaFuncionario()`, porém ambas classes teriam o MESMO MÉTODO - **quando classes possuem o mesmo método É SINAL DE REPETIÇÃO**!
  2. Outra maneira seria **cria uma outra classe abstrata** que conteria o método a `autenticaFuncionario()` para que então o Gerente e Diretor extendesse esta classe abstrata e não mais a classe abstrata Funcionário!
 
-## Interface
+## <a name="interface"></a> Interface
 Enquanto uma **classe abstrata** pode ter métodos abstratos **ou nao abstratos**, as interfaces possuem **TODOS os métodos abstratos.**
 * As interfaces são conhecidas como **_Contratos_**, onde é atribuido métodos que todas as classes que a **_implemente_** tenha os métodos!
 * A classe é possível **_extender e implementar_**!
@@ -817,7 +817,7 @@ public class Cliente implements Autenticavel {
 	}
 }
 ```
-## Exceções
+## <a name="excecoes"></a>Exceções
 ### Pilha (stack)
 A Pilha(stack) é utilizada pela JVM para poder controlar a ordem dos métodos a serem executados!
 * A pilha começa com o código `main`!
@@ -868,7 +868,7 @@ private static void metodo2() {
 ```
 <img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/arithmetic.png?raw=true" widht=400 height=300>
 
-### Try/Catch/Finally
+### <a name="trycatch"></a>Try/Catch/Finally
 Um meio de tratar as exceções é utilizando o bloco `Try{} Catch(Excepction){}`!
 1. Dentro do **_Try_** o código irá tentar executar o código e em caso de erro irá para o **_Catch_** ;
 2. O Catch espera receber um **tipo de exceção** que ele deve tratar e caso ocorra a exceção, devemos avisar o java o que fazer!
@@ -906,7 +906,7 @@ try {
 }
 ```
 
-### Como lançar exceções?
+### <a name="throw"></a>Throw new/Throws
 Comumente através do bloco `Catch` é lançada a exceção através do código `throw`! Desta forma o método que esta sendo executado **termina** , como um **break**!
 ```java
 throw new ArithmeticException("Deu erro na conta").
@@ -918,7 +918,7 @@ O código acima, irá fazer o mesmo que o bloco abaixo:
 }
 ```
 
-## Packages
+## <a name="package"></a>Packages
 O pacote vem com o intuito de organizar as classes, para que não fique tudo misturado/bagunçado!
 #### Como criar?
 Basta selecionar a pasta `src` e clicar com o botão direito > new > package!
@@ -930,7 +930,7 @@ Basta selecionar a pasta `src` e clicar com o botão direito > new > package!
 Assim como os modificadores, `private e public`, existe o modificador de acesso `package`.
 * Se uma classe esta dentro de um pacote, por padrão **se não informarmos** o modificador o modificador será `package` - porém este modificador não permite que outros pacotes tenham acesso **nem mesmo se extender**!
 
-## JavaDoc
+## <a name="javadoc"></a>JavaDoc
 O JavaDoc é complemento do Java responsável por gerar uma documentação do projeto, baseado nas anotações que são feitas!
 
 #### Como gerar?
@@ -957,7 +957,7 @@ Será criado uma pasta `doc`, com um **index.html**
 -   `@serial`
 -   `@deprecated`
 
-## Jar
+## <a name="jar"></a>Jar
 Imagine que queremos passar o projeto para outra equipe, teriamos que sair **copiando e colando?** Não! O `.jar` - **_java archive_** - é um código copilado, ou seja, em um único arquivo terão todos as classes e etc...
 
 #### Como exportar/gerar o Jar?
@@ -967,13 +967,14 @@ Clique com o botão direito no **projeto** > Export > Java > Jar file > Selecion
 Importe o .jar para a pasta lib > clique com direito no .jar > build path > add to the build path!
 Desta forma será possível utilizar as classes e etc...
 
-## Java.lang
-O java.lang é p **único pacote** do java não é importado! É um dos **mais importantes** pacoste dos java! 
+## <a name="classes"></a>Pacotes Java
+## <a name="lang"></a>Java.lang
+O java.lang é o **único pacote** do java não é importado! É um dos **mais importantes** pacoste dos java! 
 * As classes `String` e `System` pertence, a ele - utilizada no **método main**.
 * Exceções também vem dele - `Exception`, `RuntimeException`, `NullPointerException` ou `ArithmeticException`.
 
 
-### String
+### <a name="string"></a>String
 A primeira dúvida ao começar usar a classe String, é **porque não damos `new` na String?** Sendo que é uma classe e damos uma referência?<br> O java fez desta forma para **facilitar** nossa vida, porém seria a mesma:
 ```java
 String nome = "Java";
@@ -987,6 +988,12 @@ String nome = new String("Java");
 		String nome = "Java";
 		String newNome = nome.replace('v', 'c');
 		System.out.println(newNome); //Jaca
+		```
+	* `replaceAll(String x, String y)` - substitui todos caracteres encontrados
+		```java
+		String nome = "I1G2O3R";
+		String newNome = nome.replaceAll("[^0-9]+", "");
+		System.out.println(newNome); //123
 		```
 	* `toUpperCase()` - maísculo
 		```java
@@ -1011,6 +1018,12 @@ String nome = new String("Java");
 		String nome = "Treinando Java";
 		String substring = nome.substring(5);
 		System.out.println(substring); //ando Java
+		```
+	* `substring(int beginIndex, int endIndex)` - permite retornar pedaços da String definidos pelo inicio e fim
+		```java
+		String nome = "Treinando Java, porem esta string esta grande";
+		String substring = nome.substring(0,15);
+		System.out.println(substring); //Treinando Java,
 		```
 	* `lenght()` - retorna a quantidade de caracteres
 		```java
@@ -1056,8 +1069,8 @@ String nome = new String("Java");
 	System.out.println(texto); //Igor Gomes Romero Vilela
 	```
 
-### Object
-A classe Object, é **CLASSE MÃE**, todas as classes do Java provém dela! 
+### <a name="object"></a> Object
+A classe Object, é a **CLASSE MÃE**, todas as classes do Java provém dela! 
 * A classe Object é utilizada como um padrão  **generico!** , ou seja se definirmos que um método recebe um tipo `Object`, significa que qualquer tipo poderá ser utilizado!
 	* o método `System.out.println()` recebe um Object, pois nele podemos declarar qualquer tipo de referência!
 
@@ -1080,3 +1093,52 @@ A classe Object, é **CLASSE MÃE**, todas as classes do Java provém dela!
 		//A conta: 123 tem dinheiro
 	}
 	```
+
+## <a name="util"></a>Java.util
+### <a name="array"></a>Array
+O Array **é um objeto** que representa um **conjunto de dados**! <br>Ex. **_sem array_**: Imagine ter de representar um conjunto com 5 idades:
+```java
+int idade1 = 10;
+int idade2 = 12;
+int idade3 = 14;
+int idade4 = 16;
+int idade5 = 18;
+```
+Ex. **_com array_**:
+```java
+int idades [] = new int[5];
+
+//Se o array não for atribuido nenhum valor, será atribuido 0 (por ser int)
+idades[0] = 10;
+idades[1] = 12;
+idades[2] = 14;
+idades[3] = 16;
+idades[4] = 18;
+
+//Ou, de uma forma menos literal
+int idades2 [] = {10,12,14,16,18};
+```
+* Caso tentassemos atribuir o `idades[10]` iria gerar uma **exceção** `ArrayIndexOutOfBoundsException`;
+* Por utilizar array, temos métodos e vantangens!
+	* Método `length`:
+	```java
+	sysout(idades.length); // length -> irá devolver a quantidade de registros
+	
+	for(int i = 0; i<idades.length; i++){
+		idades[i] = i*i;
+		System.out.println(idades[i]);
+	}
+	// irá imprimir a sequencia de 0,1,4,9,16
+	```
+
+#### Array de referência
+Quando criamos um array de uma classe, chamamos este array de **referência**. - _no exemplo acima, haviamos criado um array de um tipo primitivo (int)_.
+```java
+ContaCorrente contas [] = new ContaCorrente[2]; 
+//contas é um objeto do tipo array que guarda objetos do tipo ContaCorrente
+
+ContaCorrente c1 = new ContaCorrente(22,12345);
+contas[0] = c1;
+
+sysout(contas[0].getNumero); //irá imprimir 22
+```
