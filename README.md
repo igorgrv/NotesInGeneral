@@ -59,6 +59,12 @@ A plataforma Java é:
 12. [Wrapper vs Primitivos](#wrapper)
 	* [Integer](#integer)
 13. [Encode](#encode)
+14. [Java 8](#java8)
+  * [Default Methods](#defaultmethod)
+  * [Lambdas](#lambdas)
+  *  [Method Reference](#methodreference)
+  *  [Streams](#streams)
+  *   [API Datas](#apidatas)
   
 
 
@@ -1949,3 +1955,89 @@ _"Wrappers, como o `Integer`, são úteis quando precisamos usar nossa variável
 Quando trabalhamos com diversos países, alguns problemas de formatação dos caractéres ocorrem, como por exemplo no Brasil, que possímos **acentuações, caracteres especiais e etc**. <br>
 * Para resolver este problema foi criada uma tabela chamada, **UNICODE**, que juntou diversos caracteres de vários países;
 	* Porém, ainda preciamos de um **tradutor**, chamados **encodings** (ASCII, UTF-8 e etc);
+
+# <a name="java8"></a>Java 8
+As principais atribuições que foram dadas ao Java8, foram:
+* Default methods;
+* Lambdas;
+* Method reference;
+* Streams;
+* Nova API de Data;
+
+## <a name="defaultmethod"></a>Default Methods
+Os **default methods** foram adicioandas as Interfaces, de modo que quando fosse adicionado um método como `default`, **não seria necessário** que classes que implementem esta interface, **implementassem** o método! - **_É O OPOSTO DA CLASSE ABSTRACT_**
+* Exemplo: na classe `java.util.List` foi inserido o método `default void sort`, e não foi necessário adicionar este método nas classes filhas de List, como ArrayList<>, LinkedList<> e etc...
+
+### Os métodos `default` permitem a interface evoluir sem quebrar compatibilidade!
+* Exemplo da implementação do método `sort`, implementado na Interface `List`:
+	* **Sem o método** sort da List, é necessário utilizar o da **Collections**:
+		```java
+		List<String> cursos = new ArrayList<String>();
+		cursos.add("Java");
+		cursos.add("Abstract");
+		cursos.add("Default");
+		
+		Collections.sort(cursos);
+		//Neste caso, por ser String ele ordenará alfabeticamente
+		```
+	* **Sem o método** sort da List, **ordenando pelo tamanho da String**, com **Comparator**:
+		```java
+		class ComparadorPorTamanho implements Comparator<String>{
+
+			@Override
+			public int compare(String s1, String s2) {
+				return Integer.compare(s1.length(), s2.length());
+			}
+			
+		}
+		
+		public static void main(String[] args) {
+			List<String> cursos = new ArrayList<String>();
+			cursos.add("Java");
+			cursos.add("Abstract");
+			cursos.add("Method Default");
+			
+			//Collections.sort(cursos);
+			Comparator<String> comparador = new ComparadorPorTamanho();
+			Collections.sort(cursos, comparador);
+			System.out.println(cursos);
+			
+		}
+		```
+	* **Com o método `sort`** da List:
+		```java
+		Comparator<String> comparador = new ComparadorPorTamanho();
+		//Collections.sort(cursos, comparador);
+
+		cursos.sort(comparador);
+		System.out.println(cursos);
+		```	
+		* Ou seja, a `interace List` só conseguiu implementar nela o método `sort` devido a implementação do método `default void sort`!
+
+* Outro exemplo está no método `forEach` que também foi implementado na `interface List`:
+	* Exibindo objetos de uma lista **com For**:
+		```java
+		List<String> cursos = new ArrayList<String>();
+		cursos.add("Java");
+		//Demais cursos adicionados
+		
+		for (String curso : cursos) {
+			System.out.println(curso);
+		}
+		```
+	*  **com forEach** - com Lambda (sem Lambda seria necessário implementar a classe `Consumer<String>` ):
+		```java
+		List<String> cursos = new ArrayList<String>();
+		cursos.add("Java");
+		//Demais cursos adicionados
+		
+		cursos.forEach(curso -> System.out.println(curso));
+		```
+
+## <a name="lambdas"></a>Lambdas
+
+## <a name="methodreference"></a>Method Reference
+
+## <a name="streams"></a>Streams
+
+## <a name="apidatas"></a>API Datas
