@@ -2093,12 +2093,29 @@ Comparator<String> comparador = new Comparator<String>() {
 
 //		COM LAMBDA
 cursos.sort((s1,s2) -> Integer.compare(s1.length(), s2.length()));
+//    OU
+cursos.sort(Comparator.comparing(s -> s.length()));
 ```
 * **_Interface Funcional -> É toda interface com um único método;_**
 	* Lambda funciona para estas classes, pois o Java sabe que somente aquele único método será implementado;
 
-## <a name="methodreference"></a>Method Reference
+## <a name="methodreference"></a>Método de Referência
+Um Método de Referência é utilizado para **simplificar** ainda mais um **lambda**. Mais especificamente, iremos avisar ao Java, que queremos um método da Classe Tal.
+* Exemplo, a classe `String` possui o método `length()`. Utilizando o método de referência, iremos deixar neste formato: `(String::length)`!
+	```java
+	//	COM LAMBDA
+	cursos.sort(Comparator.comparing(s -> s.length()));
 
+	//	COM MÉTODO DE REFERÊNCIA
+	cursos.sort(Comparator.comparing(String::length));
+
+	//-------------------------------------------------------
+	//	COM LAMBDA
+	cursos.forEach(curso -> System.out.println(curso));
+
+	//	COM MÉTODO DE REFERÊNCIA
+	cursos.forEach(System.out::println);
+	```
 ## <a name="streams"></a>Streams
 
 ## <a name="apidatas"></a>API Datas
