@@ -60,11 +60,11 @@ A plataforma Java é:
 	* [Integer](#integer)
 13. [Encode](#encode)
 14. [Java 8](#java8)
-  * [Default Methods](#defaultmethod)
-  * [Lambdas](#lambdas)
-  *  [Method Reference](#methodreference)
-  *  [Streams](#streams)
-  *   [API Datas](#apidatas)
+    * [Default Methods](#defaultmethod)
+    * [Lambdas](#lambdas)
+    *  [Method Reference](#methodreference)
+    *  [Streams](#streams)
+    *   [API Datas](#apidatas)
   
 
 
@@ -2035,6 +2035,67 @@ Os **default methods** foram adicioandas as Interfaces, de modo que quando fosse
 		```
 
 ## <a name="lambdas"></a>Lambdas
+Antes do Lambda (`->`) eram utilizadas **classes anônimas**.  
+* As classes anônimas permitiam que invez de **criarmos uma classe** para receber **um único método**, poderiamos no Construtor da própria classe passar os métodos:
+	* Exemplo **sem Classe Anônima**:
+		```java
+		class ComparadorPorTamanho implements Comparator<String>{
+
+			@Override
+			public int compare(String s1, String s2) {
+				return Integer.compare(s1.length(), s2.length());
+			}		
+		}
+		
+		public static void main(String[] args) {
+			List<String> cursos = new ArrayList<String>();
+			cursos.add("Java");
+			
+			Comparator<String> comparador = new ComparadorPorTamanho ();
+			cursos.sort(comparador);
+		}
+		```
+	* Exemplo **com Classe Anônima**:
+		```java
+		public static void main(String[] args) {
+			List<String> cursos = new ArrayList<String>();
+			cursos.add("Java");
+			
+			Comparator<String> comparador = new Comparator<String>() {
+				@Override
+				public int compare(String s1, String s2) {
+					return Integer.compare(s1.length(), s2.length());
+				}
+			};
+			cursos.sort(comparador);
+		}
+		```
+
+Lambda veio para **melhorar a Classe Anônima**, de forma que não seja necessário repetir uma grande quantidade de código!
+* **PORÉMMM**, temos que prestar atenção na utilização do Lambda - quando/como utilizar ?
+	* Utilizaremos quando formos implementar **uma interface que possui UM ÚNICO método** (chamado de Interface Funcional) , sendo que:
+		* Será necessário por entre `{ } ` quando tiver **mais de um método**;
+		* Não utilizar `{ }` quando tiver **1 método**;
+		* Não precisa dar `return`;
+		* Quando tiver **+1 argumento**, deve estar entre `(s1, s2)`;
+		* Quando tiver **1 argumento**, não é necessário por entre `()`;
+
+Exemplo acima **com Lambda**:
+```java
+/*		SEM LAMBDA
+Comparator<String> comparador = new Comparator<String>() {
+	@Override
+	public int compare(String s1, String s2) {
+		return Integer.compare(s1.length(), s2.length());
+	}
+};
+*/		
+
+//		COM LAMBDA
+cursos.sort((s1,s2) -> Integer.compare(s1.length(), s2.length()));
+```
+* **_Interface Funcional -> É toda interface com um único método;_**
+	* Lambda funciona para estas classes, pois o Java sabe que somente aquele único método será implementado;
 
 ## <a name="methodreference"></a>Method Reference
 
