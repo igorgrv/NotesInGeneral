@@ -64,8 +64,9 @@ A plataforma Java é:
     * [Lambdas](#lambdas)
     *  [Method Reference](#methodreference)
     *  [Streams](#streams)
-      * [Optional](#optional)
+	     * [Optional](#optional)
     *   [API Datas](#apidatas)
+
   
 
 
