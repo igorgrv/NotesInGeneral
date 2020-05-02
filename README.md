@@ -64,6 +64,7 @@ A plataforma Java é:
     * [Lambdas](#lambdas)
     *  [Method Reference](#methodreference)
     *  [Streams](#streams)
+      * [Optional](#optional)
     *   [API Datas](#apidatas)
   
 
@@ -2116,6 +2117,126 @@ Um Método de Referência é utilizado para **simplificar** ainda mais um **lamb
 	//	COM MÉTODO DE REFERÊNCIA
 	cursos.forEach(System.out::println);
 	```
-## <a name="streams"></a>Streams
+	* **PORÉMMM** o método de referência só podem **instanciar um único método**, caso seja necessário invocar dois métodos, terá de ser utilizado o lambda.
+		* Exemplo, queremos imprimir o nome dos cursos (não o objeto)
+		```java
+		List<Curso> cursos = new ArrayList<Curso>();
+		cursos.add(new Curso ("Java"));
+		cursos.add(new Curso ("Pyton"));
 
+		cursos.forEach(System.out::println); //irá imprimir o objeto Curso
+		
+		//Como imprimir invés do objeto, imprimir o nome de cada Curso  ??
+		cursos.forEach(c -> System.out.println(c.getNome()));
+		```
+## <a name="streams"></a>Streams
+A Interface `Stream`, veio para nos ajudar a "trabalhar" com a interface `Collection (Collections, Lists, Sets)`, nos permetindo a:
+* Filtrar;
+* Ordernar;
+* Mapear;
+* Contar;
+* Ifs;
+* ForEach;
+
+Alguns exemplos utilizando uma lista de cursos:
+```java
+List<Curso> cursos = new ArrayList<Curso>();
+cursos.add(new Curso("Java", 40));
+cursos.add(new Curso("Python", 100));
+cursos.add(new Curso("Spring", 110));
+cursos.add(new Curso("HTML", 30));
+```
+* Exemplo 1: quero que seja impresso cursos com a duração >= 100 minutos:
+	```java
+	cursos.stream()
+		.filter(c -> c.getDuracao() >= 100)
+		.forEach(c -> System.out.println(c.getNome()));
+	```
+* Exemplo 2: quero **receber** (_não imprimir, pois quero trabalhar posteriormente com esses numeros_) o tempo dos cursos com a duração >= 100 minutos:
+	```java
+	cursos.stream()
+		.filter(c -> c.getDuracao() >= 100)
+		.map(Curso::getDuracao)
+		.forEach(System.out::println); //o Map ira devolver somente a duracao
+	```
+	* O método `map(Curso::getDuracao)` transforma a `Stream<Curso>` em `Stream<Integer>`;
+
+;
+* Exemplo 3: quero a soma da duracação dos cursos com +100 minutos;
+	* Quando trabalhamos com soma, inves de utilizar `map`, podemos utilizar o `mapToInt`, que terá métodos como `sum()`:
+	```java
+	int sum = cursos.stream()
+			.filter(c -> c.getDuracao() >= 100)
+			.mapToInt(Curso::getDuracao)
+			.sum();
+	System.out.println(sum);
+	```
+
+Quando utilizamos o `stream()`, ele não afeta a lista, ou seja, caso seja feito um filtro, e seja impresso após o stream, não será considerado o filtro! <br><br>Para **guardar o resultado do stream** em um List, por exemplo, podemos utilizar o método `collect`
+* Exemplo 4: guardar em um `List<Curso>` os cursos com duracao de +100 minutos:
+	```java
+	 List<String> streamToList = cursos.stream()
+		.filter(c -> c.getDuracao() >= 100)
+		.map(Curso::getNome)
+		.collect(Collectors.toList());
+	 
+	 System.out.println(streamToList);
+	```
+### <a name="optional"></a>Optional
+Que tal uma classe que evita `null`? que evita MUITOS Ifs? A classe `Optional<E>`, como o nome já diz, retorna "por opção" o objeto ou não _(em caso de o objeto não existir)_. Alguns dos métodos mais utilizados:
+* orElse();
+* isPresent();
+
+Na prática, quando utilizamos `stream` com um `filter()`, será devolvido um objeto do tipo `Optional`:
+```java
+Optional<Curso> findAny = cursos.stream()
+		.filter(c -> c.getDuracao() >= 100)
+		.findAny(); //irá devolver por "opção" um Curso
+		//caso não exista um objeto, irá devolver um null
+
+Optional<Curso> cursoOptional= cursos.stream()
+		.filter(c -> c.getDuracao() >= 1000) //nao existe curso com esta duração
+		.findAny();
+			
+		System.out.println(cursoOptional); //irá imprimir "Optional.empty"
+```
+E se quisermos **devolver o objeto em si** e não um tipo Optional? Utilizaremos o método `orElse()`:
+```java
+Curso curso = cursoOptional.orElse(null);	
+```
+*	Porém ainda podemos receber um "NullPointerException", para resolver, podemos utilizar o `ifPresent( )`;
+	```java
+	cursos.stream()
+		.filter(c -> c.getDuracao() >= 100)
+		.findAny()
+		.ifPresent(c -> sysout(c.getNome())); //caso não existe, irá imprimir nada
+	```
+O `Optional`  possui variações, como:
+* `OptionalDouble`
+* `OptionalInt`
+
+Por exemplo, quando o `stream()` resultar em cálculos que podem retornar números "quebrados" (_zero dividido por algo_), poderá ser utilizado um dos Optionals acima!
+* Exemplo 5: Calcule a média de duração dos Cursos:
+	```java
+	OptionalDouble average = cursos.stream()
+		.mapToInt(Curso::getDuracao)
+		.average();
+	 
+	 System.out.println(average);
+	```
+* Exemplo 6: retornar o primeiro Curso com a duracao >100
+	```java
+	 cursos.stream()
+	 	.filter(c -> c.getDuracao() >= 100)
+	 	.findFirst()
+	 	.ifPresent(c -> System.out.println(c.getNome()));
+	 	//Python
+	```
+* Exemplo 7: retornar o qual é a menor duração
+	```java
+	 cursos.stream()
+	 	.mapToInt(Curso::getDuracao)
+	 	.min()
+	 	.ifPresent(System.out::println);
+	```
 ## <a name="apidatas"></a>API Datas
