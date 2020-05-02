@@ -9,7 +9,7 @@ O Java EE nada mais é, do que o Java para Web.
 2. [Servlet](#servlet)
 	* [Tomcat](#tomcat)
 	* [Dynamic Web Project](#dynamic)
-	
+	* [Criando Servlet](#criandoservlet)	
 
 ### O que faz o Maven?
 * Build mais simples;
@@ -171,8 +171,7 @@ Para iniciar um projeto com Servlet, iriamos começar com a instalação de um serv
 A Servlet é um objeto que fica **dentro do tomcat**, onde pela tradução do nome, é um _Servidorzinho_, utilizada para **páginas dinâmicas**.
 * Através da `URI` do navegador, podemos fazer um **request** ao objeto Servlet, que irá executar determinado código e devolver através de um **response** as informações!
 
-<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/servlet1.png?raw=true" width="600">
-
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/servlet1.PNG?raw=true" width="600">
 
 ## <a name="tomcat"></a>Tomcat
 Para baixar, basta baixar o .zip no site do [Tomcat](https://tomcat.apache.org/download-90.cgi) e depois extrai-lo.
@@ -205,3 +204,28 @@ Apesar do Maven, proporcionar todo um gerenciamento do projeto, podemos nós mesm
 ### Entendendo as pastas do projeto (com spring)
 Os arquivos .html que não seguem o modelo MVC, devem ficar na pasta `WebContent`.<br>
 <img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/dynamicfolder.png?raw=true" width="600">
+
+## <a name="criandoservlet"></a>Criando Servlet
+Como sabemos, a Servlet nada mais é do que uma classe Java que será criada um objeto através do Tomcat. Para cria-la:
+1. Crie um package **_br.com.gerenciador.servlet_**;
+2. Crie a classe **_HelloServlet_** que irá extender `HttpServlet`;
+3. A classe Servlet, possui um método chamado `service` que irá ter como atributos um `request` e um `response`!
+4. Para que a servlet seja "chamada" pelo navegador, precisamos passar um caminho, através da anotação `@WebServlet(urlPatterns = "/hello")`;
+5. Para passar algo visível ao navegador, iremos através do `response` passar uma estrutura HTML, utilizando o método `resp.getWriter();`
+6. Acesse através do navegador `http://localhost:8080/gerenciador/hello`
+```java
+@WebServlet(urlPatterns = "/hello")
+public class HelloServlet extends HttpServlet{
+
+	@Override
+	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		PrintWriter out = resp.getWriter();
+		out.println("<html>");
+        out.println("<body>");
+        out.println("Parabéns, você escreveu sua primeira servlet");
+        out.println("</body>");
+        out.println("</html>");
+	}
+}
+```
+
