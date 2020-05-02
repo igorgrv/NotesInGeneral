@@ -9,7 +9,9 @@ O Java EE nada mais é, do que o Java para Web.
 2. [Servlet](#servlet)
 	* [Tomcat](#tomcat)
 	* [Dynamic Web Project](#dynamic)
-	* [Criando Servlet](#criandoservlet)	
+	* [Criando Servlet](#criandoservlet)
+	* [GET / POST](#getpost)
+	* [doPost & doGet](#dopost)
 
 ### O que faz o Maven?
 * Build mais simples;
@@ -229,3 +231,46 @@ public class HelloServlet extends HttpServlet{
 }
 ```
 
+## <a name="getpost"></a>GET / POST
+* **GET:** basicamente é um protocolo enviado através da URI;
+* **POST:** irá na requisição "escondida";
+
+### Requisição via GET
+Para receber parâmetros que vieram via `URI`, temos o nosso protoco `request`, que recebe as requisições e o método `getParameter()` que recebe o parâmetro da requisição!
+* Para passar o parâmetro na `URI`, devemos seguir o padrão HTTP - passando após o nome da requisição Servlet (`nomaEmpresa`) um `?`  e o nome do atributo `nome`
+	 * `http://localhost:8080/gerenciador/novaEmpresa?nome=IgorLTDA`
+
+```java
+@WebServlet("/novaEmpresa")
+public class NovaEmpresa extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		String parameter = req.getParameter("nome");
+		PrintWriter writer = res.getWriter();
+		writer.println("<html><body>O nome da empresa cadastrada foi: " + parameter + "</body></html>");
+	}
+}
+```
+* Caso seja necessário mais parâemtros, devemos atribuir ao caracter `&outroParametro=XXXX`
+
+### Requisição via POST
+Para realizar via POST, precisaremos de um formulário HTML!
+1. No formulário, iremos criar um `form` que receberá dois atributos:
+	* `action=""` -> deve ser o caminho completo da Servlet;
+	* `method=""` -> é o tipo de requisição HTTP (GET ou POST);
+2. O `name` do input, deve ser igual ao `req.getParameter` para que a servlet saiba receber corretamente os dados!
+```html
+<html>
+	<body>
+		<form action="/gerenciador/novaEmpresa" method="POST">
+			Nome Empresa: <input type="text" name="nomeEmpresa">
+			<input type="submit" value="Salvar">
+		</form>
+	</body>
+</html>
+```
+## <a name="dopost"></a>doPost & doGet
+Basicamente, quando utilizamos o método `service` da Servlet, podemos atribuir métodos GET e POST, porém e se quisermos impedir que naquela URL seja acessado o método GET por exemplo?
+* `doPost` -> só lida com métodos POST;
+* `doGet` -> só lida com métodos GET;
