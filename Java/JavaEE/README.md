@@ -6,8 +6,11 @@ O Java EE nada mais é, do que o Java para Web.
 	* [Pom.xml](#pomxml)
 	* [Web.xml](#webxml)
 	* [Servidor no Maven](#servidormaven)
+2. [Servlet](#servlet)
+	* [Tomcat](#tomcat)
+	* [Dynamic Web Project](#dynamic)
+	
 
-# <a name="maven"></a>Maven
 ### O que faz o Maven?
 * Build mais simples;
 * Servidor gerado através do próprio maven;
@@ -156,3 +159,49 @@ Para iniciar o servidor pelo Terminal, basta:
 1. Abrir o terminal
 2. Selecionar o diretório do projeto
 3. Digitar `mvn jetty:run`
+
+### Entendendo as pastas do projeto
+
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/mavenfolder.png?raw=true" width=600 >
+
+# <a name="servlet"></a>Servlet
+Para iniciar um projeto com Servlet, iriamos começar com a instalação de um servidor **Apache Tomcat**.
+
+### Mas o que é a Servlet?
+A Servlet é um objeto que fica **dentro do tomcat**, onde pela tradução do nome, é um _Servidorzinho_, utilizada para **páginas dinâmicas**.
+* Através da `URI` do navegador, podemos fazer um **request** ao objeto Servlet, que irá executar determinado código e devolver através de um **response** as informações!
+
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/servlet1.png?raw=true" width="600">
+
+
+## <a name="tomcat"></a>Tomcat
+Para baixar, basta baixar o .zip no site do [Tomcat](https://tomcat.apache.org/download-90.cgi) e depois extrai-lo.
+### Como startar um servidor com Eclipse?
+1. Dentro do Eclipse, abra a  aba **"Servers"**;
+2. Clique em "Click to create a new server...";
+3. Selecione a pasta Tomcat > Tomcat 9 > selecione o local onde foi extraido o Tomcat > finish;
+4. Para testar, veja se foi criada a pasta "Servers" 
+5. Clique em "Start the Server" (Ctrl + alt + R) e para Pausar (Ctrl + alt + S)
+6. Irá gerar um monte de códigos no console em vermelho, onde a última mensagem deve ser: `INFO: Server startup in [457] milliseconds`
+7. Acesse o endereço `localhost:8080`
+
+### Para que serve o tomcat?
+O Tomcat, será responsável por:
+* Entender o Protocolo HTTP (Protocolo da WEB);
+* Gerar HTML como **resposta**;
+
+## <a name="dynamic"></a>Dynamic Web Project
+Apesar do Maven, proporcionar todo um gerenciamento do projeto, podemos nós mesmos gerenciar o projeto através do **_Dynamic Web Project_**, como cria-lo?
+1. Dentro do Eclipse, vamos em File > New > Other > Dynamic Web Project;
+2. Colocaremos um nome ao projeto;
+3. Eclipse ja entenderá que temos um servidor apache (Tomcat) > Next > Next;
+4. Flegar o "generate web.xml" > desta forma será criado nosso `web.xml` > Finish;
+5. Adicione o Projeto ao Tomcat (basta arrastar o projeto para o servidor);
+6. Crie um arquivo `.html` dentro da pasta `WebContent` e acesse através `localhost:8080/nomeProjeto/seu.html`
+
+**POSSÍVEIS ERROS**: ao criar o projeto, pode ser apresentado _"erro de incompatibilidade com Java Facets"_, isto se deve a versão do Tomcat vs Versão do JDK. Para ajustar, basta:
+*  Selecionar o projeto > Properties > Java Facets > Altere a versão para 12;
+
+### Entendendo as pastas do projeto (com spring)
+Os arquivos .html que não seguem o modelo MVC, devem ficar na pasta `WebContent`.<br>
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/dynamicfolder.png?raw=true" width="600">
