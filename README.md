@@ -2240,4 +2240,37 @@ Por exemplo, quando o `stream()` resultar em cálculos que podem retornar númer
 	 	.min()
 	 	.ifPresent(System.out::println);
 	```
-## <a name="apidatas"></a>API Datas
+## <a name="apidatas"></a>API Datas - LocalDateTime 
+A API de Datas do Java, foi implementada após anos utiliznado JODA (**_Java Object Date_**) e facilitará muito a utilização de **data e tempo**. Uma das classes mais utilizadas é:
+* LocalDate;
+* LocalDateTime;
+* LocalTime;
+* Period;
+
+### Métodos
+* `LocalDate.now()` -> retorna a data de hoje - formato ISO;
+* `LocalDate.of(year, month, dayOfMonth)` -> utilizada para criar uma data com determinado ano, mês e dia;
+	* `LocalDate.of(2020, Month.MAY, 1)`;
+* `LocalDate.getYear()` -> retorna o ano da variável
+	```java
+	LocalDate hoje = LocalDate.now(); //2020-05-01
+	LocalDate copa = LocalDate.of(2022, Month.JULY, 2);
+
+	int anosFaltantesParaCopa = copa.getYear() - hoje.getYear();
+	System.out.println(anosFaltantesParaCopa); //2
+	```
+* `Period.between(LocalDateOld, LocalDateNew)` -> retorna a quantidade de dias, meses e anos entre duas datas;
+	* `Period.between(hoje, copa) -> ira retornar P2Y2M1D` 
+* `Period.getYear()` -> retorna o ano dentre o periodo dado
+	```java
+	System.out.println(periodo.getYears() + " anos e " + periodo.getMonths() + " meses");
+	```
+
+### Formatador de Datas
+Para formatar Datas, utilizamos a Classe `DateTimeFormatter`, que possui inumeros métodos, porém o mais utilizado é o `ofPattern`>
+```java
+LocalDate copa = LocalDate.of(2022, Month.JULY, 2);
+
+DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyy");
+System.out.println(copa.format(formatador));
+//01/05/2020 -> data formatada
