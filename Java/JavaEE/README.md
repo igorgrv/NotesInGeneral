@@ -274,3 +274,151 @@ Para realizar via POST, precisaremos de um formulário HTML!
 Basicamente, quando utilizamos o método `service` da Servlet, podemos atribuir métodos GET e POST, porém e se quisermos impedir que naquela URL seja acessado o método GET por exemplo?
 * `doPost` -> só lida com métodos POST;
 * `doGet` -> só lida com métodos GET;
+
+## <a name="jsp"></a>JSP (Java Server Page)
+Desenvolver com servlets, passando o conteúdo HTML utilizando um `PrintWriter` não é uma boa prática, pois imagine criar todo HTML através da Servlet... <br><br>Para trabalhar com requisições, foi criado a **JSP (Java Server Page)** de modo é possível **utilizar códigos HTML & códigos Java** juntos!<br><br>
+* A Servlet processa as informações vindas do Request e passa para a JSP via `req.getRequestDispatcher`, que então irá renderiza a página no servidor antes de envia-las via response ao usuário!
+
+	<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/servlet2.PNG?raw=true" width=400>
+
+Para utilizar códigos java dentro de uma JSP, temos algumas opções:
+* ScriptLet `<%= %>`;
+* JSTL;
+
+### <a name="scriptlet"></a>Scriptlet
+O Scriptlet é utilizado para implementar códigos Java, dentro de uma JSP, utilizando `<% %>`  para demarcar início e término do código em Java. Por exemplo:
+* A sintaxe `<%=` é equivalente a `<% out.println()` -> PrintWriter
+```html
+<%
+	String scriptlet = "scriptlet na JSP";
+%>
+
+<html>
+	<body>
+		Um exemplo do uso do <%= scriptlet %>
+	</body>
+</html>
+```
+Mas como iremos mandar o código da Servlet para a JSP?
+1. Iremos informar a Servlet qual a JSP que iremos passar, utilizando o `req.getRequestDispatcher("/suaJsp")`;
+2. Com o Dispatcher, iremos informar a JSP o atributo que estamos passando, com o método `setAttribute`;
+3. Encaminhar ao servidor com o método `forward` o `req` e `res`;
+```java
+protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+	Empresa empresa = new Empresa();
+	String parameter = req.getParameter("nomeEmpresa");
+	empresa.setNome(parameter);
+	
+	RequestDispatcher rd = req.getRequestDispatcher("/empresaJsp.jsp");
+	req.setAttribute("empresa", empresa.getNome());
+	rd.forward(req, res);
+}
+```
+```html
+<%
+	String nomeEmpresa = (String) request.getAttribute("empresa");
+%>
+
+<html>
+<body>
+	A empresa cadastrada foi: <%= nomeEmpresa %>
+</body>
+</html>
+```
+
+### <a name="el"></a>Expressions Languages
+**EL**  veio para facilitar a integração entre HTML e JAVA, de forma que fique mais simples o código dentro da JSP, utilizando a expressão `${}`.<br>
+Exemplo com **Scriptlet**:
+```html
+<%
+	String nomeEmpresa = (String) request.getAttribute("empresa");
+%>
+
+<html>
+<body>
+	A empresa cadastrada foi: <%= nomeEmpresa %>
+</body>
+</html>
+```
+Exemplo com **Expression Language**:
+```html
+<html>
+	<body>
+		A empresa cadastrada foi: ${empresa}
+	</body>
+</html>
+```
+### <a name="jstl"></a>JSTL
+A **JavaServer Pages Standard Tag Library _(JSTL)_**, como o nome diz, é uma biblioteca que **em conjunto com a EL**, pode implementar diversos códigos do java, como:
+* for;
+* forEach;
+* if;
+* while;
+* formatar datas;
+
+
+#### Como usar JSTL?
+1. Será necessário baixar os [.jar](https://mvnrepository.com/artifact/javax.servlet/jstl/1.2)/dependencias para implementa-las;
+```xml
+<!-- https://mvnrepository.com/artifact/javax.servlet/jstl -->
+<dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>jstl</artifactId>
+    <version>1.2</version>
+</dependency>
+```
+2. Para utilizar em uma página JSP, será necessário adicionar um "cabeçalho" antes;
+	* jstl/core -> contém as condicionais (for, foreach, if e etc);
+	* fmt -> para formatar datas
+```java
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+```
+#### <a name="foreach"></a>forEach - Listando 
+Para exibir uma lista com objetos/dados, podemos utilizar o método `<c:forEach>`, que irá exigir:
+* `items="${ }"` -> será o atributo que foi passado pela Servlet;
+* `var=""` -> será a varíavel que será chamada dentro da tag `li`
+
+```html
+<body>
+    Lista de empresas: <br />
+    <ul>
+        <c:forEach items="${empresas}" var="empresa">
+            <li>${empresa.nome }</li>
+        </c:forEach>
+    </ul>
+</body>
+```
+#### <a name="url"></a> URL <c: url >
+O método `<c:url value="" var="">` basicamente carrega o nome do projeto e pode ser utizado na `action`  de um `<form>`!
+* Exemplo **form sem JSTL**:
+```html
+<form action="/gerenciador/novaEmpresa" method="POST">
+```
+* Exemplo **form com JSTL**:
+```html
+<form action="<c:url value="/novaEmpresa" />" method="POST">
+
+//ou
+
+<c:url value="/novaEmpresa" var="nova"/>
+<form action="${nova}" method="POST">
+```
+#### <a name="if"></a> If <c: if >
+Com JSTL podemos realizar condicionais:
+* Preencha como nulo em caso de nenhum nome de empresa for preenchido:
+```html
+<c:if test="${not empty empresa}">
+	A empresa cadastrada foi: ${empresa}
+</c:if>
+
+<c:if test="${empty empresa}">
+	Nenhuma empresa foi cadastrada :(
+</c:if>
+```
+#### <a name="fmt"></a> formatDate <fmt: formatDate>
+Quando extraimos a data direto do Java, vem um monte de código esquisito, para formatar no padrão brasileiro, temos a TAGLIB FMT:
+```html
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<fmt:formatDate value="${empresa.dataAbertura}" pattern="dd/MM/yyyy"/>
+```
