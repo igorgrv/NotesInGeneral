@@ -1,3 +1,4 @@
+
 # O Java EE
 O Java EE nada mais é, do que o Java para Web.
 # Sumário
@@ -16,7 +17,12 @@ O Java EE nada mais é, do que o Java para Web.
 	* [Scriptlet](#scriptlet)
 	* [Expressions Language](#el)
 	* [JSTL](#jstl)
+4. [JPA Hibernate](#jpa)
+5. [CRUD](#crud)
+	 *	[1º modo - JSP + Servlet](#crudservlet)
+6. [Web Services/API](#webservice)
 
+# Maven
 ### O que faz o Maven?
 * Build mais simples;
 * Servidor gerado através do próprio maven;
@@ -279,7 +285,7 @@ Basicamente, quando utilizamos o método `service` da Servlet, podemos atribuir m
 * `doPost` -> só lida com métodos POST;
 * `doGet` -> só lida com métodos GET;
 
-## <a name="jsp"></a>JSP (Java Server Page)
+# <a name="jsp"></a>JSP (Java Server Page)
 Desenvolver com servlets, passando o conteúdo HTML utilizando um `PrintWriter` não é uma boa prática, pois imagine criar todo HTML através da Servlet... <br><br>Para trabalhar com requisições, foi criado a **JSP (Java Server Page)** de modo é possível **utilizar códigos HTML & códigos Java** juntos!<br><br>
 * A Servlet processa as informações vindas do Request e passa para a JSP via `req.getRequestDispatcher`, que então irá renderiza a página no servidor antes de envia-las via response ao usuário!
 
@@ -289,7 +295,7 @@ Para utilizar códigos java dentro de uma JSP, temos algumas opções:
 * ScriptLet `<%= %>`;
 * JSTL;
 
-### <a name="scriptlet"></a>Scriptlet
+## <a name="scriptlet"></a>Scriptlet
 O Scriptlet é utilizado para implementar códigos Java, dentro de uma JSP, utilizando `<% %>`  para demarcar início e término do código em Java. Por exemplo:
 * A sintaxe `<%=` é equivalente a `<% out.println()` -> PrintWriter
 ```html
@@ -330,7 +336,7 @@ protected void service(HttpServletRequest req, HttpServletResponse res) throws S
 </html>
 ```
 
-### <a name="el"></a>Expressions Languages
+## <a name="el"></a>Expressions Languages
 **EL**  veio para facilitar a integração entre HTML e JAVA, de forma que fique mais simples o código dentro da JSP, utilizando a expressão `${}`.<br>
 Exemplo com **Scriptlet**:
 ```html
@@ -352,7 +358,7 @@ Exemplo com **Expression Language**:
 	</body>
 </html>
 ```
-### <a name="jstl"></a>JSTL
+## <a name="jstl"></a>JSTL
 A **JavaServer Pages Standard Tag Library _(JSTL)_**, como o nome diz, é uma biblioteca que **em conjunto com a EL**, pode implementar diversos códigos do java, como:
 * for;
 * forEach;
@@ -436,8 +442,10 @@ Quando extraimos a data direto do Java, vem um monte de código esquisito, para f
 	String stringData= "01/04/2020";
 	DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	LocalDate dataLocalDate = LocalDate.parse(stringData, formatador);
-	```
-# CRUD
+
+# <a name="jpa"></a>JPA Hibernate
+
+# <a name="crud"></a>CRUD
 ## <a name="crudservlet"></a>1º modo - JSP + Servlet
 ### Anotações Servlet
 Relembrando alguns métodos:
@@ -632,4 +640,137 @@ public class RemoveEmpresaServlet extends HttpServlet {
 	}
 
 }
+```
+### Atualizar/Editar
+Para atualizar/editar, será **necessário** utilizar **duas Servlets**:
+* para chamar o `mostraEmpresaServlet` 
+* para atualizar de fato a Empresa -> `atualizarEmpresaServlet`.
+	* Necessário, assim como para deletar, passar o id
+
+```html
+//listForm
+<td>
+	<a href="/gerenciador/mostraEmpresaServlet?id=${empresa.id}">Alterar</a>
+</td>
+
+
+//formAtualiza
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+
+<c:url value="/atualizaEmpresa" var="nova"/>
+
+<html>
+	<body>
+		<form action="${nova}" method="POST">
+				<input type="hidden" name="id" value="${empresa.id}">
+				Nome Empresa: <input type="text" name="nome" value="${empresa.nome}">
+				
+				<fmt:parseDate value="${empresa.dataAbertura}" pattern="yyyy-MM-dd"	var="parsedDateAbertura" />
+				Data Abertura: <input type="text" name="dataAbertura" value="<fmt:formatDate value="${parsedDateAbertura}" pattern="dd/MM/yyyy" />">
+				<input type="submit" value="Salvar">
+		</form>
+	</body>
+</html>
+```
+```java
+//mostraEmpresaServlet
+@WebServlet("/mostraEmpresaServlet")
+public class MostraEmpresaServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		String parameter = req.getParameter("id");
+		Integer id = Integer.valueOf(parameter);
+		
+		Banco banco = new Banco();
+		Empresa empresa = banco.findById(id);
+		
+		req.setAttribute("empresa", empresa);
+		
+		RequestDispatcher rd = req.getRequestDispatcher("/formAtualizaEmpresa.jsp");
+		rd.forward(req, res);
+	}
+
+}
+
+
+//AtualizaServlet
+@WebServlet("/atualizaEmpresa")
+public class AtualizaEmpresa extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		//Coletando o ID
+		String parameter = req.getParameter("id");
+		Integer id = Integer.valueOf(parameter);
+		
+		//Atualizando o nome
+		String nome = req.getParameter("nome");
+		
+		//Atualizando data de abertura
+		String parametroDataAbertura = req.getParameter("dataAbertura");
+		DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		LocalDate dataAbertura = LocalDate.parse(parametroDataAbertura, formatador);
+					
+		Banco banco = new Banco();
+		Empresa empresa = banco.findById(id);
+		empresa.setNome(nome);
+		empresa.setDataAbertura(dataAbertura);
+		
+		res.sendRedirect("listaEmpresasServlet");
+	}
+
+}
+```
+
+# <a name="webservice"></a>Web Services/API
+Em uma aplicação comum, a conversa entre o **_Request e Response_** é feito para o **navegador**, mas e se queremos utilizar, por exemplo, um celular? Televisão? Jogo? <br>
+Invés de sempre devolvermos um HTML, podemos mandar **somente os dados** de uma maneira **diferente**, por exemplo, através protocolo HTTP, utilizando:
+* json;
+* xml;
+
+Para trabalharmos com json ou xml, o java possui bibliotecas:
+* GSON: [gson-2.8.5.jar.zip](https://caelum-online-public.s3.amazonaws.com/1001-servlets-parte2/06/gson-2.8.5.jar.zip);
+	```xml
+	<dependency>
+	  <groupId>com.google.code.gson</groupId>
+	  <artifactId>gson</artifactId>
+	  <version>2.8.6</version>
+	</dependency>
+	```
+* XStream: [xstream-1.4.10-jars.zip](https://caelum-online-public.s3.amazonaws.com/1001-servlets-parte2/06/xstream-1.4.10-jars.zip)
+
+E a tal API (**_Application Programming Interface_**)?
+* Grandes provedores de Web Services, possuem **vários serviços** com várias funcionalidades, e precisamos saber:
+	* Qual o endereço?
+	* Qual o método HTTP?
+	* Qual o formato (json ou xml)?
+	* Qual os parâmetros a serem enviados?
+* Tudo acima, faz parte da definição de uma **API DE SERVIÇO**!
+
+**_"No contexto de _Web Service_, a API define a interface das funcionalidades que o serviço oferece"_**
+
+## <a name="json"></a>Json
+Para retornarmos um json, podemos utilizar a biblioteca **gson**, que através de um `List`, podemos transforma-lo no formato .json!
+```java
+@WebServlet("/jsonServlet")
+public class JsonServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		List<Empresa> empresas = new Banco().getEmpresas();
+		
+		Gson gson = new Gson();
+		String json = gson.toJson(empresas);
+		
+		res.setContentType("application/json");
+		res.getWriter().print(json);		
+	}
+
+}
+```
+	
+```json
+[{"id":1,"nome":"Igor","dataCadastro":{"date":{"year":2020,"month":5,"day":9},"time":{"hour":1,"minute":3,"second":37,"nano":79212300}},"dataAbertura":{"year":2020,"month":4,"day":1}}]
 ```
