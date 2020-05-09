@@ -12,6 +12,10 @@ O Java EE nada mais é, do que o Java para Web.
 	* [Criando Servlet](#criandoservlet)
 	* [GET / POST](#getpost)
 	* [doPost & doGet](#dopost)
+3. [JSP](#jsp)
+	* [Scriptlet](#scriptlet)
+	* [Expressions Language](#el)
+	* [JSTL](#jstl)
 
 ### O que faz o Maven?
 * Build mais simples;
@@ -421,4 +425,211 @@ Quando extraimos a data direto do Java, vem um monte de código esquisito, para f
 ```html
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <fmt:formatDate value="${empresa.dataAbertura}" pattern="dd/MM/yyyy"/>
+```
+* Para utilizar **_LocalDateTime_** - nova api Java, é necessário fazer um **_parseDate_** e depois utilizar o **_formatDate_**:
+	```html
+	<fmt:parseDate value="${empresa.dataAbertura}" pattern="yyyy-MM-dd" var="parsedDate"/>
+	<td><fmt:formatDate value="${parsedDate}" pattern="dd/MM/yyyy" /></td>
+	```
+* Para receber uma String e passar para um LocalDate, é necessário utilizar um `DateTimeFormatter`
+	```java
+	String stringData= "01/04/2020";
+	DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	LocalDate dataLocalDate = LocalDate.parse(stringData, formatador);
+	```
+# CRUD
+## <a name="crudservlet"></a>1º modo - JSP + Servlet
+### Anotações Servlet
+Relembrando alguns métodos:
+* `@WebServlet("/novaEmpresa")` -> anotação para invocar a servlet;
+* `req.getParameter("nomeEmpresa")` -> responsável por **receber** parametros (via GET ou POST);
+* `req.setAttribute("atributoParaJSP", empresa.getNome())` -> responsável por **passar** os atributos para a JSP ter acesso;
+* `req.getRequestDispatcher("pagina.jsp")` -> após processar o codigo irá direcionar para a página;
+	* Recebe um tipo `RequestDispatcher rd`;
+* `rd.forward(req, res)` -> último método, para encaminhar ao servidor toda requisição e resposta;
+* `res.sendRedirect("outraServlet")` -> substitui o Dispatcher
+
+### Cadastrando
+Para realizar o **cadastro de uma empresa**, precisamos:
+1. Modelo: Empresa e Banco (simulará um banco de dados);
+2. Formulário JSP (formEmpresa.jsp);
+3.  Servlet (empresaServlet);
+4. Formulário Retorno do cadastro (empresaCadastrada);
+
+Empresa e Banco
+```java
+public class Banco {
+
+	private static List<Empresa> empresas = new ArrayList<Empresa>();
+	private static int chaveIdSequencial = 1;
+	
+	public List<Empresa> getEmpresas(){
+		return Banco.empresas;
+	}
+
+	public void adiciona(Empresa e) {
+		e.setId(Banco.chaveIdSequencial++);
+		Banco.empresas.add(e);
+	}
+}
+
+public class Empresa {
+
+	//iremos utilizar métodos da classe wrapper para fazer parse de String
+	private Integer id;
+	private String nome;
+	private LocalDateTime dataAbertura = LocalDateTime.now();
+	private LocalDateTime dataCadastro = LocalDateTime.now();
+	
+	//getters and setters
+}
+```
+formNovaEmpresa.jsp
+```html
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<c:url value="/novaEmpresa" var="nova"/>
+
+<html>
+	<body>
+		<form action="${nova }" method="POST">
+			Nome Empresa: <input type="text" name="nomeEmpresa">
+			Nome Abertura: <input type="text" name="dataAbertura">
+			<input type="submit" value="Salvar">
+		</form>
+	</body>
+</html>
+```
+empresaServlet
+```java
+@WebServlet("/novaEmpresa")
+public class cadastraEmpresaServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		Empresa empresa = new Empresa();
+		
+		//Recebendo parâmetro da URI e atribuindo ao nome da Emrpesa
+		String nomeEmpresa= req.getParameter("nomeEmpresa");
+		empresa.setNome(nomeEmpresa);
+
+		//Inserindo data de abertura
+		String parametroDataAbertura = req.getParameter("dataAbertura");
+		DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		LocalDate dataAbertura = LocalDate.parse(parametroDataAbertura, formatador);
+		empresa.setDataAbertura(dataAbertura);
+
+		//Inserindo data de cadastro do sistema
+		LocalDateTime hoje = LocalDateTime.now();
+		empresa.setDataCadastro(hoje);
+
+		//Inserindo no banco de dados	
+		Banco banco = new Banco();
+		banco.adiciona(empresa);
+		
+		//irá mandar requisição para servlet Lista
+		RequestDispatcher rd = req.getRequestDispatcher("/listaEmpresa");
+		req.setAttribute("empresa", empresa.getNome());
+		rd.forward(req, res);
+	}
+}
+```
+#### Redirect - evitando Refresh 
+Por enquanto se o usuário apertar F5 e fizer um refresh, a Servlet irá cadastrar novamente os usuários, pois ao realizar o refresh, estamos requisitando que a servlet `/novaEmpresa` seja chamada novamente.
+* Para evitar este tipo de problema, precisamos alterar a servlet `/novaEmpresa`, onde inves de enviar um **despachador**, iremos **redirecionar** ao navegador!
+	```java
+	req.setAttribute("empresa", empresa.getNome());
+	
+	//sem utilizar /
+	res.sendRedirect("listaEmpresasServlet");
+			
+	//	RequestDispatcher rd = req.getRequestDispatcher("/listaEmpresasServlet");
+	//	req.setAttribute("empresa", empresa.getNome());
+	//	rd.forward(req, res);
+	```
+	
+### Listando
+Para LISTAR as empresas cadastradas, precisamos:
+* Passar a lista de empresas com o atributo via método `setAttribute`
+* Formulário JSP (listaEmpresa.jsp);
+
+listaEmpresaServlet
+```java
+@WebServlet("/listaEmpresasServlet")
+public class ListaEmpresasServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		Banco banco = new Banco();
+		
+		List<Empresa> empresas = banco.getEmpresas();
+		req.setAttribute("empresas", empresas);
+		
+		RequestDispatcher rd = req.getRequestDispatcher("listaEmpresa.jsp");
+		rd.forward(req, res);
+	}
+}
+```
+listaEmpresa.jsp
+```html
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<html>
+	<body>
+		<h2>Lista de empresas: </h2>
+			<table border="1">
+		<tr>
+			<th>Id</th>
+			<th>Nome</th>
+			<th>Data Abertura</th>
+			<th>Data Cadastro</th>
+			<th colspan="2">Ações</th>
+		</tr>
+			<c:forEach items="${empresas}" var="empresa">
+				<tr>
+					<td>${empresa.id}</td>
+					<td>${empresa.nome}</td>
+
+					<fmt:parseDate value="${empresa.dataAbertura}" pattern="yyyy-MM-dd"	var="parsedDateAbertura" />
+					<td><fmt:formatDate value="${parsedDateAbertura}" pattern="dd/MM/yyyy" /></td>
+					
+					<fmt:parseDate value="${empresa.dataCadastro}" pattern="yyyy-MM-dd"	var="parsedDateCadastro" />
+					<td><fmt:formatDate value="${parsedDateCadastro}" pattern="dd/MM/yyyy" /></td>
+					
+					<td>
+						<a href="/gerenciador/removeEmpresa?id=${empresa.id}">Remover</a>
+					</td>
+					<td>
+						<a href="/gerenciador/alteraEmpresa?id=${empresa.id}">Alterar</a>
+					</td>
+				</tr>
+			</c:forEach>
+	</table>
+	</body>
+</html>
+```
+
+### Removendo
+
+```java
+public class Banco {
+	public void remove(Integer id) {
+			Banco.empresas.removeIf(empresa -> empresa.getId()==id);
+		}
+}
+
+
+@WebServlet("/removeEmpresaServlet")
+public class RemoveEmpresaServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+	protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		String parameter = req.getParameter("id");
+		Integer id = Integer.valueOf(parameter);
+		
+		Banco banco = new Banco();
+		banco.remove(id);
+		
+		res.sendRedirect("listaEmpresasServlet");
+	}
+
+}
 ```
