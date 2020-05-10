@@ -21,7 +21,16 @@ O Java EE nada mais é, do que o Java para Web.
 	* [Testando Conexão](#testejdbc)
 	* [DAO](#dao)
 	* [CRUD - DAO](#cruddao)
-5. [JPA](#jpa)
+5. [JPA & Hibernate](#jpa)
+	* [Criando projeto](#projetocjpa)
+	* [Anotações](#persistence)
+	* [Criando uma Entidade](#criandoentidade)
+	* [CRUD - JPA](#crudjpa)
+	* [Estados da JPA](#estadosjpa)
+		 * [Managed](#managed)
+		 * [Detached](#detached)
+		 * [Removed](#removed)
+	 * [JPQL](#jpql)
 6. [CRUD](#crud)
 	 *	[1º modo - JSP + Servlet](#crudservlet)
 7. [Web Services/API](#webservice)
@@ -647,7 +656,274 @@ public class UsuarioDao {
 }
 ```
 
-# <a name="jpa"></a>JPA Hibernate
+# <a name="jpa"></a>JPA & Hibernate
+O JPA (**_Java Persistence API_**) é uma **especificação** que veio após o JDBC, de modo que:
+* Facilitase o uso de sintaxes do SQL;
+* Trabalha com Objetos e não com Relacionamento;
+* Cria/Gerencia o Banco de dados;
+* Menos verboso;
+
+A implementação mais conhecida é a **Hibernate**;
+
+## <a name="projetocjpa"></a>Criando projeto com JPA
+Para facilitar, o projeto será criado com o Maven, utilizando as **dependência do JPA e do MySQL**. Como Banco de Dados, será utilizado o **[MariaDB Server](https://mariadb.com/kb/en/mariadb-server-10-4-12/)**.
+```xml
+<dependencies>
+	<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
+	<dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-core</artifactId>
+		<version>5.4.15.Final</version>
+	</dependency>
+	
+	<dependency>
+		<groupId>mysql</groupId>
+		<artifactId>mysql-connector-java</artifactId>
+		<version>8.0.18</version>
+	</dependency>
+</dependencies>
+```
+### <a name="persistence"></a>persistence.xml
+O JPA recebe sua configuração através de um arquivo xml chamado `persistence.xml`, que deve estar em  **_src/main/resources/META-INF_**. Este arquivo é responsável por mapear:
+* driver;
+* jdbc;
+* usuario;
+* senha
+* dialeto (mysql);
+* show_sql / format_sql -> irá exibir o código SQL;
+* hbm2ddl.auto -> responsável por atualizar/criar as tabelas
+
+persistence.xml (sem Spring)
+```xml
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+	version="2.0">
+
+	<persistence-unit name="cursos">
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+		<class>br.com.igor.jpa.model.Cliente</class>
+
+		<properties>
+			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/igor_jpa?serverTimezone=UTC" />
+			<property name="javax.persistence.jdbc.user" value="root" />
+			<property name="javax.persistence.jdbc.password" value="root" />
+
+			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
+			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.format_sql" value="true" />
+
+			<property name="hibernate.hbm2ddl.auto" value="update" />
+		</properties>
+		
+  </persistence-unit>
+</persistence>
+```
+
+## <a name="persistence"></a> Anotações
+O Hibernate utiliza diversas **anotações** para nos ajudar a trabalhar com as tabelas e colunas.<br>
+
+CÓDIGO BASE:
+* `@Entity` -> indica o objeto para se tornar persistível (MODELO)
+* `@Table(name="tarefas")` -> indica que será a Tabela com nome XXXX
+  
+P/ COLUNAS:
+* `@Id` --> indica que aquele atributo é um ID
+	*  `@GeneratedValue` -> serve para deixar o Hibernate responsavel por gerenciar o ID
+		*  `GenerationType.AUTO` -> Valor padrão, deixa com o provedor de persistência a escolha da estratégia mais adequada  de acordo com o banco de dados.
+		* `GenerationType.IDENTITY` -> Identificador único serão gerados pela coluna de auto incremento do banco de dados.
+*  `@Column(name = "nomeDaColuna", nullable = false)` -> irá criar a coluna com este nome;
+	* `@Column(nullable = false)` -> Indica que não pode ser nulo
+* `@Size(min=10, max=256, message = "Deu ruim")`;
+
+Para LocalDateTime:
+* `@DateTimeFormat(pattern="dd/MM/yyyy")`
+	* `@Temporal(TemporalType.DATE)`  -> Temporal utilizado para datas / TemporalType indica o tipo de dado
+	* `@Temporal(TemporalType.TIME)`  -> TemporalType, retorna o horário
+
+Para Enum:
+* `@Enumerated`
+	* `@Enumerated(EnumType.STRING)`  ->indica que será retornado os valores da String
+
+P/ RELACIONAMENTOS:
+* `@ManyToOne` -> List -> Muitas Movimentações para Uma Conta -> Será criada uma  coluna com **_chave estrangeira_**
+* `@OneToMany`
+* `@ManyToMany` -> Muitas Movimentações para Muitas Categorias -> _Uma Movimentação pode estar em Muitas Categorias e Uma Categoria pode ter Muitas Movimentações_ -> Quando criada, será criada uma **_tabela relacionamento_**
+* `@OneToOne` -> Um Cliente possui Uma Conta -> _Uma Conta só tem Um Cliente_
+	* `@JoinColumn(unique=true)` -> faz com que os id pertençam somente ao id da outra tabela
+
+## <a name="criandoentidade"></a> Criando uma Entidade
+```java
+@Entity
+public class Conta {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	private String titular;
+	private Integer agencia, numero;
+	private BigDecimal saldo;
+	
+	//Getters and Setters
+}
+```
+
+Criando método `main` para que a JPA crie a tabela:
+```java
+public static void main(String[] args) {
+	EntityManagerFactory emf = Persistence.createEntityManagerFactory("conta");
+	EntityManager em = emf.createEntityManager();
+	
+	em.close();
+}
+```
+Para checar se ocorreu, será exibido no console, mas também é possível através do **MySQL Console (MariaDB)**:
+```sql
+show databases;
+use igor_jpa;
+
+show tables;
+desc nomeDaTabela; #irá conferir os atributos da tabela
+
++---------+--------------+------+-----+---------+----------------+
+| Field   | Type         | Null | Key | Default | Extra          |
++---------+--------------+------+-----+---------+----------------+
+| id      | bigint(20)   | NO   | PRI | NULL    | auto_increment |
+| agencia | int(11)      | YES  |     | NULL    |                |
+| numero  | int(11)      | YES  |     | NULL    |                |
+| titular | varchar(255) | YES  |     | NULL    |                |
++---------+--------------+------+-----+---------+----------------+
+```
+
+## <a name="crudjpa"></a> CRUD - JPA
+Para realizar a inserção de dados no DB, utilizamos a classe `EntityManager` (que recebe a fabrica de conexão). Onde basicamente temos os métodos abaixo:
+- `find` --> pode-se utilizar como WHERE [Tarefa localizaPorId = manager.find(Tarefa.class, 1L)]
+ - `remove` --> utilizado como DELETE
+ - `merge` --> utilizado como UPDATE
+ - `persist` --> utilizado como INSERT [manager.persist(tarefa);]
+
+**PORÉEMMM**... quando queremos realizar operações de **inserção, remoção ou atualização** é necessário utilizar através de uma **transação**, com `.getTransaction().begin();` e  `em.getTransaction().commit();`
+* _A transação é um mecanismo para manter a consistência das alterações de estado no banco, visto que todas as operações precisam ser executadas com sucesso, para que a transação seja confirmada._
+
+### Inserindo
+```java
+public static void main(String[] args) {
+	EntityManagerFactory emf = Persistence.createEntityManagerFactory("conta");
+	EntityManager em = emf.createEntityManager();
+	
+	Conta conta = new Conta();
+	conta.setAgencia(123);
+	conta.setNumero(123456);
+	conta.setTitular("igor");
+	
+	em.getTransaction().begin();
+	em.persist(conta);
+	em.getTransaction().commit();
+	
+	em.close();
+}
+```
+### Procurando e Atualizando
+Para localizar através do `id` a JPA possui o método `find`, onde não é necessário criar uma `query`:
+```java
+public static void main(String[] args) {
+	EntityManagerFactory emf = Persistence.createEntityManagerFactory("conta");
+	EntityManager em = emf.createEntityManager();
+	
+	Conta conta = em.find(Conta.class, 1L);
+	conta.setSaldo(BigDecimal.valueOf(350.00));
+	
+	em.getTransaction().begin();
+	em.merge(conta);
+	em.getTransaction().commit();
+	
+	em.close();
+}
+```
+### Procurando e Removendo
+```java
+public static void main(String[] args) {
+	EntityManagerFactory emf = Persistence.createEntityManagerFactory("conta");
+	EntityManager em = emf.createEntityManager();
+	
+	Conta conta = em.find(Conta.class, 1L);
+	
+	em.getTransaction().begin();
+	em.remove(conta);
+	em.getTransaction().commit();
+	
+	em.close();
+}
+```
+## <a name="estadosjpa"></a>Estados da JPA
+### <a name="managed"></a>Managed
+Quando o objeto está no estado **_managed_**, significa que poderá sofrer alterações pela JPA, ou seja, está em **sincronização automática** - qualquer tipo de alteração que o objeto tiver, a JPA irá fazer um **update** no banco. <br>
+Isto ocorre quando passamos o objeto, através do `EntityManager`, ou seja, enquanto não houver um `close()`, a JPA estará verificando o objeto.
+
+### <a name="detached"></a>Detached
+Quando o objeto esteve no estado managed e houve um `close` do `EntityManager`, o objeto passa a ser um objeto **_detached_**, ou seja, a JPA não está mais sincronizando.
+
+### <a name="removed"></a>Removed
+O objeto passa a estar no estado **_removed_** quando utilizamos o método `removed(obj)`;
+
+## <a name="jpql"></a>JPQL
+O JPQL (**_Java Persistence Query Language_**) é uma linguagem de consultas, enquanto o SQL (**_Structured Query Language_**) é voltado ao relacionamento.<br>
+
+Utilizando o objeto Movimentação como exemplo:
+* Exemplo **SQL**:
+	```sql
+	select * from movimentacao;
+	```
+* Exemplo **JPQL**:
+	```sql
+	select mfrom Movimentacao m; //com Objeto
+	```
+Para que  o JPA entenda a consulta, utilizamos a classe `TypedQuery<?>` que recebe o Objeto da pesquisa:
+```java
+public static void main(String[] args) {
+	EntityManagerFactory emf = Persistence.createEntityManagerFactory("conta");
+	EntityManager em = emf.createEntityManager();
+	
+	String jpql = "select c from Conta c";
+	
+	TypedQuery<Conta> query = em.createQuery(jpql, Conta.class);
+	List<Conta> contas = query.getResultList();
+	
+	contas.forEach(c -> System.out.println(c.getTitular()));
+}
+
+```
+### <a name="consultacriterio"></a>Consulta com critério
+
+* Exemplo **SQL**:	
+	```sql
+	select * from movimentacao where conta_id = 2;
+	```
+
+* Exemplo **JPQL**:
+	```sql
+	select mfrom Movimentacao m where m.conta.id = 2;
+	```
+
+### <a name="consultparametro"></a>Consulta com parâmetros
+Quando é utilizado parâmetros com JPA, invez de utilizarmos o `(?, ?, ?)`, utilizamos um **_named parameter_** que se torna mais fácil de trabalhar.
+```sql
+public static void main(String[] args) {
+	
+	Conta conta = new Conta();
+	conta.setId(2L);
+	
+	String jpql = "SELECT c FROM Conta c WHERE c.id = :pId";
+	TypedQuery<Conta> query = em.createQuery(jpql, Conta.class);
+	
+	//parâmetro
+	query.setParameter("pId", conta.getId());
+	
+	List<Conta> contas = query.getResultList();
+	contas.forEach(c -> System.out.println(c.getTitular()));
+}
+```
 
 # <a name="crud"></a>CRUD
 ## <a name="crudservlet"></a>1º modo - JSP + Servlet
