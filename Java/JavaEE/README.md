@@ -17,10 +17,14 @@ O Java EE nada mais é, do que o Java para Web.
 	* [Scriptlet](#scriptlet)
 	* [Expressions Language](#el)
 	* [JSTL](#jstl)
-4. [JPA Hibernate](#jpa)
-5. [CRUD](#crud)
+4. [JDBC](#jdbc)
+	* [Testando Conexão](#testejdbc)
+	* [DAO](#dao)
+	* [CRUD - DAO](#cruddao)
+5. [JPA](#jpa)
+6. [CRUD](#crud)
 	 *	[1º modo - JSP + Servlet](#crudservlet)
-6. [Web Services/API](#webservice)
+7. [Web Services/API](#webservice)
 
 # Maven
 ### O que faz o Maven?
@@ -442,6 +446,206 @@ Quando extraimos a data direto do Java, vem um monte de código esquisito, para f
 	String stringData= "01/04/2020";
 	DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	LocalDate dataLocalDate = LocalDate.parse(stringData, formatador);
+
+# <a name="jdbc"></a>JDBC
+O JDBC (**_Java Database Connectivity_**) , veio com o intuito de criar um padrão para os Softwares de Banco de Dados (MySQL, SQL Server e etc), onde este padrão, permitiria que o Desenvolvedor trocasse de DB sem afetar o código.<br>
+O JDBC, utiliza uma **_Fábrica de Conexões_**, que necessita de alguns atributos:
+- driver(jar ou dependencia); 
+- ip;
+- porta;
+- usuario;
+ - senha;
+
+```java
+public class ConnectionFactory {
+
+	public Connection getConnection() {
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			return DriverManager.getConnection("jdbc:mysql://localhost/meuBancoDeDados?useTimezone=true&serverTimezone=UTC&useSSL=false", "root","");
+		} catch (SQLException e){		
+			throw new RuntimeException(e);
+		}
+	}
+}
+```
+## <a name="testejdbc"></a>Testando Conexão
+Para testar a conexão, basta a partir da nossa `ConnectionFactory` criarmos um objeto do tipo `Connection`.
+```java
+public class TesteConexao {
+	public static void main (String[] args) throws SQLException {
+		ConnectionFactory con = new ConnectionFactory();
+		Connection conexao = con.getConnection();
+		System.out.println("conectado");
+		
+		conexao.close();
+	}
+}
+```
+* Possíveis erros:
+	* `MySQLNonTransientConnectionException:` ->  utilizar conector mais novo;
+	* `Establishing SSL connection without server's identity` -> Adicione depois do BD -> _useTimezone=true&serverTimezone=UTC&useSSL=false_
+
+## <a name="dao"></a>DAO
+O DAO (**_Data Access Object_**) é uma camada de acesso aos dados -_posteriormente substituido por um repositorio_ - que nos permite executar as rotinas no DB, evitando que ocorra códigos repetidos!<br>
+Para tarbalharmos _querys_ utilizamos o tipo  `PrepareStatement`, que recebe o tipo `Connection`e uma `String`.
+
+* Exemplo **INSERT** SEM camada DAO:
+	```java
+	public static void main(String[] args) throws SQLException {
+			Connection con = new ConnectionFactory().getConnection();
+
+			String sql = "insert into contatos (nome,email,endereco,dataNascimento) value (?,?,?,?)";
+			PreparedStatement stmr = con.prepareStatement(sql);
+			stmr.setString(1, "teste");
+			stmr.setString(2, "teste");
+			stmr.setString(3, "teste");
+			stmr.setDate(4, new java.sql.Date(Calendar.getInstance().getTimeInMillis()));
+			stmr.execute();
+
+			stmr.close();
+			System.out.println("Dados inseridos");
+
+			con.close();
+	}
+	```
+### <a name="cruddao"></a> CRUD -  DAO
+```java
+public class UsuarioDao {
+	private Connection con = new ConnectionFactory().getConnection();
+	private PreparedStatement stmt;
+
+	public void adicionar(Usuario usuario) {
+		String sql = "INSERT INTO usuarios (nome, matricula, senha, data_cadastro) VALUES (?,?,?,?)";
+		try {
+			stmt = con.prepareStatement(sql);
+			stmt.setString(1, usuario.getNome());
+			stmt.setString(2, usuario.getMatricula());
+			stmt.setString(3, usuario.getSenha());
+			stmt.setDate(4, new java.sql.Date(System.currentTimeMillis()));
+
+			stmt.execute();
+			stmt.close();
+			con.close();
+
+		} catch (SQLException e) {
+			throw new RuntimeException("Erro na insercao " + e);
+		}
+	}
+
+	public List<Usuario> getLista () {
+		List<Usuario> lista = new ArrayList<Usuario>();
+		String sql = "SELECT * FROM usuarios";
+		try {
+			stmt=con.prepareStatement(sql);
+			ResultSet rs = stmt.executeQuery();
+
+			while(rs.next()) {
+				Usuario u1 = new Usuario();
+				u1.setId(rs.getInt("id"));
+				u1.setNome(rs.getString("nome"));
+				u1.setMatricula(rs.getString("matricula"));
+				u1.setData_cadastro(rs.getDate("data_cadastro"));
+
+				lista.add(u1);
+			}
+
+			stmt.execute();
+			rs.close();
+			stmt.close();
+			con.close();
+		} catch (SQLException e) {
+			throw new RuntimeException("Erro no list " + e);
+		}
+
+		return lista;
+	}
+
+	public void remove (Usuario usuario) {
+		String sql = "DELETE FROM usuarios WHERE id = ?";
+		try {
+			stmt=con.prepareStatement(sql);
+			stmt.setInt(1, usuario.getId());
+			stmt.execute();
+
+			stmt.close();
+			con.close();
+		} catch (SQLException e) {
+			throw new RuntimeException("Id incorreto " + e);
+		}
+	}
+
+	public boolean existeUsuario(Usuario usuario) {
+
+		if (usuario == null) {
+			throw new IllegalArgumentException("Usuario não deve ser nulo");
+		}
+
+		try {
+			stmt = con.prepareStatement("select * from usuarios where matricula = ? and senha = ?");
+			stmt.setString(1, usuario.getMatricula());
+			stmt.setString(2, usuario.getSenha());
+			ResultSet rs = stmt.executeQuery();
+
+			boolean encontrado = rs.next();
+			rs.close();
+			stmt.close();
+
+			return encontrado;
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public Usuario buscaId (int id) {
+
+		try {
+			stmt = con.prepareStatement("SELECT * FROM usuarios WHERE id = ?");
+			stmt.setInt(1, id);
+			ResultSet rs = stmt.executeQuery();
+
+			if(rs.next()) {
+				return populaTarefa (rs);
+			}			
+			rs.close();
+			stmt.close();
+
+			return null;
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private Usuario populaTarefa(ResultSet rs) throws SQLException {
+		Usuario user = new Usuario();
+
+		// popula o objeto tarefa
+		user.setId(rs.getInt("id"));
+		user.setNome(rs.getString("nome"));
+		user.setMatricula(rs.getString("matricula"));
+		user.setSenha(rs.getString("senha"));
+
+		return user;
+	}
+
+	public void alteraUser (Usuario usuario) {
+		String sql = "UPDATE usuarios SET nome = ?, matricula=?, senha = ? where id = ?";
+		try {
+			stmt=con.prepareStatement(sql);
+			stmt.setString(1, usuario.getNome());
+			stmt.setString(2, usuario.getMatricula());
+			stmt.setString(3, usuario.getSenha());
+			stmt.setInt(4, usuario.getId());
+
+			stmt.execute();
+			stmt.close();
+			con.close();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+}
+```
 
 # <a name="jpa"></a>JPA Hibernate
 
