@@ -17,6 +17,7 @@ O Java EE nada mais é, do que o Java para Web.
 	* [Scriptlet](#scriptlet)
 	* [Expressions Language](#el)
 	* [JSTL](#jstl)
+	* [CRUD - SERVLET](#crudservlet)
 4. [JDBC](#jdbc)
 	* [Testando Conexão](#testejdbc)
 	* [DAO](#dao)
@@ -30,10 +31,16 @@ O Java EE nada mais é, do que o Java para Web.
 		 * [Managed](#managed)
 		 * [Detached](#detached)
 		 * [Removed](#removed)
-	 * [JPQL](#jpql)
-6. [CRUD](#crud)
-	 *	[1º modo - JSP + Servlet](#crudservlet)
-7. [Web Services/API](#webservice)
+	 	 * [JPQL](#jpql)
+       * [Consulta com critério](#consultacriterio)
+       * [Consulta com parâmetros](#consultparametro)
+       * [Consulta com JOIN FETCH](#consultajoin)
+     * [API Criteria](#apicriteria)
+     * [OpenEntityManagerInView](#openentity)
+     * [Lock Otimista](#lockotimista)
+     * [Cache](#cache)
+     * [Hibernate Statistics](#hibernatestat)
+6. [Web Services/API](#webservice)
 
 # Maven
 ### O que faz o Maven?
@@ -456,6 +463,285 @@ Quando extraimos a data direto do Java, vem um monte de código esquisito, para f
 	DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	LocalDate dataLocalDate = LocalDate.parse(stringData, formatador);
 
+## <a name="crudservlet"></a>1º modo - JSP + Servlet
+### Anotações Servlet
+Relembrando alguns métodos:
+* `@WebServlet("/novaEmpresa")` -> anotação para invocar a servlet;
+* `req.getParameter("nomeEmpresa")` -> responsável por **receber** parametros (via GET ou POST);
+* `req.setAttribute("atributoParaJSP", empresa.getNome())` -> responsável por **passar** os atributos para a JSP ter acesso;
+* `req.getRequestDispatcher("pagina.jsp")` -> após processar o codigo irá direcionar para a página;
+	* Recebe um tipo `RequestDispatcher rd`;
+* `rd.forward(req, res)` -> último método, para encaminhar ao servidor toda requisição e resposta;
+* `res.sendRedirect("outraServlet")` -> substitui o Dispatcher
+
+### Cadastrando
+Para realizar o **cadastro de uma empresa**, precisamos:
+1. Modelo: Empresa e Banco (simulará um banco de dados);
+2. Formulário JSP (formEmpresa.jsp);
+3.  Servlet (empresaServlet);
+4. Formulário Retorno do cadastro (empresaCadastrada);
+
+Empresa e Banco
+```java
+public class Banco {
+
+	private static List<Empresa> empresas = new ArrayList<Empresa>();
+	private static int chaveIdSequencial = 1;
+	
+	public List<Empresa> getEmpresas(){
+		return Banco.empresas;
+	}
+
+	public void adiciona(Empresa e) {
+		e.setId(Banco.chaveIdSequencial++);
+		Banco.empresas.add(e);
+	}
+}
+
+public class Empresa {
+
+	//iremos utilizar métodos da classe wrapper para fazer parse de String
+	private Integer id;
+	private String nome;
+	private LocalDateTime dataAbertura = LocalDateTime.now();
+	private LocalDateTime dataCadastro = LocalDateTime.now();
+	
+	//getters and setters
+}
+```
+formNovaEmpresa.jsp
+```html
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<c:url value="/novaEmpresa" var="nova"/>
+
+<html>
+	<body>
+		<form action="${nova }" method="POST">
+			Nome Empresa: <input type="text" name="nomeEmpresa">
+			Nome Abertura: <input type="text" name="dataAbertura">
+			<input type="submit" value="Salvar">
+		</form>
+	</body>
+</html>
+```
+empresaServlet
+```java
+@WebServlet("/novaEmpresa")
+public class cadastraEmpresaServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		Empresa empresa = new Empresa();
+		
+		//Recebendo parâmetro da URI e atribuindo ao nome da Emrpesa
+		String nomeEmpresa= req.getParameter("nomeEmpresa");
+		empresa.setNome(nomeEmpresa);
+
+		//Inserindo data de abertura
+		String parametroDataAbertura = req.getParameter("dataAbertura");
+		DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		LocalDate dataAbertura = LocalDate.parse(parametroDataAbertura, formatador);
+		empresa.setDataAbertura(dataAbertura);
+
+		//Inserindo data de cadastro do sistema
+		LocalDateTime hoje = LocalDateTime.now();
+		empresa.setDataCadastro(hoje);
+
+		//Inserindo no banco de dados	
+		Banco banco = new Banco();
+		banco.adiciona(empresa);
+		
+		//irá mandar requisição para servlet Lista
+		RequestDispatcher rd = req.getRequestDispatcher("/listaEmpresa");
+		req.setAttribute("empresa", empresa.getNome());
+		rd.forward(req, res);
+	}
+}
+```
+#### Redirect - evitando Refresh 
+Por enquanto se o usuário apertar F5 e fizer um refresh, a Servlet irá cadastrar novamente os usuários, pois ao realizar o refresh, estamos requisitando que a servlet `/novaEmpresa` seja chamada novamente.
+* Para evitar este tipo de problema, precisamos alterar a servlet `/novaEmpresa`, onde inves de enviar um **despachador**, iremos **redirecionar** ao navegador!
+	```java
+	req.setAttribute("empresa", empresa.getNome());
+	
+	//sem utilizar /
+	res.sendRedirect("listaEmpresasServlet");
+			
+	//	RequestDispatcher rd = req.getRequestDispatcher("/listaEmpresasServlet");
+	//	req.setAttribute("empresa", empresa.getNome());
+	//	rd.forward(req, res);
+	```
+	
+### Listando
+Para LISTAR as empresas cadastradas, precisamos:
+* Passar a lista de empresas com o atributo via método `setAttribute`
+* Formulário JSP (listaEmpresa.jsp);
+
+listaEmpresaServlet
+```java
+@WebServlet("/listaEmpresasServlet")
+public class ListaEmpresasServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		Banco banco = new Banco();
+		
+		List<Empresa> empresas = banco.getEmpresas();
+		req.setAttribute("empresas", empresas);
+		
+		RequestDispatcher rd = req.getRequestDispatcher("listaEmpresa.jsp");
+		rd.forward(req, res);
+	}
+}
+```
+listaEmpresa.jsp
+```html
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<html>
+	<body>
+		<h2>Lista de empresas: </h2>
+			<table border="1">
+		<tr>
+			<th>Id</th>
+			<th>Nome</th>
+			<th>Data Abertura</th>
+			<th>Data Cadastro</th>
+			<th colspan="2">Ações</th>
+		</tr>
+			<c:forEach items="${empresas}" var="empresa">
+				<tr>
+					<td>${empresa.id}</td>
+					<td>${empresa.nome}</td>
+
+					<fmt:parseDate value="${empresa.dataAbertura}" pattern="yyyy-MM-dd"	var="parsedDateAbertura" />
+					<td><fmt:formatDate value="${parsedDateAbertura}" pattern="dd/MM/yyyy" /></td>
+					
+					<fmt:parseDate value="${empresa.dataCadastro}" pattern="yyyy-MM-dd"	var="parsedDateCadastro" />
+					<td><fmt:formatDate value="${parsedDateCadastro}" pattern="dd/MM/yyyy" /></td>
+					
+					<td>
+						<a href="/gerenciador/removeEmpresa?id=${empresa.id}">Remover</a>
+					</td>
+					<td>
+						<a href="/gerenciador/alteraEmpresa?id=${empresa.id}">Alterar</a>
+					</td>
+				</tr>
+			</c:forEach>
+	</table>
+	</body>
+</html>
+```
+
+### Removendo
+
+```java
+public class Banco {
+	public void remove(Integer id) {
+			Banco.empresas.removeIf(empresa -> empresa.getId()==id);
+		}
+}
+
+
+@WebServlet("/removeEmpresaServlet")
+public class RemoveEmpresaServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+	protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		String parameter = req.getParameter("id");
+		Integer id = Integer.valueOf(parameter);
+		
+		Banco banco = new Banco();
+		banco.remove(id);
+		
+		res.sendRedirect("listaEmpresasServlet");
+	}
+
+}
+```
+### Atualizar/Editar
+Para atualizar/editar, será **necessário** utilizar **duas Servlets**:
+* para chamar o `mostraEmpresaServlet` 
+* para atualizar de fato a Empresa -> `atualizarEmpresaServlet`.
+	* Necessário, assim como para deletar, passar o id
+
+```html
+//listForm
+<td>
+	<a href="/gerenciador/mostraEmpresaServlet?id=${empresa.id}">Alterar</a>
+</td>
+
+
+//formAtualiza
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+
+<c:url value="/atualizaEmpresa" var="nova"/>
+
+<html>
+	<body>
+		<form action="${nova}" method="POST">
+				<input type="hidden" name="id" value="${empresa.id}">
+				Nome Empresa: <input type="text" name="nome" value="${empresa.nome}">
+				
+				<fmt:parseDate value="${empresa.dataAbertura}" pattern="yyyy-MM-dd"	var="parsedDateAbertura" />
+				Data Abertura: <input type="text" name="dataAbertura" value="<fmt:formatDate value="${parsedDateAbertura}" pattern="dd/MM/yyyy" />">
+				<input type="submit" value="Salvar">
+		</form>
+	</body>
+</html>
+```
+```java
+//mostraEmpresaServlet
+@WebServlet("/mostraEmpresaServlet")
+public class MostraEmpresaServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		String parameter = req.getParameter("id");
+		Integer id = Integer.valueOf(parameter);
+		
+		Banco banco = new Banco();
+		Empresa empresa = banco.findById(id);
+		
+		req.setAttribute("empresa", empresa);
+		
+		RequestDispatcher rd = req.getRequestDispatcher("/formAtualizaEmpresa.jsp");
+		rd.forward(req, res);
+	}
+
+}
+
+
+//AtualizaServlet
+@WebServlet("/atualizaEmpresa")
+public class AtualizaEmpresa extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		//Coletando o ID
+		String parameter = req.getParameter("id");
+		Integer id = Integer.valueOf(parameter);
+		
+		//Atualizando o nome
+		String nome = req.getParameter("nome");
+		
+		//Atualizando data de abertura
+		String parametroDataAbertura = req.getParameter("dataAbertura");
+		DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		LocalDate dataAbertura = LocalDate.parse(parametroDataAbertura, formatador);
+					
+		Banco banco = new Banco();
+		Empresa empresa = banco.findById(id);
+		empresa.setNome(nome);
+		empresa.setDataAbertura(dataAbertura);
+		
+		res.sendRedirect("listaEmpresasServlet");
+	}
+
+}
+```
+
+
 # <a name="jdbc"></a>JDBC
 O JDBC (**_Java Database Connectivity_**) , veio com o intuito de criar um padrão para os Softwares de Banco de Dados (MySQL, SQL Server e etc), onde este padrão, permitiria que o Desenvolvedor trocasse de DB sem afetar o código.<br>
 O JDBC, utiliza uma **_Fábrica de Conexões_**, que necessita de alguns atributos:
@@ -749,7 +1035,8 @@ Para Enum:
 P/ RELACIONAMENTOS:
 * `@ManyToOne` -> List -> Muitas Movimentações para Uma Conta -> Será criada uma  coluna com **_chave estrangeira_**
 * `@OneToMany`
-* `@ManyToMany` -> Muitas Movimentações para Muitas Categorias -> _Uma Movimentação pode estar em Muitas Categorias e Uma Categoria pode ter Muitas Movimentações_ -> Quando criada, será criada uma **_tabela relacionamento_**
+* `@ManyToMany` -> Muitas Movimentações para Muitas Categorias -> _Uma Movimentação pode estar em Muitas Categorias e Uma Categoria pode ter Muitas Movimentações_ -> Quando criada, será criada uma **_tabela relacionamento_**;
+	* `@JoinTable(name="NomeDaTabela")`
 * `@OneToOne` -> Um Cliente possui Uma Conta -> _Uma Conta só tem Um Cliente_
 	* `@JoinColumn(unique=true)` -> faz com que os id pertençam somente ao id da outra tabela
 
@@ -925,284 +1212,337 @@ public static void main(String[] args) {
 }
 ```
 
-# <a name="crud"></a>CRUD
-## <a name="crudservlet"></a>1º modo - JSP + Servlet
-### Anotações Servlet
-Relembrando alguns métodos:
-* `@WebServlet("/novaEmpresa")` -> anotação para invocar a servlet;
-* `req.getParameter("nomeEmpresa")` -> responsável por **receber** parametros (via GET ou POST);
-* `req.setAttribute("atributoParaJSP", empresa.getNome())` -> responsável por **passar** os atributos para a JSP ter acesso;
-* `req.getRequestDispatcher("pagina.jsp")` -> após processar o codigo irá direcionar para a página;
-	* Recebe um tipo `RequestDispatcher rd`;
-* `rd.forward(req, res)` -> último método, para encaminhar ao servidor toda requisição e resposta;
-* `res.sendRedirect("outraServlet")` -> substitui o Dispatcher
+### <a name="consultajoin"></a>Consulta com JOIN FETCH
+Quando desejamos utilizar como atributo duas tabelas distintas, utilizamos o `join fetch` para que a tabela que realizamos o `fetch` carregue automaticamente os valores!
+```sql
+public List<Produto> getProdutos(Integer contaId, Integer usuarioId) {
 
-### Cadastrando
-Para realizar o **cadastro de uma empresa**, precisamos:
-1. Modelo: Empresa e Banco (simulará um banco de dados);
-2. Formulário JSP (formEmpresa.jsp);
-3.  Servlet (empresaServlet);
-4. Formulário Retorno do cadastro (empresaCadastrada);
-
-Empresa e Banco
-```java
-public class Banco {
-
-	private static List<Empresa> empresas = new ArrayList<Empresa>();
-	private static int chaveIdSequencial = 1;
+	String jpql = "SELECT c FROM Conta c JOIN FETCH c.Usuario u WHERE c.id = :pContaId AND u.id = :pUsuarioId";
+	TypedQuery<Conta> query = em.createQuery(jpql, Conta.class);
 	
-	public List<Empresa> getEmpresas(){
-		return Banco.empresas;
-	}
-
-	public void adiciona(Empresa e) {
-		e.setId(Banco.chaveIdSequencial++);
-		Banco.empresas.add(e);
-	}
+	//parâmetro
+	query.setParameter("pContaId ", contaId);
+	query.setParameter("pUsuarioId", usuarioId);
+	
+	List<Conta> contas = query.getResultList();
+	contas.forEach(c -> System.out.println(c.getTitular()));
 }
+```
+**PORÉEEMMMM...** Caso não seja informado um dos `ids` teremos um problema na query, sendo assim, teriamos que realizar **vários ifs** para verificar se foi passado os dois parâmetros, ou um parâmetro, o que seria muito verboso.<br>
+Para resolver o problema de termos muitos parâmetros para realizar consulta, foi criada a **_API Criteria_**!
 
-public class Empresa {
+## <a name="apicriteria"></a> API Criteria
+Conforme explicado a cima, a `CriteriaQuery` é muito utilizada quando temos **+1 parâmetro** a ser computador na consulta SQL.
+1. Para criar uma query do tipo `CriteriaQuery`, iremos utilizar o `EntityManager` passando o método `getCriteriaBuilder()` que irá retornar um tipo `CriteriaBuilder`
+	*  _Este Builder, possui diversos outros métodos adicionais do SQL, como_ `equals(), like();` 
+2. O tipo `CriteriaQuery<?>` precisa receber a Classe que será feito o `FROM` e para instanciar esta Classe, iremos utilizar o `.class` no `createQuery`;
+3. Com o `CriteriaQuery` criado, podemos utilizar os métodos: `from() | get() | join()`;
+4. A partir do método `from()`, recebemos a Interface `Root<?>`, onde poderemos traçar o caminho dos atributos!
+	* Para traçar o caminho, utilizamos o método `get("nomeColuna")`, que irá retornar um `path` e como estamos passando uma String, devemos colocar dentro do `<>`;
+5. Ao final, devemos adicionar a cláusula `WHERE`, que receberá o um Array de `Predicate`;
 
-	//iremos utilizar métodos da classe wrapper para fazer parse de String
+### Consulta simples com criteria
+```java
+public List<Produto> getProdutos(String nome, Integer categoriaId, Integer lojaId) {
+	CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+	CriteriaQuery<Produto> query = criteriaBuilder.createQuery(Produto.class);
+	
+	Root<Produto> from = query.from(Produto.class);
+	Path<String> nomePath = from.<String>get("nome");
+	Path<Integer> categoriaPath = from.join("categorias").<Integer>get("id");
+	Path<Integer> lojaPath = from.<Loja>get("loja").<Integer>get("id");
+	
+	List<Predicate> predicates = new ArrayList<Predicate>();
+	
+	if(!nome.isEmpty()) {
+		Predicate like = criteriaBuilder.like(nomePath, nome);
+		predicates.add(like);
+	}
+	if(!nome.isEmpty()) {
+		Predicate categoriaEqual = criteriaBuilder.equal(categoriaPath, categoriaId);
+		predicates.add(categoriaEqual);
+	}
+	if(!nome.isEmpty()) {
+		Predicate lojaEqual = criteriaBuilder.equal(lojaPath, lojaId);
+		predicates.add(lojaEqual);
+	}
+	
+	query.where((Predicate[])predicates.toArray(new Predicate[0]));
+	
+	TypedQuery<Produto> typedQuery = em.createQuery(query);
+	return typedQuery.getResultList();
+}
+```
+## <a name="openentity"></a> OpenEntityManagerInView
+Por padrão, o Spring ao abrir um `EntityManager` ele fechará após a execução.
+* Exemplo: quando utilizamos o método `find()` o Spring, irá fazer a consulta no DB e então irá fechar o `EntityManager` automaticamente.
+
+O problema em fechar o `EntityManager` automáticamente, é quando temos na JSP, uma consulta que irá necessitar que o `EntityManager` continue aberto.
+* Exemplo: Temos uma página que possui a opção de Filmes, onde cada Filme, possui uma categoria (Ação, Ficção e etc). Ao editarmos o Filme, o `EntityManager` irá fazer um `findById()` e após ter encontrado irá encerrar-lo. Mas e as categorias???? Irá gerar um erro, pois não foram carregadas.
+
+Para corrigir este tipo de problema, o Spring possui o `OpenEntityManagerInView` que pode ser configurado dentro da classe `Configurador extends WebMvcConfigurerAdapter`, que ser feito através de um `InterceptorRegistry`
+```java
+@Bean
+	public OpenEntityManagerInViewInterceptor getOpenEntityManagerInViewInterceptor() {
+		return new OpenEntityManagerInViewInterceptor();
+	}
+	
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addWebRequestInterceptor(getOpenEntityManagerInViewInterceptor());
+	}
+```
+
+## <a name="lockotimista"></a> Lock Otimista
+Imaginemos um cenário, onde dois analistas estão editando um livro (alterando o título, preço e etc). O que vai acontecer quando um dos analistas alterar o preço e salvar, enquanto o outro estiver alterando o título? **PROBLEMA!** pois a aplicação irá entender o último registro feito, ou seja, se o último foi feito a alteração do título (com o preço antigo), será gravada todas informações do formulário do analista que estava trocando o preço!
+* Para resolver este problema, o Spring possui uma anotação chamada `@Version`, onde basta que seja adicionada a Classe, que ele irá gerenciar e evitar este tipo de erro:
+
+```java
+public class Produto {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	private String nome;
-	private LocalDateTime dataAbertura = LocalDateTime.now();
-	private LocalDateTime dataCadastro = LocalDateTime.now();
-	
-	//getters and setters
+
+	@Version
+	private int versao;
+
+	//Getters and Setters
 }
 ```
-formNovaEmpresa.jsp
-```html
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<c:url value="/novaEmpresa" var="nova"/>
 
-<html>
-	<body>
-		<form action="${nova }" method="POST">
-			Nome Empresa: <input type="text" name="nomeEmpresa">
-			Nome Abertura: <input type="text" name="dataAbertura">
-			<input type="submit" value="Salvar">
-		</form>
-	</body>
-</html>
+## <a name="cache"></a> Cache
+Para evitar diversos `SELECT`na aplicação, podemos utilizar o Cache, de forma que a JPA irá primeiro verificar no Cache se ja foi feito a consulta, caso contrário, será feito um único `SELECT` .
+* O cache serve para melhorar a perfomance da aplicação!
+
+Para configurar o Cache, iremos precisar inserir novas propriedades a **_configuração do JPA_**:
+Via xml:
+```xml
+<property name="hibernate.cache.use_second_level_cache" value="true" />
+<property name="hibernate.cache.use_query_cache" value="true" />
+<property name="hibernate.cache.use_second_level_cache" value="org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory" />
 ```
-empresaServlet
+Via Java: 
+`.setProperty("hibernate.cache.use_second_level_cache", "true");`
+`
+.setProperty("hibernate.cache.region.factory_class","org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory");`
+`.setProperty("hibernate.cache.use_query_cache", "true");`
+
 ```java
-@WebServlet("/novaEmpresa")
-public class cadastraEmpresaServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+@Bean
+	public LocalContainerEntityManagerFactoryBean getEntityManagerFactory(DataSource dataSource) {
+		LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
 
-	protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-		Empresa empresa = new Empresa();
-		
-		//Recebendo parâmetro da URI e atribuindo ao nome da Emrpesa
-		String nomeEmpresa= req.getParameter("nomeEmpresa");
-		empresa.setNome(nomeEmpresa);
+		entityManagerFactory.setPackagesToScan("br.com.igor");
+		entityManagerFactory.setDataSource(dataSource);
 
-		//Inserindo data de abertura
-		String parametroDataAbertura = req.getParameter("dataAbertura");
-		DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		LocalDate dataAbertura = LocalDate.parse(parametroDataAbertura, formatador);
-		empresa.setDataAbertura(dataAbertura);
+		entityManagerFactory
+				.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 
-		//Inserindo data de cadastro do sistema
-		LocalDateTime hoje = LocalDateTime.now();
-		empresa.setDataCadastro(hoje);
+		Properties props = new Properties();
 
-		//Inserindo no banco de dados	
-		Banco banco = new Banco();
-		banco.adiciona(empresa);
-		
-		//irá mandar requisição para servlet Lista
-		RequestDispatcher rd = req.getRequestDispatcher("/listaEmpresa");
-		req.setAttribute("empresa", empresa.getNome());
-		rd.forward(req, res);
+		props.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
+		props.setProperty("hibernate.show_sql", "true");
+		props.setProperty("hibernate.hbm2ddl.auto", "create-drop");
+
+		//Cache
+		props.setProperty("hibernate.cache.use_second_level_cache", "true");
+		props.setProperty("hibernate.cache.region.factory_class", "org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory");
+		props.setProperty("hibernate.cache.use_query_cache", "true");
+
+
+		entityManagerFactory.setJpaProperties(props);
+		return entityManagerFactory;
 	}
+
+
+```
+Desta forma, já está habilitado o Cache ao JPA, agora iremos colocar a anotação `@Cache(usage = ....)` cada as Classes que queremos que seja armazenado no cache as consultas:
+```java
+@Entity
+@Cache(usage=CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+public class Produto {
+    // Conteúdo da classe
 }
 ```
-#### Redirect - evitando Refresh 
-Por enquanto se o usuário apertar F5 e fizer um refresh, a Servlet irá cadastrar novamente os usuários, pois ao realizar o refresh, estamos requisitando que a servlet `/novaEmpresa` seja chamada novamente.
-* Para evitar este tipo de problema, precisamos alterar a servlet `/novaEmpresa`, onde inves de enviar um **despachador**, iremos **redirecionar** ao navegador!
+### Cache nas Querys
+Indo na classe DAO/Repository, iremos adicionar na `TypedQuery` o código abaixo:
+```java
+TypedQuery<Produto> typedQuery = em.createQuery(query.where(conjuncao));
+typedQuery.setHint("org.hibernate.cacheable", "true");
+
+return typedQuery.getResultList();
+```
+
+## <a name="hibernatestat"></a> Hibernate Statistics
+O Hibernate Statistics nos permite acompanhar a quantidade de consultas (**_miss_**) que foram feitas e também a quantidade de **_hits_** (cache). Basta que:
+* Seja incluído dentro da classe `Configurador`:
 	```java
-	req.setAttribute("empresa", empresa.getNome());
-	
-	//sem utilizar /
-	res.sendRedirect("listaEmpresasServlet");
-			
-	//	RequestDispatcher rd = req.getRequestDispatcher("/listaEmpresasServlet");
-	//	req.setAttribute("empresa", empresa.getNome());
-	//	rd.forward(req, res);
+	@Bean
+	public Statistics statistics(EntityManagerFactory emf) { 
+	    return emf.unwrap(SessionFactory.class).getStatistics();
+	}
 	```
+* Seja adicionado as propriedades da JPA
+	```java
+	Bean
+	public LocalContainerEntityManagerFactoryBean getEntityManagerFactory(DataSource dataSource) {
+	    ...    
+	    props.setProperty("hibernate.generate_statistics", "true");
+	    ...
+	}
+	```
+* Adicionar a JSP:
+	```html
+	<tr>
+	    <td>Cache</td>
+	    <!-- Hit -->
+	    <td></td>
+	    <!-- Miss -->
+	    <td></td>
+	    <! -- Conections -->
+	    <td></td>
+	</tr>
+	<tr>
+	    <td>Cache</td>
+	    <!-- Hit -->
+	    <td>${statistics.queryCacheHitCount}</td>
+	    <!-- Miss -->
+	    <td>${statistics.queryCacheMissCount}</td>
+	</tr>
+	```
+
+
+
+
+## <a name="crudjpa"></a> CRUD - JPA
+Para realizar a inserção de dados no DB, utilizamos a classe `EntityManager` (que recebe a fabrica de conexão). Onde basicamente temos os métodos abaixo:
+- `find` --> pode-se utilizar como WHERE [Tarefa localizaPorId = manager.find(Tarefa.class, 1L)]
+ - `remove` --> utilizado como DELETE
+ - `merge` --> utilizado como UPDATE
+ - `persist` --> utilizado como INSERT [manager.persist(tarefa);]
+
+**PORÉEMMM**... quando queremos realizar operações de **inserção, remoção ou atualização** é necessário utilizar através de uma **transação**, com `.getTransaction().begin();` e  `em.getTransaction().commit();`
+* _A transação é um mecanismo para manter a consistência das alterações de estado no banco, visto que todas as operações precisam ser executadas com sucesso, para que a transação seja confirmada._
+
+### Inserindo
+```java
+public static void main(String[] args) {
+	EntityManagerFactory emf = Persistence.createEntityManagerFactory("conta");
+	EntityManager em = emf.createEntityManager();
 	
-### Listando
-Para LISTAR as empresas cadastradas, precisamos:
-* Passar a lista de empresas com o atributo via método `setAttribute`
-* Formulário JSP (listaEmpresa.jsp);
-
-listaEmpresaServlet
+	Conta conta = new Conta();
+	conta.setAgencia(123);
+	conta.setNumero(123456);
+	conta.setTitular("igor");
+	
+	em.getTransaction().begin();
+	em.persist(conta);
+	em.getTransaction().commit();
+	
+	em.close();
+}
+```
+### Procurando e Atualizando
+Para localizar através do `id` a JPA possui o método `find`, onde não é necessário criar uma `query`:
 ```java
-@WebServlet("/listaEmpresasServlet")
-public class ListaEmpresasServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-
-	protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-		Banco banco = new Banco();
-		
-		List<Empresa> empresas = banco.getEmpresas();
-		req.setAttribute("empresas", empresas);
-		
-		RequestDispatcher rd = req.getRequestDispatcher("listaEmpresa.jsp");
-		rd.forward(req, res);
-	}
+public static void main(String[] args) {
+	EntityManagerFactory emf = Persistence.createEntityManagerFactory("conta");
+	EntityManager em = emf.createEntityManager();
+	
+	Conta conta = em.find(Conta.class, 1L);
+	conta.setSaldo(BigDecimal.valueOf(350.00));
+	
+	em.getTransaction().begin();
+	em.merge(conta);
+	em.getTransaction().commit();
+	
+	em.close();
 }
 ```
-listaEmpresa.jsp
-```html
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<html>
-	<body>
-		<h2>Lista de empresas: </h2>
-			<table border="1">
-		<tr>
-			<th>Id</th>
-			<th>Nome</th>
-			<th>Data Abertura</th>
-			<th>Data Cadastro</th>
-			<th colspan="2">Ações</th>
-		</tr>
-			<c:forEach items="${empresas}" var="empresa">
-				<tr>
-					<td>${empresa.id}</td>
-					<td>${empresa.nome}</td>
-
-					<fmt:parseDate value="${empresa.dataAbertura}" pattern="yyyy-MM-dd"	var="parsedDateAbertura" />
-					<td><fmt:formatDate value="${parsedDateAbertura}" pattern="dd/MM/yyyy" /></td>
-					
-					<fmt:parseDate value="${empresa.dataCadastro}" pattern="yyyy-MM-dd"	var="parsedDateCadastro" />
-					<td><fmt:formatDate value="${parsedDateCadastro}" pattern="dd/MM/yyyy" /></td>
-					
-					<td>
-						<a href="/gerenciador/removeEmpresa?id=${empresa.id}">Remover</a>
-					</td>
-					<td>
-						<a href="/gerenciador/alteraEmpresa?id=${empresa.id}">Alterar</a>
-					</td>
-				</tr>
-			</c:forEach>
-	</table>
-	</body>
-</html>
-```
-
-### Removendo
-
+### Procurando e Removendo
 ```java
-public class Banco {
-	public void remove(Integer id) {
-			Banco.empresas.removeIf(empresa -> empresa.getId()==id);
-		}
-}
-
-
-@WebServlet("/removeEmpresaServlet")
-public class RemoveEmpresaServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-       
-	protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-		String parameter = req.getParameter("id");
-		Integer id = Integer.valueOf(parameter);
-		
-		Banco banco = new Banco();
-		banco.remove(id);
-		
-		res.sendRedirect("listaEmpresasServlet");
-	}
-
+public static void main(String[] args) {
+	EntityManagerFactory emf = Persistence.createEntityManagerFactory("conta");
+	EntityManager em = emf.createEntityManager();
+	
+	Conta conta = em.find(Conta.class, 1L);
+	
+	em.getTransaction().begin();
+	em.remove(conta);
+	em.getTransaction().commit();
+	
+	em.close();
 }
 ```
-### Atualizar/Editar
-Para atualizar/editar, será **necessário** utilizar **duas Servlets**:
-* para chamar o `mostraEmpresaServlet` 
-* para atualizar de fato a Empresa -> `atualizarEmpresaServlet`.
-	* Necessário, assim como para deletar, passar o id
+## <a name="estadosjpa"></a>Estados da JPA
+### <a name="managed"></a>Managed
+Quando o objeto está no estado **_managed_**, significa que poderá sofrer alterações pela JPA, ou seja, está em **sincronização automática** - qualquer tipo de alteração que o objeto tiver, a JPA irá fazer um **update** no banco. <br>
+Isto ocorre quando passamos o objeto, através do `EntityManager`, ou seja, enquanto não houver um `close()`, a JPA estará verificando o objeto.
 
-```html
-//listForm
-<td>
-	<a href="/gerenciador/mostraEmpresaServlet?id=${empresa.id}">Alterar</a>
-</td>
+### <a name="detached"></a>Detached
+Quando o objeto esteve no estado managed e houve um `close` do `EntityManager`, o objeto passa a ser um objeto **_detached_**, ou seja, a JPA não está mais sincronizando.
 
+### <a name="removed"></a>Removed
+O objeto passa a estar no estado **_removed_** quando utilizamos o método `removed(obj)`;
 
-//formAtualiza
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+## <a name="jpql"></a>JPQL
+O JPQL (**_Java Persistence Query Language_**) é uma linguagem de consultas, enquanto o SQL (**_Structured Query Language_**) é voltado ao relacionamento.<br>
 
-<c:url value="/atualizaEmpresa" var="nova"/>
-
-<html>
-	<body>
-		<form action="${nova}" method="POST">
-				<input type="hidden" name="id" value="${empresa.id}">
-				Nome Empresa: <input type="text" name="nome" value="${empresa.nome}">
-				
-				<fmt:parseDate value="${empresa.dataAbertura}" pattern="yyyy-MM-dd"	var="parsedDateAbertura" />
-				Data Abertura: <input type="text" name="dataAbertura" value="<fmt:formatDate value="${parsedDateAbertura}" pattern="dd/MM/yyyy" />">
-				<input type="submit" value="Salvar">
-		</form>
-	</body>
-</html>
-```
+Utilizando o objeto Movimentação como exemplo:
+* Exemplo **SQL**:
+	```sql
+	select * from movimentacao;
+	```
+* Exemplo **JPQL**:
+	```sql
+	select mfrom Movimentacao m; //com Objeto
+	```
+Para que  o JPA entenda a consulta, utilizamos a classe `TypedQuery<?>` que recebe o Objeto da pesquisa:
 ```java
-//mostraEmpresaServlet
-@WebServlet("/mostraEmpresaServlet")
-public class MostraEmpresaServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-
-	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-		String parameter = req.getParameter("id");
-		Integer id = Integer.valueOf(parameter);
-		
-		Banco banco = new Banco();
-		Empresa empresa = banco.findById(id);
-		
-		req.setAttribute("empresa", empresa);
-		
-		RequestDispatcher rd = req.getRequestDispatcher("/formAtualizaEmpresa.jsp");
-		rd.forward(req, res);
-	}
-
+public static void main(String[] args) {
+	EntityManagerFactory emf = Persistence.createEntityManagerFactory("conta");
+	EntityManager em = emf.createEntityManager();
+	
+	String jpql = "select c from Conta c";
+	
+	TypedQuery<Conta> query = em.createQuery(jpql, Conta.class);
+	List<Conta> contas = query.getResultList();
+	
+	contas.forEach(c -> System.out.println(c.getTitular()));
 }
 
+```
+### <a name="consultacriterio"></a>Consulta com critério
 
-//AtualizaServlet
-@WebServlet("/atualizaEmpresa")
-public class AtualizaEmpresa extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+* Exemplo **SQL**:	
+	```sql
+	select * from movimentacao where conta_id = 2;
+	```
 
-	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-		//Coletando o ID
-		String parameter = req.getParameter("id");
-		Integer id = Integer.valueOf(parameter);
-		
-		//Atualizando o nome
-		String nome = req.getParameter("nome");
-		
-		//Atualizando data de abertura
-		String parametroDataAbertura = req.getParameter("dataAbertura");
-		DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		LocalDate dataAbertura = LocalDate.parse(parametroDataAbertura, formatador);
-					
-		Banco banco = new Banco();
-		Empresa empresa = banco.findById(id);
-		empresa.setNome(nome);
-		empresa.setDataAbertura(dataAbertura);
-		
-		res.sendRedirect("listaEmpresasServlet");
-	}
+* Exemplo **JPQL**:
+	```sql
+	select mfrom Movimentacao m where m.conta.id = 2;
+	```
 
+### <a name="consultparametro"></a>Consulta com parâmetros
+Quando é utilizado parâmetros com JPA, invez de utilizarmos o `(?, ?, ?)`, utilizamos um **_named parameter_** que se torna mais fácil de trabalhar.
+```sql
+public static void main(String[] args) {
+	
+	Conta conta = new Conta();
+	conta.setId(2L);
+	
+	String jpql = "SELECT c FROM Conta c WHERE c.id = :pId";
+	TypedQuery<Conta> query = em.createQuery(jpql, Conta.class);
+	
+	//parâmetro
+	query.setParameter("pId", conta.getId());
+	
+	List<Conta> contas = query.getResultList();
+	contas.forEach(c -> System.out.println(c.getTitular()));
 }
 ```
+
 
 # <a name="webservice"></a>Web Services/API
 Em uma aplicação comum, a conversa entre o **_Request e Response_** é feito para o **navegador**, mas e se queremos utilizar, por exemplo, um celular? Televisão? Jogo? <br>
