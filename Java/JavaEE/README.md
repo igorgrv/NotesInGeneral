@@ -1,6 +1,6 @@
-
 # O Java EE
 O Java EE nada mais é, do que o Java para Web.
+
 # Sumário
 1. [Maven](#maven)
 	* [Criando um projeto Web](#mavenprojeto)
@@ -31,15 +31,15 @@ O Java EE nada mais é, do que o Java para Web.
 		 * [Managed](#managed)
 		 * [Detached](#detached)
 		 * [Removed](#removed)
-  * [JPQL](#jpql)
-     * [Consulta com critério](#consultacriterio)
-     * [Consulta com parâmetros](#consultparametro)
-     * [Consulta com JOIN FETCH](#consultajoin)
-  * [API Criteria](#apicriteria)
-  * [OpenEntityManagerInView](#openentity)
-  * [Lock Otimista](#lockotimista)
-  * [Cache](#cache)
-  * [Hibernate Statistics](#hibernatestat)
+	* [JPQL](#jpql)
+		* [Consulta com critério](#consultacriterio)
+		* [Consulta com parâmetros](#consultparametro)
+		* [Consulta com JOIN FETCH](#consultajoin)
+	* [API Criteria](#apicriteria)
+	* [OpenEntityManagerInView](#openentity)
+	* [Lock Otimista](#lockotimista)
+	* [Cache](#cache)
+	* [Hibernate Statistics](#hibernatestat)
 6. [Web Services/API](#webservice)
 
 # Maven
