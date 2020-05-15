@@ -41,6 +41,13 @@ O Java EE nada mais é, do que o Java para Web.
 	* [Cache](#cache)
 	* [Hibernate Statistics](#hibernatestat)
 6. [Web Services/API](#webservice)
+7. [SPRING MVC](#springmvc)
+	* [Configurando Spring](#configspring)
+		* [Spring Initializer](#springini)
+		* [Tomcat + JSP](#tomcatjsp)
+		* [Jetty + Thymeleaf](#jettythyme)
+		* [application.properties](#application)
+	* [Camadas MVC](#camadasmvc)
 
 # Maven
 ### O que faz o Maven?
@@ -1594,3 +1601,234 @@ public class JsonServlet extends HttpServlet {
 ```json
 [{"id":1,"nome":"Igor","dataCadastro":{"date":{"year":2020,"month":5,"day":9},"time":{"hour":1,"minute":3,"second":37,"nano":79212300}},"dataAbertura":{"year":2020,"month":4,"day":1}}]
 ```
+
+# <a name="springmvc"></a> SPRING MVC
+
+O Spring é um dos maiores frameworks de mercado Java. Possui diversos módulos que facilitam a vida do desenvolvedor!<br>
+## <a name="configspring"></a> Configurando Spring
+Para utilizar o Spring, se faz necessário algumas configurações/dependências _(algumas configurações com o Spring Boot já são preenchidas)_, em alguns arquivos, como:
+* pom.xml;
+* aplication.properties
+
+E para facilitar, o Spring oferece o [**_Spring Initializer_**](https://start.spring.io/) que possibilita a geração de um projeto Maven/Groove com os arquivos padrões já pré configurados;
+
+## <a name="springini"></a>Spring Initializer
+Atraves do initializer, podemos montar o projeto com as dependencias;<br>
+Dependências mais utilizadas:
+
+* **Spring DevTools** -> faz com que as atualizações sejam automaticas;
+	*  **LiveReload plugin** -> faz com que a pagina mesmo se atualize sozinha;
+* **Spring Data JPA** -> Dependencias do JPA, para conexão e gestão do banco de dados;
+* **Spring Web** -> irá atribuit as properidades básicas da WEB;
+* **MySQL Driver** -> driver do banco de dados
+
+## <a name="tomcatjsp"></a>Tomcat + JSP
+Para **utilizar a JSP** é necessário adicionar as dependências abaixo manualmente no **_pom.xml_**:
+```xml
+<dependency>
+	<groupId>org.apache.tomcat.embed</groupId>
+	<artifactId>tomcat-embed-jasper</artifactId>
+	<scope>provided</scope>
+</dependency>
+
+<dependency>
+	<groupId>javax.servlet</groupId>
+	<artifactId>jstl</artifactId>
+</dependency>
+```
+## <a name="jettythyme"></a> Jetty + Thymeleaf
+Para utilizar Jetty, precisamos desativar o Tomcat
+```xml
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-web</artifactId>
+	<exclusions>
+		<exclusion>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+		</exclusion>
+	</exclusions>
+</dependency>
+
+<!-- Jetty Dependency -->
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-jetty</artifactId>
+</dependency>
+
+<!-- Thymeleaf Dependency -->
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-thymeleaf</artifactId>
+</dependency>
+```
+## <a name="application"></a> application.properties
+Este arquivo será responsável por configurar:
+* JPA;
+* VIEWS;
+* HIBERNATE;
+* CACHE;
+* BANCO DE DADOS;
+
+Por padrão, o Spring irá procurar o arquivo dentro da pasta: **_\src\main\resources\application.properties_**
+
+### Configurando JPA - MySQL
+```python
+#DataSource
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.url=jdbc:mysql://localhost/XXXXXXX?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=
+
+#JPA
+spring.jpa.hibernate.ddl-auto = update
+spring.jpa.properties.hibernate.format_sql = true
+spring.jpa.properties.hibernate.show_sql = true
+```
+### Configurando JPA - H2
+```python
+#DataSource
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.url=jdbc:h2:mem:forum
+spring.datasource.username=sa
+spring.datasource.password=
+
+#JPA
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.hibernate.ddl-auto = update
+spring.jpa.properties.hibernate.format_sql = true
+spring.jpa.properties.hibernate.show_sql = true
+
+#H2
+# console.enabled allow us to have a h2 console
+# console.path is how we're going to access the h2 interface
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+```
+* Open the console by: `http://localhost:8080/h2-console`
+
+### Configurando Views p/ JSP
+A pasta **_WEB-INF/views/_** deve estar localizada dentro de **_\src\main\webapp\WEB-INF/views/_**
+```python
+#Spring - Caso seja utilizado JSP
+spring.mvc.view.prefix= /WEB-INF/views/
+spring.mvc.view.suffix= .jsp
+```
+### Trocando porta
+```python
+# Trocando a porta do servidor
+server.port=9000
+```
+### Definindo prefixo projeto
+```python
+#Definindo prefixo projeto
+server.servlet.context-path=/casadocodigo
+```
+
+### Enconding UTF-8
+Dentro da Classe `SeuProjetoApplication.java` (onde executa o servidor), devemos criar um `@bean`que irá implementar um `Filter` (**_servlet.filter_**)
+```java
+@Bean
+public Filter getCharacterEncodingFilter() {
+
+    CharacterEncodingFilter encodingFilter = new CharacterEncodingFilter();
+
+    encodingFilter.setEncoding("UTF-8");
+    encodingFilter.setForceEncoding(true);
+
+    return encodingFilter;
+}
+```
+
+
+## <a name="camadasmvc"></a> Camadas MVC
+
+### Model
+A camada de Modelo/Entidades, é a camada que possui as características dos objetos.
+* Exemplo:
+	```java
+	@Entity
+	public class Produto {
+
+		@Id
+		@GeneratedValue(strategy = GenerationType.IDENTITY)
+		private Long id;
+		private String titulo;
+		private String descricao;
+		private int paginas;
+		
+		/**
+		 * @deprecated hibernateonly
+		 */
+		public Produto() {
+		}
+		
+		//Construtor
+		//Getters and Setters
+		//Hash Equals ToString
+	}
+	```
+Algumas variações de Entidade está quando:
+*  Temos um relacionamento entre Entidades, podendo ser `@ManyToOne - @OneToMany - @ManyToMany - @OneToOne`. _Este tipo de relacionamento irá requerir um ID para cada entidade._
+* Quando não queremos criar um ID para outra Tabela, podemos fazer uma relação das tabelas como uma **Coleção de elementos**, com a anotação `@ElementCollection`, indicando a JPA que será carregado todos elementos daquela Tabela.
+	* Imagine que vendemos Livros e os livros possuem, 3 tipos de preços: ebook, físico e um combo (os dois juntos). Poderiamos criar uma Entidade `Preco`, porém irá requerir um `id` o que não faz sentido, pois so queremos trabalhar com os valores, sendo assim, devemos adicionar a Classe `Preco` como `@Embeddable` e adiciona-la a um `List<Preco>` na classe `Produto`:
+		```java
+		@Entity
+		public class Produto {
+
+			@ElementCollection
+			private List<Preco> precos;
+			
+		}
+
+		@Embeddable
+		public class Preco {
+
+			private BigDecimal valor;
+			private TipoPreco tipo;
+
+		}
+		```
+	* Quando for utilizado dentro de uma view, devemos ter atenção a como instanciar esta Classe `Preco`, pois devemos instanciar através do atributo `precos`:
+		```java
+		//Controller
+		//TipoPreco é um ENUM, por isso podemos chama-lo pelo .values()
+		@GetMapping("/produtos/form")
+		public ModelAndView form() {
+			ModelAndView mv = new ModelAndView("produtos/form");
+			mv.addObject("tipos", TipoPreco.values());
+			return mv;
+		}
+
+		//view
+		//varStatus irá ser utilizado para acrescentar 1 a cada interação
+		<c:forEach items="${tipos}" var="tipo" varStatus="status">
+			<div>
+				<label>${tipo}</label> 
+				<input type="text" name="precos[${status.index}].valor">
+				<input type="hidden" name="precos[${status.index}].tipo" value="${tipo}">
+			</div>
+		</c:forEach>
+		```
+
+
+### Repositorio
+Com o Spring Boot, iremos implementar uma **interface** que irá ser responsável por extender a classe `JpaRepository<Model, Long>`. <br>
+-   Implementando esta interface, nos permite usar muitos metodos pré estabelecidos, como:
+    -   save();
+    -   saveAll();
+    -   findOne();
+    -   findAll();
+    -   count();
+    -   delete();
+    -   existsById();
+-   Se necessário, é possível criar métodos também, como um **"findByNome"**   - método que irá nos permitir encontrar uma lista dado um parâmetro nome por exemplo...:
+	```java
+	public interface ProdutoRepository extends JPARepository<Guest, Long>{
+	   List<Guest> findByName(String name); 
+	}
+	```
+
+### Controller
+A camada de Controle é responsável por ficar verificando as requisições provenientes do navegador e então baseado nos métodos, tomar uma ação.
+* Para se comunicar com um repositorio/serviço, a camada de Controle utiliza a anotação `@Autowired` para fazer a **injeção de dependência**, fazendo com que a Spring gerencie.
