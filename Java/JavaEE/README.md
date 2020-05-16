@@ -48,7 +48,8 @@ O Java EE nada mais é, do que o Java para Web.
 		* [Jetty + Thymeleaf](#jettythyme)
 		* [application.properties](#application)
 	* [Camadas MVC](#camadasmvc)
-
+	* [Validation](#validation)
+	
 # Maven
 ### O que faz o Maven?
 * Build mais simples;
@@ -1832,3 +1833,101 @@ Com o Spring Boot, iremos implementar uma **interface** que irá ser responsável 
 ### Controller
 A camada de Controle é responsável por ficar verificando as requisições provenientes do navegador e então baseado nos métodos, tomar uma ação.
 * Para se comunicar com um repositorio/serviço, a camada de Controle utiliza a anotação `@Autowired` para fazer a **injeção de dependência**, fazendo com que a Spring gerencie.
+* `@Transactional`(**_springframework.transaction.annotation.Transactional_**) é utilizado para requisições que envolvem inserção, exclusão ou atualização no banco de dados, para garantir a integridade da transação;
+* `RedirectAttributes` -> quando queremos encaminhar algum parâmetro após a requisição, utilizamos esse objeto para adicionar o tipo `Flash`, com o método `addFlashAttribute`
+	* _Atributos do tipo `Flash` têm uma particularidade que é interessante observar. Eles só duram até a próxima requisição, ou seja, transportam informações de uma requisição para a outra e, então, deixam de existir._
+* `"redirect:metodo"` -> utilizamos o redirect para evitar que a cada refresh seja enviada a requisição novamente
+
+```java
+@Controller
+@Transactional
+@RequestMapping("/produtos")
+public class ProdutosController {
+
+	@Autowired
+	private ProdutoRepository repository;
+	
+	@GetMapping("/form")
+	public ModelAndView form() {
+		ModelAndView mv = new ModelAndView("produtos/form");
+		mv.addObject("tipos", TipoPreco.values());
+		return mv;
+	}
+	
+	@PostMapping
+	public ModelAndView cadastra(Produto produto, RedirectAttributes redirect) {
+		repository.save(produto);
+		redirect.addFlashAttribute("sucesso", "Produto cadastrado com sucesso!");
+		return new ModelAndView("redirect:produtos");
+	}
+	
+	@GetMapping
+	public ModelAndView lista() {
+		ModelAndView mv = new ModelAndView("produtos/lista");
+		List<Produto> produtos = repository.findAll();
+		mv.addObject("produtos", produtos);
+		return mv;
+	}
+}
+```
+
+## <a name="validation"></a> Validation
+
+Para implementar validações nos campos, precisamos utilizar a dependência abaixo:
+```xml
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
+```
+Para uma Entidade ter os campos validados, precisamos utilizar as anotações para mostrar o que queremos validar.
+```java
+@NotEmpty(message = "{titulo.notempty}")
+private String titulo;
+@NotEmpty(message = "{descricao.notempty}")
+private String descricao;
+
+@Min(value = 5, message = "{pagina.min}")
+private int paginas;
+```
+Para configurar a mensagem que irá aparecer quando o campo for validado, criaremos um arquivo **_messages.properties_**, dentro da pasta **_src/min/resources_**
+```python
+# messages.properties
+titulo.notempty= Título nao pode ser vazio.
+descricao.notempty= Descrição não poder ser vazia.
+pagina.min= A página precisa ter no mínimo 5 páginas.
+
+#typeMismatch é utilizado pq o campo vem como String e validaremos um int
+typeMismatch = O tipo de dado foi inválido.
+typeMismatch.produto.paginas = A página precisa ter no mínimo 5 páginas.
+```
+Para configurar a JSP, será utilizado a tag `<form:errors path="" />`
+```html
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+
+<style type="text/css">
+	.error {
+		color:red;
+	}
+</style>
+
+<body>
+	<form action="/casadocodigo/produtos" method="POST">
+		<div>
+			<label>Título</label>
+			<input type="text" name="titulo">
+			<form:errors path="produto.titulo" cssClass="error"/><br>
+			
+			<label>Descrição</label>
+			<textarea rows="10" cols="20" name="descricao"></textarea>
+			<form:errors path="produto.descricao" cssClass="error"/>
+		</div>
+		<div>
+			<label>Páginas</label> 
+			<input type="text" name="paginas">
+			<form:errors path="produto.paginas" cssClass="error"/>
+		</div>
+		<button type="submit">Cadastrar</button>
+	</form>
+</body>
+```
