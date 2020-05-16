@@ -49,6 +49,7 @@ O Java EE nada mais é, do que o Java para Web.
 		* [application.properties](#application)
 	* [Camadas MVC](#camadasmvc)
 	* [Validation](#validation)
+		* [Validation - <form: /> ](#formvalidation)
 	
 # Maven
 ### O que faz o Maven?
@@ -411,6 +412,8 @@ A **JavaServer Pages Standard Tag Library _(JSTL)_**, como o nome diz, é uma bib
 ```java
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
 ```
 #### <a name="foreach"></a>forEach - Listando 
 Para exibir uma lista com objetos/dados, podemos utilizar o método `<c:forEach>`, que irá exigir:
@@ -1889,6 +1892,10 @@ private String descricao;
 
 @Min(value = 5, message = "{pagina.min}")
 private int paginas;
+
+@DateTimeFormat(pattern = "dd/MM/yyyy")
+@NotNull(message = "{datalancamento.notnull}")
+private LocalDate dataLancamento;
 ```
 Para configurar a mensagem que irá aparecer quando o campo for validado, criaremos um arquivo **_messages.properties_**, dentro da pasta **_src/min/resources_**
 ```python
@@ -1896,6 +1903,7 @@ Para configurar a mensagem que irá aparecer quando o campo for validado, criarem
 titulo.notempty= Título nao pode ser vazio.
 descricao.notempty= Descrição não poder ser vazia.
 pagina.min= A página precisa ter no mínimo 5 páginas.
+datalancamento.notnull = Data deve ser preenchida dd/MM/yyyy.
 
 #typeMismatch é utilizado pq o campo vem como String e validaremos um int
 typeMismatch = O tipo de dado foi inválido.
@@ -1927,7 +1935,64 @@ Para configurar a JSP, será utilizado a tag `<form:errors path="" />`
 			<input type="text" name="paginas">
 			<form:errors path="produto.paginas" cssClass="error"/>
 		</div>
+		<div>
+			<label>Data Lançamento:</label> 
+			<form:input path="dataLancamento"/>
+			<form:errors path="dataLancamento" cssClass="error"/>
+		</div>
 		<button type="submit">Cadastrar</button>
 	</form>
+</body>
+```
+##  <a name="formvalidation"></a> Validation - <form: />
+A Tag `<form:xxxx />` possibilita escrevermos menos código. Para implementa-la é necessário utilizar:
+```html
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+```
+* `<form:errors />` -> utilizado para retornar o erro;
+	* `<form:errors path="produto.titulo" cssClass="error"/>`
+* `<form:input />` -> representa o `<input>` do HTML, porém permite que o Spring gerencie os valores (desta forma quando a validação ocorrer, os campos não serão apagados;
+	* `<form:hidden />`
+	* `<form:textarea />`
+		* `<form:input path="produto.titulo"/>`
+* `<form:form />` -> utilizado nos formularios, para que não seja necessário ficar escrevendo _.produto_ por exemplo
+	* `<form:form action="${s:mvcUrl('PC#gravar').build() }" method="post" modelAttribute="produto">`
+
+Aplicação com tag `<form />`
+```html
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
+
+<body>
+	<form:form action="${s:mvcUrl('PC#cadastra').build()}" method="post" modelAttribute="produto">
+		<div>
+			<label>Título</label>
+			<form:input path="titulo"/>
+			<form:errors path="titulo" cssClass="error"/><br>
+			
+			<label>Descrição</label>
+			<form:textarea path="descricao" rows="10" cols="20"/>
+			<form:errors path="descricao" cssClass="error"/>
+		</div>
+		<div>
+			<label>Páginas</label> 
+			<form:input path="paginas"/>
+			<form:errors path="paginas" cssClass="error"/>
+		</div>
+		<div>
+			<label>Data Lançamento:</label> 
+			<form:input path="dataLancamento"/>
+			<form:errors path="dataLancamento" cssClass="error"/>
+		</div>
+		<c:forEach items="${tipos}" var="tipo" varStatus="status">
+			<div>
+				<label>${tipo}</label>
+				<form:input path="precos[${status.index}].valor"/>
+				<form:hidden path="precos[${status.index}].tipo" value="${tipo}"/>
+			</div>
+		</c:forEach>
+		<button type="submit">Cadastrar</button>
+	</form:form>
 </body>
 ```
