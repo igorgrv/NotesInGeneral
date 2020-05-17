@@ -17,6 +17,9 @@ O Java EE nada mais é, do que o Java para Web.
 	* [Scriptlet](#scriptlet)
 	* [Expressions Language](#el)
 	* [JSTL](#jstl)
+		* [CORE](#jstlcore)
+		* [FMT](#jstlfmt)
+		* [FORM](#jstlform)
 	* [CRUD - SERVLET](#crudservlet)
 4. [JDBC](#jdbc)
 	* [Testando Conexão](#testejdbc)
@@ -49,7 +52,6 @@ O Java EE nada mais é, do que o Java para Web.
 		* [application.properties](#application)
 	* [Camadas MVC](#camadasmvc)
 	* [Validation](#validation)
-		* [Validation - <form: /> ](#formvalidation)
 	
 # Maven
 ### O que faz o Maven?
@@ -387,6 +389,7 @@ Exemplo com **Expression Language**:
 	</body>
 </html>
 ```
+
 ## <a name="jstl"></a>JSTL
 A **JavaServer Pages Standard Tag Library _(JSTL)_**, como o nome diz, é uma biblioteca que **em conjunto com a EL**, pode implementar diversos códigos do java, como:
 * for;
@@ -415,6 +418,7 @@ A **JavaServer Pages Standard Tag Library _(JSTL)_**, como o nome diz, é uma bib
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
 ```
+## <a name="jstlcore"></a>JSTL - CORE
 #### <a name="foreach"></a>forEach - Listando 
 Para exibir uma lista com objetos/dados, podemos utilizar o método `<c:forEach>`, que irá exigir:
 * `items="${ }"` -> será o atributo que foi passado pela Servlet;
@@ -430,22 +434,31 @@ Para exibir uma lista com objetos/dados, podemos utilizar o método `<c:forEach>`
     </ul>
 </body>
 ```
-#### <a name="url"></a> URL <c: url >
+#### <a name="url"></a> URL
 O método `<c:url value="" var="">` basicamente carrega o nome do projeto e pode ser utizado na `action`  de um `<form>`!
 * Exemplo **form sem JSTL**:
-```html
-<form action="/gerenciador/novaEmpresa" method="POST">
-```
+	```html
+	<form action="/gerenciador/novaEmpresa" method="POST">
+	```
 * Exemplo **form com JSTL**:
+	```html
+	<form action="<c:url value="/novaEmpresa" />" method="POST">
+
+	//ou
+
+	<c:url value="/novaEmpresa" var="nova"/>
+	<form action="${nova}" method="POST">
+	```
+	
+Outro uso da URL, é para colocar o caminho dos arquivos estáticos, como CSS, JS e etc:
 ```html
-<form action="<c:url value="/novaEmpresa" />" method="POST">
+<!-- O contextPath irá pegar o nome do projeto -->
+<c:url value="/" var="contextPath" />
 
-//ou
-
-<c:url value="/novaEmpresa" var="nova"/>
-<form action="${nova}" method="POST">
+<link href="${contextPath}css/fonts.css"	rel="stylesheet" type="text/css" media="all" />
+<link href="${contextPath}css/fontello-ie7.css"	rel="stylesheet" type="text/css" media="all" />
 ```
-#### <a name="if"></a> If <c: if >
+#### <a name="if"></a> If 
 Com JSTL podemos realizar condicionais:
 * Preencha como nulo em caso de nenhum nome de empresa for preenchido:
 ```html
@@ -457,6 +470,7 @@ Com JSTL podemos realizar condicionais:
 	Nenhuma empresa foi cadastrada :(
 </c:if>
 ```
+## <a name="jstlfmt"></a>JSTL - FMT
 #### <a name="fmt"></a> formatDate <fmt: formatDate>
 Quando extraimos a data direto do Java, vem um monte de código esquisito, para formatar no padrão brasileiro, temos a TAGLIB FMT:
 ```html
@@ -473,6 +487,58 @@ Quando extraimos a data direto do Java, vem um monte de código esquisito, para f
 	String stringData= "01/04/2020";
 	DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	LocalDate dataLocalDate = LocalDate.parse(stringData, formatador);
+## <a name="jstlform"></a>JSTL - FORM
+A Tag `<form:xxxx />` possibilita escrevermos menos código. Para implementa-la é necessário utilizar:
+```html
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+```
+* `<form:errors />` -> utilizado para retornar o erro;
+	* `<form:errors path="produto.titulo" cssClass="error"/>`
+* `<form:input />` -> representa o `<input>` do HTML, porém permite que o Spring gerencie os valores (desta forma quando a validação ocorrer, os campos não serão apagados;
+	* `<form:hidden />`
+	* `<form:textarea />`
+		* `<form:input path="produto.titulo"/>`
+* `<form:form />` -> utilizado nos formularios, para que não seja necessário ficar escrevendo _.produto_ por exemplo
+	* `<form:form action="${s:mvcUrl('PC#gravar').build() }" method="post" modelAttribute="produto">`
+
+Aplicação com tag `<form />`
+```html
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
+
+<body>
+	<form:form action="${s:mvcUrl('PC#cadastra').build()}" method="post" modelAttribute="produto">
+		<div>
+			<label>Título</label>
+			<form:input path="titulo"/>
+			<form:errors path="titulo" cssClass="error"/><br>
+			
+			<label>Descrição</label>
+			<form:textarea path="descricao" rows="10" cols="20"/>
+			<form:errors path="descricao" cssClass="error"/>
+		</div>
+		<div>
+			<label>Páginas</label> 
+			<form:input path="paginas"/>
+			<form:errors path="paginas" cssClass="error"/>
+		</div>
+		<div>
+			<label>Data Lançamento:</label> 
+			<form:input path="dataLancamento"/>
+			<form:errors path="dataLancamento" cssClass="error"/>
+		</div>
+		<c:forEach items="${tipos}" var="tipo" varStatus="status">
+			<div>
+				<label>${tipo}</label>
+				<form:input path="precos[${status.index}].valor"/>
+				<form:hidden path="precos[${status.index}].tipo" value="${tipo}"/>
+			</div>
+		</c:forEach>
+		<button type="submit">Cadastrar</button>
+	</form:form>
+</body>
+```
 
 ## <a name="crudservlet"></a>1º modo - JSP + Servlet
 ### Anotações Servlet
@@ -1942,57 +2008,5 @@ Para configurar a JSP, será utilizado a tag `<form:errors path="" />`
 		</div>
 		<button type="submit">Cadastrar</button>
 	</form>
-</body>
-```
-##  <a name="formvalidation"></a> Validation - <form: />
-A Tag `<form:xxxx />` possibilita escrevermos menos código. Para implementa-la é necessário utilizar:
-```html
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
-```
-* `<form:errors />` -> utilizado para retornar o erro;
-	* `<form:errors path="produto.titulo" cssClass="error"/>`
-* `<form:input />` -> representa o `<input>` do HTML, porém permite que o Spring gerencie os valores (desta forma quando a validação ocorrer, os campos não serão apagados;
-	* `<form:hidden />`
-	* `<form:textarea />`
-		* `<form:input path="produto.titulo"/>`
-* `<form:form />` -> utilizado nos formularios, para que não seja necessário ficar escrevendo _.produto_ por exemplo
-	* `<form:form action="${s:mvcUrl('PC#gravar').build() }" method="post" modelAttribute="produto">`
-
-Aplicação com tag `<form />`
-```html
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
-<%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
-
-<body>
-	<form:form action="${s:mvcUrl('PC#cadastra').build()}" method="post" modelAttribute="produto">
-		<div>
-			<label>Título</label>
-			<form:input path="titulo"/>
-			<form:errors path="titulo" cssClass="error"/><br>
-			
-			<label>Descrição</label>
-			<form:textarea path="descricao" rows="10" cols="20"/>
-			<form:errors path="descricao" cssClass="error"/>
-		</div>
-		<div>
-			<label>Páginas</label> 
-			<form:input path="paginas"/>
-			<form:errors path="paginas" cssClass="error"/>
-		</div>
-		<div>
-			<label>Data Lançamento:</label> 
-			<form:input path="dataLancamento"/>
-			<form:errors path="dataLancamento" cssClass="error"/>
-		</div>
-		<c:forEach items="${tipos}" var="tipo" varStatus="status">
-			<div>
-				<label>${tipo}</label>
-				<form:input path="precos[${status.index}].valor"/>
-				<form:hidden path="precos[${status.index}].tipo" value="${tipo}"/>
-			</div>
-		</c:forEach>
-		<button type="submit">Cadastrar</button>
-	</form:form>
 </body>
 ```
