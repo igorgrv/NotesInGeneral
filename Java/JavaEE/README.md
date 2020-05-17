@@ -52,6 +52,7 @@ O Java EE nada mais é, do que o Java para Web.
 		* [application.properties](#application)
 	* [Camadas MVC](#camadasmvc)
 	* [Validation](#validation)
+	* [Cache - Guava](#springcache)
 	
 # Maven
 ### O que faz o Maven?
@@ -1975,6 +1976,26 @@ datalancamento.notnull = Data deve ser preenchida dd/MM/yyyy.
 typeMismatch = O tipo de dado foi inválido.
 typeMismatch.produto.paginas = A página precisa ter no mínimo 5 páginas.
 ```
+Para que a mensagem fique em UTF-8 precisamos configura-la no Spring, dentro do método main:
+```java
+@Bean
+public MessageSource messageSource() {
+    ReloadableResourceBundleMessageSource messageSource
+      = new ReloadableResourceBundleMessageSource();
+     
+    messageSource.setBasename("classpath:messages");
+    messageSource.setDefaultEncoding("UTF-8");
+    return messageSource;
+}
+
+@Bean
+public LocalValidatorFactoryBean getValidator() {
+    LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
+    bean.setValidationMessageSource(messageSource());
+    return bean;
+}
+```
+
 Para configurar a JSP, será utilizado a tag `<form:errors path="" />`
 ```html
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
@@ -2009,4 +2030,73 @@ Para configurar a JSP, será utilizado a tag `<form:errors path="" />`
 		<button type="submit">Cadastrar</button>
 	</form>
 </body>
+```
+
+## <a name="springcache"></a> Cache - Guava
+
+O Spring possui por padrão um Cache, que permitirá melhorar a performance da aplicação, porém, quando um projeto é colocado em produção, é sugerido que se utilize um gerenciador de Cache, como o **Guava** do Google.<br><br>
+Para utilizar o Guava, é necessário adicionar as dependências:
+```xml
+<dependency>
+    <groupId>com.google.guava</groupId>
+    <artifactId>guava</artifactId>
+    <version>18.0</version>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-context-support</artifactId>
+    <version>4.1.0.RELEASE</version>
+</dependency>
+```
+Para habilitar o Cache ao Spring, será necessário atribuir a anotação `@EnableCaching` na classe main e para gerenciar o Cache, utilizaremos a classe `CacheManager`, que nos permitirá por exemplo, definir de quanto em quanto tempo o Cache será invalidado!
+```java
+@EnableCaching
+@SpringBootApplication
+public class CasaCodigoApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(CasaCodigoApplication.class, args);
+	}
+
+	@Bean
+    public CacheManager cacheManager() {
+        CacheBuilder<Object, Object> builder = 
+            CacheBuilder.newBuilder().maximumSize(100).expireAfterAccess(5, TimeUnit.MINUTES);
+        GuavaCacheManager manager = new GuavaCacheManager();
+        manager.setCacheBuilder(builder);
+
+        return manager;
+    }
+```
+Para **habilitar o Cache** para determinado **método**, devemos anotar o método com o `@Cacheable(value="produtosHome")` passando o nome do Cache.<br>Para  **desabilitar o Cache** para determinado **método**, devemos utilizar o `@CacheEvict(value="produtosHome", allEntries=true)`, desta forma, ao executar o método que possui esta anotação, será invalidado o cache "produtosHome";
+```java
+@RequestMapping("/")
+@Cacheable(value="produtosHome")
+public ModelAndView index() {
+    ModelAndView modelAndView = new ModelAndView("home");
+    List<Produto> produtos = produtoDao.listar();
+    modelAndView.addObject("produtos",produtos);
+    return modelAndView;
+}
+
+
+RequestMapping(method=RequestMethod.POST)
+@CacheEvict(value="produtosHome", allEntries=true)
+public ModelAndView gravar(MultipartFile sumario, @Valid Produto produto, 
+        BindingResult result, RedirectAttributes redirectAttributes){
+
+    if(result.hasErrors()) {
+        return form(produto);
+    }
+
+    String path = fileSaver.write("arquivos-sumario", sumario);
+    produto.setSumarioPath(path);
+
+    produtoDao.gravar(produto);
+
+    redirectAttributes.addFlashAttribute("sucesso", "Produto cadastrado com sucesso!");
+
+    return new ModelAndView("redirect:produtos");
+}
 ```
