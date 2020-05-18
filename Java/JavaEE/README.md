@@ -57,6 +57,7 @@ O Java EE nada mais é, do que o Java para Web.
 	* [Cache - Guava](#springcache)
 	* [Json](#springjson)
 	* [Spring Security](#springsecurity)
+	* [Tratando Exceções] (#tratandoexc)
 	
 # Maven
 ### O que faz o Maven?
@@ -2433,3 +2434,62 @@ protected void configure(HttpSecurity http) throws Exception {
 	.and().logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
 }
 ```
+
+## <a name="tratandoexc"></a>Tratando Exceções
+O Spring possui um **ControlerAdivce** que nos permite tratar qualquer tipo de exceção através da anotação `@ExceptionHandler`, desta forma, podemos mapear o que queremos retornar ao usuário em caso de erro!
+* Exemplo de exceção genérica sendo tratada através da `Exception`:
+	```java
+	@ControllerAdvice
+	public class ExceptionHandlerController {
+
+		@ExceptionHandler(Exception.class)
+	    public ModelAndView trataExceptionGenerica(Exception exception){
+	        System.out.println("Erro genérico acontecendo");
+	        exception.printStackTrace();
+
+	        ModelAndView modelAndView = new ModelAndView("error");
+	        modelAndView.addObject("exception", exception);
+
+	        return modelAndView;
+	    }
+	}
+	```
+	erro.jsp
+	```html
+	<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+	<%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
+
+	<tags:pageTemplate titulo="Produto não encontrado">
+
+	  <section id="index-section" class="container middle">
+	      <h2>O produto informado não foi encontrado</h2>
+	  </section>
+
+	 <!-- 
+        Mensagem: ${exception.message}
+        <c:forEach items="${exception.stackTrace}" var="stk">
+            ${stk}
+        </c:forEach>    
+    -->
+	</tags:pageTemplate> 
+	```
+* Exemplo, exceção `NoResultException`:
+	```java
+	@ExceptionHandler(NoResultException.class)
+	public String trataDetalheNaoEcontrado(){
+	    return "errorNoResult";
+	}
+	```
+	erroNoResult.jsp
+	```html
+	<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+	<%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
+
+	<tags:pageTemplate titulo="Produto não encontrado">
+
+	  <section id="index-section" class="container middle">
+	      <h2>O produto informado não foi encontrado</h2>
+	  </section>
+
+	</tags:pageTemplate> 
+	```
