@@ -53,6 +53,8 @@ O Java EE nada mais é, do que o Java para Web.
 	* [Camadas MVC](#camadasmvc)
 	* [Validation](#validation)
 	* [Cache - Guava](#springcache)
+	* [Json](#springjson)
+	* [Spring Security](#springsecurity)
 	
 # Maven
 ### O que faz o Maven?
@@ -2098,5 +2100,278 @@ public ModelAndView gravar(MultipartFile sumario, @Valid Produto produto,
     redirectAttributes.addFlashAttribute("sucesso", "Produto cadastrado com sucesso!");
 
     return new ModelAndView("redirect:produtos");
+}
+```
+
+## <a name="springjson"></a> JSON - Spring
+E se quisessemos retornar invés de uma página, um .json? De forma que um cliente pudesse acessar nossa API através de uma URI.<br><br>
+De uma forma bem simples, utilizando a dependência do **jackson** + `@ResponseBody`, podemos retornar um .json!
+* Caso seja gerado um erro de **Lazy**, podemos adicionar a anotação na Entidade `@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})`
+ ```java
+ //Controller
+ @GetMapping("/{id}")
+@ResponseBody
+public Produto detalheJson(@PathVariable("id") Long id) {
+	Produto produto = repository.getOne(id);
+	return produto;
+}
+ ```
+ Irá retornar, o .json abaixo, por exemplo:
+ ```json
+ {
+"id":29,  
+"titulo":"Spring MVC",  
+"descricao":"O Spring é o principal concorrente da especificação JavaEE.",  
+"paginas":260,  
+"dataLancamento":"2020-01-01",  
+"precos":[
+		{
+		"valor":25.00,  
+		"tipo":"EBOOK"  
+		},  
+		{
+		"valor":35.00,  
+		"tipo":"IMPRESSO"  
+		},  
+		{
+		"valor":60.00,  
+		"tipo":"COMBO"  
+		}  
+	]  
+}
+ ```
+ ## <a name="springsecurity"></a> Spring Security
+A ordem de implementação do Spring Security:
+* Adicionar a dependências
+* Criar a Entidade `Usuario implements UserDetails`;
+	* Adicione os atributos: `Email, Senha, Id, Nome, List<Perfil>`
+	* Adicione contrutores, getters/setters;
+	* O atributo Perfil, irá ser carregado via `@ManyToMany(fetch = FetchType.EAGER)`
+	* Ao implementar a interface `UserDetails`, será adicionado diversos métodos;
+	* Crie a interface UsuarioRepository, que irá ter método para procurar pelo e-mail;
+* Crie a Entidade  `Perfil implements GrantedAuthority`
+
+### Dependência & SecurityConfiguration
+ Para utilizar o Spring Security, precisamos primeiro, adicionar a dependência:
+```xml
+ <dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+```
+Para configurar o SpringConfiguration, utilizaremos uma classe responsável para isto, chamada `SecurityConfiguration extends WebSecurityConfigurerAdapter`, dentro do pacote **_src/main/java/config_**
+```java
+@EnableWebSecurity
+@Configuration
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
+
+}
+```
+### Entidade - Usuario & Perfil
+Usuario (dentro de Model)
+```java
+@Entity
+public class Usuario implements UserDetails {
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	private String nome;
+	private String email;
+	private String senha;
+
+	@ManyToMany(fetch = FetchType.EAGER)
+	private List<Perfil> perfis;
+
+	//getters/setters & construtor
+
+	@Override
+	public String getPassword() {
+		return this.senha;
+	}
+
+	@Override
+	public String getUsername() {
+		return this.email;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
+	}
+
+}
+```
+Interface - UsuarioRepository:
+```java
+public interface UsuarioRepository extends JpaRepository<Usuario, Long>{
+	
+	Optional<Usuario> findByEmail(String email);
+}
+```
+Perfil:
+```java
+@Entity
+public class Perfil implements GrantedAuthority {
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	private String nome;
+
+	//getters/setters & construtor
+
+	@Override
+	public String getAuthority() {
+		return this.nome;
+	}
+}
+```
+### Autorizando páginas
+Dentro da classe SpringConfiguration, através do método `configure(HttpSecurity http)`, iremos informar ao Spring, quais as requisições que serão permitidas sem ter de fazer o Login:
+```java
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+	http.authorizeRequests().
+	antMatchers("/css/**", "/js/**").permitAll().
+ 	antMatchers(HttpMethod.GET, "/produtos").permitAll().
+ 	antMatchers(HttpMethod.GET, "/produtos/*").permitAll().
+ 	anyRequest().authenticated().
+ 	and().formLogin();
+}
+```
+### Autorizando usuários
+Dentro da classe SpringConfiguration, através do método `configure(AuthenticationManagerBuilder auth)` poderemos autorizar o usuário, baseado no E-mail e Senha, por exemplo, porém para isto, será necessário utilizar  o **_UsuarioService_** e o **_UsuarioRepository_**:<br><br>
+UsuarioService:
+```java
+@Service
+public class UsuarioService implements UserDetailsService{
+
+	@Autowired
+	private UsuarioRepository repository;
+	
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		Optional<Usuario> user = repository.findByEmail(username);
+		if(user.isPresent()) {
+			return user.get();
+		}
+		throw new UsernameNotFoundException("usuário não encontrado");
+	}
+
+}
+```
+<br>
+
+SpringConfiguration:
+```java
+@EnableWebSecurity
+@Configuration
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
+	
+	@Autowired
+	private UsuarioService usuarioService;
+	
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+	}
+
+	//outros config. métodos
+}
+
+//utilizado para receber o retorno da senha com criptografia
+public static void main(String[] args) {
+	System.out.println(new BCryptPasswordEncoder().encode("123456"));
+}
+```
+### Inserindo usuários
+Com o mysql aberto, podemos adicionar manualmente os códigos abaixo:
+```sql
+insert into Perfil values('ROLE_ADMIN');
+
+insert into Usuario (email, nome, senha) values ('igorgrv@.com', 'Administrador', '$2a$04$qP517gz1KNVEJUTCkUQCY.JzEoXzHFjLAhPQjrg5iP6Z/UmWjvUhq');
+
+insert into Usuario_perfil values(1,1);
+```
+### Views
+Com a taglib abaixo, podemos "esconder" elementos da view para usuários não autorizados!
+```html
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="security" %>
+```
+* Exemplo: bloqueando a inserção de produtos caso não seja o ADMIN
+	```html
+	<nav id="main-nav">
+	    <ul class="clearfix">
+	        <security:authorize access="hasRole('ADMIN')">
+	            <li>
+		             <a href="listar" rel="nofollow">Adicionar Produtos</a>
+	            </li>
+	        </security:authorize>
+	        <li>
+	            <a href="carrinho">
+	                Seu carrinho (${carrinhoCompras.quantidade})
+	            </a>
+	        </li>
+	    </ul>
+	</nav>
+	```
+### LoginForm
+Por padrão, o SpringSecurity possui um Formulário para Login, porém caso, queiramos utilizar o nosso próprio, basta incluirmos o método `
+ .and().formLogin().loginPage("/login")` dentro do método `
+configure(HttpSecurity http)`, onde "/login" será a requisição que o `LoginController`estará verificando!<br><br>
+Crie o loginForm.jsp;
+* O name dos inputs, devem constar o "username" e "password" (mesmo que na Entidade tenha sido anotado como, email e senha)
+```html
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+<body>
+    <div class="container">
+        <h1>Login Casa do Código</h1>
+        <form:form servletRelativeAction="/login" method="POST">
+            <div class="form-group">
+                <label>E-mail</label>
+                <input type="text" name="username" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" name="password" class="form-control" />
+            </div>
+            <button type="submit" class="btn btn-primary">Logar</button>
+        </form:form>
+    </div>
+</body>
+```
+SecurityConfigutarion:
+```java
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+	http.authorizeRequests().
+	antMatchers("/css/**", "/js/**").permitAll().
+ 	antMatchers(HttpMethod.GET, "/produtos").permitAll().
+ 	antMatchers(HttpMethod.GET, "/produtos/*").permitAll().
+ 	anyRequest().authenticated().
+ 	and().formLogin().loginPage("/login")
+	 	.defaultSuccessUrl("/produtos").permitAll();
+	.and().logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
 }
 ```
