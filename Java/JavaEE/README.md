@@ -20,6 +20,8 @@ O Java EE nada mais é, do que o Java para Web.
 		* [CORE](#jstlcore)
 		* [FMT](#jstlfmt)
 		* [FORM](#jstlform)
+		* [INCLUDE](#jstlinclude)
+		* [TEMPLATE](#jstltemplate)
 	* [CRUD - SERVLET](#crudservlet)
 4. [JDBC](#jdbc)
 	* [Testando Conexão](#testejdbc)
@@ -541,6 +543,62 @@ Aplicação com tag `<form />`
 		<button type="submit">Cadastrar</button>
 	</form:form>
 </body>
+```
+## <a name="jstlform"></a>JSTL - Include File
+Quando queremos importar o conteúdo de uma JSP para dentro de outra JSP, utilizamos o `<%@ include file=".jsp"`.
+* Este modelo é muito utilizado para criação do header e footer, de modo que fique padronizado nas páginas:
+	```html
+	<%@ include file="/WEB-INF/views/cabecalho.jsp" %>
+	<body>
+	<!-- conteúdo da página .jsp-->
+	</body>
+	<%@ include file="/WEB-INF/views/rodape.jsp" %>
+	```
+## <a name="jstltemplate"></a>JSTL - Template
+Apesar do `<%@ include file=""` realizar a importação de .JSP's existe uma tag responsável por implementar templates nas páginas!<br><br>
+Para isto, devemos criar a pasta **_tags_** (**_src/main/webapp/WEB-INF/tags_**) e dentro da pasta, devemos criar um arquivo **_.tag_** -> dentro deste arquivo terá o **cabeçalho e o rodapé**!<br><br>
+* Para que a TAG funcione, é necessário remover de todas as .jsps que forem utilizar, o header:
+	```java
+	<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+	```
+Arquivo **pageTemplate.tag**:
+```html
+<%@ tag language="java" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<c:url value="/" var="contextPath" />
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        <title>${titulo } - Casa do Código</title>
+        <!-- RQUIVOS CSS-->
+    </head>
+
+    <body>
+	    <%@ include file="/WEB-INF/views/cabecalho.jsp" %>
+	    
+	    <jsp:doBody />
+	    
+	    <%@ include file="/WEB-INF/views/rodape.jsp" %>
+    </body>
+</html>
+```
+Arquivo .jsp de exemplo, utilizando o template:
+```html
+<!-- outras tags como fmt, s, form -->
+<%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
+
+<tags:pageTemplate>
+	<jsp:body>
+
+    <!-- conteúdo HTML, como table e etc -->
+    
+	</jsp:body>
+</tags:pageTemplate>
 ```
 
 ## <a name="crudservlet"></a>1º modo - JSP + Servlet
