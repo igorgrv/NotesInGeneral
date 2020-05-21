@@ -1,7 +1,7 @@
 # O Java EE
-O Java EE nada mais È, do que o Java para Web.
+O Java EE nada mais √©, do que o Java para Web.
 
-# Sum·rio
+# Sum√°rio
 1. [Maven](#maven)
 	* [Criando um projeto Web](#mavenprojeto)
 	* [Pom.xml](#pomxml)
@@ -24,12 +24,12 @@ O Java EE nada mais È, do que o Java para Web.
 		* [TEMPLATE](#jstltemplate)
 	* [CRUD - SERVLET](#crudservlet)
 4. [JDBC](#jdbc)
-	* [Testando Conex„o](#testejdbc)
+	* [Testando Conex√£o](#testejdbc)
 	* [DAO](#dao)
 	* [CRUD - DAO](#cruddao)
 5. [JPA & Hibernate](#jpa)
 	* [Criando projeto](#projetocjpa)
-	* [AnotaÁıes](#persistence)
+	* [Anota√ß√µes](#persistence)
 	* [Criando uma Entidade](#criandoentidade)
 	* [CRUD - JPA](#crudjpa)
 	* [Estados da JPA](#estadosjpa)
@@ -37,8 +37,8 @@ O Java EE nada mais È, do que o Java para Web.
 		 * [Detached](#detached)
 		 * [Removed](#removed)
 	* [JPQL](#jpql)
-		* [Consulta com critÈrio](#consultacriterio)
-		* [Consulta com par‚metros](#consultparametro)
+		* [Consulta com crit√©rio](#consultacriterio)
+		* [Consulta com par√¢metros](#consultparametro)
 		* [Consulta com JOIN FETCH](#consultajoin)
 	* [API Criteria](#apicriteria)
 	* [OpenEntityManagerInView](#openentity)
@@ -57,58 +57,59 @@ O Java EE nada mais È, do que o Java para Web.
 	* [Cache - Guava](#springcache)
 	* [Json](#springjson)
 	* [Spring Security](#springsecurity)
-	* [Tratando ExceÁıes] (#tratandoexc)
+	* [Tratando Exce√ß√µes] (#tratandoexc)
+	* [Deploy - Heroku] (#heroku)	
 	
 # Maven
 ### O que faz o Maven?
 * Build mais simples;
-* Servidor gerado atravÈs do prÛprio maven;
+* Servidor gerado atrav√©s do pr√≥prio maven;
 * Gerencia o projeto;
 * Gerencia .jars/dependencias;
 
-AlÈm, do Maven, existe outro gerenciador de projetos, chamado **GRADLE**, feito para projetos **GROOVY** e tambÈm para projetos Java;
+Al√©m, do Maven, existe outro gerenciador de projetos, chamado **GRADLE**, feito para projetos **GROOVY** e tamb√©m para projetos Java;
 
 ### Download/Install
-Para [baixar o maven](https://maven.apache.org/download.cgi), devemos utilizar a vers„o `bin.zip` (por utilizar o Windows). Mas o que fazemos com o .zip?
-1. Descompacte o zip em uma pasta - sugest„o: junto com o jdk;
-2. V· em Sistemas > Config. avanÁada do sistema > Vari·veis de ambiente > Adicione as vari·veis;
-3. Crie as vari·veis:
+Para [baixar o maven](https://maven.apache.org/download.cgi), devemos utilizar a vers√£o `bin.zip` (por utilizar o Windows). Mas o que fazemos com o .zip?
+1. Descompacte o zip em uma pasta - sugest√£o: junto com o jdk;
+2. V√° em Sistemas > Config. avan√ßada do sistema > Vari√°veis de ambiente > Adicione as vari√°veis;
+3. Crie as vari√°veis:
 	* M3 -> coloque o caminho `apache-maven-3.6.3-bin\apache-maven-3.6.3\bin`;
 	* M3_HOME -> coloque o caminho `apache-maven-3.6.3-bin\apache-maven-3.6.3`
-4. No Path, adicione a vari·vel `%M3%`;
+4. No Path, adicione a vari√°vel `%M3%`;
 5. Abra o terminal e teste com `mvn --help`, deve aparecer dados do Maven;
 
 ### Gerando .jar com Maven
-Para gerar um `.jar` È necess·rio:
-1. Acessar via terminal, o diretÛrio do projeto
+Para gerar um `.jar` √© necess√°rio:
+1. Acessar via terminal, o diret√≥rio do projeto
 2. Executar a linha de comando `mvn package`
-3. Ser· gerado um .jar na pasta **target**;
+3. Ser√° gerado um .jar na pasta **target**;
 
 ### Adicionando .jar
-Toda configuraÁ„o relacionada ao maven, estar· no arquivo **_pom.xml_**. Este arquivo È respons·vel por declarar o ArtifactID, GroupId, vers„o e por **adicionar** as dependencias/.jar!<br><br> 
-**Mas onde encontrar as dependencias?** O maven possui um repositÛrio, chamado [mvnrepository](https://mvnrepository.com/).
-* Com o jar selecionado no mvnRepository, basta copiar o cÛdigo entre `<dependency>` e `</dependency>` e colar no pom.xml
+Toda configura√ß√£o relacionada ao maven, estar√° no arquivo **_pom.xml_**. Este arquivo √© respons√°vel por declarar o ArtifactID, GroupId, vers√£o e por **adicionar** as dependencias/.jar!<br><br> 
+**Mas onde encontrar as dependencias?** O maven possui um reposit√≥rio, chamado [mvnrepository](https://mvnrepository.com/).
+* Com o jar selecionado no mvnRepository, basta copiar o c√≥digo entre `<dependency>` e `</dependency>` e colar no pom.xml
 
 ### Fases do Maven
 O maven possui diversas fases, seguindo:
-1. `mvn package` -> ir· criar o .jar
+1. `mvn package` -> ir√° criar o .jar
 2. `mvn install` -> instala o .jar no repositorio local
-3. `mvn deploy` -> ir· fazer um deploy no servidor
+3. `mvn deploy` -> ir√° fazer um deploy no servidor
 
 ## <a name="mavenprojeto"></a>Criando um projeto Web
-Para criar um projeto Maven, alguns critÈrios s„o requisitados. como:
-* **Artifact ID**-> È o nome do projeto;
-* **Group ID** -> È o caminho (_br.com.igor.projeto_)
+Para criar um projeto Maven, alguns crit√©rios s√£o requisitados. como:
+* **Artifact ID**-> √© o nome do projeto;
+* **Group ID** -> √© o caminho (_br.com.igor.projeto_)
 
 Para criar no Eclipse, basta ir em:
 * **File > New > Other > Maven Project > Next > Selecionar Artifact Id Web-app > Next > Preencher o Artifact Id e Group ID**;
 
-Maven ir· baixar diversos plugins e ent„o ser· gerado um projeto Web!
+Maven ir√° baixar diversos plugins e ent√£o ser√° gerado um projeto Web!
 
-* Neste tipo de projeto, a pasta `src/main/java` n„o È criada, portanto **… NECESS¡RIO CRIA-LA** ;
+* Neste tipo de projeto, a pasta `src/main/java` n√£o √© criada, portanto **√â NECESS√ÅRIO CRIA-LA** ;
 ## <a name="pomxml"></a>Pom.xml
-O Pom.xml È o **arquivo** de configuraÁ„o **do Maven** e nele ser· atribuido as dependÍncias.
-* Quando iniciamos um projeto, haver· um erro na p·gina .jsp, **por estar faltando a dependencia Servlet**, sendo assim, temos que adicionar o cÛdigo abaixo:
+O Pom.xml √© o **arquivo** de configura√ß√£o **do Maven** e nele ser√° atribuido as depend√™ncias.
+* Quando iniciamos um projeto, haver√° um erro na p√°gina .jsp, **por estar faltando a dependencia Servlet**, sendo assim, temos que adicionar o c√≥digo abaixo:
 ```xml
 <dependencies>
 	<dependency>
@@ -119,12 +120,12 @@ O Pom.xml È o **arquivo** de configuraÁ„o **do Maven** e nele ser· atribuido as 
 	</dependency>
 </dependencies>
 ```
-AlÈm de adicionar a Servlet, precisaremos configurar o arquivo **web.xml** 
+Al√©m de adicionar a Servlet, precisaremos configurar o arquivo **web.xml** 
 ## <a name="webxml"></a>Web.xml
 Para que o projeto se torne Web, iremos precisar:
-1. Adicionar **_(Caso n„o exista)_** dentro da pasta **src > main** a pasta **_webapp > WEB-INF_**
+1. Adicionar **_(Caso n√£o exista)_** dentro da pasta **src > main** a pasta **_webapp > WEB-INF_**
 2. Criar um arquivo web.xml dentro desta pasta;
-3. Adicionar ao web o cÛdigo abaixo:
+3. Adicionar ao web o c√≥digo abaixo:
 ```xml
 <web-app version="4.0"
 	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
@@ -148,16 +149,16 @@ Para que o projeto se torne Web, iremos precisar:
 			<location>/views/index.jsp</location>
 		</error-page>
 		
-		//Para configurar sess„o
+		//Para configurar sess√£o
 		<session-config>
 			<session-timeout>2</session-timeout>
 		</session-config>
 		
-		//cÛdigo SPRING por exemplo
+		//c√≥digo SPRING por exemplo
 
 </web-app>
 ```
-4. Para utilizar o Spring, ser· adicionado:
+4. Para utilizar o Spring, ser√° adicionado:
 ```xml
 <servlet>
 	<servlet-name>springmvc</servlet-name>
@@ -176,7 +177,7 @@ Para que o projeto se torne Web, iremos precisar:
 ```
 
 ## <a name="servidormaven"></a> Servidor no Maven
-Temos trÍs conhecidos servidores containers:
+Temos tr√™s conhecidos servidores containers:
 * Tomcat;
 * Jetty;
 * JBoss;
@@ -198,7 +199,7 @@ Para adicionar o Jetty, teremos de adicionar a dependencia do jetty ao `pom.xml`
   </build>
 </project>
 ```
-ApÛs adicionar o plugin, o maven ir· baixar diversas coisas.
+Ap√≥s adicionar o plugin, o maven ir√° baixar diversas coisas.
 ### Como iniciar o servidor no Eclipse?
 Para iniciar o servidor pelo Eclipse, basta ir em:
 * Run as > Maven build... > Em goals colocar: `clean package jetty:run` > em workspace selecionar o projeto > Apply > Run
@@ -206,7 +207,7 @@ Para iniciar o servidor pelo Eclipse, basta ir em:
 ### Como iniciar o servidor no Terminal?
 Para iniciar o servidor pelo Terminal, basta:
 1. Abrir o terminal
-2. Selecionar o diretÛrio do projeto
+2. Selecionar o diret√≥rio do projeto
 3. Digitar `mvn jetty:run`
 
 ### Entendendo as pastas do projeto
@@ -214,11 +215,11 @@ Para iniciar o servidor pelo Terminal, basta:
 <img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/mavenfolder.png?raw=true" width=600 >
 
 # <a name="servlet"></a>Servlet
-Para iniciar um projeto com Servlet, iriamos comeÁar com a instalaÁ„o de um servidor **Apache Tomcat**.
+Para iniciar um projeto com Servlet, iriamos come√ßar com a instala√ß√£o de um servidor **Apache Tomcat**.
 
-### Mas o que È a Servlet?
-A Servlet È um objeto que fica **dentro do tomcat**, onde pela traduÁ„o do nome, È um _Servidorzinho_, utilizada para **p·ginas din‚micas**.
-* AtravÈs da `URI` do navegador, podemos fazer um **request** ao objeto Servlet, que ir· executar determinado cÛdigo e devolver atravÈs de um **response** as informaÁıes!
+### Mas o que √© a Servlet?
+A Servlet √© um objeto que fica **dentro do tomcat**, onde pela tradu√ß√£o do nome, √© um _Servidorzinho_, utilizada para **p√°ginas din√¢micas**.
+* Atrav√©s da `URI` do navegador, podemos fazer um **request** ao objeto Servlet, que ir√° executar determinado c√≥digo e devolver atrav√©s de um **response** as informa√ß√µes!
 
 <img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/servlet1.PNG?raw=true" width="600">
 
@@ -230,38 +231,38 @@ Para baixar, basta baixar o .zip no site do [Tomcat](https://tomcat.apache.org/d
 3. Selecione a pasta Tomcat > Tomcat 9 > selecione o local onde foi extraido o Tomcat > finish;
 4. Para testar, veja se foi criada a pasta "Servers" 
 5. Clique em "Start the Server" (Ctrl + alt + R) e para Pausar (Ctrl + alt + S)
-6. Ir· gerar um monte de cÛdigos no console em vermelho, onde a ˙ltima mensagem deve ser: `INFO: Server startup in [457] milliseconds`
-7. Acesse o endereÁo `localhost:8080`
+6. Ir√° gerar um monte de c√≥digos no console em vermelho, onde a √∫ltima mensagem deve ser: `INFO: Server startup in [457] milliseconds`
+7. Acesse o endere√ßo `localhost:8080`
 
 ### Para que serve o tomcat?
-O Tomcat, ser· respons·vel por:
+O Tomcat, ser√° respons√°vel por:
 * Entender o Protocolo HTTP (Protocolo da WEB);
 * Gerar HTML como **resposta**;
 
 ## <a name="dynamic"></a>Dynamic Web Project
-Apesar do Maven, proporcionar todo um gerenciamento do projeto, podemos nÛs mesmos gerenciar o projeto atravÈs do **_Dynamic Web Project_**, como cria-lo?
+Apesar do Maven, proporcionar todo um gerenciamento do projeto, podemos n√≥s mesmos gerenciar o projeto atrav√©s do **_Dynamic Web Project_**, como cria-lo?
 1. Dentro do Eclipse, vamos em File > New > Other > Dynamic Web Project;
 2. Colocaremos um nome ao projeto;
-3. Eclipse ja entender· que temos um servidor apache (Tomcat) > Next > Next;
-4. Flegar o "generate web.xml" > desta forma ser· criado nosso `web.xml` > Finish;
+3. Eclipse ja entender√° que temos um servidor apache (Tomcat) > Next > Next;
+4. Flegar o "generate web.xml" > desta forma ser√° criado nosso `web.xml` > Finish;
 5. Adicione o Projeto ao Tomcat (basta arrastar o projeto para o servidor);
-6. Crie um arquivo `.html` dentro da pasta `WebContent` e acesse atravÈs `localhost:8080/nomeProjeto/seu.html`
+6. Crie um arquivo `.html` dentro da pasta `WebContent` e acesse atrav√©s `localhost:8080/nomeProjeto/seu.html`
 
-**POSSÕVEIS ERROS**: ao criar o projeto, pode ser apresentado _"erro de incompatibilidade com Java Facets"_, isto se deve a vers„o do Tomcat vs Vers„o do JDK. Para ajustar, basta:
-*  Selecionar o projeto > Properties > Java Facets > Altere a vers„o para 12;
+**POSS√çVEIS ERROS**: ao criar o projeto, pode ser apresentado _"erro de incompatibilidade com Java Facets"_, isto se deve a vers√£o do Tomcat vs Vers√£o do JDK. Para ajustar, basta:
+*  Selecionar o projeto > Properties > Java Facets > Altere a vers√£o para 12;
 
 ### Entendendo as pastas do projeto (com spring)
-Os arquivos .html que n„o seguem o modelo MVC, devem ficar na pasta `WebContent`.<br>
+Os arquivos .html que n√£o seguem o modelo MVC, devem ficar na pasta `WebContent`.<br>
 <img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/dynamicfolder.png?raw=true" width="600">
 
 ## <a name="criandoservlet"></a>Criando Servlet
-Como sabemos, a Servlet nada mais È do que uma classe Java que ser· criada um objeto atravÈs do Tomcat. Para cria-la:
+Como sabemos, a Servlet nada mais √© do que uma classe Java que ser√° criada um objeto atrav√©s do Tomcat. Para cria-la:
 1. Crie um package **_br.com.gerenciador.servlet_**;
-2. Crie a classe **_HelloServlet_** que ir· extender `HttpServlet`;
-3. A classe Servlet, possui um mÈtodo chamado `service` que ir· ter como atributos um `request` e um `response`!
-4. Para que a servlet seja "chamada" pelo navegador, precisamos passar um caminho, atravÈs da anotaÁ„o `@WebServlet(urlPatterns = "/hello")`;
-5. Para passar algo visÌvel ao navegador, iremos atravÈs do `response` passar uma estrutura HTML, utilizando o mÈtodo `resp.getWriter();`
-6. Acesse atravÈs do navegador `http://localhost:8080/gerenciador/hello`
+2. Crie a classe **_HelloServlet_** que ir√° extender `HttpServlet`;
+3. A classe Servlet, possui um m√©todo chamado `service` que ir√° ter como atributos um `request` e um `response`!
+4. Para que a servlet seja "chamada" pelo navegador, precisamos passar um caminho, atrav√©s da anota√ß√£o `@WebServlet(urlPatterns = "/hello")`;
+5. Para passar algo vis√≠vel ao navegador, iremos atrav√©s do `response` passar uma estrutura HTML, utilizando o m√©todo `resp.getWriter();`
+6. Acesse atrav√©s do navegador `http://localhost:8080/gerenciador/hello`
 ```java
 @WebServlet(urlPatterns = "/hello")
 public class HelloServlet extends HttpServlet{
@@ -271,7 +272,7 @@ public class HelloServlet extends HttpServlet{
 		PrintWriter out = resp.getWriter();
 		out.println("<html>");
         out.println("<body>");
-        out.println("ParabÈns, vocÍ escreveu sua primeira servlet");
+        out.println("Parab√©ns, voc√™ escreveu sua primeira servlet");
         out.println("</body>");
         out.println("</html>");
 	}
@@ -279,12 +280,12 @@ public class HelloServlet extends HttpServlet{
 ```
 
 ## <a name="getpost"></a>GET / POST
-* **GET:** basicamente È um protocolo enviado atravÈs da URI;
-* **POST:** ir· na requisiÁ„o "escondida";
+* **GET:** basicamente √© um protocolo enviado atrav√©s da URI;
+* **POST:** ir√° na requisi√ß√£o "escondida";
 
-### RequisiÁ„o via GET
-Para receber par‚metros que vieram via `URI`, temos o nosso protoco `request`, que recebe as requisiÁıes e o mÈtodo `getParameter()` que recebe o par‚metro da requisiÁ„o!
-* Para passar o par‚metro na `URI`, devemos seguir o padr„o HTTP - passando apÛs o nome da requisiÁ„o Servlet (`nomaEmpresa`) um `?`  e o nome do atributo `nome`
+### Requisi√ß√£o via GET
+Para receber par√¢metros que vieram via `URI`, temos o nosso protoco `request`, que recebe as requisi√ß√µes e o m√©todo `getParameter()` que recebe o par√¢metro da requisi√ß√£o!
+* Para passar o par√¢metro na `URI`, devemos seguir o padr√£o HTTP - passando ap√≥s o nome da requisi√ß√£o Servlet (`nomaEmpresa`) um `?`  e o nome do atributo `nome`
 	 * `http://localhost:8080/gerenciador/novaEmpresa?nome=IgorLTDA`
 
 ```java
@@ -299,13 +300,13 @@ public class NovaEmpresa extends HttpServlet {
 	}
 }
 ```
-* Caso seja necess·rio mais par‚emtros, devemos atribuir ao caracter `&outroParametro=XXXX`
+* Caso seja necess√°rio mais par√¢emtros, devemos atribuir ao caracter `&outroParametro=XXXX`
 
-### RequisiÁ„o via POST
-Para realizar via POST, precisaremos de um formul·rio HTML!
-1. No formul·rio, iremos criar um `form` que receber· dois atributos:
+### Requisi√ß√£o via POST
+Para realizar via POST, precisaremos de um formul√°rio HTML!
+1. No formul√°rio, iremos criar um `form` que receber√° dois atributos:
 	* `action=""` -> deve ser o caminho completo da Servlet;
-	* `method=""` -> È o tipo de requisiÁ„o HTTP (GET ou POST);
+	* `method=""` -> √© o tipo de requisi√ß√£o HTTP (GET ou POST);
 2. O `name` do input, deve ser igual ao `req.getParameter` para que a servlet saiba receber corretamente os dados!
 ```html
 <html>
@@ -318,23 +319,23 @@ Para realizar via POST, precisaremos de um formul·rio HTML!
 </html>
 ```
 ## <a name="dopost"></a>doPost & doGet
-Basicamente, quando utilizamos o mÈtodo `service` da Servlet, podemos atribuir mÈtodos GET e POST, porÈm e se quisermos impedir que naquela URL seja acessado o mÈtodo GET por exemplo?
-* `doPost` -> sÛ lida com mÈtodos POST;
-* `doGet` -> sÛ lida com mÈtodos GET;
+Basicamente, quando utilizamos o m√©todo `service` da Servlet, podemos atribuir m√©todos GET e POST, por√©m e se quisermos impedir que naquela URL seja acessado o m√©todo GET por exemplo?
+* `doPost` -> s√≥ lida com m√©todos POST;
+* `doGet` -> s√≥ lida com m√©todos GET;
 
 # <a name="jsp"></a>JSP (Java Server Page)
-Desenvolver com servlets, passando o conte˙do HTML utilizando um `PrintWriter` n„o È uma boa pr·tica, pois imagine criar todo HTML atravÈs da Servlet... <br><br>Para trabalhar com requisiÁıes, foi criado a **JSP (Java Server Page)** de modo È possÌvel **utilizar cÛdigos HTML & cÛdigos Java** juntos!<br><br>
-* A Servlet processa as informaÁıes vindas do Request e passa para a JSP via `req.getRequestDispatcher`, que ent„o ir· renderiza a p·gina no servidor antes de envia-las via response ao usu·rio!
+Desenvolver com servlets, passando o conte√∫do HTML utilizando um `PrintWriter` n√£o √© uma boa pr√°tica, pois imagine criar todo HTML atrav√©s da Servlet... <br><br>Para trabalhar com requisi√ß√µes, foi criado a **JSP (Java Server Page)** de modo √© poss√≠vel **utilizar c√≥digos HTML & c√≥digos Java** juntos!<br><br>
+* A Servlet processa as informa√ß√µes vindas do Request e passa para a JSP via `req.getRequestDispatcher`, que ent√£o ir√° renderiza a p√°gina no servidor antes de envia-las via response ao usu√°rio!
 
 	<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/servlet2.PNG?raw=true" width=400>
 
-Para utilizar cÛdigos java dentro de uma JSP, temos algumas opÁıes:
+Para utilizar c√≥digos java dentro de uma JSP, temos algumas op√ß√µes:
 * ScriptLet `<%= %>`;
 * JSTL;
 
 ## <a name="scriptlet"></a>Scriptlet
-O Scriptlet È utilizado para implementar cÛdigos Java, dentro de uma JSP, utilizando `<% %>`  para demarcar inÌcio e tÈrmino do cÛdigo em Java. Por exemplo:
-* A sintaxe `<%=` È equivalente a `<% out.println()` -> PrintWriter
+O Scriptlet √© utilizado para implementar c√≥digos Java, dentro de uma JSP, utilizando `<% %>`  para demarcar in√≠cio e t√©rmino do c√≥digo em Java. Por exemplo:
+* A sintaxe `<%=` √© equivalente a `<% out.println()` -> PrintWriter
 ```html
 <%
 	String scriptlet = "scriptlet na JSP";
@@ -346,10 +347,10 @@ O Scriptlet È utilizado para implementar cÛdigos Java, dentro de uma JSP, utiliz
 	</body>
 </html>
 ```
-Mas como iremos mandar o cÛdigo da Servlet para a JSP?
+Mas como iremos mandar o c√≥digo da Servlet para a JSP?
 1. Iremos informar a Servlet qual a JSP que iremos passar, utilizando o `req.getRequestDispatcher("/suaJsp")`;
-2. Com o Dispatcher, iremos informar a JSP o atributo que estamos passando, com o mÈtodo `setAttribute`;
-3. Encaminhar ao servidor com o mÈtodo `forward` o `req` e `res`;
+2. Com o Dispatcher, iremos informar a JSP o atributo que estamos passando, com o m√©todo `setAttribute`;
+3. Encaminhar ao servidor com o m√©todo `forward` o `req` e `res`;
 ```java
 protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 	Empresa empresa = new Empresa();
@@ -374,7 +375,7 @@ protected void service(HttpServletRequest req, HttpServletResponse res) throws S
 ```
 
 ## <a name="el"></a>Expressions Languages
-**EL**  veio para facilitar a integraÁ„o entre HTML e JAVA, de forma que fique mais simples o cÛdigo dentro da JSP, utilizando a express„o `${}`.<br>
+**EL**  veio para facilitar a integra√ß√£o entre HTML e JAVA, de forma que fique mais simples o c√≥digo dentro da JSP, utilizando a express√£o `${}`.<br>
 Exemplo com **Scriptlet**:
 ```html
 <%
@@ -397,7 +398,7 @@ Exemplo com **Expression Language**:
 ```
 
 ## <a name="jstl"></a>JSTL
-A **JavaServer Pages Standard Tag Library _(JSTL)_**, como o nome diz, È uma biblioteca que **em conjunto com a EL**, pode implementar diversos cÛdigos do java, como:
+A **JavaServer Pages Standard Tag Library _(JSTL)_**, como o nome diz, √© uma biblioteca que **em conjunto com a EL**, pode implementar diversos c√≥digos do java, como:
 * for;
 * forEach;
 * if;
@@ -406,7 +407,7 @@ A **JavaServer Pages Standard Tag Library _(JSTL)_**, como o nome diz, È uma bib
 
 
 #### Como usar JSTL?
-1. Ser· necess·rio baixar os [.jar](https://mvnrepository.com/artifact/javax.servlet/jstl/1.2)/dependencias para implementa-las;
+1. Ser√° necess√°rio baixar os [.jar](https://mvnrepository.com/artifact/javax.servlet/jstl/1.2)/dependencias para implementa-las;
 ```xml
 <!-- https://mvnrepository.com/artifact/javax.servlet/jstl -->
 <dependency>
@@ -415,8 +416,8 @@ A **JavaServer Pages Standard Tag Library _(JSTL)_**, como o nome diz, È uma bib
     <version>1.2</version>
 </dependency>
 ```
-2. Para utilizar em uma p·gina JSP, ser· necess·rio adicionar um "cabeÁalho" antes;
-	* jstl/core -> contÈm as condicionais (for, foreach, if e etc);
+2. Para utilizar em uma p√°gina JSP, ser√° necess√°rio adicionar um "cabe√ßalho" antes;
+	* jstl/core -> cont√©m as condicionais (for, foreach, if e etc);
 	* fmt -> para formatar datas
 ```java
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -426,9 +427,9 @@ A **JavaServer Pages Standard Tag Library _(JSTL)_**, como o nome diz, È uma bib
 ```
 ## <a name="jstlcore"></a>JSTL - CORE
 #### <a name="foreach"></a>forEach - Listando 
-Para exibir uma lista com objetos/dados, podemos utilizar o mÈtodo `<c:forEach>`, que ir· exigir:
-* `items="${ }"` -> ser· o atributo que foi passado pela Servlet;
-* `var=""` -> ser· a varÌavel que ser· chamada dentro da tag `li`
+Para exibir uma lista com objetos/dados, podemos utilizar o m√©todo `<c:forEach>`, que ir√° exigir:
+* `items="${ }"` -> ser√° o atributo que foi passado pela Servlet;
+* `var=""` -> ser√° a var√≠avel que ser√° chamada dentro da tag `li`
 
 ```html
 <body>
@@ -441,7 +442,7 @@ Para exibir uma lista com objetos/dados, podemos utilizar o mÈtodo `<c:forEach>`
 </body>
 ```
 #### <a name="url"></a> URL
-O mÈtodo `<c:url value="" var="">` basicamente carrega o nome do projeto e pode ser utizado na `action`  de um `<form>`!
+O m√©todo `<c:url value="" var="">` basicamente carrega o nome do projeto e pode ser utizado na `action`  de um `<form>`!
 * Exemplo **form sem JSTL**:
 	```html
 	<form action="/gerenciador/novaEmpresa" method="POST">
@@ -456,9 +457,9 @@ O mÈtodo `<c:url value="" var="">` basicamente carrega o nome do projeto e pode 
 	<form action="${nova}" method="POST">
 	```
 	
-Outro uso da URL, È para colocar o caminho dos arquivos est·ticos, como CSS, JS e etc:
+Outro uso da URL, √© para colocar o caminho dos arquivos est√°ticos, como CSS, JS e etc:
 ```html
-<!-- O contextPath ir· pegar o nome do projeto -->
+<!-- O contextPath ir√° pegar o nome do projeto -->
 <c:url value="/" var="contextPath" />
 
 <link href="${contextPath}css/fonts.css"	rel="stylesheet" type="text/css" media="all" />
@@ -478,36 +479,36 @@ Com JSTL podemos realizar condicionais:
 ```
 ## <a name="jstlfmt"></a>JSTL - FMT
 #### <a name="fmt"></a> formatDate <fmt: formatDate>
-Quando extraimos a data direto do Java, vem um monte de cÛdigo esquisito, para formatar no padr„o brasileiro, temos a TAGLIB FMT:
+Quando extraimos a data direto do Java, vem um monte de c√≥digo esquisito, para formatar no padr√£o brasileiro, temos a TAGLIB FMT:
 ```html
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <fmt:formatDate value="${empresa.dataAbertura}" pattern="dd/MM/yyyy"/>
 ```
-* Para utilizar **_LocalDateTime_** - nova api Java, È necess·rio fazer um **_parseDate_** e depois utilizar o **_formatDate_**:
+* Para utilizar **_LocalDateTime_** - nova api Java, √© necess√°rio fazer um **_parseDate_** e depois utilizar o **_formatDate_**:
 	```html
 	<fmt:parseDate value="${empresa.dataAbertura}" pattern="yyyy-MM-dd" var="parsedDate"/>
 	<td><fmt:formatDate value="${parsedDate}" pattern="dd/MM/yyyy" /></td>
 	```
-* Para receber uma String e passar para um LocalDate, È necess·rio utilizar um `DateTimeFormatter`
+* Para receber uma String e passar para um LocalDate, √© necess√°rio utilizar um `DateTimeFormatter`
 	```java
 	String stringData= "01/04/2020";
 	DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	LocalDate dataLocalDate = LocalDate.parse(stringData, formatador);
 ## <a name="jstlform"></a>JSTL - FORM
-A Tag `<form:xxxx />` possibilita escrevermos menos cÛdigo. Para implementa-la È necess·rio utilizar:
+A Tag `<form:xxxx />` possibilita escrevermos menos c√≥digo. Para implementa-la √© necess√°rio utilizar:
 ```html
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 ```
 * `<form:errors />` -> utilizado para retornar o erro;
 	* `<form:errors path="produto.titulo" cssClass="error"/>`
-* `<form:input />` -> representa o `<input>` do HTML, porÈm permite que o Spring gerencie os valores (desta forma quando a validaÁ„o ocorrer, os campos n„o ser„o apagados;
+* `<form:input />` -> representa o `<input>` do HTML, por√©m permite que o Spring gerencie os valores (desta forma quando a valida√ß√£o ocorrer, os campos n√£o ser√£o apagados;
 	* `<form:hidden />`
 	* `<form:textarea />`
 		* `<form:input path="produto.titulo"/>`
-* `<form:form />` -> utilizado nos formularios, para que n„o seja necess·rio ficar escrevendo _.produto_ por exemplo
+* `<form:form />` -> utilizado nos formularios, para que n√£o seja necess√°rio ficar escrevendo _.produto_ por exemplo
 	* `<form:form action="${s:mvcUrl('PC#gravar').build() }" method="post" modelAttribute="produto">`
 
-AplicaÁ„o com tag `<form />`
+Aplica√ß√£o com tag `<form />`
 ```html
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
@@ -516,21 +517,21 @@ AplicaÁ„o com tag `<form />`
 <body>
 	<form:form action="${s:mvcUrl('PC#cadastra').build()}" method="post" modelAttribute="produto">
 		<div>
-			<label>TÌtulo</label>
+			<label>T√≠tulo</label>
 			<form:input path="titulo"/>
 			<form:errors path="titulo" cssClass="error"/><br>
 			
-			<label>DescriÁ„o</label>
+			<label>Descri√ß√£o</label>
 			<form:textarea path="descricao" rows="10" cols="20"/>
 			<form:errors path="descricao" cssClass="error"/>
 		</div>
 		<div>
-			<label>P·ginas</label> 
+			<label>P√°ginas</label> 
 			<form:input path="paginas"/>
 			<form:errors path="paginas" cssClass="error"/>
 		</div>
 		<div>
-			<label>Data LanÁamento:</label> 
+			<label>Data Lan√ßamento:</label> 
 			<form:input path="dataLancamento"/>
 			<form:errors path="dataLancamento" cssClass="error"/>
 		</div>
@@ -546,19 +547,19 @@ AplicaÁ„o com tag `<form />`
 </body>
 ```
 ## <a name="jstlform"></a>JSTL - Include File
-Quando queremos importar o conte˙do de uma JSP para dentro de outra JSP, utilizamos o `<%@ include file=".jsp"`.
-* Este modelo È muito utilizado para criaÁ„o do header e footer, de modo que fique padronizado nas p·ginas:
+Quando queremos importar o conte√∫do de uma JSP para dentro de outra JSP, utilizamos o `<%@ include file=".jsp"`.
+* Este modelo √© muito utilizado para cria√ß√£o do header e footer, de modo que fique padronizado nas p√°ginas:
 	```html
 	<%@ include file="/WEB-INF/views/cabecalho.jsp" %>
 	<body>
-	<!-- conte˙do da p·gina .jsp-->
+	<!-- conte√∫do da p√°gina .jsp-->
 	</body>
 	<%@ include file="/WEB-INF/views/rodape.jsp" %>
 	```
 ## <a name="jstltemplate"></a>JSTL - Template
-Apesar do `<%@ include file=""` realizar a importaÁ„o de .JSP's existe uma tag respons·vel por implementar templates nas p·ginas!<br><br>
-Para isto, devemos criar a pasta **_tags_** (**_src/main/webapp/WEB-INF/tags_**) e dentro da pasta, devemos criar um arquivo **_.tag_** -> dentro deste arquivo ter· o **cabeÁalho e o rodapÈ**!<br><br>
-* Para que a TAG funcione, È necess·rio remover de todas as .jsps que forem utilizar, o header:
+Apesar do `<%@ include file=""` realizar a importa√ß√£o de .JSP's existe uma tag respons√°vel por implementar templates nas p√°ginas!<br><br>
+Para isto, devemos criar a pasta **_tags_** (**_src/main/webapp/WEB-INF/tags_**) e dentro da pasta, devemos criar um arquivo **_.tag_** -> dentro deste arquivo ter√° o **cabe√ßalho e o rodap√©**!<br><br>
+* Para que a TAG funcione, √© necess√°rio remover de todas as .jsps que forem utilizar, o header:
 	```java
 	<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 	```
@@ -575,7 +576,7 @@ Arquivo **pageTemplate.tag**:
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-        <title>${titulo } - Casa do CÛdigo</title>
+        <title>${titulo } - Casa do C√≥digo</title>
         <!-- RQUIVOS CSS-->
     </head>
 
@@ -596,29 +597,29 @@ Arquivo .jsp de exemplo, utilizando o template:
 <tags:pageTemplate>
 	<jsp:body>
 
-    <!-- conte˙do HTML, como table e etc -->
+    <!-- conte√∫do HTML, como table e etc -->
     
 	</jsp:body>
 </tags:pageTemplate>
 ```
 
-## <a name="crudservlet"></a>1∫ modo - JSP + Servlet
-### AnotaÁıes Servlet
-Relembrando alguns mÈtodos:
-* `@WebServlet("/novaEmpresa")` -> anotaÁ„o para invocar a servlet;
-* `req.getParameter("nomeEmpresa")` -> respons·vel por **receber** parametros (via GET ou POST);
-* `req.setAttribute("atributoParaJSP", empresa.getNome())` -> respons·vel por **passar** os atributos para a JSP ter acesso;
-* `req.getRequestDispatcher("pagina.jsp")` -> apÛs processar o codigo ir· direcionar para a p·gina;
+## <a name="crudservlet"></a>1¬∫ modo - JSP + Servlet
+### Anota√ß√µes Servlet
+Relembrando alguns m√©todos:
+* `@WebServlet("/novaEmpresa")` -> anota√ß√£o para invocar a servlet;
+* `req.getParameter("nomeEmpresa")` -> respons√°vel por **receber** parametros (via GET ou POST);
+* `req.setAttribute("atributoParaJSP", empresa.getNome())` -> respons√°vel por **passar** os atributos para a JSP ter acesso;
+* `req.getRequestDispatcher("pagina.jsp")` -> ap√≥s processar o codigo ir√° direcionar para a p√°gina;
 	* Recebe um tipo `RequestDispatcher rd`;
-* `rd.forward(req, res)` -> ˙ltimo mÈtodo, para encaminhar ao servidor toda requisiÁ„o e resposta;
+* `rd.forward(req, res)` -> √∫ltimo m√©todo, para encaminhar ao servidor toda requisi√ß√£o e resposta;
 * `res.sendRedirect("outraServlet")` -> substitui o Dispatcher
 
 ### Cadastrando
 Para realizar o **cadastro de uma empresa**, precisamos:
-1. Modelo: Empresa e Banco (simular· um banco de dados);
-2. Formul·rio JSP (formEmpresa.jsp);
+1. Modelo: Empresa e Banco (simular√° um banco de dados);
+2. Formul√°rio JSP (formEmpresa.jsp);
 3.  Servlet (empresaServlet);
-4. Formul·rio Retorno do cadastro (empresaCadastrada);
+4. Formul√°rio Retorno do cadastro (empresaCadastrada);
 
 Empresa e Banco
 ```java
@@ -639,7 +640,7 @@ public class Banco {
 
 public class Empresa {
 
-	//iremos utilizar mÈtodos da classe wrapper para fazer parse de String
+	//iremos utilizar m√©todos da classe wrapper para fazer parse de String
 	private Integer id;
 	private String nome;
 	private LocalDateTime dataAbertura = LocalDateTime.now();
@@ -672,7 +673,7 @@ public class cadastraEmpresaServlet extends HttpServlet {
 	protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 		Empresa empresa = new Empresa();
 		
-		//Recebendo par‚metro da URI e atribuindo ao nome da Emrpesa
+		//Recebendo par√¢metro da URI e atribuindo ao nome da Emrpesa
 		String nomeEmpresa= req.getParameter("nomeEmpresa");
 		empresa.setNome(nomeEmpresa);
 
@@ -690,7 +691,7 @@ public class cadastraEmpresaServlet extends HttpServlet {
 		Banco banco = new Banco();
 		banco.adiciona(empresa);
 		
-		//ir· mandar requisiÁ„o para servlet Lista
+		//ir√° mandar requisi√ß√£o para servlet Lista
 		RequestDispatcher rd = req.getRequestDispatcher("/listaEmpresa");
 		req.setAttribute("empresa", empresa.getNome());
 		rd.forward(req, res);
@@ -698,7 +699,7 @@ public class cadastraEmpresaServlet extends HttpServlet {
 }
 ```
 #### Redirect - evitando Refresh 
-Por enquanto se o usu·rio apertar F5 e fizer um refresh, a Servlet ir· cadastrar novamente os usu·rios, pois ao realizar o refresh, estamos requisitando que a servlet `/novaEmpresa` seja chamada novamente.
+Por enquanto se o usu√°rio apertar F5 e fizer um refresh, a Servlet ir√° cadastrar novamente os usu√°rios, pois ao realizar o refresh, estamos requisitando que a servlet `/novaEmpresa` seja chamada novamente.
 * Para evitar este tipo de problema, precisamos alterar a servlet `/novaEmpresa`, onde inves de enviar um **despachador**, iremos **redirecionar** ao navegador!
 	```java
 	req.setAttribute("empresa", empresa.getNome());
@@ -713,8 +714,8 @@ Por enquanto se o usu·rio apertar F5 e fizer um refresh, a Servlet ir· cadastrar
 	
 ### Listando
 Para LISTAR as empresas cadastradas, precisamos:
-* Passar a lista de empresas com o atributo via mÈtodo `setAttribute`
-* Formul·rio JSP (listaEmpresa.jsp);
+* Passar a lista de empresas com o atributo via m√©todo `setAttribute`
+* Formul√°rio JSP (listaEmpresa.jsp);
 
 listaEmpresaServlet
 ```java
@@ -745,7 +746,7 @@ listaEmpresa.jsp
 			<th>Nome</th>
 			<th>Data Abertura</th>
 			<th>Data Cadastro</th>
-			<th colspan="2">AÁıes</th>
+			<th colspan="2">A√ß√µes</th>
 		</tr>
 			<c:forEach items="${empresas}" var="empresa">
 				<tr>
@@ -798,10 +799,10 @@ public class RemoveEmpresaServlet extends HttpServlet {
 }
 ```
 ### Atualizar/Editar
-Para atualizar/editar, ser· **necess·rio** utilizar **duas Servlets**:
+Para atualizar/editar, ser√° **necess√°rio** utilizar **duas Servlets**:
 * para chamar o `mostraEmpresaServlet` 
 * para atualizar de fato a Empresa -> `atualizarEmpresaServlet`.
-	* Necess·rio, assim como para deletar, passar o id
+	* Necess√°rio, assim como para deletar, passar o id
 
 ```html
 //listForm
@@ -882,8 +883,8 @@ public class AtualizaEmpresa extends HttpServlet {
 
 
 # <a name="jdbc"></a>JDBC
-O JDBC (**_Java Database Connectivity_**) , veio com o intuito de criar um padr„o para os Softwares de Banco de Dados (MySQL, SQL Server e etc), onde este padr„o, permitiria que o Desenvolvedor trocasse de DB sem afetar o cÛdigo.<br>
-O JDBC, utiliza uma **_F·brica de Conexıes_**, que necessita de alguns atributos:
+O JDBC (**_Java Database Connectivity_**) , veio com o intuito de criar um padr√£o para os Softwares de Banco de Dados (MySQL, SQL Server e etc), onde este padr√£o, permitiria que o Desenvolvedor trocasse de DB sem afetar o c√≥digo.<br>
+O JDBC, utiliza uma **_F√°brica de Conex√µes_**, que necessita de alguns atributos:
 - driver(jar ou dependencia); 
 - ip;
 - porta;
@@ -903,8 +904,8 @@ public class ConnectionFactory {
 	}
 }
 ```
-## <a name="testejdbc"></a>Testando Conex„o
-Para testar a conex„o, basta a partir da nossa `ConnectionFactory` criarmos um objeto do tipo `Connection`.
+## <a name="testejdbc"></a>Testando Conex√£o
+Para testar a conex√£o, basta a partir da nossa `ConnectionFactory` criarmos um objeto do tipo `Connection`.
 ```java
 public class TesteConexao {
 	public static void main (String[] args) throws SQLException {
@@ -916,12 +917,12 @@ public class TesteConexao {
 	}
 }
 ```
-* PossÌveis erros:
+* Poss√≠veis erros:
 	* `MySQLNonTransientConnectionException:` ->  utilizar conector mais novo;
 	* `Establishing SSL connection without server's identity` -> Adicione depois do BD -> _useTimezone=true&serverTimezone=UTC&useSSL=false_
 
 ## <a name="dao"></a>DAO
-O DAO (**_Data Access Object_**) È uma camada de acesso aos dados -_posteriormente substituido por um repositorio_ - que nos permite executar as rotinas no DB, evitando que ocorra cÛdigos repetidos!<br>
+O DAO (**_Data Access Object_**) √© uma camada de acesso aos dados -_posteriormente substituido por um repositorio_ - que nos permite executar as rotinas no DB, evitando que ocorra c√≥digos repetidos!<br>
 Para tarbalharmos _querys_ utilizamos o tipo  `PrepareStatement`, que recebe o tipo `Connection`e uma `String`.
 
 * Exemplo **INSERT** SEM camada DAO:
@@ -1012,7 +1013,7 @@ public class UsuarioDao {
 	public boolean existeUsuario(Usuario usuario) {
 
 		if (usuario == null) {
-			throw new IllegalArgumentException("Usuario n„o deve ser nulo");
+			throw new IllegalArgumentException("Usuario n√£o deve ser nulo");
 		}
 
 		try {
@@ -1082,16 +1083,16 @@ public class UsuarioDao {
 ```
 
 # <a name="jpa"></a>JPA & Hibernate
-O JPA (**_Java Persistence API_**) È uma **especificaÁ„o** que veio apÛs o JDBC, de modo que:
+O JPA (**_Java Persistence API_**) √© uma **especifica√ß√£o** que veio ap√≥s o JDBC, de modo que:
 * Facilitase o uso de sintaxes do SQL;
-* Trabalha com Objetos e n„o com Relacionamento;
+* Trabalha com Objetos e n√£o com Relacionamento;
 * Cria/Gerencia o Banco de dados;
 * Menos verboso;
 
-A implementaÁ„o mais conhecida È a **Hibernate**;
+A implementa√ß√£o mais conhecida √© a **Hibernate**;
 
 ## <a name="projetocjpa"></a>Criando projeto com JPA
-Para facilitar, o projeto ser· criado com o Maven, utilizando as **dependÍncia do JPA e do MySQL**. Como Banco de Dados, ser· utilizado o **[MariaDB Server](https://mariadb.com/kb/en/mariadb-server-10-4-12/)**.
+Para facilitar, o projeto ser√° criado com o Maven, utilizando as **depend√™ncia do JPA e do MySQL**. Como Banco de Dados, ser√° utilizado o **[MariaDB Server](https://mariadb.com/kb/en/mariadb-server-10-4-12/)**.
 ```xml
 <dependencies>
 	<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
@@ -1109,14 +1110,14 @@ Para facilitar, o projeto ser· criado com o Maven, utilizando as **dependÍncia d
 </dependencies>
 ```
 ### <a name="persistence"></a>persistence.xml
-O JPA recebe sua configuraÁ„o atravÈs de um arquivo xml chamado `persistence.xml`, que deve estar em  **_src/main/resources/META-INF_**. Este arquivo È respons·vel por mapear:
+O JPA recebe sua configura√ß√£o atrav√©s de um arquivo xml chamado `persistence.xml`, que deve estar em  **_src/main/resources/META-INF_**. Este arquivo √© respons√°vel por mapear:
 * driver;
 * jdbc;
 * usuario;
 * senha
 * dialeto (mysql);
-* show_sql / format_sql -> ir· exibir o cÛdigo SQL;
-* hbm2ddl.auto -> respons·vel por atualizar/criar as tabelas
+* show_sql / format_sql -> ir√° exibir o c√≥digo SQL;
+* hbm2ddl.auto -> respons√°vel por atualizar/criar as tabelas
 
 persistence.xml (sem Spring)
 ```xml
@@ -1146,38 +1147,38 @@ persistence.xml (sem Spring)
 </persistence>
 ```
 
-## <a name="persistence"></a> AnotaÁıes
-O Hibernate utiliza diversas **anotaÁıes** para nos ajudar a trabalhar com as tabelas e colunas.<br>
+## <a name="persistence"></a> Anota√ß√µes
+O Hibernate utiliza diversas **anota√ß√µes** para nos ajudar a trabalhar com as tabelas e colunas.<br>
 
-C”DIGO BASE:
-* `@Entity` -> indica o objeto para se tornar persistÌvel (MODELO)
-* `@Table(name="tarefas")` -> indica que ser· a Tabela com nome XXXX
+C√ìDIGO BASE:
+* `@Entity` -> indica o objeto para se tornar persist√≠vel (MODELO)
+* `@Table(name="tarefas")` -> indica que ser√° a Tabela com nome XXXX
   
 P/ COLUNAS:
-* `@Id` --> indica que aquele atributo È um ID
+* `@Id` --> indica que aquele atributo √© um ID
 	*  `@GeneratedValue` -> serve para deixar o Hibernate responsavel por gerenciar o ID
-		*  `GenerationType.AUTO` -> Valor padr„o, deixa com o provedor de persistÍncia a escolha da estratÈgia mais adequada  de acordo com o banco de dados.
-		* `GenerationType.IDENTITY` -> Identificador ˙nico ser„o gerados pela coluna de auto incremento do banco de dados.
-*  `@Column(name = "nomeDaColuna", nullable = false)` -> ir· criar a coluna com este nome;
-	* `@Column(nullable = false)` -> Indica que n„o pode ser nulo
+		*  `GenerationType.AUTO` -> Valor padr√£o, deixa com o provedor de persist√™ncia a escolha da estrat√©gia mais adequada  de acordo com o banco de dados.
+		* `GenerationType.IDENTITY` -> Identificador √∫nico ser√£o gerados pela coluna de auto incremento do banco de dados.
+*  `@Column(name = "nomeDaColuna", nullable = false)` -> ir√° criar a coluna com este nome;
+	* `@Column(nullable = false)` -> Indica que n√£o pode ser nulo
 * `@Size(min=10, max=256, message = "Deu ruim")`;
 
 Para LocalDateTime:
 * `@DateTimeFormat(pattern="dd/MM/yyyy")`
 	* `@Temporal(TemporalType.DATE)`  -> Temporal utilizado para datas / TemporalType indica o tipo de dado
-	* `@Temporal(TemporalType.TIME)`  -> TemporalType, retorna o hor·rio
+	* `@Temporal(TemporalType.TIME)`  -> TemporalType, retorna o hor√°rio
 
 Para Enum:
 * `@Enumerated`
-	* `@Enumerated(EnumType.STRING)`  ->indica que ser· retornado os valores da String
+	* `@Enumerated(EnumType.STRING)`  ->indica que ser√° retornado os valores da String
 
 P/ RELACIONAMENTOS:
-* `@ManyToOne` -> List -> Muitas MovimentaÁıes para Uma Conta -> Ser· criada uma  coluna com **_chave estrangeira_**
+* `@ManyToOne` -> List -> Muitas Movimenta√ß√µes para Uma Conta -> Ser√° criada uma  coluna com **_chave estrangeira_**
 * `@OneToMany`
-* `@ManyToMany` -> Muitas MovimentaÁıes para Muitas Categorias -> _Uma MovimentaÁ„o pode estar em Muitas Categorias e Uma Categoria pode ter Muitas MovimentaÁıes_ -> Quando criada, ser· criada uma **_tabela relacionamento_**;
+* `@ManyToMany` -> Muitas Movimenta√ß√µes para Muitas Categorias -> _Uma Movimenta√ß√£o pode estar em Muitas Categorias e Uma Categoria pode ter Muitas Movimenta√ß√µes_ -> Quando criada, ser√° criada uma **_tabela relacionamento_**;
 	* `@JoinTable(name="NomeDaTabela")`
-* `@OneToOne` -> Um Cliente possui Uma Conta -> _Uma Conta sÛ tem Um Cliente_
-	* `@JoinColumn(unique=true)` -> faz com que os id pertenÁam somente ao id da outra tabela
+* `@OneToOne` -> Um Cliente possui Uma Conta -> _Uma Conta s√≥ tem Um Cliente_
+	* `@JoinColumn(unique=true)` -> faz com que os id perten√ßam somente ao id da outra tabela
 
 ## <a name="criandoentidade"></a> Criando uma Entidade
 ```java
@@ -1195,7 +1196,7 @@ public class Conta {
 }
 ```
 
-Criando mÈtodo `main` para que a JPA crie a tabela:
+Criando m√©todo `main` para que a JPA crie a tabela:
 ```java
 public static void main(String[] args) {
 	EntityManagerFactory emf = Persistence.createEntityManagerFactory("conta");
@@ -1204,13 +1205,13 @@ public static void main(String[] args) {
 	em.close();
 }
 ```
-Para checar se ocorreu, ser· exibido no console, mas tambÈm È possÌvel atravÈs do **MySQL Console (MariaDB)**:
+Para checar se ocorreu, ser√° exibido no console, mas tamb√©m √© poss√≠vel atrav√©s do **MySQL Console (MariaDB)**:
 ```sql
 show databases;
 use igor_jpa;
 
 show tables;
-desc nomeDaTabela; #ir· conferir os atributos da tabela
+desc nomeDaTabela; #ir√° conferir os atributos da tabela
 
 +---------+--------------+------+-----+---------+----------------+
 | Field   | Type         | Null | Key | Default | Extra          |
@@ -1223,14 +1224,14 @@ desc nomeDaTabela; #ir· conferir os atributos da tabela
 ```
 
 ## <a name="crudjpa"></a> CRUD - JPA
-Para realizar a inserÁ„o de dados no DB, utilizamos a classe `EntityManager` (que recebe a fabrica de conex„o). Onde basicamente temos os mÈtodos abaixo:
+Para realizar a inser√ß√£o de dados no DB, utilizamos a classe `EntityManager` (que recebe a fabrica de conex√£o). Onde basicamente temos os m√©todos abaixo:
 - `find` --> pode-se utilizar como WHERE [Tarefa localizaPorId = manager.find(Tarefa.class, 1L)]
  - `remove` --> utilizado como DELETE
  - `merge` --> utilizado como UPDATE
  - `persist` --> utilizado como INSERT [manager.persist(tarefa);]
 
-**POR…EMMM**... quando queremos realizar operaÁıes de **inserÁ„o, remoÁ„o ou atualizaÁ„o** È necess·rio utilizar atravÈs de uma **transaÁ„o**, com `.getTransaction().begin();` e  `em.getTransaction().commit();`
-* _A transaÁ„o È um mecanismo para manter a consistÍncia das alteraÁıes de estado no banco, visto que todas as operaÁıes precisam ser executadas com sucesso, para que a transaÁ„o seja confirmada._
+**POR√âEMMM**... quando queremos realizar opera√ß√µes de **inser√ß√£o, remo√ß√£o ou atualiza√ß√£o** √© necess√°rio utilizar atrav√©s de uma **transa√ß√£o**, com `.getTransaction().begin();` e  `em.getTransaction().commit();`
+* _A transa√ß√£o √© um mecanismo para manter a consist√™ncia das altera√ß√µes de estado no banco, visto que todas as opera√ß√µes precisam ser executadas com sucesso, para que a transa√ß√£o seja confirmada._
 
 ### Inserindo
 ```java
@@ -1251,7 +1252,7 @@ public static void main(String[] args) {
 }
 ```
 ### Procurando e Atualizando
-Para localizar atravÈs do `id` a JPA possui o mÈtodo `find`, onde n„o È necess·rio criar uma `query`:
+Para localizar atrav√©s do `id` a JPA possui o m√©todo `find`, onde n√£o √© necess√°rio criar uma `query`:
 ```java
 public static void main(String[] args) {
 	EntityManagerFactory emf = Persistence.createEntityManagerFactory("conta");
@@ -1284,19 +1285,19 @@ public static void main(String[] args) {
 ```
 ## <a name="estadosjpa"></a>Estados da JPA
 ### <a name="managed"></a>Managed
-Quando o objeto est· no estado **_managed_**, significa que poder· sofrer alteraÁıes pela JPA, ou seja, est· em **sincronizaÁ„o autom·tica** - qualquer tipo de alteraÁ„o que o objeto tiver, a JPA ir· fazer um **update** no banco. <br>
-Isto ocorre quando passamos o objeto, atravÈs do `EntityManager`, ou seja, enquanto n„o houver um `close()`, a JPA estar· verificando o objeto.
+Quando o objeto est√° no estado **_managed_**, significa que poder√° sofrer altera√ß√µes pela JPA, ou seja, est√° em **sincroniza√ß√£o autom√°tica** - qualquer tipo de altera√ß√£o que o objeto tiver, a JPA ir√° fazer um **update** no banco. <br>
+Isto ocorre quando passamos o objeto, atrav√©s do `EntityManager`, ou seja, enquanto n√£o houver um `close()`, a JPA estar√° verificando o objeto.
 
 ### <a name="detached"></a>Detached
-Quando o objeto esteve no estado managed e houve um `close` do `EntityManager`, o objeto passa a ser um objeto **_detached_**, ou seja, a JPA n„o est· mais sincronizando.
+Quando o objeto esteve no estado managed e houve um `close` do `EntityManager`, o objeto passa a ser um objeto **_detached_**, ou seja, a JPA n√£o est√° mais sincronizando.
 
 ### <a name="removed"></a>Removed
-O objeto passa a estar no estado **_removed_** quando utilizamos o mÈtodo `removed(obj)`;
+O objeto passa a estar no estado **_removed_** quando utilizamos o m√©todo `removed(obj)`;
 
 ## <a name="jpql"></a>JPQL
-O JPQL (**_Java Persistence Query Language_**) È uma linguagem de consultas, enquanto o SQL (**_Structured Query Language_**) È voltado ao relacionamento.<br>
+O JPQL (**_Java Persistence Query Language_**) √© uma linguagem de consultas, enquanto o SQL (**_Structured Query Language_**) √© voltado ao relacionamento.<br>
 
-Utilizando o objeto MovimentaÁ„o como exemplo:
+Utilizando o objeto Movimenta√ß√£o como exemplo:
 * Exemplo **SQL**:
 	```sql
 	select * from movimentacao;
@@ -1320,7 +1321,7 @@ public static void main(String[] args) {
 }
 
 ```
-### <a name="consultacriterio"></a>Consulta com critÈrio
+### <a name="consultacriterio"></a>Consulta com crit√©rio
 
 * Exemplo **SQL**:	
 	```sql
@@ -1332,8 +1333,8 @@ public static void main(String[] args) {
 	select mfrom Movimentacao m where m.conta.id = 2;
 	```
 
-### <a name="consultparametro"></a>Consulta com par‚metros
-Quando È utilizado par‚metros com JPA, invez de utilizarmos o `(?, ?, ?)`, utilizamos um **_named parameter_** que se torna mais f·cil de trabalhar.
+### <a name="consultparametro"></a>Consulta com par√¢metros
+Quando √© utilizado par√¢metros com JPA, invez de utilizarmos o `(?, ?, ?)`, utilizamos um **_named parameter_** que se torna mais f√°cil de trabalhar.
 ```sql
 public static void main(String[] args) {
 	
@@ -1343,7 +1344,7 @@ public static void main(String[] args) {
 	String jpql = "SELECT c FROM Conta c WHERE c.id = :pId";
 	TypedQuery<Conta> query = em.createQuery(jpql, Conta.class);
 	
-	//par‚metro
+	//par√¢metro
 	query.setParameter("pId", conta.getId());
 	
 	List<Conta> contas = query.getResultList();
@@ -1359,7 +1360,7 @@ public List<Produto> getProdutos(Integer contaId, Integer usuarioId) {
 	String jpql = "SELECT c FROM Conta c JOIN FETCH c.Usuario u WHERE c.id = :pContaId AND u.id = :pUsuarioId";
 	TypedQuery<Conta> query = em.createQuery(jpql, Conta.class);
 	
-	//par‚metro
+	//par√¢metro
 	query.setParameter("pContaId ", contaId);
 	query.setParameter("pUsuarioId", usuarioId);
 	
@@ -1367,18 +1368,18 @@ public List<Produto> getProdutos(Integer contaId, Integer usuarioId) {
 	contas.forEach(c -> System.out.println(c.getTitular()));
 }
 ```
-**POR…EEMMMM...** Caso n„o seja informado um dos `ids` teremos um problema na query, sendo assim, teriamos que realizar **v·rios ifs** para verificar se foi passado os dois par‚metros, ou um par‚metro, o que seria muito verboso.<br>
-Para resolver o problema de termos muitos par‚metros para realizar consulta, foi criada a **_API Criteria_**!
+**POR√âEEMMMM...** Caso n√£o seja informado um dos `ids` teremos um problema na query, sendo assim, teriamos que realizar **v√°rios ifs** para verificar se foi passado os dois par√¢metros, ou um par√¢metro, o que seria muito verboso.<br>
+Para resolver o problema de termos muitos par√¢metros para realizar consulta, foi criada a **_API Criteria_**!
 
 ## <a name="apicriteria"></a> API Criteria
-Conforme explicado a cima, a `CriteriaQuery` È muito utilizada quando temos **+1 par‚metro** a ser computador na consulta SQL.
-1. Para criar uma query do tipo `CriteriaQuery`, iremos utilizar o `EntityManager` passando o mÈtodo `getCriteriaBuilder()` que ir· retornar um tipo `CriteriaBuilder`
-	*  _Este Builder, possui diversos outros mÈtodos adicionais do SQL, como_ `equals(), like();` 
-2. O tipo `CriteriaQuery<?>` precisa receber a Classe que ser· feito o `FROM` e para instanciar esta Classe, iremos utilizar o `.class` no `createQuery`;
-3. Com o `CriteriaQuery` criado, podemos utilizar os mÈtodos: `from() | get() | join()`;
-4. A partir do mÈtodo `from()`, recebemos a Interface `Root<?>`, onde poderemos traÁar o caminho dos atributos!
-	* Para traÁar o caminho, utilizamos o mÈtodo `get("nomeColuna")`, que ir· retornar um `path` e como estamos passando uma String, devemos colocar dentro do `<>`;
-5. Ao final, devemos adicionar a cl·usula `WHERE`, que receber· o um Array de `Predicate`;
+Conforme explicado a cima, a `CriteriaQuery` √© muito utilizada quando temos **+1 par√¢metro** a ser computador na consulta SQL.
+1. Para criar uma query do tipo `CriteriaQuery`, iremos utilizar o `EntityManager` passando o m√©todo `getCriteriaBuilder()` que ir√° retornar um tipo `CriteriaBuilder`
+	*  _Este Builder, possui diversos outros m√©todos adicionais do SQL, como_ `equals(), like();` 
+2. O tipo `CriteriaQuery<?>` precisa receber a Classe que ser√° feito o `FROM` e para instanciar esta Classe, iremos utilizar o `.class` no `createQuery`;
+3. Com o `CriteriaQuery` criado, podemos utilizar os m√©todos: `from() | get() | join()`;
+4. A partir do m√©todo `from()`, recebemos a Interface `Root<?>`, onde poderemos tra√ßar o caminho dos atributos!
+	* Para tra√ßar o caminho, utilizamos o m√©todo `get("nomeColuna")`, que ir√° retornar um `path` e como estamos passando uma String, devemos colocar dentro do `<>`;
+5. Ao final, devemos adicionar a cl√°usula `WHERE`, que receber√° o um Array de `Predicate`;
 
 ### Consulta simples com criteria
 ```java
@@ -1413,13 +1414,13 @@ public List<Produto> getProdutos(String nome, Integer categoriaId, Integer lojaI
 }
 ```
 ## <a name="openentity"></a> OpenEntityManagerInView
-Por padr„o, o Spring ao abrir um `EntityManager` ele fechar· apÛs a execuÁ„o.
-* Exemplo: quando utilizamos o mÈtodo `find()` o Spring, ir· fazer a consulta no DB e ent„o ir· fechar o `EntityManager` automaticamente.
+Por padr√£o, o Spring ao abrir um `EntityManager` ele fechar√° ap√≥s a execu√ß√£o.
+* Exemplo: quando utilizamos o m√©todo `find()` o Spring, ir√° fazer a consulta no DB e ent√£o ir√° fechar o `EntityManager` automaticamente.
 
-O problema em fechar o `EntityManager` autom·ticamente, È quando temos na JSP, uma consulta que ir· necessitar que o `EntityManager` continue aberto.
-* Exemplo: Temos uma p·gina que possui a opÁ„o de Filmes, onde cada Filme, possui uma categoria (AÁ„o, FicÁ„o e etc). Ao editarmos o Filme, o `EntityManager` ir· fazer um `findById()` e apÛs ter encontrado ir· encerrar-lo. Mas e as categorias???? Ir· gerar um erro, pois n„o foram carregadas.
+O problema em fechar o `EntityManager` autom√°ticamente, √© quando temos na JSP, uma consulta que ir√° necessitar que o `EntityManager` continue aberto.
+* Exemplo: Temos uma p√°gina que possui a op√ß√£o de Filmes, onde cada Filme, possui uma categoria (A√ß√£o, Fic√ß√£o e etc). Ao editarmos o Filme, o `EntityManager` ir√° fazer um `findById()` e ap√≥s ter encontrado ir√° encerrar-lo. Mas e as categorias???? Ir√° gerar um erro, pois n√£o foram carregadas.
 
-Para corrigir este tipo de problema, o Spring possui o `OpenEntityManagerInView` que pode ser configurado dentro da classe `Configurador extends WebMvcConfigurerAdapter`, que ser feito atravÈs de um `InterceptorRegistry`
+Para corrigir este tipo de problema, o Spring possui o `OpenEntityManagerInView` que pode ser configurado dentro da classe `Configurador extends WebMvcConfigurerAdapter`, que ser feito atrav√©s de um `InterceptorRegistry`
 ```java
 @Bean
 	public OpenEntityManagerInViewInterceptor getOpenEntityManagerInViewInterceptor() {
@@ -1432,8 +1433,8 @@ Para corrigir este tipo de problema, o Spring possui o `OpenEntityManagerInView`
 ```
 
 ## <a name="lockotimista"></a> Lock Otimista
-Imaginemos um cen·rio, onde dois analistas est„o editando um livro (alterando o tÌtulo, preÁo e etc). O que vai acontecer quando um dos analistas alterar o preÁo e salvar, enquanto o outro estiver alterando o tÌtulo? **PROBLEMA!** pois a aplicaÁ„o ir· entender o ˙ltimo registro feito, ou seja, se o ˙ltimo foi feito a alteraÁ„o do tÌtulo (com o preÁo antigo), ser· gravada todas informaÁıes do formul·rio do analista que estava trocando o preÁo!
-* Para resolver este problema, o Spring possui uma anotaÁ„o chamada `@Version`, onde basta que seja adicionada a Classe, que ele ir· gerenciar e evitar este tipo de erro:
+Imaginemos um cen√°rio, onde dois analistas est√£o editando um livro (alterando o t√≠tulo, pre√ßo e etc). O que vai acontecer quando um dos analistas alterar o pre√ßo e salvar, enquanto o outro estiver alterando o t√≠tulo? **PROBLEMA!** pois a aplica√ß√£o ir√° entender o √∫ltimo registro feito, ou seja, se o √∫ltimo foi feito a altera√ß√£o do t√≠tulo (com o pre√ßo antigo), ser√° gravada todas informa√ß√µes do formul√°rio do analista que estava trocando o pre√ßo!
+* Para resolver este problema, o Spring possui uma anota√ß√£o chamada `@Version`, onde basta que seja adicionada a Classe, que ele ir√° gerenciar e evitar este tipo de erro:
 
 ```java
 public class Produto {
@@ -1450,10 +1451,10 @@ public class Produto {
 ```
 
 ## <a name="cache"></a> Cache
-Para evitar diversos `SELECT`na aplicaÁ„o, podemos utilizar o Cache, de forma que a JPA ir· primeiro verificar no Cache se ja foi feito a consulta, caso contr·rio, ser· feito um ˙nico `SELECT` .
-* O cache serve para melhorar a perfomance da aplicaÁ„o!
+Para evitar diversos `SELECT`na aplica√ß√£o, podemos utilizar o Cache, de forma que a JPA ir√° primeiro verificar no Cache se ja foi feito a consulta, caso contr√°rio, ser√° feito um √∫nico `SELECT` .
+* O cache serve para melhorar a perfomance da aplica√ß√£o!
 
-Para configurar o Cache, iremos precisar inserir novas propriedades a **_configuraÁ„o do JPA_**:
+Para configurar o Cache, iremos precisar inserir novas propriedades a **_configura√ß√£o do JPA_**:
 Via xml:
 ```xml
 <property name="hibernate.cache.use_second_level_cache" value="true" />
@@ -1495,16 +1496,16 @@ Via Java:
 
 
 ```
-Desta forma, j· est· habilitado o Cache ao JPA, agora iremos colocar a anotaÁ„o `@Cache(usage = ....)` cada as Classes que queremos que seja armazenado no cache as consultas:
+Desta forma, j√° est√° habilitado o Cache ao JPA, agora iremos colocar a anota√ß√£o `@Cache(usage = ....)` cada as Classes que queremos que seja armazenado no cache as consultas:
 ```java
 @Entity
 @Cache(usage=CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Produto {
-    // Conte˙do da classe
+    // Conte√∫do da classe
 }
 ```
 ### Cache nas Querys
-Indo na classe DAO/Repository, iremos adicionar na `TypedQuery` o cÛdigo abaixo:
+Indo na classe DAO/Repository, iremos adicionar na `TypedQuery` o c√≥digo abaixo:
 ```java
 TypedQuery<Produto> typedQuery = em.createQuery(query.where(conjuncao));
 typedQuery.setHint("org.hibernate.cacheable", "true");
@@ -1513,8 +1514,8 @@ return typedQuery.getResultList();
 ```
 
 ## <a name="hibernatestat"></a> Hibernate Statistics
-O Hibernate Statistics nos permite acompanhar a quantidade de consultas (**_miss_**) que foram feitas e tambÈm a quantidade de **_hits_** (cache). Basta que:
-* Seja incluÌdo dentro da classe `Configurador`:
+O Hibernate Statistics nos permite acompanhar a quantidade de consultas (**_miss_**) que foram feitas e tamb√©m a quantidade de **_hits_** (cache). Basta que:
+* Seja inclu√≠do dentro da classe `Configurador`:
 	```java
 	@Bean
 	public Statistics statistics(EntityManagerFactory emf) { 
@@ -1554,14 +1555,14 @@ O Hibernate Statistics nos permite acompanhar a quantidade de consultas (**_miss
 
 
 ## <a name="crudjpa"></a> CRUD - JPA
-Para realizar a inserÁ„o de dados no DB, utilizamos a classe `EntityManager` (que recebe a fabrica de conex„o). Onde basicamente temos os mÈtodos abaixo:
+Para realizar a inser√ß√£o de dados no DB, utilizamos a classe `EntityManager` (que recebe a fabrica de conex√£o). Onde basicamente temos os m√©todos abaixo:
 - `find` --> pode-se utilizar como WHERE [Tarefa localizaPorId = manager.find(Tarefa.class, 1L)]
  - `remove` --> utilizado como DELETE
  - `merge` --> utilizado como UPDATE
  - `persist` --> utilizado como INSERT [manager.persist(tarefa);]
 
-**POR…EMMM**... quando queremos realizar operaÁıes de **inserÁ„o, remoÁ„o ou atualizaÁ„o** È necess·rio utilizar atravÈs de uma **transaÁ„o**, com `.getTransaction().begin();` e  `em.getTransaction().commit();`
-* _A transaÁ„o È um mecanismo para manter a consistÍncia das alteraÁıes de estado no banco, visto que todas as operaÁıes precisam ser executadas com sucesso, para que a transaÁ„o seja confirmada._
+**POR√âEMMM**... quando queremos realizar opera√ß√µes de **inser√ß√£o, remo√ß√£o ou atualiza√ß√£o** √© necess√°rio utilizar atrav√©s de uma **transa√ß√£o**, com `.getTransaction().begin();` e  `em.getTransaction().commit();`
+* _A transa√ß√£o √© um mecanismo para manter a consist√™ncia das altera√ß√µes de estado no banco, visto que todas as opera√ß√µes precisam ser executadas com sucesso, para que a transa√ß√£o seja confirmada._
 
 ### Inserindo
 ```java
@@ -1582,7 +1583,7 @@ public static void main(String[] args) {
 }
 ```
 ### Procurando e Atualizando
-Para localizar atravÈs do `id` a JPA possui o mÈtodo `find`, onde n„o È necess·rio criar uma `query`:
+Para localizar atrav√©s do `id` a JPA possui o m√©todo `find`, onde n√£o √© necess√°rio criar uma `query`:
 ```java
 public static void main(String[] args) {
 	EntityManagerFactory emf = Persistence.createEntityManagerFactory("conta");
@@ -1615,19 +1616,19 @@ public static void main(String[] args) {
 ```
 ## <a name="estadosjpa"></a>Estados da JPA
 ### <a name="managed"></a>Managed
-Quando o objeto est· no estado **_managed_**, significa que poder· sofrer alteraÁıes pela JPA, ou seja, est· em **sincronizaÁ„o autom·tica** - qualquer tipo de alteraÁ„o que o objeto tiver, a JPA ir· fazer um **update** no banco. <br>
-Isto ocorre quando passamos o objeto, atravÈs do `EntityManager`, ou seja, enquanto n„o houver um `close()`, a JPA estar· verificando o objeto.
+Quando o objeto est√° no estado **_managed_**, significa que poder√° sofrer altera√ß√µes pela JPA, ou seja, est√° em **sincroniza√ß√£o autom√°tica** - qualquer tipo de altera√ß√£o que o objeto tiver, a JPA ir√° fazer um **update** no banco. <br>
+Isto ocorre quando passamos o objeto, atrav√©s do `EntityManager`, ou seja, enquanto n√£o houver um `close()`, a JPA estar√° verificando o objeto.
 
 ### <a name="detached"></a>Detached
-Quando o objeto esteve no estado managed e houve um `close` do `EntityManager`, o objeto passa a ser um objeto **_detached_**, ou seja, a JPA n„o est· mais sincronizando.
+Quando o objeto esteve no estado managed e houve um `close` do `EntityManager`, o objeto passa a ser um objeto **_detached_**, ou seja, a JPA n√£o est√° mais sincronizando.
 
 ### <a name="removed"></a>Removed
-O objeto passa a estar no estado **_removed_** quando utilizamos o mÈtodo `removed(obj)`;
+O objeto passa a estar no estado **_removed_** quando utilizamos o m√©todo `removed(obj)`;
 
 ## <a name="jpql"></a>JPQL
-O JPQL (**_Java Persistence Query Language_**) È uma linguagem de consultas, enquanto o SQL (**_Structured Query Language_**) È voltado ao relacionamento.<br>
+O JPQL (**_Java Persistence Query Language_**) √© uma linguagem de consultas, enquanto o SQL (**_Structured Query Language_**) √© voltado ao relacionamento.<br>
 
-Utilizando o objeto MovimentaÁ„o como exemplo:
+Utilizando o objeto Movimenta√ß√£o como exemplo:
 * Exemplo **SQL**:
 	```sql
 	select * from movimentacao;
@@ -1651,7 +1652,7 @@ public static void main(String[] args) {
 }
 
 ```
-### <a name="consultacriterio"></a>Consulta com critÈrio
+### <a name="consultacriterio"></a>Consulta com crit√©rio
 
 * Exemplo **SQL**:	
 	```sql
@@ -1663,8 +1664,8 @@ public static void main(String[] args) {
 	select mfrom Movimentacao m where m.conta.id = 2;
 	```
 
-### <a name="consultparametro"></a>Consulta com par‚metros
-Quando È utilizado par‚metros com JPA, invez de utilizarmos o `(?, ?, ?)`, utilizamos um **_named parameter_** que se torna mais f·cil de trabalhar.
+### <a name="consultparametro"></a>Consulta com par√¢metros
+Quando √© utilizado par√¢metros com JPA, invez de utilizarmos o `(?, ?, ?)`, utilizamos um **_named parameter_** que se torna mais f√°cil de trabalhar.
 ```sql
 public static void main(String[] args) {
 	
@@ -1674,7 +1675,7 @@ public static void main(String[] args) {
 	String jpql = "SELECT c FROM Conta c WHERE c.id = :pId";
 	TypedQuery<Conta> query = em.createQuery(jpql, Conta.class);
 	
-	//par‚metro
+	//par√¢metro
 	query.setParameter("pId", conta.getId());
 	
 	List<Conta> contas = query.getResultList();
@@ -1684,8 +1685,8 @@ public static void main(String[] args) {
 
 
 # <a name="webservice"></a>Web Services/API
-Em uma aplicaÁ„o comum, a conversa entre o **_Request e Response_** È feito para o **navegador**, mas e se queremos utilizar, por exemplo, um celular? Televis„o? Jogo? <br>
-InvÈs de sempre devolvermos um HTML, podemos mandar **somente os dados** de uma maneira **diferente**, por exemplo, atravÈs protocolo HTTP, utilizando:
+Em uma aplica√ß√£o comum, a conversa entre o **_Request e Response_** √© feito para o **navegador**, mas e se queremos utilizar, por exemplo, um celular? Televis√£o? Jogo? <br>
+Inv√©s de sempre devolvermos um HTML, podemos mandar **somente os dados** de uma maneira **diferente**, por exemplo, atrav√©s protocolo HTTP, utilizando:
 * json;
 * xml;
 
@@ -1701,17 +1702,17 @@ Para trabalharmos com json ou xml, o java possui bibliotecas:
 * XStream: [xstream-1.4.10-jars.zip](https://caelum-online-public.s3.amazonaws.com/1001-servlets-parte2/06/xstream-1.4.10-jars.zip)
 
 E a tal API (**_Application Programming Interface_**)?
-* Grandes provedores de Web Services, possuem **v·rios serviÁos** com v·rias funcionalidades, e precisamos saber:
-	* Qual o endereÁo?
-	* Qual o mÈtodo HTTP?
+* Grandes provedores de Web Services, possuem **v√°rios servi√ßos** com v√°rias funcionalidades, e precisamos saber:
+	* Qual o endere√ßo?
+	* Qual o m√©todo HTTP?
 	* Qual o formato (json ou xml)?
-	* Qual os par‚metros a serem enviados?
-* Tudo acima, faz parte da definiÁ„o de uma **API DE SERVI«O**!
+	* Qual os par√¢metros a serem enviados?
+* Tudo acima, faz parte da defini√ß√£o de uma **API DE SERVI√áO**!
 
-**_"No contexto de _Web Service_, a API define a interface das funcionalidades que o serviÁo oferece"_**
+**_"No contexto de _Web Service_, a API define a interface das funcionalidades que o servi√ßo oferece"_**
 
 ## <a name="json"></a>Json
-Para retornarmos um json, podemos utilizar a biblioteca **gson**, que atravÈs de um `List`, podemos transforma-lo no formato .json!
+Para retornarmos um json, podemos utilizar a biblioteca **gson**, que atrav√©s de um `List`, podemos transforma-lo no formato .json!
 ```java
 @WebServlet("/jsonServlet")
 public class JsonServlet extends HttpServlet {
@@ -1736,26 +1737,26 @@ public class JsonServlet extends HttpServlet {
 
 # <a name="springmvc"></a> SPRING MVC
 
-O Spring È um dos maiores frameworks de mercado Java. Possui diversos mÛdulos que facilitam a vida do desenvolvedor!<br>
+O Spring √© um dos maiores frameworks de mercado Java. Possui diversos m√≥dulos que facilitam a vida do desenvolvedor!<br>
 ## <a name="configspring"></a> Configurando Spring
-Para utilizar o Spring, se faz necess·rio algumas configuraÁıes/dependÍncias _(algumas configuraÁıes com o Spring Boot j· s„o preenchidas)_, em alguns arquivos, como:
+Para utilizar o Spring, se faz necess√°rio algumas configura√ß√µes/depend√™ncias _(algumas configura√ß√µes com o Spring Boot j√° s√£o preenchidas)_, em alguns arquivos, como:
 * pom.xml;
 * aplication.properties
 
-E para facilitar, o Spring oferece o [**_Spring Initializer_**](https://start.spring.io/) que possibilita a geraÁ„o de um projeto Maven/Groove com os arquivos padrıes j· prÈ configurados;
+E para facilitar, o Spring oferece o [**_Spring Initializer_**](https://start.spring.io/) que possibilita a gera√ß√£o de um projeto Maven/Groove com os arquivos padr√µes j√° pr√© configurados;
 
 ## <a name="springini"></a>Spring Initializer
 Atraves do initializer, podemos montar o projeto com as dependencias;<br>
-DependÍncias mais utilizadas:
+Depend√™ncias mais utilizadas:
 
-* **Spring DevTools** -> faz com que as atualizaÁıes sejam automaticas;
+* **Spring DevTools** -> faz com que as atualiza√ß√µes sejam automaticas;
 	*  **LiveReload plugin** -> faz com que a pagina mesmo se atualize sozinha;
-* **Spring Data JPA** -> Dependencias do JPA, para conex„o e gest„o do banco de dados;
-* **Spring Web** -> ir· atribuit as properidades b·sicas da WEB;
+* **Spring Data JPA** -> Dependencias do JPA, para conex√£o e gest√£o do banco de dados;
+* **Spring Web** -> ir√° atribuit as properidades b√°sicas da WEB;
 * **MySQL Driver** -> driver do banco de dados
 
 ## <a name="tomcatjsp"></a>Tomcat + JSP
-Para **utilizar a JSP** È necess·rio adicionar as dependÍncias abaixo manualmente no **_pom.xml_**:
+Para **utilizar a JSP** √© necess√°rio adicionar as depend√™ncias abaixo manualmente no **_pom.xml_**:
 ```xml
 <dependency>
 	<groupId>org.apache.tomcat.embed</groupId>
@@ -1795,14 +1796,14 @@ Para utilizar Jetty, precisamos desativar o Tomcat
 </dependency>
 ```
 ## <a name="application"></a> application.properties
-Este arquivo ser· respons·vel por configurar:
+Este arquivo ser√° respons√°vel por configurar:
 * JPA;
 * VIEWS;
 * HIBERNATE;
 * CACHE;
 * BANCO DE DADOS;
 
-Por padr„o, o Spring ir· procurar o arquivo dentro da pasta: **_\src\main\resources\application.properties_**
+Por padr√£o, o Spring ir√° procurar o arquivo dentro da pasta: **_\src\main\resources\application.properties_**
 
 ### Configurando JPA - MySQL
 ```python
@@ -1858,7 +1859,7 @@ server.servlet.context-path=/casadocodigo
 ```
 
 ### Enconding UTF-8
-Dentro da Classe `SeuProjetoApplication.java` (onde executa o servidor), devemos criar um `@bean`que ir· implementar um `Filter` (**_servlet.filter_**)
+Dentro da Classe `SeuProjetoApplication.java` (onde executa o servidor), devemos criar um `@bean`que ir√° implementar um `Filter` (**_servlet.filter_**)
 ```java
 @Bean
 public Filter getCharacterEncodingFilter() {
@@ -1876,7 +1877,7 @@ public Filter getCharacterEncodingFilter() {
 ## <a name="camadasmvc"></a> Camadas MVC
 
 ### Model
-A camada de Modelo/Entidades, È a camada que possui as caracterÌsticas dos objetos.
+A camada de Modelo/Entidades, √© a camada que possui as caracter√≠sticas dos objetos.
 * Exemplo:
 	```java
 	@Entity
@@ -1900,10 +1901,10 @@ A camada de Modelo/Entidades, È a camada que possui as caracterÌsticas dos objet
 		//Hash Equals ToString
 	}
 	```
-Algumas variaÁıes de Entidade est· quando:
-*  Temos um relacionamento entre Entidades, podendo ser `@ManyToOne - @OneToMany - @ManyToMany - @OneToOne`. _Este tipo de relacionamento ir· requerir um ID para cada entidade._
-* Quando n„o queremos criar um ID para outra Tabela, podemos fazer uma relaÁ„o das tabelas como uma **ColeÁ„o de elementos**, com a anotaÁ„o `@ElementCollection`, indicando a JPA que ser· carregado todos elementos daquela Tabela.
-	* Imagine que vendemos Livros e os livros possuem, 3 tipos de preÁos: ebook, fÌsico e um combo (os dois juntos). Poderiamos criar uma Entidade `Preco`, porÈm ir· requerir um `id` o que n„o faz sentido, pois so queremos trabalhar com os valores, sendo assim, devemos adicionar a Classe `Preco` como `@Embeddable` e adiciona-la a um `List<Preco>` na classe `Produto`:
+Algumas varia√ß√µes de Entidade est√° quando:
+*  Temos um relacionamento entre Entidades, podendo ser `@ManyToOne - @OneToMany - @ManyToMany - @OneToOne`. _Este tipo de relacionamento ir√° requerir um ID para cada entidade._
+* Quando n√£o queremos criar um ID para outra Tabela, podemos fazer uma rela√ß√£o das tabelas como uma **Cole√ß√£o de elementos**, com a anota√ß√£o `@ElementCollection`, indicando a JPA que ser√° carregado todos elementos daquela Tabela.
+	* Imagine que vendemos Livros e os livros possuem, 3 tipos de pre√ßos: ebook, f√≠sico e um combo (os dois juntos). Poderiamos criar uma Entidade `Preco`, por√©m ir√° requerir um `id` o que n√£o faz sentido, pois so queremos trabalhar com os valores, sendo assim, devemos adicionar a Classe `Preco` como `@Embeddable` e adiciona-la a um `List<Preco>` na classe `Produto`:
 		```java
 		@Entity
 		public class Produto {
@@ -1921,10 +1922,10 @@ Algumas variaÁıes de Entidade est· quando:
 
 		}
 		```
-	* Quando for utilizado dentro de uma view, devemos ter atenÁ„o a como instanciar esta Classe `Preco`, pois devemos instanciar atravÈs do atributo `precos`:
+	* Quando for utilizado dentro de uma view, devemos ter aten√ß√£o a como instanciar esta Classe `Preco`, pois devemos instanciar atrav√©s do atributo `precos`:
 		```java
 		//Controller
-		//TipoPreco È um ENUM, por isso podemos chama-lo pelo .values()
+		//TipoPreco √© um ENUM, por isso podemos chama-lo pelo .values()
 		@GetMapping("/produtos/form")
 		public ModelAndView form() {
 			ModelAndView mv = new ModelAndView("produtos/form");
@@ -1933,7 +1934,7 @@ Algumas variaÁıes de Entidade est· quando:
 		}
 
 		//view
-		//varStatus ir· ser utilizado para acrescentar 1 a cada interaÁ„o
+		//varStatus ir√° ser utilizado para acrescentar 1 a cada intera√ß√£o
 		<c:forEach items="${tipos}" var="tipo" varStatus="status">
 			<div>
 				<label>${tipo}</label> 
@@ -1945,8 +1946,8 @@ Algumas variaÁıes de Entidade est· quando:
 
 
 ### Repositorio
-Com o Spring Boot, iremos implementar uma **interface** que ir· ser respons·vel por extender a classe `JpaRepository<Model, Long>`. <br>
--   Implementando esta interface, nos permite usar muitos metodos prÈ estabelecidos, como:
+Com o Spring Boot, iremos implementar uma **interface** que ir√° ser respons√°vel por extender a classe `JpaRepository<Model, Long>`. <br>
+-   Implementando esta interface, nos permite usar muitos metodos pr√© estabelecidos, como:
     -   save();
     -   saveAll();
     -   findOne();
@@ -1954,7 +1955,7 @@ Com o Spring Boot, iremos implementar uma **interface** que ir· ser respons·vel 
     -   count();
     -   delete();
     -   existsById();
--   Se necess·rio, È possÌvel criar mÈtodos tambÈm, como um **"findByNome"**   - mÈtodo que ir· nos permitir encontrar uma lista dado um par‚metro nome por exemplo...:
+-   Se necess√°rio, √© poss√≠vel criar m√©todos tamb√©m, como um **"findByNome"**   - m√©todo que ir√° nos permitir encontrar uma lista dado um par√¢metro nome por exemplo...:
 	```java
 	public interface ProdutoRepository extends JPARepository<Guest, Long>{
 	   List<Guest> findByName(String name); 
@@ -1962,12 +1963,12 @@ Com o Spring Boot, iremos implementar uma **interface** que ir· ser respons·vel 
 	```
 
 ### Controller
-A camada de Controle È respons·vel por ficar verificando as requisiÁıes provenientes do navegador e ent„o baseado nos mÈtodos, tomar uma aÁ„o.
-* Para se comunicar com um repositorio/serviÁo, a camada de Controle utiliza a anotaÁ„o `@Autowired` para fazer a **injeÁ„o de dependÍncia**, fazendo com que a Spring gerencie.
-* `@Transactional`(**_springframework.transaction.annotation.Transactional_**) È utilizado para requisiÁıes que envolvem inserÁ„o, exclus„o ou atualizaÁ„o no banco de dados, para garantir a integridade da transaÁ„o;
-* `RedirectAttributes` -> quando queremos encaminhar algum par‚metro apÛs a requisiÁ„o, utilizamos esse objeto para adicionar o tipo `Flash`, com o mÈtodo `addFlashAttribute`
-	* _Atributos do tipo `Flash` tÍm uma particularidade que È interessante observar. Eles sÛ duram atÈ a prÛxima requisiÁ„o, ou seja, transportam informaÁıes de uma requisiÁ„o para a outra e, ent„o, deixam de existir._
-* `"redirect:metodo"` -> utilizamos o redirect para evitar que a cada refresh seja enviada a requisiÁ„o novamente
+A camada de Controle √© respons√°vel por ficar verificando as requisi√ß√µes provenientes do navegador e ent√£o baseado nos m√©todos, tomar uma a√ß√£o.
+* Para se comunicar com um repositorio/servi√ßo, a camada de Controle utiliza a anota√ß√£o `@Autowired` para fazer a **inje√ß√£o de depend√™ncia**, fazendo com que a Spring gerencie.
+* `@Transactional`(**_springframework.transaction.annotation.Transactional_**) √© utilizado para requisi√ß√µes que envolvem inser√ß√£o, exclus√£o ou atualiza√ß√£o no banco de dados, para garantir a integridade da transa√ß√£o;
+* `RedirectAttributes` -> quando queremos encaminhar algum par√¢metro ap√≥s a requisi√ß√£o, utilizamos esse objeto para adicionar o tipo `Flash`, com o m√©todo `addFlashAttribute`
+	* _Atributos do tipo `Flash` t√™m uma particularidade que √© interessante observar. Eles s√≥ duram at√© a pr√≥xima requisi√ß√£o, ou seja, transportam informa√ß√µes de uma requisi√ß√£o para a outra e, ent√£o, deixam de existir._
+* `"redirect:metodo"` -> utilizamos o redirect para evitar que a cada refresh seja enviada a requisi√ß√£o novamente
 
 ```java
 @Controller
@@ -2004,14 +2005,14 @@ public class ProdutosController {
 
 ## <a name="validation"></a> Validation
 
-Para implementar validaÁıes nos campos, precisamos utilizar a dependÍncia abaixo:
+Para implementar valida√ß√µes nos campos, precisamos utilizar a depend√™ncia abaixo:
 ```xml
 <dependency>
 	<groupId>org.springframework.boot</groupId>
 	<artifactId>spring-boot-starter-validation</artifactId>
 </dependency>
 ```
-Para uma Entidade ter os campos validados, precisamos utilizar as anotaÁıes para mostrar o que queremos validar.
+Para uma Entidade ter os campos validados, precisamos utilizar as anota√ß√µes para mostrar o que queremos validar.
 ```java
 @NotEmpty(message = "{titulo.notempty}")
 private String titulo;
@@ -2025,19 +2026,19 @@ private int paginas;
 @NotNull(message = "{datalancamento.notnull}")
 private LocalDate dataLancamento;
 ```
-Para configurar a mensagem que ir· aparecer quando o campo for validado, criaremos um arquivo **_messages.properties_**, dentro da pasta **_src/min/resources_**
+Para configurar a mensagem que ir√° aparecer quando o campo for validado, criaremos um arquivo **_messages.properties_**, dentro da pasta **_src/min/resources_**
 ```python
 # messages.properties
-titulo.notempty= TÌtulo nao pode ser vazio.
-descricao.notempty= DescriÁ„o n„o poder ser vazia.
-pagina.min= A p·gina precisa ter no mÌnimo 5 p·ginas.
+titulo.notempty= T√≠tulo nao pode ser vazio.
+descricao.notempty= Descri√ß√£o n√£o poder ser vazia.
+pagina.min= A p√°gina precisa ter no m√≠nimo 5 p√°ginas.
 datalancamento.notnull = Data deve ser preenchida dd/MM/yyyy.
 
-#typeMismatch È utilizado pq o campo vem como String e validaremos um int
-typeMismatch = O tipo de dado foi inv·lido.
-typeMismatch.produto.paginas = A p·gina precisa ter no mÌnimo 5 p·ginas.
+#typeMismatch √© utilizado pq o campo vem como String e validaremos um int
+typeMismatch = O tipo de dado foi inv√°lido.
+typeMismatch.produto.paginas = A p√°gina precisa ter no m√≠nimo 5 p√°ginas.
 ```
-Para que a mensagem fique em UTF-8 precisamos configura-la no Spring, dentro do mÈtodo main:
+Para que a mensagem fique em UTF-8 precisamos configura-la no Spring, dentro do m√©todo main:
 ```java
 @Bean
 public MessageSource messageSource() {
@@ -2057,7 +2058,7 @@ public LocalValidatorFactoryBean getValidator() {
 }
 ```
 
-Para configurar a JSP, ser· utilizado a tag `<form:errors path="" />`
+Para configurar a JSP, ser√° utilizado a tag `<form:errors path="" />`
 ```html
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 
@@ -2070,21 +2071,21 @@ Para configurar a JSP, ser· utilizado a tag `<form:errors path="" />`
 <body>
 	<form action="/casadocodigo/produtos" method="POST">
 		<div>
-			<label>TÌtulo</label>
+			<label>T√≠tulo</label>
 			<input type="text" name="titulo">
 			<form:errors path="produto.titulo" cssClass="error"/><br>
 			
-			<label>DescriÁ„o</label>
+			<label>Descri√ß√£o</label>
 			<textarea rows="10" cols="20" name="descricao"></textarea>
 			<form:errors path="produto.descricao" cssClass="error"/>
 		</div>
 		<div>
-			<label>P·ginas</label> 
+			<label>P√°ginas</label> 
 			<input type="text" name="paginas">
 			<form:errors path="produto.paginas" cssClass="error"/>
 		</div>
 		<div>
-			<label>Data LanÁamento:</label> 
+			<label>Data Lan√ßamento:</label> 
 			<form:input path="dataLancamento"/>
 			<form:errors path="dataLancamento" cssClass="error"/>
 		</div>
@@ -2095,8 +2096,8 @@ Para configurar a JSP, ser· utilizado a tag `<form:errors path="" />`
 
 ## <a name="springcache"></a> Cache - Guava
 
-O Spring possui por padr„o um Cache, que permitir· melhorar a performance da aplicaÁ„o, porÈm, quando um projeto È colocado em produÁ„o, È sugerido que se utilize um gerenciador de Cache, como o **Guava** do Google.<br><br>
-Para utilizar o Guava, È necess·rio adicionar as dependÍncias:
+O Spring possui por padr√£o um Cache, que permitir√° melhorar a performance da aplica√ß√£o, por√©m, quando um projeto √© colocado em produ√ß√£o, √© sugerido que se utilize um gerenciador de Cache, como o **Guava** do Google.<br><br>
+Para utilizar o Guava, √© necess√°rio adicionar as depend√™ncias:
 ```xml
 <dependency>
     <groupId>com.google.guava</groupId>
@@ -2110,7 +2111,7 @@ Para utilizar o Guava, È necess·rio adicionar as dependÍncias:
     <version>4.1.0.RELEASE</version>
 </dependency>
 ```
-Para habilitar o Cache ao Spring, ser· necess·rio atribuir a anotaÁ„o `@EnableCaching` na classe main e para gerenciar o Cache, utilizaremos a classe `CacheManager`, que nos permitir· por exemplo, definir de quanto em quanto tempo o Cache ser· invalidado!
+Para habilitar o Cache ao Spring, ser√° necess√°rio atribuir a anota√ß√£o `@EnableCaching` na classe main e para gerenciar o Cache, utilizaremos a classe `CacheManager`, que nos permitir√° por exemplo, definir de quanto em quanto tempo o Cache ser√° invalidado!
 ```java
 @EnableCaching
 @SpringBootApplication
@@ -2130,7 +2131,7 @@ public class CasaCodigoApplication {
         return manager;
     }
 ```
-Para **habilitar o Cache** para determinado **mÈtodo**, devemos anotar o mÈtodo com o `@Cacheable(value="produtosHome")` passando o nome do Cache.<br>Para  **desabilitar o Cache** para determinado **mÈtodo**, devemos utilizar o `@CacheEvict(value="produtosHome", allEntries=true)`, desta forma, ao executar o mÈtodo que possui esta anotaÁ„o, ser· invalidado o cache "produtosHome";
+Para **habilitar o Cache** para determinado **m√©todo**, devemos anotar o m√©todo com o `@Cacheable(value="produtosHome")` passando o nome do Cache.<br>Para  **desabilitar o Cache** para determinado **m√©todo**, devemos utilizar o `@CacheEvict(value="produtosHome", allEntries=true)`, desta forma, ao executar o m√©todo que possui esta anota√ß√£o, ser√° invalidado o cache "produtosHome";
 ```java
 @RequestMapping("/")
 @Cacheable(value="produtosHome")
@@ -2163,9 +2164,9 @@ public ModelAndView gravar(MultipartFile sumario, @Valid Produto produto,
 ```
 
 ## <a name="springjson"></a> JSON - Spring
-E se quisessemos retornar invÈs de uma p·gina, um .json? De forma que um cliente pudesse acessar nossa API atravÈs de uma URI.<br><br>
-De uma forma bem simples, utilizando a dependÍncia do **jackson** + `@ResponseBody`, podemos retornar um .json!
-* Caso seja gerado um erro de **Lazy**, podemos adicionar a anotaÁ„o na Entidade `@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})`
+E se quisessemos retornar inv√©s de uma p√°gina, um .json? De forma que um cliente pudesse acessar nossa API atrav√©s de uma URI.<br><br>
+De uma forma bem simples, utilizando a depend√™ncia do **jackson** + `@ResponseBody`, podemos retornar um .json!
+* Caso seja gerado um erro de **Lazy**, podemos adicionar a anota√ß√£o na Entidade `@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})`
  ```java
  //Controller
  @GetMapping("/{id}")
@@ -2175,12 +2176,12 @@ public Produto detalheJson(@PathVariable("id") Long id) {
 	return produto;
 }
  ```
- Ir· retornar, o .json abaixo, por exemplo:
+ Ir√° retornar, o .json abaixo, por exemplo:
  ```json
  {
 "id":29,  
 "titulo":"Spring MVC",  
-"descricao":"O Spring È o principal concorrente da especificaÁ„o JavaEE.",  
+"descricao":"O Spring √© o principal concorrente da especifica√ß√£o JavaEE.",  
 "paginas":260,  
 "dataLancamento":"2020-01-01",  
 "precos":[
@@ -2200,25 +2201,25 @@ public Produto detalheJson(@PathVariable("id") Long id) {
 }
  ```
  ## <a name="springsecurity"></a> Spring Security
-A ordem de implementaÁ„o do Spring Security:
-* Adicionar a dependÍncias
+A ordem de implementa√ß√£o do Spring Security:
+* Adicionar a depend√™ncias
 * Criar a Entidade `Usuario implements UserDetails`;
 	* Adicione os atributos: `Email, Senha, Id, Nome, List<Perfil>`
 	* Adicione contrutores, getters/setters;
-	* O atributo Perfil, ir· ser carregado via `@ManyToMany(fetch = FetchType.EAGER)`
-	* Ao implementar a interface `UserDetails`, ser· adicionado diversos mÈtodos;
-	* Crie a interface UsuarioRepository, que ir· ter mÈtodo para procurar pelo e-mail;
+	* O atributo Perfil, ir√° ser carregado via `@ManyToMany(fetch = FetchType.EAGER)`
+	* Ao implementar a interface `UserDetails`, ser√° adicionado diversos m√©todos;
+	* Crie a interface UsuarioRepository, que ir√° ter m√©todo para procurar pelo e-mail;
 * Crie a Entidade  `Perfil implements GrantedAuthority`
 
-### DependÍncia & SecurityConfiguration
- Para utilizar o Spring Security, precisamos primeiro, adicionar a dependÍncia:
+### Depend√™ncia & SecurityConfiguration
+ Para utilizar o Spring Security, precisamos primeiro, adicionar a depend√™ncia:
 ```xml
  <dependency>
 	<groupId>org.springframework.boot</groupId>
 	<artifactId>spring-boot-starter-security</artifactId>
 </dependency>
 ```
-Para configurar o SpringConfiguration, utilizaremos uma classe respons·vel para isto, chamada `SecurityConfiguration extends WebSecurityConfigurerAdapter`, dentro do pacote **_src/main/java/config_**
+Para configurar o SpringConfiguration, utilizaremos uma classe respons√°vel para isto, chamada `SecurityConfiguration extends WebSecurityConfigurerAdapter`, dentro do pacote **_src/main/java/config_**
 ```java
 @EnableWebSecurity
 @Configuration
@@ -2305,8 +2306,8 @@ public class Perfil implements GrantedAuthority {
 	}
 }
 ```
-### Autorizando p·ginas
-Dentro da classe SpringConfiguration, atravÈs do mÈtodo `configure(HttpSecurity http)`, iremos informar ao Spring, quais as requisiÁıes que ser„o permitidas sem ter de fazer o Login:
+### Autorizando p√°ginas
+Dentro da classe SpringConfiguration, atrav√©s do m√©todo `configure(HttpSecurity http)`, iremos informar ao Spring, quais as requisi√ß√µes que ser√£o permitidas sem ter de fazer o Login:
 ```java
 @Override
 protected void configure(HttpSecurity http) throws Exception {
@@ -2318,8 +2319,8 @@ protected void configure(HttpSecurity http) throws Exception {
  	and().formLogin();
 }
 ```
-### Autorizando usu·rios
-Dentro da classe SpringConfiguration, atravÈs do mÈtodo `configure(AuthenticationManagerBuilder auth)` poderemos autorizar o usu·rio, baseado no E-mail e Senha, por exemplo, porÈm para isto, ser· necess·rio utilizar  o **_UsuarioService_** e o **_UsuarioRepository_**:<br><br>
+### Autorizando usu√°rios
+Dentro da classe SpringConfiguration, atrav√©s do m√©todo `configure(AuthenticationManagerBuilder auth)` poderemos autorizar o usu√°rio, baseado no E-mail e Senha, por exemplo, por√©m para isto, ser√° necess√°rio utilizar  o **_UsuarioService_** e o **_UsuarioRepository_**:<br><br>
 UsuarioService:
 ```java
 @Service
@@ -2334,7 +2335,7 @@ public class UsuarioService implements UserDetailsService{
 		if(user.isPresent()) {
 			return user.get();
 		}
-		throw new UsernameNotFoundException("usu·rio n„o encontrado");
+		throw new UsernameNotFoundException("usu√°rio n√£o encontrado");
 	}
 
 }
@@ -2355,7 +2356,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 		auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
 	}
 
-	//outros config. mÈtodos
+	//outros config. m√©todos
 }
 
 //utilizado para receber o retorno da senha com criptografia
@@ -2363,8 +2364,8 @@ public static void main(String[] args) {
 	System.out.println(new BCryptPasswordEncoder().encode("123456"));
 }
 ```
-### Inserindo usu·rios
-Com o mysql aberto, podemos adicionar manualmente os cÛdigos abaixo:
+### Inserindo usu√°rios
+Com o mysql aberto, podemos adicionar manualmente os c√≥digos abaixo:
 ```sql
 insert into Perfil values('ROLE_ADMIN');
 
@@ -2373,11 +2374,11 @@ insert into Usuario (email, nome, senha) values ('igorgrv@.com', 'Administrador'
 insert into Usuario_perfil values(1,1);
 ```
 ### Views
-Com a taglib abaixo, podemos "esconder" elementos da view para usu·rios n„o autorizados!
+Com a taglib abaixo, podemos "esconder" elementos da view para usu√°rios n√£o autorizados!
 ```html
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="security" %>
 ```
-* Exemplo: bloqueando a inserÁ„o de produtos caso n„o seja o ADMIN
+* Exemplo: bloqueando a inser√ß√£o de produtos caso n√£o seja o ADMIN
 	```html
 	<nav id="main-nav">
 	    <ul class="clearfix">
@@ -2395,9 +2396,9 @@ Com a taglib abaixo, podemos "esconder" elementos da view para usu·rios n„o auto
 	</nav>
 	```
 ### LoginForm
-Por padr„o, o SpringSecurity possui um Formul·rio para Login, porÈm caso, queiramos utilizar o nosso prÛprio, basta incluirmos o mÈtodo `
- .and().formLogin().loginPage("/login")` dentro do mÈtodo `
-configure(HttpSecurity http)`, onde "/login" ser· a requisiÁ„o que o `LoginController`estar· verificando!<br><br>
+Por padr√£o, o SpringSecurity possui um Formul√°rio para Login, por√©m caso, queiramos utilizar o nosso pr√≥prio, basta incluirmos o m√©todo `
+ .and().formLogin().loginPage("/login")` dentro do m√©todo `
+configure(HttpSecurity http)`, onde "/login" ser√° a requisi√ß√£o que o `LoginController`estar√° verificando!<br><br>
 Crie o loginForm.jsp;
 * O name dos inputs, devem constar o "username" e "password" (mesmo que na Entidade tenha sido anotado como, email e senha)
 ```html
@@ -2405,7 +2406,7 @@ Crie o loginForm.jsp;
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 <body>
     <div class="container">
-        <h1>Login Casa do CÛdigo</h1>
+        <h1>Login Casa do C√≥digo</h1>
         <form:form servletRelativeAction="/login" method="POST">
             <div class="form-group">
                 <label>E-mail</label>
@@ -2435,16 +2436,16 @@ protected void configure(HttpSecurity http) throws Exception {
 }
 ```
 
-## <a name="tratandoexc"></a>Tratando ExceÁıes
-O Spring possui um **ControlerAdivce** que nos permite tratar qualquer tipo de exceÁ„o atravÈs da anotaÁ„o `@ExceptionHandler`, desta forma, podemos mapear o que queremos retornar ao usu·rio em caso de erro!
-* Exemplo de exceÁ„o genÈrica sendo tratada atravÈs da `Exception`:
+## <a name="tratandoexc"></a>Tratando Exce√ß√µes
+O Spring possui um **ControlerAdivce** que nos permite tratar qualquer tipo de exce√ß√£o atrav√©s da anota√ß√£o `@ExceptionHandler`, desta forma, podemos mapear o que queremos retornar ao usu√°rio em caso de erro!
+* Exemplo de exce√ß√£o gen√©rica sendo tratada atrav√©s da `Exception`:
 	```java
 	@ControllerAdvice
 	public class ExceptionHandlerController {
 
 		@ExceptionHandler(Exception.class)
 	    public ModelAndView trataExceptionGenerica(Exception exception){
-	        System.out.println("Erro genÈrico acontecendo");
+	        System.out.println("Erro gen√©rico acontecendo");
 	        exception.printStackTrace();
 
 	        ModelAndView modelAndView = new ModelAndView("error");
@@ -2459,10 +2460,10 @@ O Spring possui um **ControlerAdivce** que nos permite tratar qualquer tipo de e
 	<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 	<%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
 
-	<tags:pageTemplate titulo="Produto n„o encontrado">
+	<tags:pageTemplate titulo="Produto n√£o encontrado">
 
 	  <section id="index-section" class="container middle">
-	      <h2>O produto informado n„o foi encontrado</h2>
+	      <h2>O produto informado n√£o foi encontrado</h2>
 	  </section>
 
 	 <!-- 
@@ -2473,7 +2474,7 @@ O Spring possui um **ControlerAdivce** que nos permite tratar qualquer tipo de e
     -->
 	</tags:pageTemplate> 
 	```
-* Exemplo, exceÁ„o `NoResultException`:
+* Exemplo, exce√ß√£o `NoResultException`:
 	```java
 	@ExceptionHandler(NoResultException.class)
 	public String trataDetalheNaoEcontrado(){
@@ -2485,11 +2486,88 @@ O Spring possui um **ControlerAdivce** que nos permite tratar qualquer tipo de e
 	<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 	<%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
 
-	<tags:pageTemplate titulo="Produto n„o encontrado">
+	<tags:pageTemplate titulo="Produto n√£o encontrado">
 
 	  <section id="index-section" class="container middle">
-	      <h2>O produto informado n„o foi encontrado</h2>
+	      <h2>O produto informado n√£o foi encontrado</h2>
 	  </section>
 
 	</tags:pageTemplate> 
 	```
+	
+## <a name="heroku"></a>Deploy - Heroku
+O heroku √© um servidor gratuito, que se releciona com o Git, ou seja, se fizermos um `git push` ele atualiza tamb√©m!<br>
+* Para utilizar o Heroku, precisamos utilizar o  [**Heroku toolbelt**](https://devcenter.heroku.com/articles/heroku-cli#download-and-install) e tamb√©m o [PostgreSQL](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads);
+* Adicionar as depend√™ncias abaixo:
+	```xml
+	<dependency>
+	    <groupId>org.postgresql</groupId>
+	    <artifactId>postgresql</artifactId>
+	    <version>9.4-1201-jdbc41</version>
+	</dependency>
+	```
+### Configurando - PostgreqSQL Local
+* Ap√≥s	baixar e instalar o PostgreSQL, √© necess√°rio abrir o **pgAdmin4** e criar o banco de dados!
+* Realizar as altera√ß√µes no **_application.properties_**:, seguindo o que foi configurado no pgAdmin4:
+	```
+	#DataSource
+	spring.datasource.driver-class-name=org.postgresql.Driver
+	spring.datasource.url=jdbc:postgresql://localhost:5432/casaCodigo
+	spring.datasource.username=root
+	spring.datasource.password=root
+
+	#JPA
+	spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
+	spring.jpa.hibernate.ddl-auto = update
+	spring.jpa.properties.hibernate.format_sql = true
+	spring.jpa.properties.hibernate.show_sql = true
+	```
+*	Para checar se o banco foi criado corretamente, o Postgresql , pode ser acessado via **_SQL Shell_**, preenchendo:
+	```sql
+	Server: Localhost;
+	Database: casaCodigo;
+	Port: 5432;
+	Username: postgres;
+	Password: root;
+	\d #ir√° exibir as tabelas do BD;
+	```
+### Deploy Heroku
+Para realizar o Deploy no Heroku, ser√° necess√°rio:
+* Fazer [Login ](https://id.heroku.com/login) no Heroku;
+* Clicar em New -> Create new App -> informar nome do projeto;
+* Executar os c√≥digos abaixo no cmd;
+	```git
+	$ heroku login 		# ir√° abrir o navegador
+	$ cd noProjeto
+	$ git init
+	$ git add .
+	$ git commit -am "Sua mensagem de commit"
+	$ git push heroku master
+
+	$ heroku logs --tail 	#ir√° exibir o log igual eclipse
+	```
+	* Caso o projeto j√° exista:
+		```git
+		$ heroku login
+		$ cd noProjeto
+		$ git add .
+		$ git commit -am "Sua mensagem de commit"
+		$ heroku git:remote -a casadocodigo-igor
+		$ git push heroku master
+		
+		$ heroku logs --tail 	#ir√° exibir o log igual eclipse
+		```
+### Configurando -  PostgreqSQL - Heroku
+Uma vez que o projeto foi publicado, o heroku ir√° criar o banco de dados automaticamente e ir√° deixar dispon√≠vel as informa√ß√µes, como:
+* Server: 
+* Database: 
+* Port: 
+* Username: 
+* Password: 
+	*	Pode ser instanciado o banco de dados atrav√©s do codigo:
+		```git
+		$ heroku addons:create heroku-postgresql:hobby-dev
+		```
+
+Basta ir em **_Overview_** dentro do projeto -> clicar em **_Heroku Postgres_** -> Settings -> Views Credentials;
+*	Com estas informa√ß√µes, √© poss√≠vel executar Querys, pelo **_SQL Shell_**, utilizando as credenciais forneceidas pelo Heroku;
