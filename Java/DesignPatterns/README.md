@@ -16,6 +16,7 @@ Ao criar um projeto, devemos pensar sempre na possibilidade de, **novidades e al
 1. [Strategy](#strategypat)
 2. [Chain of Responsibility](#chainpat)
 3. [Template Method](#templatepat)
+4. [decoratorpat](#decoratorpat)
 
 ## Strategy<a name="strategypat"></a>
 **Quando utilizar o padrão Strategy?**
@@ -682,9 +683,112 @@ public class IHIT extends ImpostoTemplate{
 
 
 
+## Decorator<a name="decoratorpat"></a>
+
+**Quando utilizar o padrão Decorator?**
+
+* _Sempre que percebemos que temos comportamentos que podem ser compostos por comportamentos de outras classes envolvidas em uma mesma hierarquia, como foi o caso dos impostos, que podem ser composto por outros impostos_
+
+**Dado o desenvolvimento:**
+
+* Após os impostos terem sido criados, o cliente gostaria de poder compor um imposto no outro, ou seja, `new ICMS(new ISS())`, porém, precisaremos fazer com que o construtor de cada imposto receba este tipo de imposto, mas como?
+
+<br>
+
+Classes base:
+
+```java
+public class Orcamento {
+
+	private Double valor;
+	private List<Item> itens;
+
+	public Orcamento(Double valor) {
+		this.valor = valor;
+		this.itens = new ArrayList<Item>();
+	}
+    
+    //getters and setters
+}
+```
+
+### Aplicando o Decorator
+
+A ideia do Decorator, é fazer com que uma **Classe Abstrata Mãe** tenha em seu construtor um parâmetro dela mesma! `public Imposto(Imposto outroImposto)` e também um construtor vazio, para que seja possível implementar as classes filhas com o construtor vazio.<br>
+
+<br>
+
+Essa classe mãe, terá métodos (não abstratos) que poderam ser utilizados pela classe filha, não tendo a necessidade da reescrita do código!<br>
+
+<br>
+
+Class Abstrata mãe:
+
+```java
+public abstract class Imposto {
+	
+	private Imposto outroImposto;
+	public Imposto(Imposto outroImposto) {
+		this.outroImposto = outroImposto;
+	}
+	
+	public Imposto() {
+		this.outroImposto = null;
+	}
+	
+	public abstract double calcula(Orcamento orcamento);
+	
+	public double calculaOutroImposto(Orcamento orcamento) {
+		return (outroImposto == null ? 0 : this.outroImposto.calcula(orcamento));
+	}
+}
+```
 
 
 
+Classes filhas:
+
+```java
+public class ICMS extends Imposto{
+
+	public ICMS(Imposto outroImposto) {
+		super(outroImposto);
+	}
+	
+	public ICMS() {}
+
+	@Override
+	public double calcula(Orcamento orcamento) {
+		return orcamento.getValor() * 0.05 + calculaOutroImposto(orcamento);
+	}
+}
 
 
+public class ISS extends Imposto{
+	
+	public ISS(Imposto outroImposto) {
+		super(outroImposto);
+	}
+	
+	public ISS() {}
 
+	@Override
+	public double calcula(Orcamento orcamento) {
+		return orcamento.getValor() * 0.06 + calculaOutroImposto(orcamento);
+	}
+
+}
+```
+
+Testando:
+
+```java
+public static void main(String[] args) {
+	 Imposto impostoComplexo = new ISS(new ICMS());     
+     Orcamento orcamento = new Orcamento(500.0);
+
+     double valor = impostoComplexo.calcula(orcamento);
+
+     System.out.println(valor);
+}
+```
