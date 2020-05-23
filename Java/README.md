@@ -158,7 +158,7 @@ int idade = 37 //Agora o Java entende o que é a 'idade'
 	double salario = 1250.70;
 	int valor = salario; 
 	//para que ocorra a transformação do salario para valor é necessário realziar um casting
-
+	
 	int valor = (int) salario;
 	//resultado: 1250 -> irá perder a precisão
 	```
@@ -925,6 +925,7 @@ Um meio de tratar as exceções é utilizando o bloco `Try{} Catch(Excepction){}
 	```
 	O código não parou mais, apenas informou que houve uma exceção
 	<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/trycatch.png?raw=true" widht=400 height=300>
+	
 	* Um módo de não ficar esse monte de código de exceção, é utilizar o `e.getMessage()` - ira apenas aparecer `ArithmeticException / by zero`!
 
 * Podemos ter **mais de um catch**! Basta adicionar um 'pipe' ao lado da exceção
@@ -1089,18 +1090,18 @@ String nome = new String("Java");
 		```java
 		String nome = "";
 		System.out.println(nome.isEmpty()); //true
-		```		
+		```
 	* `trim()` - retira espaços desnecessários, como " "
 		```java
 		String nome = " Igor    ";
 		String nomeSemEspaco = nome.trim();
 		System.out.println(nomeSemEspaco); //Alura
-		```		
+		```
 	* `contains(String x)` - retorna boolean p /verificar se contém a String
 		```java
 		String nome = " Igor   ";
 		System.out.println(nome.contains("Ig"); //true
-		```		
+		```
 
 	**StringBuilder**
 	O StringBuilder é utilizado para concatenar Strings
@@ -1934,6 +1935,7 @@ As classes Wrappers nos ajudam com o mundo orientado a objeto, como por exemplo,
 	```
 	<br>
 	
+
 Outro exemplo da utilização de classes Wrapper vs Primitivo:<br> 
 * Pense em um sistema de cadastro, onde **a idade não é necessária**, ou seja, caso não seja preenchida devemos **considera-la** `null`.
 	```java
@@ -2013,7 +2015,7 @@ Os **default methods** foram adicioandas as Interfaces, de modo que quando fosse
 
 		cursos.sort(comparador);
 		System.out.println(cursos);
-		```	
+		```
 		* Ou seja, a `interace List` só conseguiu implementar nela o método `sort` devido a implementação do método `default void sort`!
 
 * Outro exemplo está no método `forEach` que também foi implementado na `interface List`:
@@ -2183,7 +2185,19 @@ Quando utilizamos o `stream()`, ele não afeta a lista, ou seja, caso seja feito
 	 
 	 System.out.println(streamToList);
 	```
+* Exemplo 5: retornar se existe a String “X” dentro da Lista
+
+  ```java
+  public boolean existeCanetaOuLapis(Orcamento orcamento, String nomeItem) {
+      return orcamento.getItens().stream()
+          .anyMatch(item -> item.getNome().equals(nomeItem));
+  }
+  ```
+
+  
+
 ### <a name="optional"></a>Optional
+
 Que tal uma classe que evita `null`? que evita MUITOS Ifs? A classe `Optional<E>`, como o nome já diz, retorna "por opção" o objeto ou não _(em caso de o objeto não existir)_. Alguns dos métodos mais utilizados:
 * orElse();
 * isPresent();
@@ -2250,6 +2264,7 @@ A API de Datas do Java, foi implementada após anos utiliznado JODA (**_Java Obj
 ### Métodos
 * `LocalDate.now()` -> retorna a data de hoje - formato ISO;
 * `LocalDate.of(year, month, dayOfMonth)` -> utilizada para criar uma data com determinado ano, mês e dia;
+	
 	* `LocalDate.of(2020, Month.MAY, 1)`;
 * `LocalDate.getYear()` -> retorna o ano da variável
 	```java
@@ -2260,6 +2275,7 @@ A API de Datas do Java, foi implementada após anos utiliznado JODA (**_Java Obj
 	System.out.println(anosFaltantesParaCopa); //2
 	```
 * `Period.between(LocalDateOld, LocalDateNew)` -> retorna a quantidade de dias, meses e anos entre duas datas;
+	
 	* `Period.between(hoje, copa) -> ira retornar P2Y2M1D` 
 * `Period.getYear()` -> retorna o ano dentre o periodo dado
 	```java
@@ -2274,3 +2290,4 @@ LocalDate copa = LocalDate.of(2022, Month.JULY, 2);
 DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyy");
 System.out.println(copa.format(formatador));
 //01/05/2020 -> data formatada
+```

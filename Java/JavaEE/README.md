@@ -57,8 +57,8 @@ O Java EE nada mais é, do que o Java para Web.
 	* [Cache - Guava](#springcache)
 	* [Json](#springjson)
 	* [Spring Security](#springsecurity)
-	* [Tratando Exceções] (#tratandoexc)
-	* [Deploy - Heroku] (#heroku)	
+	* [Tratando Exceções](#tratandoexc)
+	* [Deploy - Heroku](#heroku)	
 	
 # Maven
 ### O que faz o Maven?
@@ -457,6 +457,7 @@ O método `<c:url value="" var="">` basicamente carrega o nome do projeto e pode
 	<form action="${nova}" method="POST">
 	```
 	
+
 Outro uso da URL, é para colocar o caminho dos arquivos estáticos, como CSS, JS e etc:
 ```html
 <!-- O contextPath irá pegar o nome do projeto -->
@@ -494,6 +495,7 @@ Quando extraimos a data direto do Java, vem um monte de código esquisito, para 
 	String stringData= "01/04/2020";
 	DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	LocalDate dataLocalDate = LocalDate.parse(stringData, formatador);
+	```
 ## <a name="jstlform"></a>JSTL - FORM
 A Tag `<form:xxxx />` possibilita escrevermos menos código. Para implementa-la é necessário utilizar:
 ```html
@@ -1154,6 +1156,7 @@ CÓDIGO BASE:
 * `@Entity` -> indica o objeto para se tornar persistível (MODELO)
 * `@Table(name="tarefas")` -> indica que será a Tabela com nome XXXX
   
+
 P/ COLUNAS:
 * `@Id` --> indica que aquele atributo é um ID
 	*  `@GeneratedValue` -> serve para deixar o Hibernate responsavel por gerenciar o ID
@@ -1730,7 +1733,7 @@ public class JsonServlet extends HttpServlet {
 
 }
 ```
-	
+
 ```json
 [{"id":1,"nome":"Igor","dataCadastro":{"date":{"year":2020,"month":5,"day":9},"time":{"hour":1,"minute":3,"second":37,"nano":79212300}},"dataAbertura":{"year":2020,"month":4,"day":1}}]
 ```
@@ -2570,4 +2573,5 @@ Uma vez que o projeto foi publicado, o heroku irá criar o banco de dados automa
 		```
 
 Basta ir em **_Overview_** dentro do projeto -> clicar em **_Heroku Postgres_** -> Settings -> Views Credentials;
+
 *	Com estas informações, é possível executar Querys, pelo **_SQL Shell_**, utilizando as credenciais forneceidas pelo Heroku;
