@@ -804,6 +804,8 @@ public static void main(String[] args) {
 
 * O State é utilizado para os casos onde determina classe terá Estados com regras, como por exemplo, um Orçamento “EM_APROVACAO” pode ir depois para “APROVADO” ou “RECUSADO”, mas nunca direto para “FINALIZADO”. Quando temos este tipo de Regra, utilizamos o Design State! 
 
+  <img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/statepat.png?raw=true" width="700" height="450">
+
 **Dado o desenvolvimento:**
 
 * Crie um desconto extra, seguindo a ordem de que:
