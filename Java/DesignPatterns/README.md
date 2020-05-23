@@ -16,7 +16,8 @@ Ao criar um projeto, devemos pensar sempre na possibilidade de, **novidades e al
 1. [Strategy](#strategypat)
 2. [Chain of Responsibility](#chainpat)
 3. [Template Method](#templatepat)
-4. [decoratorpat](#decoratorpat)
+4. [Decorator](#decoratorpat)
+5. [State](#statepat)
 
 ## Strategy<a name="strategypat"></a>
 **Quando utilizar o padrão Strategy?**
@@ -687,6 +688,7 @@ public class IHIT extends ImpostoTemplate{
 
 **Quando utilizar o padrão Decorator?**
 
+* `Imposto imposto = new ICMS(new ISS())` -> decorator permite compor uma classe na outra
 * _Sempre que percebemos que temos comportamentos que podem ser compostos por comportamentos de outras classes envolvidas em uma mesma hierarquia, como foi o caso dos impostos, que podem ser composto por outros impostos_
 
 **Dado o desenvolvimento:**
@@ -792,3 +794,8 @@ public static void main(String[] args) {
      System.out.println(valor);
 }
 ```
+
+
+## State<a name="statepat"></a>
+
+* O State é utilizado para os casos onde determina classe terá Estados com regras, como por exemplo, um Orçamento “EM_APROVACAO” pode ir depois para “APROVADO” ou “RECUSADO”, mas nunca direto para “FINALIZADO”. Quando temos este tipo de Regra, utilizamos o Design State!
