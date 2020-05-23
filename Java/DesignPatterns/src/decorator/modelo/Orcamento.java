@@ -11,5 +11,5 @@ public class Orcamento {
 	public Double getValor() {
 		return valor;
 	}
-	
+
 }

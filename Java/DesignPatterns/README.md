@@ -22,7 +22,7 @@ Ao criar um projeto, devemos pensar sempre na possibilidade de, **novidades e al
 ## Strategy<a name="strategypat"></a>
 **Quando utilizar o padrão Strategy?**
 
-* _O padrão strategy é muito útil quando temos um conjunto de algoritmos similares, e precisamos alternar entre eles em diferentes pedaços da aplicação._<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/strategypat.png?raw=true" width="600" height="300">
+* _O padrão strategy é muito útil quando temos um conjunto de algoritmos similares, e precisamos alternar entre eles em diferentes pedaços da aplicação._<br><img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/strategypat.png?raw=true" width="700" height="300">
 
 **Dado o desenvolvimento:**
 
@@ -236,7 +236,7 @@ public class TestaInvestimento {
 
 * _Quando temos uma **lista de comandos a serem executados** de acordo com algum cenário em específico, e sabemos também qual o próximo cenário que deve ser validado, caso o anterior não satisfaça a condição._
 
-  <img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/chainpat.png?raw=true" width="600" height="350">
+  <img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/chainpat.png?raw=true" width="700" height="450">
 
 **Dado o desenvolvimento:**
 
@@ -496,7 +496,7 @@ public static void main(String[] args) {
 
 * _O corpo dos métodos são parecidos? Com o Template Method, a ideia é criar uma **classe abstrata** que implemente esses metodos, fazendo com quem extende-la siga aquele padrão! _
 
-  <img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/templatepat.png?raw=true" width="600" height="350">
+  <img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/templatepat.png?raw=true" width="700" height="450">
 
 **Dado o desenvolvimento:**
 
@@ -802,4 +802,199 @@ public static void main(String[] args) {
 
 ## State<a name="statepat"></a>
 
-* O State é utilizado para os casos onde determina classe terá Estados com regras, como por exemplo, um Orçamento “EM_APROVACAO” pode ir depois para “APROVADO” ou “RECUSADO”, mas nunca direto para “FINALIZADO”. Quando temos este tipo de Regra, utilizamos o Design State!
+* O State é utilizado para os casos onde determina classe terá Estados com regras, como por exemplo, um Orçamento “EM_APROVACAO” pode ir depois para “APROVADO” ou “RECUSADO”, mas nunca direto para “FINALIZADO”. Quando temos este tipo de Regra, utilizamos o Design State! 
+
+**Dado o desenvolvimento:**
+
+* Crie um desconto extra, seguindo a ordem de que:
+  * Se EM_APROVACAO, desconto de +5%;
+  * Se APROVADO, desconto de +2%;
+  * Se REPROVADO, sem desconto;
+
+Classes base:
+
+```java
+public class Orcamento {
+
+	private Double valor;
+	private List<Item> itens;
+
+	public Orcamento(Double valor) {
+		this.valor = valor;
+		this.itens = new ArrayList<Item>();
+	}
+    
+    //getters and setters
+}
+
+
+public class Item {
+
+	private double valor;
+	private String nome;
+    
+    //getters and setters
+}    
+```
+
+**Possíveis soluções:**
+
+1. Criar um método dentro da Classe Orçamento que irá `aplicarDescontoExtra()` e que irá receber um novo parâmetro chamado `estadoAtual`, onde será verificado o estado para dar o desconto;
+
+2. Acrescentar ao construtor, que todo novo Orçamento, começa com o `estadoAtual = EM_APROVACAO`;
+
+   * Com **ifs**:
+
+     ```java
+     public class Orcamento {
+     
+     	private Double valor;
+     	private List<Item> itens = new ArrayList<Item>();
+     	private int estadoAtual;
+     	private static final int EM_APROVACAO = 1;
+     	private static final int APROVADO = 2;
+         
+         //PARA CADA NOVO ESTADO, SERA NECESSÁRIO UM NOVO IF
+         public void aplicaDescontoExtra() {
+                 if(estadoAtual == EM_APROVACAO) {
+                     valor -= valor * 0.05;
+                 } else if (estadoAtual == APROVADO) {
+                     valor -= valor * 0.02;
+                 } else {
+                     throw new RuntimeException("Somente se em_provacao ou aprovado, recebem desconto extra");
+                 }
+             }
+     }
+     ```
+
+
+
+### Aplicando o State
+
+O conceito de State, é que através de um Contrato/Interface, tenhamos todos os estados possíveis e desta forma podemos controlar para qual estado é permitido e tudo isso podendo ser feito dentro da própria classe Orcamento:
+
+```java
+//TERÁ TODOS OS ESTADOS POSSÍVEIS
+public interface EstadoDeUmOrcamento {
+
+	void aplicaDescontoExtra(Orcamento orcamento);
+	void aprova(Orcamento orcamento);
+	void reprova(Orcamento orcamento);
+	void finaliza(Orcamento orcamento);
+}
+
+//CADA ESTADO POSSUIRA SEU DESCONTO E DARÁ A REGRA!
+public class EmAprovacao implements EstadoDeUmOrcamento{
+
+	@Override
+	public void aplicaDescontoExtra(Orcamento orcamento) {
+		orcamento.valor -= orcamento.valor * 0.05;
+	}
+
+	@Override
+	public void aprova(Orcamento orcamento) {
+		orcamento.estadoAtual = new Aprovado();
+	}
+
+	@Override
+	public void reprova(Orcamento orcamento) {
+		orcamento.estadoAtual = new Reprovado();
+	}
+
+	@Override
+	public void finaliza(Orcamento orcamento) {
+		throw new RuntimeException("Orcamento deve estar aprovado ou finalizado");
+	}
+
+}
+
+
+public class Aprovado implements EstadoDeUmOrcamento{
+
+	@Override
+	public void aplicaDescontoExtra(Orcamento orcamento) {
+		orcamento.valor -= orcamento.valor * 0.02;
+	}
+
+	@Override
+	public void aprova(Orcamento orcamento) {
+		throw new RuntimeException("O orcamento ja esta aprovado");
+	}
+
+	@Override
+	public void reprova(Orcamento orcamento) {
+		throw new RuntimeException("O orcamento aprovado não pode ser reprovado");
+	}
+
+	@Override
+	public void finaliza(Orcamento orcamento) {
+		orcamento.estadoAtual = new Finalizado();
+	}
+	
+}
+
+//CLASSES REPROVA E FINALIZA
+
+//----------------------------------------------------------------------------
+public class Orcamento {
+
+	protected Double valor;
+	protected EstadoDeUmOrcamento estadoAtual;
+	
+    //DENTRO DO CONSTRUTOR IREMOS INFORMAR EM QUAL ESTADO COMEÇA
+	public Orcamento(Double valor) {
+		this.valor = valor;
+        //CADA ESTADO PODERÁ CHAMAR OUTRO ESTADO, SEGUINDO A LOGICA DE NEGOCIO
+		this.estadoAtual = new EmAprovacao();
+	}
+    
+    public void aplicaDescontoExtra() {
+		this.estadoAtual.aplicaDescontoExtra(this);
+	}
+	
+    //MÉTODOS ABAIXO REPRESENTARAM OS ESTADOS
+    /*
+    * No inicio, o estado é EM_APROVACAO
+    * todos estados possuiram APROVA, REPROVA e FINALIZA
+    * portanto, ao chamar o metodo aprova do EM_APROVACAO, será alterado o Estado
+    */
+	public void aprovaOrcamento() {
+		this.estadoAtual.aprova(this);
+	}
+	
+	public void reprovaOrcamento() {
+		this.estadoAtual.reprova(this);
+	}
+	
+	public void finalizaOrcamento() {
+		this.estadoAtual.finaliza(this);
+	}
+    
+}
+
+//----------------------------------------------------------------------------
+//TESTANDO
+public class TestaState {
+
+	public static void main(String[] args) {
+		Orcamento orcamento = new Orcamento(500.00);
+		
+        //Se inicio EM_APROVACAO
+		orcamento.aplicaDescontoExtra();
+		System.out.println(orcamento.getValor());
+		//475, foi aplicado o DescontoExtra do EM_APROVACAO
+        
+		orcamento.aprovaOrcamento();
+		orcamento.aplicaDescontoExtra();	
+		System.out.println(orcamento.getValor());
+        //465, foi aplicado o DescontoExtra do APROVADO
+		
+		orcamento.finalizaOrcamento();
+		orcamento.aplicaDescontoExtra();
+		System.out.println(orcamento.getValor());
+        //465, não possui desconto extra, lançará expection
+	}
+
+}
+```
+
