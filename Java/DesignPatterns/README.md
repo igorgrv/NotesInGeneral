@@ -22,7 +22,7 @@ Ao criar um projeto, devemos pensar sempre na possibilidade de, **novidades e al
 ## Strategy<a name="strategypat"></a>
 **Quando utilizar o padrão Strategy?**
 
-* _O padrão strategy é muito útil quando temos um conjunto de algoritmos similares, e precisamos alternar entre eles em diferentes pedaços da aplicação._
+* _O padrão strategy é muito útil quando temos um conjunto de algoritmos similares, e precisamos alternar entre eles em diferentes pedaços da aplicação._<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/strategypat.png?raw=true" width="600" height="300">
 
 **Dado o desenvolvimento:**
 
@@ -235,6 +235,8 @@ public class TestaInvestimento {
 **Quando utilizar o padrão Chain of Responsibility?**
 
 * _Quando temos uma **lista de comandos a serem executados** de acordo com algum cenário em específico, e sabemos também qual o próximo cenário que deve ser validado, caso o anterior não satisfaça a condição._
+
+  <img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/chainpat.png?raw=true" width="600" height="350">
 
 **Dado o desenvolvimento:**
 
@@ -492,7 +494,9 @@ public static void main(String[] args) {
 
 **Quando utilizar o padrão Template Method?**
 
-* _Possui classes com métodos parecidos? Com o Template Method, a ideia é criar uma **classe abstrata** que implemente esses metodos, fazendo com quem extende-la siga aquele padrão! _
+* _O corpo dos métodos são parecidos? Com o Template Method, a ideia é criar uma **classe abstrata** que implemente esses metodos, fazendo com quem extende-la siga aquele padrão! _
+
+  <img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/templatepat.png?raw=true" width="600" height="350">
 
 **Dado o desenvolvimento:**
 
