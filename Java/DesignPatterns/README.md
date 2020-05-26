@@ -18,6 +18,8 @@ Ao criar um projeto, devemos pensar sempre na possibilidade de, **novidades e al
 3. [Template Method](#templatepat)
 4. [Decorator](#decoratorpat)
 5. [State](#statepat)
+6. [Builder](#builderpat)
+7. [Observer](#observerpat)
 
 ## Strategy<a name="strategypat"></a>
 **Quando utilizar o padrão Strategy?**
@@ -494,6 +496,10 @@ public static void main(String[] args) {
 
 **Quando utilizar o padrão Template Method?**
 
+* _Imagine que temos uma série de algoritmos matemáticos a serem implementados. Todos eles são bem parecidos, possuem a mesma estrutura. As variações são mínimas, por exemplo, um deles deve iterar até o fim da lista, enquanto o outro deve iterar até a metade dela._
+
+  * O Template Method cairia como uma luva, já que ele possibilita que o desenvolvedor escreva a "estrutura" do algoritmo apenas uma vez, e a reutilize nas implementações específicas de cada um dos algoritmos.
+  
 * _O corpo dos métodos são parecidos? Com o Template Method, a ideia é criar uma **classe abstrata** que implemente esses metodos, fazendo com quem extende-la siga aquele padrão! _
 
   <img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/templatepat.png?raw=true" width="700" height="450">
@@ -693,7 +699,14 @@ public class IHIT extends ImpostoTemplate{
 **Quando utilizar o padrão Decorator?**
 
 * `Imposto imposto = new ICMS(new ISS())` -> decorator permite compor uma classe na outra
+
 * _Sempre que percebemos que temos comportamentos que podem ser compostos por comportamentos de outras classes envolvidas em uma mesma hierarquia, como foi o caso dos impostos, que podem ser composto por outros impostos_
+
+* _Imagine que estamos implementando uma sequência de filtros. Esses filtros precisam eliminar diversas faturas de uma lista, de acordo com algumas regras de negócio: faturas menores que 2000 devem ser eliminadas, faturas maiores do que 8000 devem ser eliminadas, faturas entre 3000 e 4500 que foram emitidas no estado de São Paulo devem ser eliminadas, e assim por diante._
+
+  _Uma implementação procedural produziria uma sequência de ifs enorme para verificar todas essas condições._ 
+
+  * O Decorator, cairia bem neste caso, cada filtro teria sua própria classe, simples e fácil de ser compreendida e mantida.
 
 **Dado o desenvolvimento:**
 
@@ -802,6 +815,10 @@ public static void main(String[] args) {
 
 ## State<a name="statepat"></a>
 
+* _Um Contrato pode sofrer tipos de alterações, descontos, ajustes enquanto está EM ANDAMENTO. O mesmo pode acontecer quando ele está FALTANDO ASSINATURA DO CLIENTE. Mas, após ASSINADO, o contrato não pode mais sofrer alterações._
+
+  * O State facilitaria o trabalho do desenvolvedor, já que ele possibilitaria que as ações de cada estado fiquem centralizadas em classes específicas, evitando a possível bagunça de um código procedural cheio de ifs.
+  
 * O State é utilizado para os casos onde determina classe terá Estados com regras, como por exemplo, um Orçamento “EM_APROVACAO” pode ir depois para “APROVADO” ou “RECUSADO”, mas nunca direto para “FINALIZADO”. Quando temos este tipo de Regra, utilizamos o Design State! 
 
   <img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/statepat.png?raw=true" width="700" height="450">
@@ -997,6 +1014,337 @@ public class TestaState {
         //465, não possui desconto extra, lançará expection
 	}
 
+}
+```
+
+## Builder <a name="builderpat"></a>
+
+O Builder é utilizado para deixar a construção de uma classe mais simples! Imagine a classe nota fiscal, que recebe:
+
+* Razão Social;
+* CNPJ;
+* Data;
+* Valor;
+* Lista de itens;
+* Observações
+
+Fazer a criação desta classe se torna algo trabalhoso, veja:
+
+```java
+List<Item> itens = Arrays.asList(new Item("Item1", 200.0)), new Item("Item2", 10;0));
+
+NotaFiscal nf = 
+    new NotaFiscal("Razao Social", 12345678910, LocalDate.now(), 500.00, itens, impostos, "Observações")
+    
+NotaFiscal nf2 =
+    new NotaFiscal("Nova Razao Social", 99999999999, LocalDate.now(), 1000.00, itens, impostos, "Observações 2222")
+```
+
+### Aplicando o Builder
+
+A ideia do builder, é **ter uma classe Criadora** que irá “montar” a classe através de métodos e depois invocalos, como:
+
+```java
+class BuilderDeNotaFiscal {
+      private String razaoSocial;
+      private String cnpj;
+      private double valorTotal;
+      private double impostos;
+      private List<ItemDaNota> todosItens = new ArrayList<ItemDaNota>();
+
+      public void paraEmpresa(String razaoSocial) {
+        this.razaoSocial = razaoSocial;
+      }
+
+      public void comCnpj(String cnpj) {
+        this.cnpj = cnpj;
+      }
+    
+      public void comItem(ItemDaNota item) {
+        todosItens.add(item);
+        valorBruto += item.getValor();
+        impostos += item.getValor() * 0.05;
+      }
+    
+      //outros métodos
+    
+     public NotaFiscal constroi() {
+        return new NotaFiscal(razaoSocial, cnpj, data, valorBruto, impostos, todosItens, observacoes);
+      }
+}
+```
+
+Desta forma, utilizando o criador de notas, podemos criar uma nota desta forma:
+
+```java
+public static void main(String[] args) {
+    BuilderDeNotaFiscal builder = new CriadorDeNotaFiscal();
+    builder.paraEmpresa("Igor");
+    builder.comCnpj("123.456.789/0001-10");
+    builder.comItem(new Item("item 1", 100.0));
+    builder.comItem(new Item("item 2", 200.0));
+    builder.comItem(new Item("item 3", 300.0));
+    builder.comObservacoes("entregar nf pessoalmente");
+    builder.naDataAtual();
+
+    NotaFiscal nf = builder.constroi();
+}
+```
+
+Para não repetir a palavra `builder`, podemos invez de ter métodos `void` termos métodos que retornam o próprio `NotaFiscalBuilder`, passando o this como retorno!
+
+```java
+ class NotaFiscalBuilder {
+      private String razaoSocial;
+      private String cnpj;
+      private double valorTotal;
+      private double impostos;
+      private Calendar data;
+      private String observacoes;
+
+      private List<ItemDaNota> todosItens = new ArrayList<ItemDaNota>();
+
+      public NotaFiscalBuilder paraEmpresa(String razaoSocial) {
+        this.razaoSocial = razaoSocial;
+        return this; // retorno eu mesmo, o próprio builder, para que o cliente continue utilizando
+      }
+
+      public NotaFiscalBuilder comCnpj(String cnpj) {
+        this.cnpj = cnpj;
+        return this;
+      }
+
+      public NotaFiscalBuilder comItem(ItemDaNota item) {
+        todosItens.add(item);
+        valorBruto += item.getValor();
+        impostos += item.getValor() * 0.05;
+        return this;
+      }
+
+      // código continua aqui com a mesma ideia
+      // substituindo void por NotaFiscalBuilder e retornando this em todos eles...
+ }
+```
+
+```java
+public static void main(String[] args) {
+    NotaFiscal nf = new NotaFiscalBuilder().paraEmpresa("Igor")
+        .comCnpj("123.456.789/0001-10")
+        .comItem(new Item("item 1", 100.0))
+        .comItem(new Item("item 2", 200.0))
+        .comItem(new Item("item 3", 300.0))
+        .comObservacoes("entregar nf pessoalmente")
+        .naDataAtual()
+        .constroi();
+}
+```
+
+### Aplicando o builder ao Item
+
+Note que o Item, temos que ficar passando um `new Item("String", 100.00)`, podemos criar um builder para ele também:
+
+```java
+class ItemDaNotaBuilder {
+    private String descricao;
+    private double valor;
+
+    public ItemDaNotaBuilder comDescricao(String descricao) {
+        this.descricao = descricao;
+        return this;
+    }
+
+    public ItemDaNotaBuilder comValor(double valor) {
+        this.valor = valor;
+        return this;
+    }
+
+    public ItemDaNota constroi() {
+        return new ItemDaNota(descricao, valor);
+    }
+}
+```
+
+E então, poderiamos apenas chamar o método `constroi`
+
+```java
+public static void main(String[] args) {
+    ItemDaNotaBuilder itemUm = new ItemDaNotaBuilder().comDescricao("Item 1")
+        .comValor(100.0)
+        .constroi();
+    
+    ItemDaNotaBuilder itemDois = new ItemDaNotaBuilder().comDescricao("Item 1")
+        .comValor(100.0)
+        .constroi();
+    
+    NotaFiscal nf = new NotaFiscalBuilder().paraEmpresa("Igor")
+        .comCnpj("123.456.789/0001-10")
+        .comItem(itemUm)
+        .comItem(itemDois)
+        .comObservacoes("entregar nf pessoalmente")
+        .naDataAtual()
+        .constroi();
+}
+```
+
+## Observer<a name="observerpat"></a>
+
+* Imagina que você precise avisar 3 sistemas externos (auditoria, financeiro, e agências), assim que uma conta bancária receber um depósito.
+  * O Observer se encaixaria muito bem. Ele permite que você notifique e execute ações após algum acontecimento no seu sistema.
+
+Imagine que depois de criarmos uma Nota Fiscal, através do nosso `NotaFiscalBuilder`, fosse necessário ações, como:
+
+* enviaPorEmail(NotaFiscal nf);
+* salvaNoBanco(NotaFiscal nf);
+* enviaPorSms(NotaFiscal nf);
+* imprime(NotaFiscal nf);
+
+```java
+plass NotaFiscalBuilder {
+
+    public NotaFiscal constroi() {
+        NotaFiscal notaFiscal = new NotaFiscal(razaoSocial, cnpj, valorTotal, impostos, data, observacoes);
+
+        // invocando as ações posteriores
+        enviaPorEmail(notaFiscal);
+        salvaNoBanco(notaFiscal);
+        enviaPorSms(notaFiscal);
+        imprime(notaFiscal);
+
+        return notaFiscal;
+    }
+
+    // resto da classe aqui
+}
+```
+
+Se criarmos estes métodos dentro da classe Builder, estaremos **aumentando o acoplamento a esta classe**. Para corrigir este problema, poderiamos então criar “miniClasses”:
+
+```java
+class NotaFiscalBuilder {
+        // código aqui...
+
+    public NotaFiscal constroi() {
+        NotaFiscal notaFiscal = new NotaFiscal(razaoSocial, cnpj, valorTotal, impostos, data, observacoes);
+
+        new EnviadorDeEmail().enviaPorEmail(notaFiscal);
+        new NotaFiscalDao().salvaNoBanco(notaFiscal);
+        new EnviadorDeSms().enviaPorSms(notaFiscal);
+        new Impressora().imprime(notaFiscal);
+    }
+}
+
+
+//"MINI-CLASSES"
+public class EnviadorDeEmail {
+
+    public void enviaPorEmail(NotaFiscal notaFiscal) {
+        System.out.println("enviando por e-mail");
+    }
+}
+
+public class NotaFiscalDao {
+    public void salvaNoBanco(NotaFiscal notaFiscal) {
+        System.out.println("salvando no banco");
+    }
+}
+
+public class EnviadorDeSms {
+    public void enviaPorSms(NotaFiscal notaFiscal) {
+        System.out.println("enviando por sms");
+    }
+}
+
+public class Impressora {
+    public void imprime(NotaFiscal notaFiscal) {
+        System.out.println("imprimindo notaFiscal");
+    }
+}
+```
+
+Porém, ainda mantivemos o **alto acoplamento **para a classe `NotaFiscalBuilder`.
+
+### Aplicando o Observer
+
+Com o observer, o 1º passo é verificar **o que se tem em comum entre as classes**, que em nosso exemplo, é que todas as classes possuem uma **ação**, sendo assim, poderiamos ter uma Interface que implemente uma ação!
+
+```java
+interface AcaoAposGerarNota {
+    void executa(NotaFiscal notaFiscal);
+}
+
+public class EnviadorDeEmail implements AcaoAposGerarNota {
+    public void executa(NotaFiscal notaFiscal) {
+        System.out.println("enviando por e-mail");
+    }
+}
+
+public class NotaFiscalDao implements AcaoAposGerarNota {
+    public void executa(NotaFiscal notaFiscal) {
+        System.out.println("salvando no banco");
+    }
+}
+
+public class EnviadorDeSms implements AcaoAposGerarNota {
+    public void executa(NotaFiscal notaFiscal) {
+        System.out.println("enviando por sms");
+    }
+}
+
+public class Impressora implements AcaoAposGerarNota {
+    public void executa(NotaFiscal notaFiscal) {
+        System.out.println("imprimindo notaFiscal");
+    }
+}
+```
+
+Desta forma, o método `constroi` não irá precisar saber quais ações estão sendo feitas, apenas irá executar o que estiver dentro da lista:
+
+```java
+public class NotaFiscalBuilder {
+    private List<AcaoAposGerarNota> todasAcoesASeremExecutadas;
+	//outros atributos omitidos
+    
+    public NotaFiscalBuilder() {
+          this.todasAcoesASeremExecutadas = new ArrayList<AcaoAposGerarNota>();
+        }
+
+    public void adicionaAcao(AcaoAposGerarNota novaAcao) {
+        this.todasAcoesASeremExecutadas.add(novaAcao);
+    }
+    
+    
+    //DEMAIS MÉTODOS    
+    public NotaFiscal constroi() {
+
+        NotaFiscal notaFiscal = new NotaFiscal(razaoSocial, cnpj, valorTotal, impostos, data, observacoes);
+
+        for(AcaoAposGerarNota acao : todasAcoesASeremExecutadas) {
+            acao.executa(notaFiscal);
+        }
+    }
+}
+```
+
+Então, podemos adicionar a sequência de ações que quisermos:
+
+```java
+public class TesteAcao {
+    public static void main(String[] args) {
+        NotaFiscalBuilder builder = new NotaFiscalBuilder();
+        builder.adicionaAcao(new EnviadorDeEmail());
+        builder.adicionaAcao(new NotaFiscalDao());
+        builder.adicionaAcao(new EnviadorDeSms());
+        builder.adicionaAcao(new Impressora());
+
+        NotaFiscal notaFiscal = builder.paraEmpresa("Caelum")
+            .comCnpj("123.456.789/0001-10")
+            .comItem(new ItemDaNota("item 1", 100.0))
+            .comItem(new ItemDaNota("item 2", 200.0))
+            .comItem(new ItemDaNota("item 3", 300.0))
+            .comObservacoes("entregar notaFiscal pessoalmente")
+            .naDataAtual()
+            .constroi();
+    }
 }
 ```
 
