@@ -1400,3 +1400,74 @@ public class MeuAplicativo {
 O Builder e o Factory, tem o mesmo intuito, otimizar a criação de classes, porém possuem semânticas diferentes.<br><br>
 * Builder:
 	* Quando temos classes com muitos atributos, como no exemplo da criação da Nota Fiscal
+
+## FlyWeight <a name="flyweightpat"></a>
+* Imagine que precisamos instanciar vários objetos parecidos de uma classe, por exemplo, imagine que temos a classe `NotasMusicais` e queremos criar uma música, onde cada nota será um objeto:
+	```java
+	List<NotasMusicais> musica = Arrays.asList(new Do(), new Re(), new Mi(), new Fa(), new Fa(), new Fa(), new Do(), new Re())
+	```
+Perceba que há apesar de serem objetos identicos, precisam ser instanciados várias vezes!
+
+* O padrão FlyWeight, utiliza um **Mapa** `Map` que através do método `get` irá retornar o objeto!
+```java
+public class NotasMusicais {
+
+		private static Map<String, Nota> notas = 
+			new HashMap<String, Nota>();
+
+		static {
+
+			notas.put("do", new Do());
+			notas.put("re", new Re());
+			notas.put("mi", new Mi());
+			notas.put("fa", new Fa());
+			notas.put("sol", new Sol());
+			notas.put("la", new La());
+			notas.put("si", new Si());
+
+		}
+		public Nota pega(String nome) {
+			return notas.get(nome);
+		}
+}
+
+	//INTERFACE NOTA
+	public interface Nota {
+		String simbolo();
+	}
+
+	//NOTAS MUSICAIS
+	public class Do implements Nota {
+
+		@Override
+		public String simbolo() {
+		return "C";
+		}
+	}
+
+	// re, mi, fa, sol, la, si...
+	
+	//IMPLEMETANDO
+	public static void main(String[] args) {
+
+        NotasMusicais notas = new NotasMusicais();
+
+        List<Nota> doReMiFa = Arrays.asList(
+            notas.pega("do"),    
+            notas.pega("re"),    
+            notas.pega("mi"),    
+            notas.pega("fa"),    
+            notas.pega("fa"),    
+            notas.pega("fa"),    
+
+            notas.pega("do"),    
+            notas.pega("re"),    
+            notas.pega("do"),    
+            notas.pega("re"),
+			//DEMAIS NOTAS
+        );        
+		
+		//Se impremissimos o código, iriamos ver que a referência é ao mesmo objeto!
+    }
+}
+```
