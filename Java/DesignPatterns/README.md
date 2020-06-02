@@ -20,6 +20,7 @@ Ao criar um projeto, devemos pensar sempre na possibilidade de, **novidades e al
 5. [State](#statepat)
 6. [Builder](#builderpat)
 7. [Observer](#observerpat)
+8. [Factory](#factorypat)
 
 ## Strategy<a name="strategypat"></a>
 **Quando utilizar o padrão Strategy?**
@@ -1348,3 +1349,54 @@ public class TesteAcao {
 }
 ```
 
+## Factory <a name="factorypat"></a>
+* Imagine um pedaço de código que irá se repetir exatamente igual em outras classes. 
+	* A solução, criamos uma classe com um método que irá possuir o código X, onde as classes irão chamar este método;
+* O padrão factory mais conhecido, é quando estamos aprendendo **JDBC**  e criamos a famosa classe **ConnectionFactory** - Este nome não é atoa!
+* _Usamos uma fábrica quando temos que isolar o processo de criação de um objeto em um único lugar. Essa fábrica pode descobrir como criar o objeto dentro dela própria, mas geralmente ela não precisa de muitas informações para criar o objeto._
+
+SEM FACTORY (a cada query será necessário escrever o caminho do banco):
+```java
+public class MeuAplicativo {
+
+    public static void main(String[] args) throws SQLException {
+        Connection conexao = 
+                DriverManager.getConnection("jdbc:mysql://localhost:3306/banco", "usuario", "senha");
+
+        PreparedStatement ps = conexao.prepareStatement("select * from ...");
+        // codigo continua aqui
+    }
+}
+```
+COM FACTORY (instanciamos sempre a classe ConnectionFactory):
+```java
+public class ConnectionFactory {
+
+    public Connection getConnection() {
+        try {
+            Connection conexao = 
+                    DriverManager.getConnection("jdbc:mysql://localhost:3306/banco", "usuario", "senha");
+
+            return conexao;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+
+
+//MÉTODO MAIN
+public class MeuAplicativo {
+
+    public static void main(String[] args) throws SQLException {
+        Connection conexao = new ConnectionFactory.getConnection();
+		
+		//métodos
+	}
+}
+```
+
+### BUILDER vs FACTORY <a name="factorybuilder"></a>
+O Builder e o Factory, tem o mesmo intuito, otimizar a criação de classes, porém possuem semânticas diferentes.<br><br>
+* Builder:
+	* Quando temos classes com muitos atributos, como no exemplo da criação da Nota Fiscal
