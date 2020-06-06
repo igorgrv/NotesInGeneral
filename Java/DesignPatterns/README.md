@@ -21,6 +21,8 @@ Ao criar um projeto, devemos pensar sempre na possibilidade de, **novidades e al
 6. [Builder](#builderpat)
 7. [Observer](#observerpat)
 8. [Factory](#factorypat)
+9. [FlyWeight](#flyweightpat)
+10. [Memento](#mementopat)
 
 ## Strategy<a name="strategypat"></a>
 **Quando utilizar o padrão Strategy?**
@@ -1469,5 +1471,115 @@ public class NotasMusicais {
 		
 		//Se impremissimos o código, iriamos ver que a referência é ao mesmo objeto!
     }
+}
+```
+
+## Memento <a name="mementopat"></a>
+* Imagine que queremos fazer um **rollback**, ou o famoso **CTRL + Z** de um status,  ou seja, voltar ao que era anteriormente. O padrão de projeto **Memento** nos ajuda a voltar `Estados` anteriores!
+	* Exemplo.: Imagine que temos os `Estados` de um `Contrato` como "NOVO", "EM_ANDAMENTO", "ACERTADO", "CONCLUIDO" e queremos tanto `avancar()` quanto `voltarEstado(X)`. Como fazer?
+
+### Aplicando o Memento
+O Memento é um padrão que irá utilizar:
+* Classe mãe, no nosso caso `Contrato`;
+* Classe que encapsulará `Contrato`, responsável pelos `Estados`;
+* Classe responsável por **guardar os Estados**;
+
+Classe Contrato:
+```java
+public enum TipoContrato {
+    NOVO,
+    EM_ANDAMENTO,
+    ACERTADO,
+    CONCLUIDO
+}
+
+public class Contrato {
+
+    private Calendar data;
+    private String cliente;
+    private TipoContrato tipo;
+
+    public Contrato(Calendar data, String cliente, TipoContrato tipo) {
+        this.data = data;
+        this.cliente = cliente;
+        this.tipo = tipo;
+    }
+	
+	//Getters
+	
+	//Método responsável por avançar os Estados
+	 public void avanca() {
+        if(tipo == TipoContrato.NOVO) tipo = TipoContrato.EM_ANDAMENTO;
+        else if(tipo == TipoContrato.EM_ANDAMENTO) tipo = TipoContrato.ACERTADO;
+        else if(tipo == TipoContrato.ACERTADO) tipo = TipoContrato.CONCLUIDO;
+    }
+	
+	//método que irá armazenar o Estado
+	public Estado salvaEstado() {
+        return new Estado(new Contrato(data, cliente, tipo));
+    }
+
+}
+```
+<br>
+Classe Estado:
+```java
+public class Estado {
+
+    private Contrato contrato;
+
+    public Estado(Contrato contrato) {
+        this.contrato = contrato;
+    }
+
+    public Contrato getEstado() {
+        return contrato;
+    }
+
+}
+```
+<br>
+Classe Histórico:
+```java
+public class Historico {
+
+    private List<Estado> estadosSalvos = new ArrayList<Estado>();
+
+    public Estado pega(int index) {
+        return estadosSalvos.get(index);
+    }
+
+    public void adiciona(Estado estado) {
+        estadosSalvos.add(estado);
+    }
+
+}
+```
+<br>
+Testando o Memento:
+```java
+public static void main(String[] args) {
+
+        Historico historico = new Historico();
+
+        Contrato contrato = new Contrato(Calendar.getInstance(), "Mauricio", TipoContrato.NOVO);
+		//salvando a posição 0 -> Estado "NOVO"
+        historico.adiciona(contrato.salvaEstado());
+		
+		//avançando para posição 1 -> Estado "EM_ANDAMENTO"
+        contrato.avanca();
+        historico.adiciona(contrato.salvaEstado());
+
+		//avançando para posição 2 -> Estado "ACERTADO"
+        contrato.avanca();
+        historico.adiciona(contrato.salvaEstado());
+
+		//avançando para posição 3 -> Estado "CONCLUÍDO"
+        contrato.avanca();
+        historico.adiciona(contrato.salvaEstado());
+
+        System.out.println(contrato.getTipo()); //Irá imprimir "CONCLUÍDO"
+        contrato.restaura(historico.pega(1)); //Selecionado posição 1
+        System.out.println(contrato.getTipo()); //Irá imprimir "EM_ANDAMENTO"
 }
 ```
