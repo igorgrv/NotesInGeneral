@@ -1521,7 +1521,7 @@ public class Contrato {
 
 }
 ```
-<br>
+
 Classe Estado:
 ```java
 public class Estado {
@@ -1538,7 +1538,7 @@ public class Estado {
 
 }
 ```
-<br>
+
 Classe Histórico:
 ```java
 public class Historico {
@@ -1555,7 +1555,7 @@ public class Historico {
 
 }
 ```
-<br>
+
 Testando o Memento:
 ```java
 public static void main(String[] args) {
