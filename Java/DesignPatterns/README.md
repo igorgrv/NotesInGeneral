@@ -1643,3 +1643,130 @@ public static void main (String[] args) {
 	Calendar agora = new Relogio().hoje();
 }
 ```
+
+## Command <a name="commandpat"></a>
+É uma aplicação com um **Fluxo/Worflow**? Se sim, devemos utilizar esse padrão de projeto para nos ajudar a executar as etapas!
+* Imaginemos que temos um fluxo de `Pedidos`, que seguirá as etapas:
+```java
+public enum Status {
+	NOVO,
+	PROCESSANDO,
+	PAGO,
+	ITEM_SEPARADO,
+	ENTREGUE;
+}
+
+public class Pedido {
+
+private String cliente;
+private double valor;
+private Status status;
+private Calendar dataFinalizacao;
+
+public Pedido(String cliente, double valor) {
+super();
+this.cliente = cliente;
+this.valor = valor;
+}
+public String getCliente() {
+return cliente;
+}
+public double getValor() {
+return valor;
+}
+public Status getStatus() {
+return status;
+}
+
+public void paga() {
+status = Status.PAGO;
+}
+
+public Calendar getDataFinalizacao() {
+return dataFinalizacao;
+}
+
+public void finaliza() {
+dataFinalizacao = Calendar.getInstance();
+status = Status.ENTREGUE;
+}
+}
+```
+O segredo deste Design Pattern é criar uma `FilaDeTrabalho `  e criar um padrão de `Comando`, ou seja, uma Interface:
+
+```java
+public class FilaDeTrabalho {
+
+    private List<Comando> comandos;
+
+    public FilaDeTrabalho() {
+        comandos = new ArrayList<Comando>();
+    }
+
+    public void adiciona(Comando comando) {
+        comandos.add(comando);
+    }
+
+	//Irá executar o método 'executa' de cada Comando
+    public void processa() {
+        for(Comando comando : comandos) {
+            comando.executa();
+        }
+    }
+}
+
+
+//PADRÃO PARA COMANDO
+public interface Comando {
+	void executa();
+}
+
+//Para cada tipo de Comando, teremos uma nova classe que extenderá Comando
+public class ConcluiPedido implements Comando {
+
+    private Pedido pedido;
+
+    public ConcluiPedido(Pedido pedido) {
+        this.pedido = pedido;
+    }
+
+    @Override
+    public void executa() {
+        pedido.finaliza();
+    }
+
+}
+
+public class PagaPedido implements Comando {
+
+    private Pedido pedido;
+
+    public PagaPedido(Pedido pedido){
+        this.pedido = pedido;
+    }
+    @Override
+    public void executa() {
+        pedido.paga();
+    }
+
+}
+```
+
+Testando o programa:
+```java
+public class Programa {
+
+    public static void main(String[] args) {
+        Pedido pedido1 = new Pedido("Mauricio", 150.0);
+        Pedido pedido2 = new Pedido("Marcelo", 250.0);
+
+        FilaDeTrabalho fila = new FilaDeTrabalho();
+
+        fila.adiciona(new PagaPedido(pedido1));
+        fila.adiciona(new PagaPedido(pedido2));
+        fila.adiciona(new ConcluiPedido(pedido1));
+
+        fila.processa();
+    }
+}
+```
