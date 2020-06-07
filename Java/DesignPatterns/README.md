@@ -23,6 +23,9 @@ Ao criar um projeto, devemos pensar sempre na possibilidade de, **novidades e al
 8. [Factory](#factorypat)
 9. [FlyWeight](#flyweightpat)
 10. [Memento](#mementopat)
+11. [Bridge / Adapter](#bridgeadapterspat)
+12. [Command](#commandpat)
+13. [Façade / Singleton](#singletonpat)
 
 ## Strategy<a name="strategypat"></a>
 **Quando utilizar o padrão Strategy?**
@@ -1581,5 +1584,62 @@ public static void main(String[] args) {
         System.out.println(contrato.getTipo()); //Irá imprimir "CONCLUÍDO"
         contrato.restaura(historico.pega(1)); //Selecionado posição 1
         System.out.println(contrato.getTipo()); //Irá imprimir "EM_ANDAMENTO"
+}
+```
+
+## Bridges e Adapters <a name="bridgeadapterspat"></a>
+* O padrão Bridge serve para abstrair a implementação de uma API;
+
+Imagine o cenário onde temos uma implementação de uma API de Mapas, ou seja, podemos utilizar o `GoogleMaps` ou o `MapLink` por exemplo:
+
+```java
+public static void main (String[] args) {
+	String url = "http://maps.google.com.br/maps?q=endereco+aqui"
+	URL google = new URL(url);
+	InputStream stream = google.openStream();
+	
+	//irá lançar excções e etc
+}
+```
+O problema desta implementação é, e se quisessemos alterar a API? Imagine quantas outras classes não precisariamos alterar.... Para isto surgiu o padrão **Bridge**, quer serve para abstrair a implementação da API!
+### Aplicando o Bridge
+Para implementar o Bridge, precisamos de **Uma Interface**, que irá ser responsável pelo padrão da API
+```java
+public interface Mapa {
+	String devolveMapa(String rua);
+}
+
+
+public class GoogleMaps implements Mapa {
+	public String devolveMapa(String rua) {
+		String url = "http://maps.google.com.br/maps?q=endereco+aqui"
+		URL google = new URL(url);
+		InputStream stream = google.openStream();
+	}
+}
+
+public static void main (String[] args) {
+	Mapa mapa = new GoogleMaps();
+	//Mapa mapa = new MapLink();
+	String conteudo = mapa.devolveMapa("Rua Vergueiro, 3185");
+}
+```
+Desta forma, encapsulamos o nosso código do mapa, de uma forma que a aplicação não precisa saber a implementação, apenas passar a String!
+
+### Adapter
+O Adapter segue o mesmo modelo do Bridge, a diferença está em que o Bridge implementa serviços externos e o Adapter, implementa serviços internos!
+* Exemplo: Imagine que temos que melhorar um projeto legado, ou seja, precisamos ir migrando em partes, pacotes antigos, classes antigas e etc. 
+Com o Adapter, podemos implementar uma classe que abstrai classes antigas
+
+A classe `Calendar` é um ótimo exemplo de uma classe "antiga" que foi substituida pelo `LocalDate`:
+```java
+class Relogio {
+	public Calendar hoje() {
+		return Calendar.getInstance();
+	}
+}
+
+public static void main (String[] args) {
+	Calendar agora = new Relogio().hoje();
 }
 ```
