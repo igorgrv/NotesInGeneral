@@ -1770,3 +1770,53 @@ public class Programa {
     }
 }
 ```
+
+# SOLID
+## Coesão
+O conceito de uma classe coesa, é de que a classe possui uma **única responsabilidade**, ou seja, ela sabe fazer somente aquilo, de uma forma que em caso de alteração, somente aquela classe deve ser alterada, não necessitando alterar diversas classes.
+
+###Classes sem coesão
+Dado o exemplo, vamos melhorar a classe:
+```java
+public class CalculadoraDeSalario {
+
+    public double calcula(Funcionario funcionario) {
+        if(DESENVOLVEDOR.equals(funcionario.getCargo())) {
+            return dezOuVintePorcento(funcionario);
+        }
+
+        if(DBA.equals(funcionario.getCargo()) || TESTER.equals(funcionario.getCargo())) {
+            return quinzeOuVinteCincoPorcento(funcionario);
+        }
+
+        throw new RuntimeException("funcionario invalido");
+    }
+
+    private double dezOuVintePorcento(Funcionario funcionario) {
+        if(funcionario.getSalarioBase() > 3000.0) {
+            return funcionario.getSalarioBase() * 0.8;
+        }
+        else {
+            return funcionario.getSalarioBase() * 0.9;
+        }
+    }
+
+    private double quinzeOuVinteCincoPorcento(Funcionario funcionario) {
+        if(funcionario.getSalarioBase() > 2000.0) {
+            return funcionario.getSalarioBase() * 0.75;
+        }
+        else {
+            return funcionario.getSalarioBase() * 0.85;
+        }
+    }
+
+}
+```
+Podemos perceber que essa classe tem alguns problemas em caso de futuras alterações/adições, pois a classe é:
+* Responsável por aplicar a regra de cálculo;
+* Responsável por fazer a verificação do tipo do cargo;
+* Tende a ter muitos ifs;
+* Tende a crescer cada vez mais com adição de novos cargos;
+* Será necessário utilizar o famoso CTRL + F / CTRL + H;
+
+###Aplicando a coesão
