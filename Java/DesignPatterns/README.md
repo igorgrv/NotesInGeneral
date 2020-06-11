@@ -26,7 +26,8 @@ Ao criar um projeto, devemos pensar sempre na possibilidade de, **novidades e al
 11. [Bridge / Adapter](#bridgeadapterspat)
 12. [Command](#commandpat)
 13. [Façade / Singleton](#singletonpat)
-14. [SOLID](#solidpaat)
+14. [SOLID](#solidpat)
+	*. ["S" - SRP](#srppat)
 
 ## Strategy<a name="strategypat"></a>
 **Quando utilizar o padrão Strategy?**
@@ -1773,6 +1774,10 @@ public class Programa {
 ```
 
 # SOLID <a name="solidpat"></a>
+## "S"- SRP Single Responsibility Principle <a name="srppat"></a>
+A 1º letra do SOLID, nada mais significa do que Coesão! Relembrando, significa que a classe deve possuir apenas **uma responsabilidade**.
+* O mesmo serve para uma **Interface**, ela apenas deve provenir **uma responsabilidade** as classes que herdam dela, ou seja, se for incluir um novo método, este método deve ser exclusivamente destinado a responsabilidade X - também chamado de ISP - Interface Single Principle;
+
 ## Coesão
 O conceito de uma classe coesa, é de que a classe possui uma **única responsabilidade**, ou seja, ela sabe fazer somente aquilo, de uma forma que em caso de alteração, somente aquela classe deve ser alterada, não necessitando alterar diversas classes.
 
@@ -1820,9 +1825,7 @@ Podemos perceber que essa classe tem alguns problemas em caso de futuras altera�
 * Tende a crescer cada vez mais com adição de novos cargos;
 * Será necessário utilizar o famoso CTRL + F / CTRL + H;
 
-## "S"- SRP Single Responsibility Principle
-A 1º letra do SOLID, nada mais significa do que Coesão! Relembrando, significa que a classe deve possuir apenas **uma responsabilidade**.
-* O mesmo serve para uma **Interface**, ela apenas deve provenir **uma responsabilidade** as classes que herdam dela, ou seja, se for incluir um novo método, este método deve ser exclusivamente destinado a responsabilidade X - também chamado de ISP - Interface Single Principle;
+
 ###Aplicando a coesão
 
 Primeiro, vamos separar as responsabilidades:
