@@ -26,6 +26,7 @@ Ao criar um projeto, devemos pensar sempre na possibilidade de, **novidades e al
 11. [Bridge / Adapter](#bridgeadapterspat)
 12. [Command](#commandpat)
 13. [Façade / Singleton](#singletonpat)
+14. [SOLID](#solidpaat)
 
 ## Strategy<a name="strategypat"></a>
 **Quando utilizar o padrão Strategy?**
@@ -1771,7 +1772,7 @@ public class Programa {
 }
 ```
 
-# SOLID
+# SOLID <a name="solidpat"></a>
 ## Coesão
 O conceito de uma classe coesa, é de que a classe possui uma **única responsabilidade**, ou seja, ela sabe fazer somente aquilo, de uma forma que em caso de alteração, somente aquela classe deve ser alterada, não necessitando alterar diversas classes.
 
@@ -1819,4 +1820,108 @@ Podemos perceber que essa classe tem alguns problemas em caso de futuras altera�
 * Tende a crescer cada vez mais com adição de novos cargos;
 * Será necessário utilizar o famoso CTRL + F / CTRL + H;
 
+## "S"- SRP Single Responsibility Principle
+A 1º letra do SOLID, nada mais significa do que Coesão! Relembrando, significa que a classe deve possuir apenas **uma responsabilidade**.
+* O mesmo serve para uma **Interface**, ela apenas deve provenir **uma responsabilidade** as classes que herdam dela, ou seja, se for incluir um novo método, este método deve ser exclusivamente destinado a responsabilidade X - também chamado de ISP - Interface Single Principle;
 ###Aplicando a coesão
+
+Primeiro, vamos separar as responsabilidades:
+* Podemos notar que temos regras de cálculo de salário, então porque não fazer com que elas fiquem em classes separadas? Assim cada uma terá uma responsabilidade!
+* Outro ponto é a lógica dessas classes privadas `dezOuVintePorcento` & `quinzeOuVinteCincoPorcento` - são bem parecidas:
+	* Ambas **devolvem um double e recebem um `Funcionário` ** - o que significa que podemos ter uma **Interface** que irá implementar o método `calcula`:
+	```java
+	//INTERFACE
+	public interface RegraDeCalculo {
+		public double calcula(Funcionario funcionario);
+	}
+	
+	//1º REGRA
+	public class DezOuVintePorCento implements RegraDeCalculo {
+
+		public double calcula(Funcionario funcionário) {
+			if(funcionario.getSalarioBase() > 3000.0) {
+				return funcionario.getSalarioBase() * 0.8;
+			}
+			else {
+				return funcionario.getSalarioBase() * 0.9;
+			}
+		}
+	}
+	
+	//2º REGRA
+	public class QuinzeOuVinteECincoPorCento implements RegraDeCalculo  {
+		public double calcula(Funcionario funcionario) {
+			if(funcionario.getSalarioBase() > 2000.0) {
+				return funcionario.getSalarioBase() * 0.75;
+			}
+			else {
+				return funcionario.getSalarioBase() * 0.85;
+			}
+		}
+
+	}
+	```
+* Desta forma a classe `CalculadoraDeSalario` ficou menor, mas ainda sim continua com um problema. A cada novo funcionário teriamos um novo if...
+```java
+public class CalculadoraDeSalario {
+
+		public double calcula(Funcionario funcionario) {
+			if(DESENVOLVEDOR.equals(funcionario.getCargo())) {
+				return new DezOuVintePorCento(). calcula(funcionario);
+			}
+
+			if(DBA.equals(funcionario.getCargo()) || TESTER.equals(funcionario.getCargo())) {
+				return new QuinzeOuVinteECincoPorCento().calcula(funcionario);
+			}
+			throw new RuntimeException("funcionario invalido");
+		}
+	}
+```
+Vamos perceber o que cada `if` tem em comum:
+* A cada novo funcionário, é necessário aplicar uma RegraDeCalculo, então podiamos fazer algo como `DESENVOLVEDOR(new DezOuVintePorCento())`. Desta forma, assim que for criado um `Funcionario` do tipo Desenvolvedor, será aplicado a Regra para ele...
+	* Mas como? Utilizando um `ENUM`!
+	```java
+	public enum Cargo {
+		DESENVOLVEDOR(new DezOuVintePorCento()),
+		DBA(new DezOuVintePorCento()),
+		TESTER(new QuinzeOuVinteECincoPorCento());
+	}
+	```
+	* Para isto é necessário que ao instanciar esta classe, o construtor receba uma `RegraDeCalculo`:
+	```java
+	public enum Cargo {
+		DESENVOLVEDOR(new DezOuVintePorCento()),
+		DBA(new DezOuVintePorCento()),
+		TESTER(new QuinzeOuVinteECincoPorCento());
+	}
+	
+	private RegraDeCalculo regra;
+
+	Cargo(RegraDeCalculo regra)  {
+		this.regra = regra;
+	}
+	
+	public RegraDeCalculo getRegra()  {
+		return regra;
+	}
+	```
+	* Deste modo a classe `CalculadoraDeSalario` diminuiu bastante e se tornou coesa! ou seja, só possui uma regra:
+	```java
+	public class CalculadoraDeSalario {
+		public double calcula(Funcionario funcionario)  {
+			return funcionario.getCargo().getRegra().calcula(funcionario);
+		}
+	}
+	```
+	* E porque não, esconder mais ainda este código? Podemos coloca-lo dentro da própria classe `Funcionario`:
+	```java
+	//CLASSE CALCULADORA
+	public double  calcula(Funcionario funcionario)  {
+		return funcionario.calculaSalario();
+	}
+	
+	//CLASSE FUNCIONÁRIO
+	public double calculaSalario()  {
+   	 return  cargo.getRegra().calcula(this);
+	} 
+	```
