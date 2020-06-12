@@ -28,7 +28,8 @@ Ao criar um projeto, devemos pensar sempre na possibilidade de, **novidades e al
 13. [Façade / Singleton](#singletonpat)
 14. [SOLID](#solidpat)
 	* ["S" - SRP - Coesão](#srppat)
-	* [Acoplamento](#acoplapat)
+	* ["D" - DIP - Acoplamento](#dippat)
+	* ["O"- OCP](#ocppat)
 
 ## Strategy<a name="strategypat"></a>
 **Quando utilizar o padrão Strategy?**
@@ -1930,6 +1931,7 @@ Vamos perceber o que cada `if` tem em comum:
 	} 
 	```
 	
+## "D"- DIP Dependency Inversion Principle <a name="dippat"></a>
 ## Acoplamento <a name="acoplapat"></a>
 O acoplamento nada mais é do que "depender" de algo, ou seja, uma classe muito acoplada significa que é uma classe que depende muito de outras!<br>
 #### Qual o problema de uma clase muito acoplada?
@@ -2000,3 +2002,74 @@ public class GeradorDeNotaFiscal  {
 }
 ```
 
+## "O"- OCP Open Closed Principle <a name="ocppat"></a>
+Com a idéia de coesão e acoplamento, vamos análisar o código abaixo:
+* `CalculadoraDePrecos` -> classe de implementação, onde seguindo a lógica de Coesão não pode ter mais de uma responsabilidade e seguindo a lógica de Acoplamento, não pode depender de outra classe, nem sofrer com alguma alteração.
+
+```java
+public class CalculadoraDePrecos {
+
+    public double calcula(Compra produto) {
+        TabelaDePrecoPadrao tabela = new TabelaDePrecoPadrao();
+        Frete correios = new Frete();
+
+        double desconto = tabela.descontoPara(produto.getValor());
+        double frete = correios.para(produto.getCidade());
+
+        return produto.getValor() * (1-desconto) + frete;
+    }
+}
+
+public class TabelaDePrecoPadrao {
+    public double descontoPara(double valor) {
+        if(valor>5000) return 0.03;
+        if(valor>1000) return 0.05;
+        return 0;
+    }
+}
+
+public class Frete {
+    public double para(String cidade) {
+        if("SAO PAULO".equals(cidade.toUpperCase())) {
+            return 15;
+        }
+        return 30;
+    }
+}
+```
+O código acima funciona seguindo as implementações de Coesão e Acoplamento, porém imagine que queremos **Expandir** nosso projeto, queremos:
+* Nova `TabelaDePreço`;
+* Novo `ServicoDeFrete`;
+
+A solução seria colocar `ifs`? Ja vimos que não é bom deixar nossa classe saber muito sobre a implementação...<br>
+O Padrão **OCP** - Princípio fechado e aberto, aideia é que as suas classes **sejam abertas para extensão**Ou seja, eu tenho que conseguir estendê-la, ou seja, mudar o comportamento dela, de maneira fácil. Mas ela **tem que estar fechada para alteração**, ou seja, eu não tenho que ficar o tempo inteiro indo nela pra mexer um if a mais, para fazer uma modificação ou coisa do tipo.
+
+### Aplicando o OCP
+Devemos lembrar sempre que "Orientar a objetos é pensar em abstração"! E para isto nada melhor que uma Interface.
+* Queremos ter a liberdade de expandir nosso sistema, de forma que seja possível o código abaixo:
+
+```java
+ServicoDeEntrega correio = new Correios();
+ServicoDeEntrega jadLog = new Correios();
+
+TabelaPreco normal = new TabelaDePrecoNormal();
+TabelaPreco diferenciada = new TabelaDePrecoDiferenciada();
+```
+Ficou mais fácil de perceber as Interfaces que precisaremos criar!
+```java
+public interface TabelaDePreco  {
+    double descontoPara(double valor);
+}
+
+public interface ServicoDeEntrega  {
+    double para(String cidade);
+}
+```
+Basta alterarmos o construtor da CalculadoraDePrecos, que quando alguma classe for implementar nosso cálculo, vai poder informar qual tipo de Tabela e Serviço de entrega será feito, ou seja, não a classe `CalculadoraDePrecos` não será afetada!
+```java
+public class CalculadoraDePrecos  {
+
+    public CalculadoraDePrecos(TabelaDePreco tabela, ServicoDeEntrega entrega) {
+    }
+}
+```
