@@ -29,7 +29,7 @@ Ao criar um projeto, devemos pensar sempre na possibilidade de, **novidades e al
 14. [SOLID](#solidpat)
 	* ["S" - SRP - Coesão](#srppat)
 	* ["D" - DIP - Acoplamento](#dippat)
-	* ["O"- OCP](#ocppat)
+	* ["O"- OCP - Classes Extensíveis](#ocppat)
 
 ## Strategy<a name="strategypat"></a>
 **Quando utilizar o padrão Strategy?**
