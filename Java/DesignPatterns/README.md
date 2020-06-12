@@ -27,7 +27,8 @@ Ao criar um projeto, devemos pensar sempre na possibilidade de, **novidades e al
 12. [Command](#commandpat)
 13. [Façade / Singleton](#singletonpat)
 14. [SOLID](#solidpat)
-	*. ["S" - SRP](#srppat)
+	* ["S" - SRP - Coesão](#srppat)
+	* [Acoplamento](#acoplapat)
 
 ## Strategy<a name="strategypat"></a>
 **Quando utilizar o padrão Strategy?**
@@ -1826,7 +1827,7 @@ Podemos perceber que essa classe tem alguns problemas em caso de futuras altera�
 * Será necessário utilizar o famoso CTRL + F / CTRL + H;
 
 
-###Aplicando a coesão
+### Aplicando a coesão
 
 Primeiro, vamos separar as responsabilidades:
 * Podemos notar que temos regras de cálculo de salário, então porque não fazer com que elas fiquem em classes separadas? Assim cada uma terá uma responsabilidade!
@@ -1928,3 +1929,74 @@ Vamos perceber o que cada `if` tem em comum:
    	 return  cargo.getRegra().calcula(this);
 	} 
 	```
+	
+## Acoplamento <a name="acoplapat"></a>
+O acoplamento nada mais é do que "depender" de algo, ou seja, uma classe muito acoplada significa que é uma classe que depende muito de outras!<br>
+#### Qual o problema de uma clase muito acoplada?
+Imagine o cenário abaixo,  onde a classe `GeradorDeNotaFiscal` possui um alto acoplamento com as classes `EnviadorDeEmail`, `NFDAO` e `SAP` - o que aconteceria se a classe `SAP` parasse de funcionar? iria afetar a classe `GeradorDeNotaFiscal`;
+<img src="https://s3.amazonaws.com/caelum-online-public/solid+com+java/DiagramaSolidJava.jpg" width="500">
+```java
+public class GeradorDeNotaFiscal {
+
+    private final EnviadorDeEmail email;
+    private final NotaFiscalDao dao;
+
+    public GeradorDeNotaFiscal(EnviadorDeEmail email, NotaFiscalDao dao) {
+        this.email = email;
+        this.dao = dao;
+    }
+
+    public NotaFiscal gera(Fatura fatura) {
+
+        double valor = fatura.getValorMensal();
+
+        NotaFiscal nf = new NotaFiscal(valor, impostoSimplesSobreO(valor));
+
+        email.enviaEmail(nf);
+        dao.persiste(nf);
+
+        return nf;
+    }
+
+    private double impostoSimplesSobreO(double valor) {
+        return valor * 0.06;
+    }
+}
+```
+Mas sabemos que é impossível não se acoplar uma classe, a questão é **_"precisamos sempre evitar depende de classes que vão sofrer mudanças"_**.
+* Temos medo de se acoplar a classe `String` ou `List`? NÃO, pois sabemos que estas classes não sofreram mudanças, ou seja, **temos que nos acoplar a Classes** em que vamos **ter medo de altera-las!**;
+
+#### Como diminuir o acoplamento? Tendo medo!
+Se pensarmos na `List` e `String`, o que tem em comum? Ambas possuem tantas implementações, que jamais iremos querer mexer nelas, pq isso implicaria em uma mudança gigantesca em todas as outras classes!<br>
+A idéia é fazermos o mesmo com a nossa Classe:
+* Vamos criar uma Interface chamada `AcoesAposGerarNF`, que irá ter o método `executa` e todas as classes `EnviadorDeEmail`, `NFDAO` e `SAP` irão implementa-la.
+
+<img src="https://s3.amazonaws.com/caelum-online-public/solid+com+java/GeradorDeNotaFiscal+com+Interface.jpg" width="500">
+
+_Essa interface que eu acabei de criar, ela acabou de virar estável. A chance de ela mudar vai ser menor. Porque você, programador, vai ter medo de mexer nela. Mexeu nela, criou um método a mais, mudou uma assinatura de algum método, você vai ter que mudar em todas as implementações abaixo. Isso vai fazer com que ela seja estável, naturalmente._
+
+```java
+//Criando a Interface
+public interface AcaoAposGerarNota {
+	void executa(NotaFiscal nf);
+}
+
+//Invés de receber as ações, iremos receber UMA LISTA DE AÇÕES:
+//Será igual ao PADRÃO OBSERVER
+public class GeradorDeNotaFiscal  {
+    private List<AcaoAposGerarNota>  acoes;
+	
+    public GeradorDeNotaFiscal(List<AcaoAposGerarNota>  acoes)  {
+        this.acoes = acoes;
+    }
+	
+    public NotaFiscal gera(Fatura fatura)  { 
+        double valor = fatura.getValorMensal();
+        NotaFiscal nf = new NotaFiscal(valor , impostoSimplesSobre0(valor));
+        for(AcaoAposGerarNota acao  :  acoes)  {`
+            acao.executa(nf);
+        }
+        return nf;
+}
+```
+
