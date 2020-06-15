@@ -1,0 +1,152 @@
+AWS - Amazon 
+--------------------------------------------------------------------------------------------------------------------------------- 
+CODIGOS LINUX - UTILIZADO PARA GERENCIAR AS INSTANCIAS DA AWS
+
+ls -> exibe os arquivos da pasta (igual o dir)
+  ls -l -> ira gerar em lista 
+mkdir -> cria pasta
+  mkdir pastaTeste
+vi -> cria arquivo
+  vi index.html -> ira criar o arquivo index.html
+netstat -ltun -> Exibe as portas que estao em execucao
+sudo systemctl stop mariadb -> Para o serviço em execucao
+sudo systemctl disabled mariadb -> desabilita o servico
+sudo shutdown -h now -> desliga o computador imediatamente
+
+---------------------------------------------------------------------------------------------------------------------------------
+CONTA GRATUIDA - TIPOS:
+
+  * SEMPRE GRAUTITO
+    AWS Lambda - 1 milhao solicitacoes por mes
+    30GB USO (somando todas as instancias) -> consulte por EBS (Elastic Block Store)
+    
+  * Preco GRATUITO POR 12 MESES
+    *EC2 - 750horas por mes
+    *S3 - memoria 5GB -> colocar imagens e etc
+    *RDS - para banco de dados 750h
+  * TESTE
+
+ACESSANDO:
+  *Procurar por AWS Console --> Selecione EC2 --> Inicie uma instancia
+  *Por padrao e utilizado Amazon Linux 2 AMI 1e opcao --> ira pedir para criar uma KEY ou utilizar uma existente (arquivo .PEM)
+  
+CONSULTANDO Preco:
+  *Preco tabela amazon
+  *Para entender os calculos, ou simular -> https://calculator.s3.amazonaws.com/index.html
+  
+CONFIGURANDO SSH:
+  *putty.exe -> https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
+  *puttygen.exe
+  
+  *https://www.youtube.com/watch?v=bi7ow5NGC-U --> configuracao
+  
+  *No puttygen -> selecione sua chave .PEM -> save private key
+  *No putty -> Host Name -> copie o usuario informado pela AWS, proveniente de "CONNECTION" ao selecionar uma instancia (exemplo: ec2-54-94-211-111.sa-east-1.compute.amazonaws.com)
+    *em Date -> cole o usuario
+    *em SSH -> Auth -> selecione o arquivo gerado pelo puttygen
+    *Save como modelo e clique em open
+    
+  *Atualize a maquina -> sudo yum update
+--------------------------------------------------------------------------------------------------------------------------------- 
+PARANDO/TERMINANDO UMA INSTANCIA
+  *Na tela do "EC2 DASHBOARD", com o botao direito --> instance state --> terminate/stop
+  *Para excluir basta aguardar
+  
+  *Para impedir que a maquina seja desligada -> Selecione a instancia -> Actions -> Instance Settings -> Change Terminator protection
+
+SECURITY GROUP
+  *E como um firewall, onde para acessar e necessario um acesso SSH
+    *Caso permita qualquer IP "anywhere/Custom 0.0.0.0/0", podera ser acessado por todos.
+  *VPC e o que( define a rede em comum, ou seja, se deseja que as instancias se "conversem", se faz necessario deixar em conjunto a VPC
+    *HTTP/HTTPS (acesso-web)-> para habilitar a porta 8080, e necessario criar um security group que tenha esta regra
+
+  *Para alterar o SecurityGroup, basta selecionar a instancia -> Actions -> Networking -> Change SecurityGroup
+
+CRIANDO UMA instancia CUSTOMIZADA (COM IMAGENS PRe DEFINIDAS)
+  *AWS MARKETPLACE -> ao criar uma instancia, podemos lancar uma instancia pre configurada (com imagem, banco de dados)
+    *ATENcaO AO CUSTO DE CADA IMAGEM PRe CUSTOMIZADA
+    *Acompanhe como configurar a instancia conforme cada fabricante
+
+  *INSTANCIA CUSTOMIZADA -> Para criar uma instancia customizada, apos escolher o tipo "t2.micro", nos campos de "Advanced Details"
+    tera o campo "user data" -> este campo e responsavel por receber um script "linux" para criar os servicos necessarios
+
+    exemplo de "user data" script (arquivo do tip .sh):
+      #!/bin/bash
+      #Atualizando os pacotes
+      yum update -y
+      #Configurando os repositorios
+      amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
+      #Instalando o apache e o mysql
+      yum install -y httpd mariadb-server
+      #inicializacaoo automatica
+      systemctl start httpd
+      systemctl enable httpd
+      systemctl start mariadb
+      systemctl enable mariadb
+      #Ajustando o permissionamento
+      usermod -a -G apache ec2-user
+      chown -R ec2-user:apache /var/www
+
+  *CRIANDO UMA IMAGEM
+    *Baseado na instancia customizada, com o script acima, podemos selecionar a instancia -> Image -> Create Image
+    *VANTAGEM: se torna mais rapido subir instancias iguais, com os recursos pre-definidos, pois teremos uma imagem espelho da outra
+
+IP DEDICADO (ELASTIC IP)
+  *ATENCAO: o IP dedicado nao sera cobrado caso a instancia esteja ativa, POREM, se a instancia estiver pausada, sera COBRADO!
+  *COMO CRIAR:
+    *Dentro do DASHBOARD -> Va NETWORKING & SECURITY (Elastic IPs) -> Allocate elastic IP address -> Actions -> Associate Elastic IP
+
+--------------------------------------------------------------------------------------------------------------------------------- 
+RDS - Relational Database Service
+  *RDS se trata de uma instancia com a imagem de um banco de dados
+  *COMO CRIAR:
+    *Clique em CREATE DATABASE -> escolha o tipo de DB -> informe uma senha
+
+  *Para realizar a comunicao com o Banco de Dados, precisamos do ENDPOINT.
+    *Selecione a instancia RDS, va ate "CONNECTIVITY & SECURITY" e copie o endpoint demonstrado (atraves dele faremos a conexao)
+
+  *Para ocorrer a conexao, se faz necessario a instancia EC2 e RDS estarem na mesmo VPC (lembrar de flegar o security group)
+    *Acessando via Console:
+      mysql -u usuario -h SeuEndPoint -p suaSenha
+        ex.: mysql -u admin -h database-1.coe4czrk5waf.sa-east-1.rds.amazonaws.com -p 
+
+--------------------------------------------------------------------------------------------------------------------------------- 
+TEMPLATE/IMAGEM FINAL
+  *Apos criar uma instancia com o layout feito (pagina ja rodando e funcionando), podemos criar um espelho, de forma que quando formos criar instancias
+  novas, estas instancias sejam todas iguais.
+  *COMO CRIAR:
+    *Primeiro e necessario parar a instancia que sera gerado o espelho
+    *Selecione a instancia -> Create Image  (igual ao topico CRIANDO UMA IMAGEM)
+    *Apos a imagem ter sido criada, va em IMAGES (AMIs) -> selecione a imagem -> botao direito -> launch
+--------------------------------------------------------------------------------------------------------------------------------- 
+ENTENDENDO O DIAGRAMA DA EC2
+  RESUMO: https://miro.medium.com/max/751/1*XLbYqFVdgaoJdrAmSYvp4Q.jpeg
+
+  DIAGRAMA:
+    Usuarios fazem requisições ao servidor (atraves porta 8080/443) -> Load Balancing recebe todo o trafego, distribui para as instancias ->
+      -> Auto-scaling acompanha o uso das instancias, gerando ou retirando instancias -> todas instancias apontam para o banco de dados;
+
+  LOAD BALACING:
+    *Responsavel por receber todo o trafego proveniente dos usuarios e encaminhar ao grupo de instancias (auto-scaling);
+    *Sera no IP do LB que o usuario ira fazer as requisicoes
+    *COMO CRIAR:
+      *Va ate LOAD BALACING (dentro de EC2) -> LoadBalancers -> Create Load Balancer (tipo HTTP) -> Por padrao, o nome inicia-se LB-nomeProjeto ->
+        -> internet faceing (virado para internet, ou seja, para o usuario) -> Avalibility Zone, necessario escolher pelo menos duas subredes ->
+        -> avance, crie um novo SecurityGroup para o LB, utilizando o HTTP -> Target Group (onde o LB olha, no caso o grupo) -> Configure com o nome TG-seuProjeto ->
+        -> Health check, verifica se em X tempo retorna 200, se apos X segundos e considerada a instancia com timeout, threshold e a qntd de tentativas para considerar uma instancai ruim
+        -> avancar -> ira esperar o Auto-Scaling(grupo de instancias) -> create;
+
+  AUTO-SCALING:
+    *Ou chamado Grupo de instancias, e responsavel por criar, destruir, gerenciar todas as intancias, baseado no uso!
+    *COMO CRIAR:
+      *Va ate AUTO-SCALING -> Launch configuration -> My AMIs (ira gerar como um espelho todas as intancias) -> Selecione o tipo de instancia -> name AS-seuProjeto ->
+      -> SecurityGroup, selecione o VPC, HTTP, REMOTO (porta 22) -> create;
+    
+    *AUTOSCALING GROUPS (responsavel por gerencia as instancias)
+      *Va ate AUTO-SCALING -> AUTO-SCALING-GROUP -> Selecione as subnets existente no LoadBalance -> selecione a quantidade de instancias a serem criadas de inicio
+      -> Advanced Details, selecione a opcao LOAD BALACING para que habilite o LB a gerenciar o AutoScaling -> selecione ECB -> CREATE;
+
+      *Alterando padrao minimo e maximo de instancias:
+          *Selecione o ASGroup, va em actions -> Edit
+--------------------------------------------------------------------------------------------------------------------------------- 
+FRENOOM - CRIANDO UM APELIDO PARA O LoadBalancer (Public DNS)

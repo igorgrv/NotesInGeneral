@@ -1,5 +1,4 @@
 # Design Patterns<a name="designpatterns"></a> 
-
 Os design patterns, vieram para resolver problemas comuns no dia a dia dos desenvolvedores, como:
 
 * Classes gigantescas;
@@ -41,7 +40,9 @@ Quando utilizar um padrão?
 12. [Command](#commandpat)
 13. [Façade / Singleton](#singletonpat)
 14. [SOLID](#solidpat)
-
+* ["S" - SRP - Coesão](#srppat)
+* ["D" - DIP - Acoplamento](#dippat)
+	* ["O"- OCP - Classes Extensíveis](#ocppat)
 ## Strategy<a name="strategypat"></a>
 **Quando utilizar o padrão Strategy?**
 
@@ -1875,4 +1876,301 @@ public class EmpresaFacadeSingleton {
 EmpresaFacade fachada = new EmpresaFacadeSingleton().getInstancia();
 ```
 
-## SOLID <a name="solidpat"></a>
+# SOLID <a name="solidpat"></a>
+## "S"- SRP Single Responsibility Principle <a name="srppat"></a>
+A 1º letra do SOLID, nada mais significa do que Coesão! Relembrando, significa que a classe deve possuir apenas **uma responsabilidade**.
+* O mesmo serve para uma **Interface**, ela apenas deve provenir **uma responsabilidade** as classes que herdam dela, ou seja, se for incluir um novo método, este método deve ser exclusivamente destinado a responsabilidade X - também chamado de ISP - Interface Single Principle;
+
+## Coesão
+O conceito de uma classe coesa, é de que a classe possui uma **única responsabilidade**, ou seja, ela sabe fazer somente aquilo, de uma forma que em caso de alteração, somente aquela classe deve ser alterada, não necessitando alterar diversas classes.
+
+###Classes sem coesão
+Dado o exemplo, vamos melhorar a classe:
+```java
+public class CalculadoraDeSalario {
+
+    public double calcula(Funcionario funcionario) {
+        if(DESENVOLVEDOR.equals(funcionario.getCargo())) {
+            return dezOuVintePorcento(funcionario);
+        }
+
+        if(DBA.equals(funcionario.getCargo()) || TESTER.equals(funcionario.getCargo())) {
+            return quinzeOuVinteCincoPorcento(funcionario);
+        }
+
+        throw new RuntimeException("funcionario invalido");
+    }
+
+    private double dezOuVintePorcento(Funcionario funcionario) {
+        if(funcionario.getSalarioBase() > 3000.0) {
+            return funcionario.getSalarioBase() * 0.8;
+        }
+        else {
+            return funcionario.getSalarioBase() * 0.9;
+        }
+    }
+
+    private double quinzeOuVinteCincoPorcento(Funcionario funcionario) {
+        if(funcionario.getSalarioBase() > 2000.0) {
+            return funcionario.getSalarioBase() * 0.75;
+        }
+        else {
+            return funcionario.getSalarioBase() * 0.85;
+        }
+    }
+
+}
+```
+Podemos perceber que essa classe tem alguns problemas em caso de futuras alterações/adições, pois a classe é:
+* Responsável por aplicar a regra de cálculo;
+* Responsável por fazer a verificação do tipo do cargo;
+* Tende a ter muitos ifs;
+* Tende a crescer cada vez mais com adição de novos cargos;
+* Será necessário utilizar o famoso CTRL + F / CTRL + H;
+
+
+### Aplicando a coesão
+
+Primeiro, vamos separar as responsabilidades:
+* Podemos notar que temos regras de cálculo de salário, então porque não fazer com que elas fiquem em classes separadas? Assim cada uma terá uma responsabilidade!
+* Outro ponto é a lógica dessas classes privadas `dezOuVintePorcento` & `quinzeOuVinteCincoPorcento` - são bem parecidas:
+	* Ambas **devolvem um double e recebem um `Funcionário` ** - o que significa que podemos ter uma **Interface** que irá implementar o método `calcula`:
+	```java
+	//INTERFACE
+	public interface RegraDeCalculo {
+		public double calcula(Funcionario funcionario);
+	}
+	
+	//1º REGRA
+	public class DezOuVintePorCento implements RegraDeCalculo {
+
+		public double calcula(Funcionario funcionário) {
+			if(funcionario.getSalarioBase() > 3000.0) {
+				return funcionario.getSalarioBase() * 0.8;
+			}
+			else {
+				return funcionario.getSalarioBase() * 0.9;
+			}
+		}
+	}
+	
+	//2º REGRA
+	public class QuinzeOuVinteECincoPorCento implements RegraDeCalculo  {
+		public double calcula(Funcionario funcionario) {
+			if(funcionario.getSalarioBase() > 2000.0) {
+				return funcionario.getSalarioBase() * 0.75;
+			}
+			else {
+				return funcionario.getSalarioBase() * 0.85;
+			}
+		}
+
+	}
+	```
+* Desta forma a classe `CalculadoraDeSalario` ficou menor, mas ainda sim continua com um problema. A cada novo funcionário teriamos um novo if...
+```java
+public class CalculadoraDeSalario {
+
+		public double calcula(Funcionario funcionario) {
+			if(DESENVOLVEDOR.equals(funcionario.getCargo())) {
+				return new DezOuVintePorCento(). calcula(funcionario);
+			}
+
+			if(DBA.equals(funcionario.getCargo()) || TESTER.equals(funcionario.getCargo())) {
+				return new QuinzeOuVinteECincoPorCento().calcula(funcionario);
+			}
+			throw new RuntimeException("funcionario invalido");
+		}
+	}
+```
+Vamos perceber o que cada `if` tem em comum:
+* A cada novo funcionário, é necessário aplicar uma RegraDeCalculo, então podiamos fazer algo como `DESENVOLVEDOR(new DezOuVintePorCento())`. Desta forma, assim que for criado um `Funcionario` do tipo Desenvolvedor, será aplicado a Regra para ele...
+	* Mas como? Utilizando um `ENUM`!
+	```java
+	public enum Cargo {
+		DESENVOLVEDOR(new DezOuVintePorCento()),
+		DBA(new DezOuVintePorCento()),
+		TESTER(new QuinzeOuVinteECincoPorCento());
+	}
+	```
+	* Para isto é necessário que ao instanciar esta classe, o construtor receba uma `RegraDeCalculo`:
+	```java
+	public enum Cargo {
+		DESENVOLVEDOR(new DezOuVintePorCento()),
+		DBA(new DezOuVintePorCento()),
+		TESTER(new QuinzeOuVinteECincoPorCento());
+	}
+	
+	private RegraDeCalculo regra;
+
+	Cargo(RegraDeCalculo regra)  {
+		this.regra = regra;
+	}
+	
+	public RegraDeCalculo getRegra()  {
+		return regra;
+	}
+	```
+	* Deste modo a classe `CalculadoraDeSalario` diminuiu bastante e se tornou coesa! ou seja, só possui uma regra:
+	```java
+	public class CalculadoraDeSalario {
+		public double calcula(Funcionario funcionario)  {
+			return funcionario.getCargo().getRegra().calcula(funcionario);
+		}
+	}
+	```
+	* E porque não, esconder mais ainda este código? Podemos coloca-lo dentro da própria classe `Funcionario`:
+	```java
+	//CLASSE CALCULADORA
+	public double  calcula(Funcionario funcionario)  {
+		return funcionario.calculaSalario();
+	}
+	
+	//CLASSE FUNCIONÁRIO
+	public double calculaSalario()  {
+   	 return  cargo.getRegra().calcula(this);
+	} 
+	```
+	
+## "D"- DIP Dependency Inversion Principle <a name="dippat"></a>
+## Acoplamento <a name="acoplapat"></a>
+O acoplamento nada mais é do que "depender" de algo, ou seja, uma classe muito acoplada significa que é uma classe que depende muito de outras!<br>
+#### Qual o problema de uma clase muito acoplada?
+Imagine o cenário abaixo,  onde a classe `GeradorDeNotaFiscal` possui um alto acoplamento com as classes `EnviadorDeEmail`, `NFDAO` e `SAP` - o que aconteceria se a classe `SAP` parasse de funcionar? iria afetar a classe `GeradorDeNotaFiscal`;
+<img src="https://s3.amazonaws.com/caelum-online-public/solid+com+java/DiagramaSolidJava.jpg" width="500">
+```java
+public class GeradorDeNotaFiscal {
+
+    private final EnviadorDeEmail email;
+    private final NotaFiscalDao dao;
+
+    public GeradorDeNotaFiscal(EnviadorDeEmail email, NotaFiscalDao dao) {
+        this.email = email;
+        this.dao = dao;
+    }
+
+    public NotaFiscal gera(Fatura fatura) {
+
+        double valor = fatura.getValorMensal();
+
+        NotaFiscal nf = new NotaFiscal(valor, impostoSimplesSobreO(valor));
+
+        email.enviaEmail(nf);
+        dao.persiste(nf);
+
+        return nf;
+    }
+
+    private double impostoSimplesSobreO(double valor) {
+        return valor * 0.06;
+    }
+}
+```
+Mas sabemos que é impossível não se acoplar uma classe, a questão é **_"precisamos sempre evitar depende de classes que vão sofrer mudanças"_**.
+* Temos medo de se acoplar a classe `String` ou `List`? NÃO, pois sabemos que estas classes não sofreram mudanças, ou seja, **temos que nos acoplar a Classes** em que vamos **ter medo de altera-las!**;
+
+#### Como diminuir o acoplamento? Tendo medo!
+Se pensarmos na `List` e `String`, o que tem em comum? Ambas possuem tantas implementações, que jamais iremos querer mexer nelas, pq isso implicaria em uma mudança gigantesca em todas as outras classes!<br>
+A idéia é fazermos o mesmo com a nossa Classe:
+* Vamos criar uma Interface chamada `AcoesAposGerarNF`, que irá ter o método `executa` e todas as classes `EnviadorDeEmail`, `NFDAO` e `SAP` irão implementa-la.
+
+<img src="https://s3.amazonaws.com/caelum-online-public/solid+com+java/GeradorDeNotaFiscal+com+Interface.jpg" width="500">
+
+_Essa interface que eu acabei de criar, ela acabou de virar estável. A chance de ela mudar vai ser menor. Porque você, programador, vai ter medo de mexer nela. Mexeu nela, criou um método a mais, mudou uma assinatura de algum método, você vai ter que mudar em todas as implementações abaixo. Isso vai fazer com que ela seja estável, naturalmente._
+
+```java
+//Criando a Interface
+public interface AcaoAposGerarNota {
+	void executa(NotaFiscal nf);
+}
+
+//Invés de receber as ações, iremos receber UMA LISTA DE AÇÕES:
+//Será igual ao PADRÃO OBSERVER
+public class GeradorDeNotaFiscal  {
+    private List<AcaoAposGerarNota>  acoes;
+	
+    public GeradorDeNotaFiscal(List<AcaoAposGerarNota>  acoes)  {
+        this.acoes = acoes;
+    }
+	
+    public NotaFiscal gera(Fatura fatura)  { 
+        double valor = fatura.getValorMensal();
+        NotaFiscal nf = new NotaFiscal(valor , impostoSimplesSobre0(valor));
+        for(AcaoAposGerarNota acao  :  acoes)  {`
+            acao.executa(nf);
+        }
+        return nf;
+}
+```
+
+## "O"- OCP Open Closed Principle <a name="ocppat"></a>
+Com a idéia de coesão e acoplamento, vamos análisar o código abaixo:
+* `CalculadoraDePrecos` -> classe de implementação, onde seguindo a lógica de Coesão não pode ter mais de uma responsabilidade e seguindo a lógica de Acoplamento, não pode depender de outra classe, nem sofrer com alguma alteração.
+
+```java
+public class CalculadoraDePrecos {
+
+    public double calcula(Compra produto) {
+        TabelaDePrecoPadrao tabela = new TabelaDePrecoPadrao();
+        Frete correios = new Frete();
+
+        double desconto = tabela.descontoPara(produto.getValor());
+        double frete = correios.para(produto.getCidade());
+
+        return produto.getValor() * (1-desconto) + frete;
+    }
+}
+
+public class TabelaDePrecoPadrao {
+    public double descontoPara(double valor) {
+        if(valor>5000) return 0.03;
+        if(valor>1000) return 0.05;
+        return 0;
+    }
+}
+
+public class Frete {
+    public double para(String cidade) {
+        if("SAO PAULO".equals(cidade.toUpperCase())) {
+            return 15;
+        }
+        return 30;
+    }
+}
+```
+O código acima funciona seguindo as implementações de Coesão e Acoplamento, porém imagine que queremos **Expandir** nosso projeto, queremos:
+* Nova `TabelaDePreço`;
+* Novo `ServicoDeFrete`;
+
+A solução seria colocar `ifs`? Ja vimos que não é bom deixar nossa classe saber muito sobre a implementação...<br>
+O Padrão **OCP** - Princípio fechado e aberto, aideia é que as suas classes **sejam abertas para extensão**Ou seja, eu tenho que conseguir estendê-la, ou seja, mudar o comportamento dela, de maneira fácil. Mas ela **tem que estar fechada para alteração**, ou seja, eu não tenho que ficar o tempo inteiro indo nela pra mexer um if a mais, para fazer uma modificação ou coisa do tipo.
+
+### Aplicando o OCP
+Devemos lembrar sempre que "Orientar a objetos é pensar em abstração"! E para isto nada melhor que uma Interface.
+* Queremos ter a liberdade de expandir nosso sistema, de forma que seja possível o código abaixo:
+
+```java
+ServicoDeEntrega correio = new Correios();
+ServicoDeEntrega jadLog = new Correios();
+
+TabelaPreco normal = new TabelaDePrecoNormal();
+TabelaPreco diferenciada = new TabelaDePrecoDiferenciada();
+```
+Ficou mais fácil de perceber as Interfaces que precisaremos criar!
+```java
+public interface TabelaDePreco  {
+    double descontoPara(double valor);
+}
+
+public interface ServicoDeEntrega  {
+    double para(String cidade);
+}
+```
+Basta alterarmos o construtor da CalculadoraDePrecos, que quando alguma classe for implementar nosso cálculo, vai poder informar qual tipo de Tabela e Serviço de entrega será feito, ou seja, não a classe `CalculadoraDePrecos` não será afetada!
+```java
+public class CalculadoraDePrecos  {
+
+    public CalculadoraDePrecos(TabelaDePreco tabela, ServicoDeEntrega entrega) {
+    }
+}
+```
