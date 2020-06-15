@@ -1,5 +1,4 @@
 # Design Patterns<a name="designpatterns"></a> 
-
 Os design patterns, vieram para resolver problemas comuns no dia a dia dos desenvolvedores, como:
 
 * Classes gigantescas;
@@ -9,7 +8,21 @@ Os design patterns, vieram para resolver problemas comuns no dia a dia dos desen
 Ao criar um projeto, devemos pensar sempre na possibilidade de, **novidades e alterações**, o que nem sempre é fácil de prever, então para isso, foram dados nomes alguns procedimentos, conhecidos como **_Padrões de Projetos_** , que buscam  ter classes com:
 
 * Baixo acoplamento;
-* Alta coesão!
+* Alta coesão! -> _coesão: uma única responsabilidade;_
+
+Design Patterns mais utilizados:
+
+* Factory Method -> criador de objetos;
+* Strategy -> Para cada tipo de exercicio, tem um tipo de calculo diferente e um jeito comum é criar classes que implementem uma interface em comum, com métodos em comum;
+
+DDD (Domain Driven Design): deixa implicito que as classes/métodos tenham nomes do mundo real, por exemplo, classes que vão estar conversando com o analista, sem que seja algo que so o desenvolvedor saiba;
+
+Quando utilizar um padrão?
+
+* Primeiro, pensar que temos um problema e queremos resolver;
+  * Pode começar ocm um código cheio de ifs e “feio”;, mas se atentar ao passo abaixo!
+* Segundo, pensar que precisaremos fazer manutenção e isso deve ser fácil para qualquer um que vá dar manutenção;
+  * Aqui é hora de deixar o código bonito e utilizando os patterns;
 
 # Tipos de Design Patterns
 
@@ -1774,6 +1787,97 @@ public class Programa {
     }
 }
 ```
+
+## Façades e Singleton <a name="singletonpat"></a>
+
+Imagine que temos uma classe que possui diversas implementações:
+
+```java
+public class Programa {
+    public static void main(String[] args) {
+        String cpf = /// pega cpf
+        Cliente cliente = new ClienteDao().buscaPorCpf(cpf);
+
+        Fatura fatura = new Fatura(cliente, valor);
+
+        Cobranca cobranca = new Cobranca(Tipo.BOLETO, fatura);
+        cobranca.emite();
+
+        ContatoCliente contato = new ContatoCliente(cliente, cobranca);
+        contato.dispara();
+    }
+}
+```
+
+Deste modo, nosso código esta muito “aberto”. O **Façades** vem com o intuito de abstrair o código criando uma **Fachada**.
+
+* Criemos uma classe que irá ser a fachada:
+
+  ```java
+  public class EmpresaFacade {
+  
+      public Cliente buscaCliente(String cpf) {
+          return new ClienteDao().buscaPorCpf(cpf);
+      }
+      public Fatura criaFatura(Cliente cliente, double valor) {
+          Fatura fatura = new Fatura(cliente, valor);
+          return fatura;
+      }
+  
+      public Cobranca geraCobranca(Fatura fatura) {
+          Cobranca cobranca = new Cobranca(Tipo.BOLETO, fatura);
+          cobranca.emite();
+  
+          return cobranca;
+      }
+  
+      public ContatoCliente fazContato(Cliente cliente, Cobranca cobranca) {
+          ContatoCliente contato = new ContatoCliente(cliente, cobranca);
+          contato.dispara();
+  
+          return contato;
+      }
+  }
+  ```
+
+* Para implementar o programa agora, basta darmos new na nossa faixada:
+
+  ```java
+  public class Programa {
+      public static void main(String[] args) {
+   	    EmpresaFacade empresa = new EmpresaFacade();
+          empresa.buscaCliente("cpf");
+          empresa.criaFatura
+  	    //demais métodos
+      }
+  }
+  ```
+
+  
+
+### Singleton
+
+O padrão Singleton, serve para impedir que por exemplo, a fachada seja implementada **mais de uma vez:**
+
+```java
+public class EmpresaFacadeSingleton {
+
+    private static EmpresaFacade instancia;
+
+    public EmpresaFacade getInstancia() {
+        if(instancia == null) {
+            instancia = new EmpresaFacade();
+        }
+
+        return instancia;
+    }
+}
+
+//Para implementar:
+EmpresaFacade fachada = new EmpresaFacadeSingleton().getInstancia();
+```
+
+## 
 
 # SOLID <a name="solidpat"></a>
 ## "S"- SRP Single Responsibility Principle <a name="srppat"></a>
