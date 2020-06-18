@@ -40,9 +40,9 @@ Quando utilizar um padrão?
 12. [Command](#commandpat)
 13. [Façade / Singleton](#singletonpat)
 14. [SOLID](#solidpat)
-* ["S" - SRP - Coesão](#srppat)
-* ["D" - DIP - Acoplamento](#dippat)
-	* ["O"- OCP - Classes Extensíveis](#ocppat)
+    * ["S" - SRP - Coesão](#srppat)
+    * ["D" - DIP - Acoplamento](#dippat)
+    * ["O"- OCP - Classes Extensíveis](#ocppat)
 ## Strategy<a name="strategypat"></a>
 **Quando utilizar o padrão Strategy?**
 
@@ -2147,7 +2147,7 @@ O Padrão **OCP** - Princípio fechado e aberto, aideia é que as suas classes *
 
 ### Aplicando o OCP
 Devemos lembrar sempre que "Orientar a objetos é pensar em abstração"! E para isto nada melhor que uma Interface.
-* Queremos ter a liberdade de expandir nosso sistema, de forma que seja possível o código abaixo:
+* Queremos ter a liberdade de expandir nosso sistema, de forma que seja possível o código abaixo: 
 
 ```java
 ServicoDeEntrega correio = new Correios();
