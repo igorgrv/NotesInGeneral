@@ -43,6 +43,8 @@ Quando utilizar um padrão?
     * ["S" - SRP - Coesão](#srppat)
     * ["D" - DIP - Acoplamento](#dippat)
     * ["O"- OCP - Classes Extensíveis](#ocppat)
+    * [Encapsulamento](#encpaspat)
+    * [“L” - LSP - Herança e Composição](#lpat)
 ## Strategy<a name="strategypat"></a>
 **Quando utilizar o padrão Strategy?**
 
@@ -1884,8 +1886,9 @@ A 1º letra do SOLID, nada mais significa do que Coesão! Relembrando, significa
 ## Coesão
 O conceito de uma classe coesa, é de que a classe possui uma **única responsabilidade**, ou seja, ela sabe fazer somente aquilo, de uma forma que em caso de alteração, somente aquela classe deve ser alterada, não necessitando alterar diversas classes.
 
-###Classes sem coesão
+### Classes sem coesão
 Dado o exemplo, vamos melhorar a classe:
+
 ```java
 public class CalculadoraDeSalario {
 
@@ -2143,7 +2146,7 @@ O código acima funciona seguindo as implementações de Coesão e Acoplamento, 
 * Novo `ServicoDeFrete`;
 
 A solução seria colocar `ifs`? Ja vimos que não é bom deixar nossa classe saber muito sobre a implementação...<br>
-O Padrão **OCP** - Princípio fechado e aberto, aideia é que as suas classes **sejam abertas para extensão**Ou seja, eu tenho que conseguir estendê-la, ou seja, mudar o comportamento dela, de maneira fácil. Mas ela **tem que estar fechada para alteração**, ou seja, eu não tenho que ficar o tempo inteiro indo nela pra mexer um if a mais, para fazer uma modificação ou coisa do tipo.
+O Padrão **OCP** - Princípio fechado e aberto, a ideia é que as suas classes **sejam abertas para extensão**, ou seja, eu tenho que conseguir extende-la, ou seja, mudar o comportamento dela, de maneira fácil. Mas ela **tem que estar fechada para alteração**, ou seja, eu não tenho que ficar o tempo inteiro indo nela pra mexer um if a mais, para fazer uma modificação ou coisa do tipo.
 
 ### Aplicando o OCP
 Devemos lembrar sempre que "Orientar a objetos é pensar em abstração"! E para isto nada melhor que uma Interface.
@@ -2174,3 +2177,253 @@ public class CalculadoraDePrecos  {
     }
 }
 ```
+
+## Encapsulamento <a name="encpaspat"></a>
+
+O encapsulamento serve para deixar o código mais protegido/escondido, de forma que uma classe não tenha que saber muito de outra. Um meio muito utilizado é o **TELL, DON’T ASK**, de forma que:
+
+* **Temos** que saber **o que** o método faz;
+* **Não temos** que saber **como** ele faz;
+
+Exemplo:
+
+```java
+//MAL ENCAPSULADO
+NotaFiscal nf = new NotaFiscal();
+double valor;
+if (nf.getValorSemImposto() > 10000)  {
+    valor = 0.06 * nf.getValor();
+}
+else {
+    valor = 0.12 * nf.getValor();
+}
+
+//TELL, DON'T ASK
+//A class notaFiscal irá fazer a verificação acima
+NotaFiscal nf = new NotaFiscal();
+double valor = nf.calculaValorImposto();
+```
+
+<hr>
+
+Outro problema de encapsulamento é o da **cadeia de métodos**:
+
+```java
+public void algumMetodo()  {
+    Fatura fatura = pegaFaturaDeAlgumLugar();
+    fatura.getCliente().marcaComoInadimplente();
+}
+```
+
+Quem nunca escreveu um método que chama outro? Existe até mesmo uma lei para isto, chama **Lei de Demeter**, que fala para evitar o máximo invocações em cadeia.<br>
+
+Para o exemplo acima o correto seria criar um método na classe `Fatura`:
+
+```java
+public void algumMetodo() {
+    Fatura fatura = pegaFaturaDeAlgumLugar();
+    fatura.marcaClienteComoInadimplente();
+}
+```
+
+
+
+<hr>
+
+Agora analisando o código abaixo:
+
+```java
+public class ProcessadorDeBoletos {
+
+    public void processa(List<Boleto> boletos, Fatura fatura) {
+        double total = 0;
+        for(Boleto boleto : boletos) {
+            Pagamento pagamento = new Pagamento(boleto.getValor(),   
+        MeioDePagamento.BOLETO);
+            fatura.getPagamentos().add(pagamento);
+
+            total += fatura.getValor();
+        }
+
+        if(total >= fatura.getValor()) {
+            fatura.setPago(true);
+        }
+    }
+}
+```
+
+Alguns pontos importantes a serem analisados sobre a classe `ProcessadorDeBoletos`
+
+* Não tem problema de **Coesão**, pois a classe realiza somente uma coisa/uma responsabilidade;
+* Não tem problema de **Acoplamento**, pois está se acoplando a duas Classes que não tem como fugir (`Boleto` e `Fatura`);
+* Tem **problema de encapsulamento**…
+  * A classe conhece muito sobre a `Fatura`!
+  * E se fosse criado o `ProcessadorDeCartao` ? Teriamos que copiar e colar?
+  * E se a classe `Fatura` muda algo no atributo valor ou Pago? Todas as classes iriam quebrar?
+
+Corrigindo a classe:
+
+```java
+//Iremos retirar o trecho de código abaixo, pois estará encapsulado na Fatura
+double total = 0;
+total += fatura.getValor();
+
+//Lei de Demeter
+fatura.getPagamentos().add(pagamento);
+if(total >= fatura.getValor()) {
+    fatura.setPago(true);
+}
+//-------------------------------------------------------------------------
+
+//Corrigindo Lei de Demeter - fatura.getPagamentos().add(pagamento);
+public class Fatura {
+    public void adicionaPagamento(Pagamento pagamento)  {
+    	this.pagamentos.add(pagamento);
+	}
+
+	private double valorTotalDosPagamentos()  {
+        double total = 0;    
+
+        for(Pagamento p : pagamentos)  {
+        total += p.getValor();
+        }
+        return total;
+	}
+}
+
+
+public class ProcessadorDeBoletos {
+
+    public void processa(List<Boleto> boletos, Fatura fatura) {
+
+        for(Boleto boleto : boletos) {
+            Pagamento pagamento = new Pagamento(boleto.getValor(), MeioDePagamento.BOLETO);
+            fatura.adicionaPagamento(pagamento);
+        }
+    }
+}
+```
+
+## “L” - LSP - Herança e Composição <a name="lpat"></a>
+
+A pesquisadora **Liskov** fez um estudo e viu que para usar a Herança temos que:
+
+* Ver as PRÉ condições;
+  * Uma classe filha não pode “apertar” a classe pai, ou seja, se tenho a classe pai que permite um inteiro de 1 a 100 a classe filha não pode apertar de modo que permita somente de 1 a 50;
+* Ver as PÓS condições;
+  * Uma classe filha não pode “afrouxar” a classe pai, ou seja, se tenho a classe pai que permite um inteiro de 1 a 100 a classe filha não pode afrouxar de modo que permita somente de 1 a 200;
+
+Este princípio foi chamado de **LSP - Liskov Substitutive Principle**.<br><br>
+
+Um exemplo do problema do mal uso de heranças:
+
+	* Dada a classe `ContaComum` o que acontece se criarmos a classe `ContaEstudante` e extende-la? 
+	* Teremos que lançar exceções para o método `rende()`?
+
+```java
+public class ContaComum {
+
+    protected double saldo;
+
+    public ContaComum() {
+        this.saldo = 0;
+    }
+
+    public void deposita(double valor) {
+        this.saldo += valor;
+    }
+
+    public double getSaldo() {
+        return saldo;
+    }
+
+    public void rende()      {
+        this.saldo*= 1.1;
+    }    
+}
+
+
+public class ContaDeEstudante extends ContaComum {
+
+    public void rende()  {
+        throw new ContaNaoRendeException();
+    }
+}
+```
+
+
+
+Para ajustar este tipo de problema, é sugerido o uso de **Composição**, onde inves de extendermos uma classe, iremos utilizar de uma nova classe para invocar os métodos, neste caso, chamada de `ManipuladorDeSaldo`
+
+```java
+public class ManipuladorDeSaldo  {
+
+    private double saldo;
+
+    public void deposita(double valor) {
+        this.saldo += valor;
+     }
+
+    public void saca(double valor) {
+        if (valor <= this.saldo)  {
+            this.saldo -= valor;
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public double getSaldo()  {
+        return saldo;
+    }
+    
+    public void rende(double taxa)  { 
+    	this.saldo *= taxa;
+	}
+}
+
+
+
+
+public class ContaComum  {
+
+    private ManipuladorDeSaldo manipulador
+        
+    public ContaComum()  {
+        this.manipulador = new ManipuladorDeSaldo();
+    }
+    
+    public void rende()  { 
+        this.manipulador.rende(1.1);
+    }
+    
+    public void saca(double valor)  {
+        manipulador.saca(valor);
+    }
+    
+    public void deposita(double valor)  {
+        manipulador.deposita(valor);
+    }
+}
+
+
+public class ContaDeEstudante extends ContaComum  {
+    private ManipuladorDeSaldo m;
+    private int milhas;
+
+    public ContaDeEstudante()  { 
+        m = new ManipuladorDeSaldo()
+    }
+    public void deposita(double valor)  {
+        m.deposita(valor);
+        this.milhas += (int)valor;
+    }
+    public int getMilhas()  {
+        return.milhas;
+    }
+    
+    public double getSaldo()  {
+        return manipulador.getSaldo();
+    }
+}
+```
+
