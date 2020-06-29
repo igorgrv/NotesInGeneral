@@ -1344,3 +1344,762 @@ Algo comum é o código ir evoluindo e então os testes terem que ir evoluindo j
 
 ## Mock & Exceções
 
+Vamos imaginar o cenário onde o banco de dados falhou, ou até mesmo o servidor que envia email deu problema… Como podemos fazer com que apesar do problema o sistema continue funcionando? Com **Try/Catch**!
+
+```java
+for (Leilao leilao : todosLeiloesCorrentes) {
+    try {
+        if (comecouSemanaPassada(leilao)) {
+            leilao.encerra();
+            total++;
+            dao.atualiza(leilao);
+            carteiro.envia(leilao);
+        }
+    } catch(Exception e) {
+        // salvo a excecao no sistema de logs
+        // e o loop continua!
+    }
+}
+```
+
+Mas e o teste? Como ele interpretará isso?
+
+* O Mock possui um método chama `doThrow(Exception)` que pode ser utilizado junto com o método `when()`
+
+Vamos simular que o `leilao1` deu problema, mas queremos que o sistema prossiga com a atualizacao do `leilao2`
+
+```java
+@Test
+public void deveContinuarAExecucaoMesmoQuandoDaoFalha() {
+    Calendar antiga = Calendar.getInstance();
+    antiga.set(1999, 1, 20);
+
+    Leilao leilao1 = new CriadorDeLeilao().para("TV de plasma")
+        .naData(antiga).constroi();
+    Leilao leilao2 = new CriadorDeLeilao().para("Geladeira")
+        .naData(antiga).constroi();
+
+    RepositorioDeLeiloes daoFalso = mock(RepositorioDeLeiloes.class);
+    when(daoFalso.correntes()).thenReturn(Arrays.asList(leilao1, leilao2));
+
+    //TRATAMOS A EXCEÇÃO DO LEILAO1
+    doThrow(new RuntimeException()).when(daoFalso).atualiza(leilao1);
+
+    EnviadorDeEmail carteiroFalso = mock(EnviadorDeEmail.class);
+    EncerradorDeLeilao encerrador = 
+        new EncerradorDeLeilao(daoFalso, carteiroFalso);
+
+    encerrador.encerra();
+
+    //VERIFICAMOS SE O LEILAO2 FOI ATUALIZADO E ENVIADO
+    verify(daoFalso).atualiza(leilao2);
+    verify(carteiroFalso).envia(leilao2);
+}
+```
+
+## Recuperando valor de um método
+
+E se quisermos pegar um valor final de um método? Por exemplo, temos o método `getMaiorLance()` que retorna o maior lance dado de um `Leilao`, mas como “capturamos” este valor?
+
+* A classe `ArgumentCaptor` serve para pegarmos o **resultado do método**!
+
+Vamos utilizar a classe `Pagamento` que iremos testar se o pagamento feito foi do maior lance:
+
+```java
+public class Pagamento {
+
+	private double valor;
+	private Calendar data;
+
+	public Pagamento(double valor, Calendar data) {
+		this.valor = valor;
+		this.data = data;
+	}
+	public double getValor() {
+		return valor;
+	}
+	public Calendar getData() {
+		return data;
+	}
+}
+
+//CLASSE QUE IREMOS TESTAR
+public class GeradorDePagamentos {
+
+	private RepositorioDeLeiloes leiloes;
+	private RepositoDePagamentos pagamentos;
+	private Avaliador avaliador;
+
+	public GeradorDePagamentos(RepositorioDeLeiloes leiloes, RepositoDePagamentos pagamentos, Avaliador avaliador) {
+		this.leiloes = leiloes;
+		this.pagamentos = pagamentos;
+		this.avaliador = avaliador;
+	}
+	
+    //MÉTODO QUE IRÁ PEGAR O PAGAMENTO DO MAIOR LANCE
+	public void gera () {
+		List<Leilao> leiloesEncerrados = leiloes.encerrados();
+		for (Leilao leilao : leiloesEncerrados) {
+			avaliador.avalia(leilao);
+			
+			Pagamento pagamento = new Pagamento(avaliador.getMaiorLance(), Calendar.getInstance());
+			pagamentos.salva(pagamento);
+		}
+	}
+}
+
+
+public class GeradorDePagamentosTest {
+
+	@Test
+	public void deveGerarPagamentoParaUmLeilaoEncerrado() {
+		Avaliador avaliador = new Avaliador();
+		Leilao leilao = new CriadorDeLeilao()
+				.para("TV")
+				.lance(new Usuario("igor"), 200.00)
+				.lance(new Usuario("Stephanie"), 250.00)
+				.constroi();
+		
+		//MOCKAMOS AQUILO QUE IREMOS UTILIZAR MÉTODOS NOS TESTES
+		RepositoDePagamentos pagamentos = mock(RepositoDePagamentos.class);
+		RepositorioDeLeiloes leiloes = mock(RepositorioDeLeiloes.class);
+		
+		when(leiloes.encerrados()).thenReturn(asList(leilao));
+		
+		GeradorDePagamentos gerador = new GeradorDePagamentos(leiloes, pagamentos, avaliador);
+		gerador.gera();
+		
+		 // criamos o ArgumentCaptor que sabe capturar um Pagamento
+	    ArgumentCaptor<Pagamento> argumento = ArgumentCaptor.forClass(Pagamento.class);
+	    // capturamos o Pagamento que foi passado para o método salvar
+	    verify(pagamentos).salva(argumento.capture());
+	    
+	    Pagamento pagamentoGerado = argumento.getValue();
+        assertEquals(250.0, pagamentoGerado.getValor(), 0.00001);
+	}
+
+}
+```
+
+# Selenium - Teste Automatizado
+
+O Selenium é uma biblioteca que nos possibilita fazer testes automatizados, ou seja, permite com que a máquina execute diversos testes, repetidamente, com possibilidade de até mesmo nos trazer evidências!
+
+## Getting Started - Testando o Google
+
+Além de adicionar a dependência abaixo, se faz necessário baixar o [chromedriver](http://chromedriver.storage.googleapis.com/index.html) correspondente a versão do Google Chrome
+
+```xml
+<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
+<dependency>
+    <groupId>org.seleniumhq.selenium</groupId>
+    <artifactId>selenium-java</artifactId>
+    <version>3.141.59</version>
+</dependency>
+```
+
+1. Devemos verificar o **Browser** que iremos utilizar e a partir do do browser, o Selenium oferece a classe `WebDriver`
+
+   ```java
+   System.setProperty("webdriver.chrome.driver", "C:\\SeleniumDrivers\\chromedriver.exe");
+   WebDriver driver = new ChromeDriver();
+   ```
+
+2. Para **expandir a tela** assim que o Browser for aberto:
+
+   ```java
+   driver.manage().window().maximize();
+   ```
+
+3. Para **abri o browser determinada URL**, utilizamos o método `get("http...")`
+
+   ```java
+   driver.get("https://www.google.com.br/");
+   
+   driver.close(); //necessário fechar por último
+   ```
+
+4. Para **procurar** um **TextBox**, podemos utilizar o método `findElement(By.name("id"))`;
+
+   * _Este método nos permite localizar o campo pelo: **name, id, tagName**(button, form, li);_
+
+   ```java
+   WebElement txtBusca = driver.findElement(By.name("q"));
+   ```
+
+5. Para **escrever** em um Texbox, utilizamos o `sendKeys`:
+
+   ```java
+   txtBusca.sendKeys("Testando a busca com Selenium");
+   ```
+
+6. Para **Submeter** um formulário, temos duas formas:
+
+   * Ou pelo próprio campo: `txtBusca.submit();`
+
+   * Ou pelo botão: 
+
+     ```java
+     WebElement botaoSalvar = driver.findElement(By.id("btnSalvar"));
+     botaoSalvar.click();
+     ```
+
+Exemplo: Abra o navegador no google e pesquise sobre o Selenium:
+
+```java
+public class TesteAutomatizado {
+	public static void main(String[] args) {
+		System.setProperty("webdriver.chrome.driver", "C:\\SeleniumDrivers\\chromedriver.exe");
+		WebDriver driver = new ChromeDriver();
+		driver.manage().window().maximize();
+		driver.get("https://www.google.com.br/");
+		
+		WebElement txtBusca = driver.findElement(By.name("q"));
+		txtBusca.sendKeys("Testando a busca com Selenium");
+		
+		txtBusca.submit();
+        
+        driver.close();
+	}
+}
+```
+
+## Preenchendo e testando formularios
+
+Para este teste, será utilizado o projeto [leiloes ](<http://s3.amazonaws.com/caelum-online-public/PM-74/leiloes.zip)(desenvolvido pela Alura). Este projeto, necessita que seja executado pelo  [ANT](https://ant.apache.org/bindownload.cgi) (necessita ser instalado, junto com o a variável de ambiente ANT_HOME no windows);
+
+* Deverá ser trocado o ivy.jar de 2.20 para 2.5 -> também realizar a alteração no build.properties;
+* Deverá utilizar o JDK 8;
+* Acessar o projeto via terminal e executar o comando `ant jetty.run`
+
+**Exemplo**: Teste o cadastro de usuário, dada a URL: `http://localhost:8080/usuarios/new`
+
+```java
+@BeforeEach
+void setUp() {
+    System.setProperty("webdriver.chrome.driver", "C:\\SeleniumDrivers\\chromedriver.exe");
+    driver = new ChromeDriver();
+
+    driver.manage().window().maximize();
+    driver.get("http://localhost:8080/usuarios/new");
+
+    txtNome = driver.findElement(By.name("usuario.nome"));
+    txtEmail = driver.findElement(By.name("usuario.email"));
+}
+
+@Test
+void testandoCadastroDeUsuario() {
+    txtNome.sendKeys("Igor");
+    txtEmail.sendKeys("igorgrv@hotmail.com");
+
+    txtNome.submit();
+
+    boolean achouNome = driver.getPageSource().contains("Igor");
+    boolean achouEmail = driver.getPageSource().contains("igorgrv@hotmail.com");
+
+    assertTrue(achouEmail);
+    assertTrue(achouNome);
+
+}
+
+@AfterEach
+void after() {
+    driver.close();
+}
+```
+
+Até a etapa acima, ja aprendemos… Mas e para checar se o usuário foi cadastrado?
+
+* Para **verificar um texto** dentro de uma página HTML, temos o comando:
+
+  ```java
+  boolean achouNome = driver.getPageSource().contains("Igor");
+  boolean achouEmail = driver.getPageSource().contains("igorgrv@hotmail.com");
+  ```
+
+```java
+class UsuarioTesteTest {
+	@Test
+	void testandoCadastroDeUsuario() {
+		System.setProperty("webdriver.chrome.driver", "C:\\SeleniumDrivers\\chromedriver.exe");
+		WebDriver driver = new ChromeDriver();
+		
+		driver.manage().window().maximize();
+		driver.get("http://localhost:8080/usuarios/new");
+		
+		WebElement txtNome = driver.findElement(By.name("usuario.nome"));
+		WebElement txtEmail = driver.findElement(By.name("usuario.email"));
+		
+		txtNome.sendKeys("Igor");
+		txtEmail.sendKeys("igorgrv@hotmail.com");
+		
+		txtNome.submit();
+		
+		boolean achouNome = driver.getPageSource().contains("Igor");
+		boolean achouEmail = driver.getPageSource().contains("igorgrv@hotmail.com");
+		
+		assertTrue(achouEmail);
+		assertTrue(achouNome);
+        
+        driver.close();
+	}
+}
+```
+
+**Exemplo 2**: Verifique se o não preenchimento do Nome do usuário é apresentado o erro de “Nome obrigatório”;
+
+```java
+@Test
+void deveApresentarErroDoFormularioCasoNaoSejaPreenchidoNome() {
+    txtEmail.sendKeys("igorgrv@hotmail.com");
+
+    txtEmail.submit();
+
+    boolean achouValidacao = driver.getPageSource().contains("Nome obrigatorio!");
+
+    assertTrue(achouValidacao);
+}
+```
+
+**Exemplo 3**: erifique se o não preenchimento do Nome e Email do usuário é apresentado o erro de “Nome obrigatório!” e "E-mail obrigatorio!" ;
+
+```java
+@Test
+void deveApresentarErroDoFormularioCasoNaoSejaPreenchidoNomeEEmail() {
+    txtEmail.submit();
+
+    boolean nomeObrigatorio = driver.getPageSource().contains("Nome obrigatorio!");
+    boolean emailObrigatorio = driver.getPageSource().contains("E-mail obrigatorio!");
+
+    assertTrue(nomeObrigatorio);
+    assertTrue(emailObrigatorio);
+}
+```
+
+## Verificando se um link funciona
+
+E se quissemos testar um link, ou seja, uma tag `<a href="" />`? O Selenium, possui um elemento que nos permite fazer a **busca pelo texto** do link, através do `By.linkText("Novo usuário")`;
+
+* Exemplo: 
+
+  * Invés de utilizar a URL: `http://localhost:8080/usuarios/new` 
+  * Utilize URL: `http://localhost:8080/usuarios`
+
+  * Irá ser necessário clicar no link “Novo Usuário”
+
+  ```java
+  //BASTA ALTERAR O MÉTODO @BEFORE
+  @BeforeEach
+  void setUp() {
+      System.setProperty("webdriver.chrome.driver", "C:\\SeleniumDrivers\\chromedriver.exe");
+      driver = new ChromeDriver();
+  
+      driver.manage().window().maximize();
+      driver.get("http://localhost:8080/usuarios");
+  
+      //IRÁ PROCURAR O LINK E CLICAR NELE
+      linkNovoUsuario = driver.findElement(By.linkText("Novo Usuário"));
+      linkNovoUsuario.click();
+  
+      txtNome = driver.findElement(By.name("usuario.nome"));
+      txtEmail = driver.findElement(By.name("usuario.email"));
+  }
+  ```
+
+  
+
+## Page Objects
+
+A idéia do PageObjects é simplificar o teste, de forma que seja mais clean! E um meio de fazer isto seria **criar uma Classe para cada página!**
+
+```java
+linkNovoUsuario = driver.findElement(By.linkText("Novo Usuário"));
+linkNovoUsuario.click();
+
+//SIMPLIFICANDO PODEMOS FAZER
+usuario.novo()
+```
+
+```java
+txtNome = driver.findElement(By.name("usuario.nome"));
+txtEmail = driver.findElement(By.name("usuario.email"));
+
+txtNome.sendKeys("Igor");
+txtEmail.sendKeys("igorgrv@hotmail.com");
+
+txtNome.submit();
+
+//SIMPLIFICANDO PODEMOS:
+usuario.novo().cadastra("Igor","igorgrv@hotmail.com");
+```
+
+```JAVA
+boolean achouNome = driver.getPageSource().contains("Igor");
+boolean achouEmail = driver.getPageSource().contains("igorgrv@hotmail.com");
+
+assertTrue(achouEmail);
+assertTrue(achouNome);
+
+//SIMPLIFICANDO PODEMOS:
+asserTrue(usuario.existeNaListagem("Igor","igorgrv@hotmail.com"));
+```
+
+Portanto, o código simplificado ficaria:
+
+```java
+usuario.novo().cadastra("Igor","igorgrv@hotmail.com");
+asserTrue(usuario.existeNaListagem("Igor","igorgrv@hotmail.com"));
+```
+
+1. Crie uma nova classe para a Pagina Usuario:
+
+   ```java
+   public class UsuarioPage {
+   
+   	private WebDriver driver;
+   
+   	public UsuarioPage(WebDriver driver) {
+   		this.driver = driver;
+   	}
+   	
+   	public void visita() {
+   		driver.get("http://localhost:8080/usuarios");
+   	}
+   	
+       //Irá direcionar para próxima página
+   	public UsuarioNovoPage novo() {
+   		driver.findElement(By.linkText("Novo Usuário")).click();
+   		return new UsuarioNovoPage(driver);
+   	}
+   	
+   	public boolean existeNaListagemDaPagina(String nome, String email) {
+   		return driver.getPageSource().contains(nome) && driver.getPageSource().contains(email);
+   	}
+   }
+   ```
+
+2. Crie uma nova classe para a Página Novo Usuario:
+
+   ```java
+   public class UsuarioNovoPage {
+   
+   	private WebDriver driver;
+   
+   	public UsuarioNovoPage(WebDriver driver) {
+   		this.driver = driver;
+   	}
+   
+   	public void cadastra(String nome, String email) {
+   		WebElement txtNome = driver.findElement(By.name("usuario.nome"));
+   		WebElement txtEmail = driver.findElement(By.name("usuario.email"));
+   
+   		txtNome.sendKeys(nome);
+   		txtEmail.sendKeys(email);
+   
+   		txtNome.submit();
+   	}
+   	
+   	public boolean validacaoDeNomeObrigatorio() {
+   		return driver.getPageSource().contains("Nome obrigatorio!");
+   	}
+   
+   }
+   ```
+
+3. Automatize o teste:
+
+   ```java
+   class UsuarioTesteTest {
+   
+   	private WebDriver driver;
+   	private UsuarioPage usuario;
+   
+   	@BeforeEach
+   	void setUp() {
+   		System.setProperty("webdriver.chrome.driver", "C:\\SeleniumDrivers\\chromedriver.exe");
+   		driver = new ChromeDriver();
+   		driver.manage().window().maximize();
+   		
+   		usuario = new UsuarioPage(driver);
+   		usuario.visita();
+   	}
+   
+   	@Test
+   	void testandoCadastroDeUsuario() {
+   		usuario.novo().cadastra("igor", "igorgrv@hotmail.com");
+   		assertTrue(usuario.existeNaListagemDaPagina("igor", "igorgrv@hotmail.com"));
+   	}
+   
+   	@Test
+   	void deveApresentarErroDoFormularioCasoNaoSejaPreenchidoNome() {
+   		UsuarioNovoPage form = usuario.novo();
+   		form.cadastra("", "igorgrv@hotmail.com");
+   
+   		assertTrue(form.validacaoDeNomeObrigatorio());
+   	}
+   
+   	@AfterEach
+   	void after() {
+   		driver.close();
+   	}
+   
+   }
+   ```
+
+Exemplo 2:
+
+* Crie um teste para verificar se o usuário poderá ser excluído:
+
+  ```java
+  public class UsuarioPage {
+  
+	private WebDriver driver;
+  
+  	public UsuarioPage(WebDriver driver) {
+  		this.driver = driver;
+  	}
+      
+      public void excluirUsuario(int i) {
+          driver.findElements(By.tagName("button")).get(i-1).click();;
+  
+          //IRÁ ACEITAR O JAVASCRIPT
+          Alert alert = driver.switchTo().alert();
+          alert.accept();
+      }
+  }
+  
+  @Test
+  void testaSeOUsuarioPodeSerExcluido() {
+      usuario.novo().cadastra("igor2", "igorgrv2@hotmail.com");
+      assertTrue(usuario.existeNaListagemDaPagina("igor2", "igorgrv2@hotmail.com"));
+  
+      usuario.excluirUsuario(1);
+      assertFalse(usuario.existeNaListagemDaPagina("igor2", "igorgrv2@hotmail.com"));
+  }
+  ```
+  
+
+## Formulários mais complexos
+
+E como faremos caso quisessemos testar um formulário com **ComboBox**  ou **ChecBox**? 
+
+* Exemplo: passe para um ComboBox o valor a ser preenchido:
+
+  ```java
+  Select cmbUsuario = new Select(driver.findElement(By.name("usuario")));
+  cmbUsuario.selectByVisibleText(usuario);
+  ```
+
+* Exemplo2: teste um CheckBox:
+
+  ```java
+  //usado é proviniente do método
+  if(usado) {
+      WebElement ckUsado = driver.findElement(By.name("leilao.usado"));
+      ckUsado.click();
+  }
+  ```
+
+* Testando as funções do Leilão:
+
+  ```java
+  public class LeilaoPage {
+  
+  	private WebDriver driver;
+  
+  	public LeilaoPage(WebDriver driver) {
+  		this.driver = driver;
+  	}
+  	
+  	public void visita () {
+  		driver.get("http://localhost:8080/leiloes");
+  	}
+  	
+  	public LeilaoNovoPage novo () {
+  		driver.findElement(By.linkText("Novo Leilão")).click();
+  		return new LeilaoNovoPage(driver);
+  	}
+  
+  	public boolean existe(String produto, double valor, String usuario, boolean usado) {
+  
+          return driver.getPageSource().contains(produto) && 
+                  driver.getPageSource().contains(String.valueOf(valor)) &&
+                  driver.getPageSource().contains(usado ? "Sim" : "Não");
+  
+      }
+  }
+  
+  public class LeilaoNovoPage {
+  
+  	private WebDriver driver;
+  
+  	public LeilaoNovoPage(WebDriver driver) {
+  		this.driver = driver;
+  	}
+  
+  	public void preenche(String nome, double valor, String usuario, boolean usado) {
+  		WebElement txtNome = driver.findElement(By.name("leilao.nome"));
+  		WebElement txtValor = driver.findElement(By.name("leilao.valorInicial"));
+  
+  		txtNome.sendKeys(nome);
+  		txtValor.sendKeys(String.valueOf(valor));
+  
+  		Select cmbUsuario = new Select(driver.findElement(By.name("leilao.usuario.id")));
+  		cmbUsuario.selectByVisibleText(usuario);
+  
+  		if (usado) {
+  			WebElement ckUsado = driver.findElement(By.name("leilao.usado"));
+  			ckUsado.click();
+  		}
+  
+  		txtNome.submit();
+  
+  	}
+  }
+  
+  
+  public class LeilaoTeste {
+  
+  	private ChromeDriver driver;
+  	private LeilaoPage leiloes;
+  	private UsuarioPage usuarios;
+  
+  	@BeforeEach
+  	void inicializa() {
+  		System.setProperty("webdriver.chrome.driver", "C:\\SeleniumDrivers\\chromedriver.exe");
+  		driver = new ChromeDriver();
+  		driver.manage().window().maximize();
+  		
+  		leiloes = new LeilaoPage(driver);
+  		usuarios = new UsuarioPage(driver);
+  		
+  		usuarios.visita();
+  		usuarios.novo().cadastra("Paulo Henrique", "paulo@henrique.com");
+  
+  	}
+  
+  	@Test
+  	void deveCadastrarUmLeilao() {
+  
+  		leiloes.visita();
+  		LeilaoNovoPage novoLeilao = leiloes.novo();
+  		novoLeilao.preenche("Geladeira", 123, "Paulo Henrique", true);
+  
+  		assertTrue(leiloes.existe("Geladeira", 123, "Paulo Henrique", true));
+  	}
+  	
+  	@AfterEach
+  	void after () {
+  		driver.close();
+  	}
+  }
+  ```
+
+  
+
+## Testes com AJAX
+
+Quando se trata de uma requisição em AJAX, não podemos pedir para o JUnit verificar instanteneamente se a requisição foi feita e ai está o “segredo”.
+
+* Crie um teste para verificar se um lance foi efetuado (lembre-se de que o lance é feito através de uma requisição AJAX)!
+
+  ```java
+  //A IMPLEMENTAÇÃO DEVE SER SIMPLES, LEMBRE-SE DO TDD, VAMOS COMEÇAR PELO TESTE
+  @Test
+  public void deveFazerUmLance() {
+  
+      leiloes.detalhes(1);
+  
+      lances.lance("José Alberto", 150);
+  
+      assertTrue(lances.existeLance("José Alberto", 150));
+  }
+  ```
+
+Implementações:
+
+```java
+public class DetalhesDoLeilaoPage {
+
+    private WebDriver driver;
+
+    public DetalhesDoLeilaoPage(WebDriver driver) {
+        this.driver = driver;
+    }
+
+    public void lance(String usuario, double valor) {
+        WebElement txtValor = driver.findElement(By.name("lance.valor"));
+        WebElement combo = driver.findElement(By.name("lance.usuario.id"));
+        Select cbUsuario = new Select(combo);
+
+        cbUsuario.selectByVisibleText(usuario);
+        txtValor.sendKeys(String.valueOf(valor));
+
+        
+        //POR SE TRATAR DE UM BOTÃO EM AJAX, DEVEMOS FAZER PELO BOTÃO!
+        driver.findElement(By.id("btnDarLance")).click();
+    }
+    
+    
+    //AQUI MORA O PROBLEMA DA VERIFICAÇÃO EM AJAX, PRECISAMOS SETAR UM TIME
+    public boolean existeLance(String usuario, double valor) {
+        return driver.getPageSource().contains(usuario)
+                && driver.getPageSource().contains(String.valueOf(valor));
+    }
+
+}
+```
+
+**Setando um Time** para verificar se o elemento foi preenchido:
+
+```java
+public boolean existeLance(String usuario, double valor) {
+    Boolean temUsuario = new WebDriverWait(driver, 10)
+        .until(ExpectedConditions
+               .textToBePresentInElement(By.id("lancesDados"), usuario));
+
+    if(temUsuario) {
+        return driver.getPageSource().contains(String.valueOf(valor));
+    } else {
+        return false;
+    }
+}
+```
+
+Teste:
+
+```java
+public class LanceSystemTest {
+
+    private WebDriver driver;
+    private LeiloesPage leiloes;
+
+    @Before
+    public void inicializa() {
+        this.driver = new FirefoxDriver();
+
+                driver.get("http://localhost:8080/apenas-teste/limpa");
+
+        UsuariosPage usuarios = new UsuariosPage(driver);
+        usuarios.visita();
+        usuarios.novo().cadastra("Paulo Henrique", "paulo@henrique.com");
+        usuarios.novo().cadastra("José Alberto", "jose@alberto.com");
+
+        leiloes = new LeiloesPage(driver);
+        leiloes.visita();
+        leiloes.novo().preenche("Geladeira", 100, "Paulo Henrique", false);
+    }
+
+    @Test
+    public void deveFazerUmLance() {
+
+        DetalhesDoLeilaoPage lances = leiloes.detalhes(1);
+
+        lances.lance("José Alberto", 150);
+
+        assertTrue(lances.existeLance("José Alberto", 150));
+    }
+
+}
+```
+
