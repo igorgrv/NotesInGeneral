@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "outDir": "BankApp/app/js", /* Aqui será informado onde será criada a pasta JS, proveniente do TS */
+        "noEmitOnError": true,
+        "removeComments": true,
+        "module": "System"
+    },
+    "include": [
+        "BankApp/app/ts/**/*" /* Diretorio dos arquivos TypeScript */
+    ]
+}
