@@ -3,8 +3,9 @@
 
 # Sumário
 1. [TypeScript](#typescript)
+2. [WebPack](#webpack)
 
-# TypeScript
+# TypeScript <a name="typescript"></a>
 
 O TypeScript é uma linguagem criada pela Microsoft que vem como uma aprimoração ao próprio JavaScript, de forma que podemos “verificar o código” antes do tempo de execução, ou seja, no tempo de compilação, assim como outras linguagens como Java e C#. <br><br>
 
@@ -609,8 +610,10 @@ Como sabemos, o jQuery é a biblioteca mais utilizada do JavaScript, que nos fac
 
 Para instalar o jQuery será necessário rodar o comando e **reiniciar o VSCode**:
 
+​	* Caso o VSCode continue sem encontrar as extensões, será necessário reinstalar os pacotes (apagando a pasta node_modules e o arquivo package.json);
+
 ```
-npm install @types/jquery@2.0.42 --save-dev
+npm i @types/jquery@2.0.42 --save-dev
 ```
 
 Com jQuery:
@@ -709,6 +712,58 @@ Diferente do Namespace que nos faz fazer todas as tags `<script>` no `index.html
   export class MensagemView extends View<string> {}
   ```
 
+
+
+### Importação em Barri
+
+E se, invés de fazermos diversos `imports` de uma mesma pasta, importássemos com uma única linha? Exemplo:
+
+```typescript
+//COMO ESTA:
+import { MensagemView } from '../views/MensagemView';
+import { NegociacaoView } from '../views/NegociacaoView';
+import { Negociacao } from '../models/Negociacao';
+import { Negociacoes } from '../models/Negociacoes';
+
+//O QUE QUEREMOS:
+import { NegociacoesView, MensagemView } from '../views/index';
+import { Negociacao, Negociacoes } from '../models/index';
+```
+
+Através de um arquivo `index.ts` podemos passar todos os arquivos daquela mesma pasta!
+
+```
+├── ts
+│   ├── views
+│   │   ├── MensagemView.ts
+│   │   ├── NegociacaoView.ts
+│   │   ├── View.ts
+│   │   └── index.ts --> arquivo chave
+│   │
+│   ├── models
+│   │   ├── Negociacao.ts
+│   │   ├── Negociacoes.ts
+│   │   └── index.ts --> arquivo chave
+```
+
+declaração nos arquivos `index.ts` **de cada pasta**:
+
+```typescript
+//PASTA VIEW
+export * from './View';
+export * from './MensagemView';
+export * from './NegociacoesView';
+
+
+//PASTA MODELS
+export * from './Negociacao';
+export * from './Negociacoes';
+```
+
+
+
+
+
 Agora que temos os `imports` e `exports` podemos utilizar nosso **loader**, que será proveniente da biblioteca **system.js**:
 
 ```html
@@ -784,3 +839,368 @@ adicionar o comando `“module”: “System”` ao arquivo tsconfig.json:
   ```
 
   
+
+## StrictNullCheck
+
+No mundo Java, quase recebemos uma variável do tipo `null`, o Java na hora reclama com um `NullPointerException`, porém no TypeScript, por padrão, variáveis do tipo boolean, arrays, permitem receber os tipos `null` e `undefined`.<br><br>
+
+E como impedir que isto ocorra?
+
+* No `tsconfig.json` iremos ativar a propriedade `“StrictNullCheck" = true`;
+
+  * Com essa propriedade, somente se falarmos ao TypeScript que a variável é nula, que ele irá permitir que o atributo seja mudado.
+
+  ```json
+  {
+      "compilerOptions": {
+          "target": "es6",
+          "outDir": "BankApp/app/js", 
+          "noEmitOnError": true,
+          "removeComments": true,
+          "module": "System",
+          "strictNullChecks": true
+      },
+      "include": [
+          "BankApp/app/ts/**/*"
+      ]
+  }
+  ```
+
+  	* Se pegarmos um elemento do HTML e ele não existir, teremos que verificar agora, pq o `strickNullChecks` irá reclamar
+
+  ```typescript
+  // Antes
+  const elCartao: HTMLDivElement = <HTMLDivElement> document.querySelector('#cartao_1');
+  let elPaiDoPai = elCartao.parentElement.parentElement;
+  
+  // Depois
+  const elCartao: HTMLDivElement = <HTMLDivElement> document.querySelector('#cartao_1');
+  let elPaiDoPai;
+  if(elCartao.parentElement) {
+      elPaiDoPai = elCartao.parentElement.parentElement;
+  }
+  console.log(elPaiDoPai);
+  ```
+
+  * O mesmo vale para `Arrays`, pois precisaremos informar qual o tipo de Array para que não fique como `undefined`:
+
+  ```typescript
+  // Antes
+   paraArray(): Negociacao[] {
+       return [].concat(this._negociacoes);
+   }
+  
+  // Depois
+  paraArray(): Negociacao[] {
+      return ([] as Negociacao[]).concat(this._negociacoes);
+  }
+  ```
+
+
+
+## Enums
+
+O Enum no TypeScript funciona igual no Java.
+
+* Exemplo: Vamos bloquear que negociações sejam feitas aos Sábados e Domingos:
+
+  ```typescript
+  // NegociacaoController
+  adiciona(event: Event) {
+  
+      event.preventDefault();
+  
+      let data = new Date(this._inputData.val().replace(/-/g, ','));
+  
+      if(data.getDay() == 0 || data.getDay() == 6) {
+  
+          this._mensagemView.update('Somente negociações em dias úteis, por favor!');
+          return 
+      }
+      
+       const negociacao = new Negociacao(
+           data, 
+           parseInt(this._inputQuantidade.val()),
+           parseFloat(this._inputValor.val())
+       );
+      
+      //DEMAIS CODIGO
+  }
+  ```
+
+  Mas e se invés do `getDay() == 0` quiséssemos deixar mais nítido que se trata de um Sábado ou Domingo? **Podemos usar enums!**
+
+  ```typescript
+  enum DiaDaSemana {
+      Domingo, //por padrão o Enum entende que se começa com 0
+      Segunda, // 1
+      Terca,
+      Quarta, 
+      Quinta, 
+      Sexta, 
+      Sabado, // 6 
+  }
+  
+  // NegociacaoController
+  adiciona(event: Event) {
+  
+      event.preventDefault();
+  
+      let data = new Date(this._inputData.val().replace(/-/g, ','));
+  
+      if(data.getDay() == DiaDaSemana.Sabado || data.getDay() == DiaDaSemana.Domingo) {
+  
+          this._mensagemView.update('Somente negociações em dias úteis, por favor!');
+          return 
+      }
+  
+      const negociacao = new Negociacao(
+          data, 
+          parseInt(this._inputQuantidade.val()),
+          parseFloat(this._inputValor.val())
+      );
+      
+      //DEMAIS CODIGO
+  }
+  ```
+
+  Para melhorar ainda mais o código, podemos encapsular todo esse `if`, criando um método privado chamado `ehDiaUtil(Date data)`:
+
+  ```typescript
+  import { NegociacoesView, MensagemView } from '../views/index';
+  import { Negociacao, Negociacoes } from '../models/index';
+  
+  export class NegociacaoController {
+  
+      private _inputData: JQuery;
+      private _inputQuantidade: JQuery;
+      private _inputValor: JQuery;
+      private _negociacoes = new Negociacoes();
+      private _negociacoesView = new NegociacoesView('#negociacoesView');
+      private _mensagemView = new MensagemView('#mensagemView');
+  
+      constructor() {
+          this._inputData = $('#data');
+          this._inputQuantidade = $('#quantidade');
+          this._inputValor = $('#valor');
+          this._negociacoesView.update(this._negociacoes);
+      }
+  
+      adiciona(event: Event) {
+  
+          event.preventDefault();
+  
+          let data = new Date(this._inputData.val().replace(/-/g, ','));
+  
+          if(!this.ehDiaUtil(data)) {
+              this._mensagemView.update('Somente negociações em dias úteis, por favor!');
+              return
+          }
+  
+          const negociacao = new Negociacao(
+              data,
+              parseInt(this._inputQuantidade.val()),
+              parseFloat(this._inputValor.val())
+          );
+  
+          this._negociacoes.adiciona(negociacao);
+  
+          this._negociacoesView.update(this._negociacoes);
+          this._mensagemView.update('Negociação adicionada com sucesso!');
+      }
+  
+      private ehDiaUtil(data: Date):boolean {
+          if(data.getDay() == DiaDaSemana.Domingo || data.getDay() == DiaDaSemana.Sabado){
+              return false;
+          } else {
+              return true;
+          };
+      }
+  }
+  
+  enum DiaDaSemana {
+      Domingo, //por padrão o Enum entende que se começa com 0
+      Segunda, // 1
+      Terca,
+      Quarta,
+      Quinta,
+      Sexta,
+      Sabado, // 6
+  }
+  ```
+
+  
+
+## Decorators
+
+Se lembra das anotações do Java? O Decorator do TypeScript funciona da mesma maneira! com o `@AlgumaCoisa` podemos falar para executar determinada função, porém teremos que criar nossas anotações.<br>
+
+<br>
+
+Adicione a anotação `"experimentalDecorators": true` no `tsconfig.ts`:
+
+```json
+{
+    "compilerOptions": {
+        "target": "es6",
+        "outDir": "./app/js",
+        "noEmitOnError": true,
+        "removeComments": true,
+        "module": "System",
+        "strictNullChecks": true,
+        "experimentalDecorators": true
+    },
+    "include": [
+        "./app/ts/**/*"
+    ]
+}
+```
+
+A ideia seria algo parecido com:
+
+```typescript
+class NegociacaoController {
+
+    @tempoDeExecucao()
+    adiciona(event:Event) {
+        //codigo
+    }
+}
+
+class View {
+    
+    @tempoDeExecucao()
+    update(){
+        //Codigo
+    }
+}
+```
+
+<br>
+
+Para criar o decorator:
+
+1. Crie a pasta **helpers**;
+
+2. Dentro da pasta, crie a classe Decorator, com o nome da anotação;
+
+3. Como padrão, um decorator segue o código base abaixo:
+
+   ```typescript
+   export function padraoDecorator() {
+   
+       return function(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+   
+           const metodoOriginal = descriptor.value;
+   
+           descriptor.value = function(...args: any[]) {
+                   console.log('-----------------------')
+                   console.log(`Parms do mét. ${propertyKey}:${JSON.stringify(args)}`);
+                   const resultado = metodoOriginal.apply(this, args);
+                   console.log(`Resultado do método: ${JSON.stringify(resultado)}` )
+                   console.log('-----------------------')
+                   return resultado;
+               }
+   
+           return descriptor;
+       }
+   }
+   ```
+
+   
+
+### Criando um Decorator para verificar Tempo De Execucao
+
+Decorator: `tempoDeExecucao()`
+
+```typescript
+export function tempoDeExecucao() {
+
+    return function(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+
+        const metodoOriginal = descriptor.value;
+
+        descriptor.value = function(...args: any[]) {
+            console.log('-----------------------')
+            console.log(`Parâmetros do método ${propertyKey}: ${JSON.stringify(args)}`);
+            const t1 = performance.now();
+            const resultado = metodoOriginal.apply(this, args);
+            console.log(`Resultado do método: ${JSON.stringify(resultado)}` )
+            const t2 = performance.now();
+            console.log(`${propertyKey} demorou ${t2 - t1} ms`);
+            console.log('-----------------------')
+            return resultado;
+        }
+
+        return descriptor;
+    }
+}
+```
+
+NegociacaoController:
+
+```typescript
+class NegociacaoController {
+    @tempoDeExecucao()
+    adiciona(event: Event) {
+
+        event.preventDefault();
+
+        let data = new Date(this._inputData.val().replace(/-/g, ','));
+
+        if (!this.ehDiaUtil(data)) {
+            this._mensagemView.update('Somente negociações em dias úteis, por favor!');
+            return
+        }
+    //code
+    }
+}
+```
+
+
+
+## Consumindo API e Uso de Interfaces
+
+O exemplo de API que será consumida, será [este](https://s3.amazonaws.com/caelum-online-public/typescript/api.zip). Onde iremos implementar a mesma aplicação de Negócios porém, como se fosse um sistema legado.<br><br>
+
+Para utilizar a API, devemos deixa-la executando em um segundo terminal (executar comando `npm start`). Para acessa-la podemos utilizar a URL: `http://localhost:8080/dados`;<br><br>
+
+O .json que irá retornar da API:
+
+	* montante = valor;
+	* vezes = quantidade;
+
+```json
+[{"montante":200.5,"vezes":2},{"montante":100.2,"vezes":5},{"montante":50.5,"vezes":1},{"montante":70.5,"vezes":2}]
+```
+
+<br>
+
+UM meio de consumir a API, será através de um botão:
+
+```html
+<button class="btn btn-primary" type="submit">Incluir</button>
+<button id="botao-importa" class="btn btn-primary" type="button">Importar</button>
+```
+
+
+
+# WebPack <a name="webpack"></a>
+
+O WebPack trata-se de module bundler que "empacota" módulos para carregá-los na aplicação. Ele é voltado para a criação de **“Single Pages Application” (SPA -> Páginas que não recarregam)**, sendo utilizado pelo [Angular CLI](https://cli.angular.io/), [Vue CLI](https://github.com/vuejs/vue-cli) e [Create React App](https://github.com/facebookincubator/create-react-app).<br><br>
+
+Imagine, não precisar importar na mão, bibliotecas **JavaScript, Css entre outras?** Esta ferramenta faz tudo isto para nos!
+
+## Getting Started
+
+1. Baixe o projeto [aqui](https://s3.amazonaws.com/caelum-online-public/webpack/stages/01-projeto-webpack.zip);
+2. Entre no diretório `projeto-webpack/client` e execute o comando no terminal:
+   1. `npm i`
+   2. `npm run watch`;
+3. Entre no diretório `projeto-webpack/server` e execute o comando no terminal `npm start`;
+
+## SPA
+
+O conceito de SPA é lindo, porém se não tomarmos cuidado, o primeiro acesso a página pode ser doloroso ao usuário, uma vez que a página carrega todas as bibliotecas, além do tempo que o interpretador pode levar para parsear todos os arquivos…<br><br>
+
+Para isto, o WebPack, permite dividir a aplicação em bundles menores, carregando aquilo que somente for de fato utilizado!
