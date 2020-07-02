@@ -1204,3 +1204,208 @@ Imagine, não precisar importar na mão, bibliotecas **JavaScript, Css entre out
 O conceito de SPA é lindo, porém se não tomarmos cuidado, o primeiro acesso a página pode ser doloroso ao usuário, uma vez que a página carrega todas as bibliotecas, além do tempo que o interpretador pode levar para parsear todos os arquivos…<br><br>
 
 Para isto, o WebPack, permite dividir a aplicação em bundles menores, carregando aquilo que somente for de fato utilizado!
+
+## Configurando o WebPack
+
+O WebPack dispensa a utilização de outros loaders, justamente porque ele cria loaders em tempo de desenvolvimento, ou seja, em nosso projeto, não utilizaremos a linha de comando:
+
+1. Vamos apagar a pasta `app` (deixar somente a pasta `app/src`);
+2. No arquivo `index.html`, remover a linha abaixo:
+
+```html
+<script>
+    System.defaultJSExtensions = true;
+    System.import('js/app.js').catch(err => console.error(err));
+</script>
+```
+
+3. E adicionar a linha abaixo, deixando somente os `scripts` abaixo:
+
+```html
+<script src="node_modules/reflect-metadata/Reflect.js"></script>
+<script src="dist/bundle.js"></script>
+```
+
+* WebPack, também dispensará o uso do `App.ts` bem como a importação de bibliotecas css e js. Sendo assim, precisamos configurar o nosso projeto dentro da pasta `package.json`;
+
+4. Dentro do arquivo `package.json` - removeremos o `systemjs` e o `babel-cli` , através dos comandos:
+
+   ```
+   npm un babel-cli --save-dev
+   npm un systemjs --save
+   npm un babel-plugin-transform-es2015-modules-systemjs --save-dev
+   
+   npm i webpack@3.1.0 babel-core@6.25.0 --save-dev
+   npm i babel-loader@7.1.0 --save-dev
+   ```
+
+5. Adicionaremos o comando abaixo:
+
+   ```json
+   "scripts": {
+       "test": "echo \"Error: no test specified\" && exit 1",
+       "build-dev": "webpack --config webpack.config.js"
+   },
+   ```
+
+6. Criaremos o arquivo `webpack.config.js`
+
+   ![novo arquivo criado](https://s3.amazonaws.com/caelum-online-public/Webpack/1.7_1_novo+arquivo+criado.png)
+
+6. Que terá o código abaixo:
+
+   ```javascript
+   const path = require('path');
+   module.exports = {
+       entry: './app-src/app.js',
+       output: {
+           filename: 'bundle.js',
+           path: path.resolve(__dirname, 'dist')
+       },
+       module: {
+           rules: [
+               {
+                   test: /\.js$/,
+                   exclude: /node_modules/,
+                   use: {
+                       loader: 'babel-loader'
+                   }
+               }
+           ]
+       }
+   }
+   ```
+
+7. Agora no terminal, iremos subir o servidor novamente, acessando a pasta `projeto-webpack/cli` e digitando o comando:
+
+   ```
+   npm run build-dev
+   ```
+
+
+
+# Angular
+
+Preparando o ambiente, recursos necessários:
+
+* Angular CLI;
+
+  ```
+  npm install -g @angular/cli
+  ```
+
+* [Node.js](https://nodejs.org/en/download/);
+
+* [Visual Code](https://code.visualstudio.com/download);
+
+## Sobre o Angular
+
+O Angular é um Framework SPA, que nos permite criar componentes reutilizáveis que encapsulam sua apresentação e comportamento. O Angular utiliza o TypeScript, ou seja, tem tudo o que o JavaScript possui com outros recursos, como suporte a uma linguagem tipada!
+
+* Considerações sobre o uso do Angular: 
+  * O Angular sempre trabalha com as duas últimas versões do navegador.
+  * O **Angularjs** foi a versão `1.x` enquanto a partir da versão `2.x` foi chamado somente de **Angular**, cujo o código foi totalmente reescrito.
+
+## Criando um projeto
+
+Após ter realizado a instalação do Angular pelo comando `npm i -g @angular/cli`, devemos criar um projeto seguindo os comandos abaixo:
+
+```
+ng new seu-projeto
+cd seu-projeto
+ng serve --open
+```
+
+Caso de um erro no comando `ng serve --open` devemos reinstalar o `rxjs` com o comando:
+
+  `npm install rxjs@6.0.0 --save` 
+
+## Componentes
+
+No Angular, como falado anteriormente, todo comportamento e visual é encapsulado dentro de **componentes**, ou seja, se abrirmos o `index.html`, encontraremos o código abaixo:
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AngularPicture</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+  <app-root></app-root>
+</body>
+</html>
+```
+
+Onde a TAG `<app-root></app-root>` demonstra ser um componente Angular! Onde todo código **CSS, .JS e HTML** esta encapsulado internamente!
+
+* Para verificar o componente, podemos acessar a pasta `src/app/app.component.ts`:
+
+  ```typescript
+  import { Component } from '@angular/core';
+  
+  @Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css']
+  })
+  export class AppComponent {
+    title = 'angular-picture';
+  }
+  ```
+
+  Entendendo as TAGs:
+
+  * `@Component({})` -> é um decorator que declara a classe como um componente;
+    * `selector` -> é a TAG que pode ser utilizada em templates;
+    * `templaetUrl` -> é onde ficará o HTML;
+    * `styleUrls` -> é onde ficará o CSS;
+
+### Data-Binding / AngularExpression
+
+Assim como o Java possui a ExpressionLanguage, o Angular possui o **AngularExpression**, que utiliza como atalho o `{{ }}`.  Então, quando nosso componente declarar uma variável com o nome `title`, esta variável poderá ser acessada no HTML, utilizando `{{ title }}`;
+
+* Exemplo:
+
+  ```typescript
+  import { Component } from '@angular/core';
+  
+  @Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css']
+  })
+  export class AppComponent {
+    title = 'angular-picture';
+  }
+  
+  ```
+
+  ```HTML
+  <!-- app.component.html -->
+  testando a TAG {{ title }}
+  ```
+
+  
+
+**PORÉM**, quando formos utilizar o **AE (AngularExpression)** em TAGs HTML, precisaremos colocar os elementos do HTML entre `[]`:
+
+* Exemplo:
+
+  ```typescript
+  export class AppComponent {
+    title = 'angular-picture';
+    urlTeste = 'https://arquivo.devmedia.com.br/noticias/documentacao/documentacao_angular-cli-instalacao_38247.png';
+    altTeste = 'foto do angular cli';
+  }
+  ```
+
+  ```html
+  testando a TAG {{ title }}
+  <img [src]="urlTeste" [alt]="altTeste">
+  ```
+
+  
