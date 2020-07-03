@@ -1345,14 +1345,14 @@ Onde a TAG `<app-root></app-root>` demonstra ser um componente Angular! Onde tod
 * Para verificar o componente, podemos acessar a pasta `src/app/app.component.ts`:
 
   ```typescript
-  import { Component } from '@angular/core';
+  import { Component, OnInit } from '@angular/core';
   
   @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css']
   })
-  export class AppComponent {
+  export class AppComponent implements OnInit{
     title = 'angular-picture';
   }
   ```
@@ -1371,14 +1371,14 @@ Assim como o Java possui a ExpressionLanguage, o Angular possui o **AngularExpre
 * Exemplo:
 
   ```typescript
-  import { Component } from '@angular/core';
+  import { Component, OnInit } from '@angular/core';
   
   @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css']
   })
-  export class AppComponent {
+  export class AppComponent implements OnInit{
     title = 'angular-picture';
   }
   
@@ -1396,7 +1396,7 @@ Assim como o Java possui a ExpressionLanguage, o Angular possui o **AngularExpre
 * Exemplo:
 
   ```typescript
-  export class AppComponent {
+  export class AppComponent implements OnInit{
     title = 'angular-picture';
     urlTeste = 'https://arquivo.devmedia.com.br/noticias/documentacao/documentacao_angular-cli-instalacao_38247.png';
     altTeste = 'foto do angular cli';
@@ -1408,4 +1408,560 @@ Assim como o Java possui a ExpressionLanguage, o Angular possui o **AngularExpre
   <img [src]="urlTeste" [alt]="altTeste">
   ```
 
-  
+
+
+### Adicionando outros Componentes
+
+Vamos supor que queremos utilizar uma AE, com o nome de `<ap-photo></ap-photo>` que irá automaticamente carregar o código HTML e CSS abaixo:
+
+```html
+<img src="minhaURL" alt="meuAlt" />
+```
+
+Para isto, iremos ter que criar um novo Componente:
+
+1. Crie a pasta com o nome do componente, no nosso caso: `photo`;
+
+2. Digite o comando `ng g c photo/nomeDoComponente` (no nosso caso `photo`);
+
+3. Será criado os arquivos `.html, .css e .ts`;
+
+4. Dentro do arquivo `photo.component.ts` iremos criar o atalho `<ap-photo>` utilizando **AE**.
+
+   ```typescript
+   import { Component, OnInit } from '@angular/core';
+   
+   @Component({
+     selector: 'ap-photo',
+     templateUrl: './photo.component.html',
+     styleUrls: ['./photo.component.css']
+   })
+   export class PhotoComponent {
+     url = 'https://arquivo.devmedia.com.br/noticias/documentacao/documentacao_angular-cli-instalacao_38247.png';
+     descricao = 'teste';
+   }
+   ```
+
+5. Adicionaremos no arquivo `photo.component.html` o HTML que irá ser carregado ao chamar a TAG `<ap-photo>`:
+
+   ```html
+   <p>photo works!</p>
+   <img [src]="url" [alt]="description">
+   ```
+
+6. Para que funcione na URL raiz, iremos adicionar no `app.component.html` a TAG URL:
+
+   ```html
+   <ap-photo></ap-photo>
+   ```
+
+7. Em `app.module.ts` foi adicionado (se não foi, devemos adicionar) o componente:
+
+   ```typescript
+   @NgModule({
+     declarations: [
+       AppComponent,
+       PhotoComponent
+     ],
+   ```
+
+## Instalando Bootstrap e outros
+
+Utilizando projetos com Angular, **não adicionamos URLs “na mão”**, ou seja, se queremos adicionar o bootstrap, teremos que utilizar o `npm i boostrap`  e assim será para todas as outra bibliotecas que iremos utilizar.<br><br>
+
+Para **adicionar** ao projeto, teremos que ir até o arquivo `angular.json` e adicionar dentro das TAGS `style` se for uma biblioteca CSS ou dentro de `script` se for biblioteca JS.
+
+* Adicionando o Bootstrap:
+
+  * Rodamos o comando `npm i boostrap`;
+
+  * Adicionamos dentro do arquivo `angular.json` o comando abaixo:
+
+    ```json
+     "styles": [
+         "src/styles.css",
+         "node_modules/bootstrap/dist/css/bootstrap.min.css"
+     ],
+    "scripts": []
+    ```
+
+  * Testando:
+
+    ```html
+    testando a TAG {{ title }}
+    <img class="img-thumbnail" [src]="urlTeste" [alt]="altTeste">
+    ```
+
+    
+
+## Componente Dinâmico
+
+Voltando na TAG `<ap-photo></ap-photo> ` não estamos podendo ficar mudando a URL, pq se tornou algo fixo no arquivo `photo.component.html`, mas e se fosse possível fazer:
+
+```html
+<ap-photo url="novaURL" description="Nova Descrição"></ap-photo>
+```
+
+Para que isto seja possível, temos que declarar as variáveis do `photo.component.ts` com a anotação `@input()` e deixa-las em branco:
+
+```typescript
+export class PhotoComponent {
+    @Input() description='';
+    @Input() url='';
+}
+```
+
+```html
+//photo.module.html
+<p>photo works!</p>
+<img [src]="url" [alt]="description">
+```
+
+Assim, no `app.module.html` podemos utilizar o que quisermos!:
+
+```html
+<ap-photo url="https://miro.medium.com/max/3200/1*7UAtB_mAAVYC8ju_cb7gcQ.png" description="teste"></ap-photo>
+```
+
+### Organizando Componentes em Modulos
+
+Todo componente precisa de um módulo para poder funcionar. Para que o projeto não fique cheio de declarations no `app.module.ts`, podemos criar um **modulo** que será responsável por possuir os componentes relacionados a `photo`:
+
+1. Vamos criar a pasta photos e executar o comando `ng g m photos` -> este comando irá criar o arquivo `photos.module.ts`;
+
+2. Dentro do arquivo `photos.module.ts` teremos de declarar o componente `photo.component` (será necessário importa-lo);
+
+   ```typescript
+   import { NgModule } from '@angular/core';
+   import { PhotoComponent } from './photo/photo.component';
+   
+   
+   @NgModule({
+     declarations: [ PhotoComponent ],
+     exports: [ PhotoComponent ]
+   })
+   export class PhotosModule { }
+   ```
+
+3. Agora dentro do arquivo `app.module.ts`:
+
+   ```typescript
+   @NgModule({
+     declarations: [
+       AppComponent
+     ],
+     imports: [
+       BrowserModule,
+       PhotosModule
+     ],
+   ```
+
+
+
+## Reproduzindo uma Lista
+
+Para exibir no navegador, iremos criar um `Array` de Photos, de forma que seja exibida todas as fotos no navegador, porém, não queremos ficar fazendo cópia e cola, queremos passar o array e com um único `<ap-photo>` aparecer todas as fotos;
+
+1. Vamos criar array de `Photos` na classe `app.component.ts`:
+
+   1. Iremos passar os parâmetros que o `<ap-photo>` pede
+
+   ```typescript
+   photos = [
+       {
+         url:'linkImagem1',
+         description:'igor'
+       },
+       {
+         url:'linkDaImagem2',
+         description:'igor2'
+       }
+     ]
+   ```
+
+2. No Arquivo `app.component.html`, utilizaremos a **diretiva** `*ngFor`, que espera receber os parâmetros do Array no `app.component.ts`:
+
+   ```html
+   <ap-photo
+       *ngFor="let photo of photos"
+       [url]="photo.url"
+       [description]="photo.description">
+   </ap-photo>
+   ```
+
+   
+
+## Angular e API
+
+A API que será utilizada, será [esta](https://s3.amazonaws.com/caelum-online-public/865-angular/api.zip), que irá retornar as fotos dos usuários baseado em um link. Para rodar a API, temos:
+
+1. Descompactar o arquivo;
+
+2. Acessar via terminal o diretório e executar o comando `npm install`; 
+
+3. Depois de instalar, executar `npm start`;
+
+   1. Caso dê erro, será necessário verificar as instalações com `npm i xxxx`:
+
+      ```
+      npm i sqlite3 jsonwebtoken jimp multer cors express
+      ```
+
+<br>
+
+Para iniciarmos, primeiro precisaremos importar o `HTTPClientModule` dentro do nosso arquivo `app.module.ts`, desta forma, poderemos utilizar desta biblioteca para fazer as comunicações com a API!
+
+```typescript
+import { HttpClientModule } from '@angular/common/http'
+
+import { PhotosModule } from './photos/photos.module';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    PhotosModule,
+    HttpClientModule
+  ],
+```
+
+Injetando dentro do `app.component.ts`
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent implements OnInit {
+
+  constructor(http:HttpClient){
+    console.log(http);
+  }
+}
+```
+
+
+
+### Recebendo Lista da API
+
+Nossa URI que será consumida por enquanto será `http://localhost:3000/flavio/photos`.
+
+1. Dentro do `app.component.ts`, iremos utilizar o `HTTPClient` para pegar um `Observable`;
+
+   ```typescript
+   export class AppComponent implements OnInit {
+   
+     photos = [];
+       
+     constructor(http:HttpClient){
+       http
+         .get('ttp://localhost:3000/flavio/photos').subscribe()
+     }
+   
+   }
+   ```
+
+2. Dentro do `subscrive` iremos receber o retorno da API, que iremos colocar dentro do array `photos[]`
+
+   ```typescript
+   .subscribe(photos => this.photos = photos);
+   ```
+
+3. Isto retornará um erro, pq o TypeScript não aceita o tipo Any[]. Sendo assim, colocar o tipo de `photos` como `Object`:
+
+   ```typescript
+   export class AppComponent implements OnInit {
+   
+     photos: Object[] = [];
+   
+     constructor(http:HttpClient){
+       http
+         .get<Object[]>('http://localhost:3000/flavio/photos')
+         .subscribe(photos => this.photos = photos);
+     }
+   
+   }
+   ```
+
+4. Como nossa classe `app.component.html` já está com os parâmetros igual ao da API (`url` e `description`), o navegador vai automaticamente exibir todas as imagens do link!
+
+
+
+### Utilizando Service
+
+Como já vimos anteriormente com o TypeScript, não é uma boa prática manter acessos a banco de dados/APIs diretamente em uma classe, o ideal é criar um `Service` que contenha este acesso, de forma que caso seja necessário alterar algo, seja alterado somente nesta classe `service`.
+
+1. Crie dentro da pasta  `photos/photo/photo.service.ts` ;
+
+2. A classe Service, para o Angular reconhece-lá, teremos que atribuir o decorator `@Injectable` que vêm do pacote `@Angular/core`:
+
+   ```typescript
+   import { Injectable } from '@angular/core';
+   
+   const API = 'http://localhost:3000/';
+   
+   @Injectable({providedIn: 'root'})
+   export class PhotoService {
+   
+   }
+   ```
+
+3. No construtor, iremos receber o `HTTPClient` e iremos criar o método `listFromUser()` que irá receber um usuário e retornar um `Observable`:
+
+   ```typescript
+   @Injectable({ providedIn: 'root' })
+   export class PhotoService {
+   
+       constructor(private http: HttpClient) {
+           this.http = http;
+       }
+   
+       listFromUser(username: string) {
+           return this.http
+               .get<Object[]>(API + username + '/photos');
+       }
+   
+   }
+   ```
+
+4. Agora precisamos alterar o arquivo `app.component.ts` para que ele utilize o `service` :
+
+   ```typescript
+   export class AppComponent implements OnInit{
+   
+     photos: Object[] = [];
+   
+     constructor(private photoService: PhotoService) {  }
+     
+     ngOnInit(): void {
+       this.photoService
+         .listFromUser('flavio')
+         .subscribe(photos => this.photos = photos);
+     }
+   
+   }
+   ```
+
+   
+
+### Utilizando Interface
+
+Para padronizar o retorno da API, a melhor forma é com uma Interface, que irá representar o .json da API:
+
+1. Crie a interface `photos/photo/photo.ts`:
+
+   ```typescript
+   export interface Photo {
+       id:number;
+       postDate:Date;
+       url:string;
+       description:string;
+       allowComments:boolean;
+       likes:number;
+       comments:number;
+       userId:number;
+   }
+   ```
+
+2. Altere o método `listFromUser` da classe `photo.service`, que não irá receber mais um `get<Any[]>` e sim a interface `photo[]`;
+
+   ```typescript
+   import { Photo } from './photo';
+   
+   const API = 'http://localhost:3000/';
+   
+   @Injectable({ providedIn: 'root' })
+   export class PhotoService {
+   
+       constructor(private http: HttpClient) {
+           this.http = http;
+       }
+   
+       listFromUser(username: string) {
+           console.log(API + username + '/photos');
+           return this.http
+               .get<Photo[]>(API + username + '/photos');
+       }
+   
+   }
+   ```
+
+
+
+## Rotas de Acesso
+
+### Organizando o código
+
+Iremos retirar todo o código do `app.component.ts` e deixar em um componente específico da página que lista as fotos, desta forma, seguiremos o padrão **para cada página um componente** e também tiramos a responsabilidade do `app.component.ts` .
+
+1. Crie através do comando `ng g c photos/photo-list` o componente de lista;
+2. Mova o código do `app.component.ts` para o `photo-list.component.ts`;
+3. Para que funcione o método `*ngFor` precisamos importar no `photos.module.ts` a classe `CommonMondule`;
+
+### Acessando componentes pela URL
+
+A ideia é de que ao acessar `localhost:3000/user/flavio` exiba a lista, e quando acessarmos `p/add` abra o formulário, mas por enquanto, não mapeamos nenhuma **rota**.
+
+* Mapeando rotas:
+
+  1. Abra o arquivo `app-routing.module.ts`;
+
+  2. Dentro da `const routes[]` iremos adicionar todos os caminhos, passando a variável `path` que irá receber o caminho e a variável `component` que irá especificar qual o Componente que será aberto:
+
+     ```typescript
+     import { NgModule } from '@angular/core';
+     import { Routes, RouterModule } from '@angular/router';
+     import { PhotoListComponent } from './photos/photo-list/photo-list.component';
+     import { PhotoFormComponent } from './photos/photo-form/photo-form.component';
+     
+     
+     const routes: Routes = [
+       { path: 'user/flavio', component: PhotoListComponent },
+       { path: 'p/add', component: PhotoFormComponent}
+     ];
+     
+     @NgModule({
+       imports: [RouterModule.forRoot(routes)],
+       exports: [RouterModule]
+     })
+     export class AppRoutingModule { }
+     ```
+
+  3. No arquivo, `app.module.ts` é necessário estar importando o `AppRoutingModule`:
+
+     ```typescript
+     import { BrowserModule } from '@angular/platform-browser';
+     import { NgModule } from '@angular/core';
+     import { AppComponent } from './app.component';
+     import {AppRoutingModule} from './app-routing.module';
+     
+     import { PhotosModule } from './photos/photos.module';
+     
+     @NgModule({
+       declarations: [
+         AppComponent
+       ],
+       imports: [
+         BrowserModule,
+         AppRoutingModule,
+         PhotosModule
+       ],
+       providers: [],
+       bootstrap: [AppComponent]
+     })
+     export class AppModule { }
+     ```
+
+### Retornando página de erro
+
+Seguindo o mesmo padrão para exibir um componente baseado no roteamento de um `path`, iremos criar um `path:'**'` que caso a URL não exista, irá retornar o componente escolhido.
+
+1. Vamos executar os comandos abaixo:
+
+   ```
+   ng g m errors
+   ng g c errors/not-found
+   ```
+
+2. No conteúdo `not-found.component.html` iremos adicionar um simples exemplo de HTML:
+
+   ```html
+   <div class="text-center">
+       <h2>This page is not avaliable</h2>
+       <p>
+           The link you have acccessed may be broken or
+           the page may have ben removed.
+       </p>
+   </div>
+   ```
+
+3. Então, como todo módulo, temos de adicionar no `app.module.ts`, para que este se torne visível:
+
+   ```typescript
+   @NgModule({
+     declarations: [
+       AppComponent
+     ],
+     imports: [
+       BrowserModule,
+       AppRoutingModule,
+       PhotosModule,
+       ErrorsModule
+     ],
+   ```
+
+4. Devemos então, adicionar no `app-routing.modules.ts` o `path` genérico:
+
+   ```typescript
+   import { NotFoundComponent } from './errors/not-found/not-found.component';
+   
+   const routes: Routes = [
+     { path: 'user/flavio', component: PhotoListComponent },
+     { path: 'p/add', component: PhotoFormComponent },
+     { path: '**', component: NotFoundComponent }
+   ];
+   ```
+
+
+
+### URLs dinâmicas
+
+Não queremos deixar fixo o endereço `localhost:4200/user/flavio` queremos poder passar qualquer usuário e receber de volta a lista de fotos e para isto, temos que fazer algumas alterações em nosso roteamento!
+
+1. Em `app-routing.modules.ts` iremos alterar o `path: ‘user/flavio’` para `path: ‘user/:userName'` pq desta forma, estamos deixando genérico o retorno;
+
+2. Em `photo-list.component.ts` iremos utilizar um recurso do `ActivatedRoute` que pega a rota indicada naquele momento:
+
+   ```typescript
+   constructor(
+       private photoService: PhotoService, 
+       private activatedRoute: ActivatedRoute) { }
+   ```
+
+3. Com a classe `ActivatedRoute` iremos utilizar o método `snapshot` que irá capturar o `params.userName`:
+
+   ```typescript
+   constructor(
+       private photoService: PhotoService, 
+       private activatedRoute: ActivatedRoute) { }
+   
+     ngOnInit(): void {
+   
+       const userName = this.activatedRoute.snapshot.params.userName;
+       this.photoService
+         .listFromUser(userName)
+         .subscribe(photos => this.photos = photos);
+     }
+   ```
+
+   1. Como a nosso Serviço `photo.service.ts` já está recebendo o método `listFromUser` de forma dinâmica, não precisamos altera-lo.
+
+      ```typescript
+      import { Injectable } from '@angular/core';
+      import { HttpClient } from '@angular/common/http';
+      import { Photo } from './photo';
+      
+      @Injectable({ providedIn: 'root' })
+      export class PhotoService {
+      
+          constructor(private http: HttpClient) {
+              this.http = http;
+          }
+      
+          listFromUser(userName: string) {
+              console.log(API + userName + '/photos');
+              return this.http
+                  .get<Photo[]>(API + userName + '/photos');
+          }
+      
+      }
+      ```
+
+      
+
