@@ -99,7 +99,7 @@
     "mime-db": "^1.33.0",
     "mime-types": "^2.1.18",
     "min-document": "^2.19.0",
-    "minimist": "^0.0.8",
+    "minimist": "^1.2.3",
     "mkdirp": "^0.5.1",
     "ms": "^2.0.0",
     "multer": "^1.4.2",
