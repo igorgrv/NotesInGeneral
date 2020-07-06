@@ -1,6 +1,3 @@
-
-# ANGULAR
-
 # Sumário
 1. [TypeScript](#typescript)
 2. [WebPack](#webpack)
@@ -1697,9 +1694,9 @@ Nossa URI que será consumida por enquanto será `http://localhost:3000/flavio/p
 
 Como já vimos anteriormente com o TypeScript, não é uma boa prática manter acessos a banco de dados/APIs diretamente em uma classe, o ideal é criar um `Service` que contenha este acesso, de forma que caso seja necessário alterar algo, seja alterado somente nesta classe `service`.
 
-1. Crie dentro da pasta  `photos/photo/photo.service.ts` ;
+1. Digite o comando `ng g s photos/photo` -> será criado o arquivo `photo.service.ts`;
 
-2. A classe Service, para o Angular reconhece-lá, teremos que atribuir o decorator `@Injectable` que vêm do pacote `@Angular/core`:
+2. A classe Service, com o decorator `@Injectable` que vêm do pacote `@Angular/core`:
 
    ```typescript
    import { Injectable } from '@angular/core';
@@ -1963,5 +1960,535 @@ Não queremos deixar fixo o endereço `localhost:4200/user/flavio` queremos pode
       }
       ```
 
+
+
+## Melhorando os componentes
+
+Até o momento, temos um componente **responsável por listar** todas as fotos, porém, vamos melhorar o layout com o bootstrap, de forma que **seja exibido 3 fotos por `row `**:
+
+* Dentro do `photo-list.component.html` vamos colocar as fotos em uma lista ordenada:
+
+```html
+<ol class="list-unstyled row">
+    <li *ngFor="let photo of photos" class="col-4">
+        <ap-photo [url]="photo.url" [description]="photo.description"></ap-photo>
+    </li>
+</ol>
+```
+
+O problema desta abordagem, é que se olharmos o HTML, foi gerado uma única `row` com várias `columns` e isto irá “estourar” a página conforme se tenha mais fotos. **O ideal é criarmos um componente** `Photo` que irá ser chamado pela `photo-list.component.html`
+
+### Componente exclusivo
+
+1. Iremos criar o componente `Photo`, com `ng g c photos/photo-list/photos` que será o cara especializado em mexer na foto;
+
+2. Então iremos tirar a responsabilidade do  `photo-list.component.html` e passar para o`photos.component.html` ;
+
+3. Iremos criar um array do tipo `Photo` no `photos.component.ts`, de forma que o `photo-list` possa utiliza-lo posteriormente;
+
+   ```typescript
+   //photo-list.component.ts
+   export class PhotoListComponent implements OnInit {
+   
+     @Input() photosList: Photo[] = [];
+   
+     constructor(
+       private photoService: PhotoService, 
+       private activatedRoute: ActivatedRoute) { }
+   
+     ngOnInit(): void {
+   
+       const userName = this.activatedRoute.snapshot.params.userName;
+       this.photoService
+         .listFromUser(userName)
+         .subscribe(photos => this.photosList = photos);
+     }
+   }
+   
+   
+   //photos.component.ts
+   export class PhotosComponent implements OnInit {
+   
+     @Input() photosComponent: Photo[] = []
+     constructor() { }
+   
+     ngOnInit(): void {
+     }
+   
+   }
+   ```
+
+   ```html
+   <!-- photos.component.html -->
+   <ol class="list-unstyled row">
+       <li *ngFor="let photo of photosComponent" class="col-4">
+           <ap-photo [url]="photo.url" [description]="photo.description"></ap-photo>
+       </li>
+   </ol>
+   
+   
+   <!-- photo-list.component.html -->
+   <ap-photos [photosComponent]="photosList"></ap-photos>
+   ```
+
+4. **PORÉM** até o momento isto não alterou em nada de nosso HTML, pois **só** estamos **mudando as responsabilidades**;
+
+<br>
+
+A questão está no **tratamento das grids** que precisa ser alterado! Invés de fazermos um `*ngFor` em cada `<ol>` teremos dois  `*ngFor`, sendo:
+
+* um para a `<li>` que será nossa `row`;
+* um para uma `<div>` que será nossa  `col`;
+
+Para isto, teremos que criar uma função que irá preencher um novo array que representará as `rows`:
+
+1. Vamos adicionar o array:
+
+   ```typescript
+   //photo.component.ts
+   
+   @Input() photosComponent: Photo[] = []
+   row: any[] = [];
+   ```
+
+2. Vamos alterar o HTML, para fazermos os dois `ngFor`, iterando sobre `row` e `photosComponent`
+
+   ```html
+   <ol class="list-unstyled">
+       <li *ngFor="let col of row" class="row">
+           <div *ngFor="let photo of col" class="col-4">
+               <ap-photo 
+                         [url]="photo.url" 
+                         [description]="photo.description">
+               </ap-photo>
+           </div>
+       </li>
+   </ol>
+   ```
+
+3. Será feita uma iteração de 3 em 3, então será utilizado um `for` e também alteraremos o `OnInit` para `OnChanges` para que não seja executado somente uma vez, mas toda vez que fotos forem adicionadas 
+
+   1. O `slice` sempre recebe uma posição inicial e depois a quantidade final (não inclusiva), portanto se queremos do `index[0]` ao `index[2]` iremos fazer `slice(index, index+3)`, que irá ser o resultado de `[0,1,2]` e depois `[3,4,5]`;
+
+   ```typescript
+   export class PhotosComponent implements OnChanges {
+   
+     @Input() photosComponent: Photo[] = []
+     row: any[] = [];
+   
+     constructor() { }
+   
+     ngOnChanges(changes: SimpleChanges) {
+       if(changes.photosComponent){
+         this.row = this.groupColumns(this.photosComponent);
+       }
+     }
+   
+     groupColumns(photosComponent: Photo[]) {
+       const newRows = []
+   
+       for(let index = 0; index < photosComponent.length; index+=3){
+         newRows.push(
+             photosComponent.slice(index, index+3)
+         );
+       }
+       return newRows;
+     }
+   
+   }
+   ```
+
+   
+
+## Eventos com Angular
+
+### KeyUp
+
+O `KeyUp` é um evento do JavaScript que **se ativa a cada dígito inserido**, um ótimo candidato a fazermos um **filtro responsivo**, ou seja, um filtro que conforme digitamos vai alterando algo!
+
+* No Angular, podemos capturar um valor (parecido com o `QuerySelector`) através do comando `$event.target.value`
+
+<br>
+
+Iremos criar um filtro responsivo para as fotos, onde conforme digitamos irá ser filtrado as fotos baseado pela descrição da foto!
+
+1. Iremos adicionar uma variável chamada `filter` que será um tipo `string` no `PhotoListComponent`;
+
+2. Dentro do nosso `photo-list.component.html` iremos adicionar um botão, com o evento `keyup`;
+
+   1. Quando estamos lindando um um evento que recebe um variável e faz uma função, utilizamos `()` invés do `[]`;
+
+   ```html
+   <div class="text-center mt-3 mb-3">
+       <form>
+           <input
+               class="rounded"
+               type="search"
+               placeholder="search..."
+               autofocus
+               (keyup)="filter = $event.target.value">
+       </form>
+   </div>
+   
+   <!-- para testarmos, irá exibir os caracteres conforme escrevemos
+   	{{ filter }}
+   -->
+   <ap-photos 
+       [photosComponent]="photosList">
+   </ap-photos>
+   ```
+
+   
+
+### Pipes
+
+O Pipe é uma espécie de filtro no Angular, onde podemos fazer mudanças, como por exemplo:
+
+* Fazer um template para datas;
+* Deixar sempre maísculos;
+* Sempre minúsculo;
+
+Ou seja, o `pipe` é como um tubo, onde o que saí dele é um elemento “filtrado” que passa por alguma alteração.
+
+<br>
+
+Exemplo, de um pipe que transforma a letra em maiúscula:
+
+```typescript
+export class PhotoListComponent implements OnInit {
+
+  @Input() photosList: Photo[] = [];
+  filter:string = 'igor';
+```
+
+```html
+<div class="text-center mt-3 mb-3">
+    <form>
+        <input
+            class="rounded"
+            type="search"
+            placeholder="search..."
+            autofocus
+            (keyup)="filter = $event.target.value">
+    </form>
+</div>
+
+<!-- ao colocarmos um | informa ao angular q se trata de um Pipe e depois vêm a função -->
+{{ filter | uppercase}}
+```
+
+<br>
+
+Vamos aplicar um pipe nas fotos, que irá fazer um **filtro pela descrição** baseado em nosso `<input>`, ou seja, irá ficar algo parecido com:
+
+```html
+<ap-photos [photosComponent]="photosList | filterByDescription: filter"> </ap-photos>
+```
+
+<br>
+
+1. Vamos criar um Pipe, dentro de `photo-list` através do comando `ng g p photos/photo-list/filterByDescription`;
+
+   1. será criado o arquivo `filter-by-description.pipe.ts`;
+
+   2. **Atenção ao `name: ‘filterByDescription’`** deve ser igual ao pipe dado no `[photosComponent]="photosList | filterByDescription: filter"> `
+
+      ```typescript
+      import { Pipe, PipeTransform } from '@angular/core';
       
+      @Pipe({
+        name: 'filterByDescription'
+      })
+      export class FilterByDescriptionPipe implements PipeTransform {
+      
+        transform(value: unknown, ...args: unknown[]): unknown {
+          return null;
+        }
+      
+      }
+      ```
+
+2. Iremos utilizar o método `transform` para implementar nossos filtros, este método:
+
+   1. Recebe dois parâmetros, sendo o:
+      1.  primeiro, o tipo de retorno que iremos trabalhar;
+      2. segundo, o nosso filtro, em nosso caso a descrição do `input`;
+   2. Por boa prática, devemos utilizar os métodos `trim()` e `toLowerCase()` para que não tenhamos problemas com maiúsculo e minúsculo;
+   3. Por último teremos que utilizar o método `filter() e includes()` que irá verificar se contém a descrição:
+
+   ```typescript
+   transform(photos: Photo[], descriptionQuery: string) {
+       descriptionQuery = descriptionQuery.trim().toLowerCase();
+   
+       if(descriptionQuery){
+         return photos.filter(photo =>
+             photo.description.toLowerCase().includes(descriptionQuery)
+           );
+       } else {
+         return photos;
+       }
+     }
+   ```
+
+3. Podemos melhorar mais o filtro, pois quando filtramos algo que não existe, o usuário fica sem saber o que houve, pois fica vazio. Então, vamos implementar uma mensagem, em caso não seja encontrado nada!
+
+   1. iremos utilizar o **`*ngIf`** que irá verificar se o elemento `photos` (array do `photos.component.ts`) tem algum elemento!
+
+   ```html
+   <p class="text-center text-muted" *ngIf="!photos.length">
+       Sorry, no photos
+   </p>
+   ```
+
+## Resolver
+
+O Resolver é o cara responsável por carregar todos os dados durante a navegação para rota, para que então disponibilize a um componente.<br>
+
+Para que será utilizado? 
+
+* Queremos que a mensagem _“Sorry, no photos”_ não seja exibida ao carregarmos a página!
+* É uma boa prática, assim como um `Service` de se utilizar o `Resolver` nos componentes que irão fazer requisições
+
+
+
+1. Iremos criar dentro de `photo-list` o nosso `photo-list.resolver.ts` ;
+
+   1. Todo `Resolve` é genérico, ou seja, precisamos passar para ele o tipo de retorno. No nosso caso, o retorno sera um `Observable<Photo>`, pois nosso método `listFromUser` retorna este tipo.
+
+   ```typescript
+   
+   @Injectable({
+     providedIn: 'root'
+   })
+   export class PhotoListResolver implements Resolve<Observable<Photo[]>> {
+   
+     constructor(private _service: PhotoService) { }
+   }
+   ```
+
+2. Com a ajuda da IDE, iremos implementar os métodos abstratos da interface `Resolve`:
+
+   ```typescript
+   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Photo[]> {
+       throw new Error('Method not implemented.');
+   }
+   ```
+
+3. O intuito nosso, é retornar o método `listFromUser` que recebe um `userName`:
+
+   ```typescript
+   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Photo[]> {
+       const userName = route.params.userName;
+       return this._service.listFromUser(userName);
+   }
+   ```
+
+4. Porém, como o `resolve` trabalha com rotas, precisamos deixar explicito no `app.routing.module.ts`:
+
+   ```typescript
+   const routes: Routes = [
+     { 
+       path: 'user/:userName', 
+       component: PhotoListComponent,
+       resolve: {
+         photos: PhotoListResolver
+       }
+     },
+   ```
+
+5. Como estamos utilizando o `Resolver` , não precisaremos utilizar mais no `photo-list.component.ts` os métodos provenientes do `Service`, mais sim do próprio `Resolver`:
+
+   1. O método `data` serve para pegar o parâmetro informado no `routes`
+
+   ```typescript
+   export class PhotoListComponent implements OnInit {
+   
+     photos: Photo[] = [];
+     filter:string = '';
+   
+     constructor(private activatedRoute: ActivatedRoute) { }
+   
+     ngOnInit(): void {
+       this.photos = this.activatedRoute.snapshot.data.photos;
+     }
+   }
+   ```
+
+
+
+## Debounce
+
+Voltando ao **Filtro reativo**, não prestamos atenção em um possível problema que podemos ter, que é a quantidade alta de **requisições** feitas pelo evento **KeyUp**, pois acabamos mandando sempre requisições a cada clique.<br>
+
+<br>
+
+E se colocássemos um tempo? O **Debounce** serve para que a gente consiga colocar um tempo ao o evento, de forma que só após aquele tempo o evento será executado!
+
+1. Iremos no `photo-list.component.ts` e vamos adicionar uma variável chamada `debounce` que será do tipo `Subject<String>`
+
+   ```typescript
+   export class PhotoListComponent implements OnInit {
+   
+     photos: Photo[] = [];
+     filter:string = '';
+     debounce: Subject<string> = new Subject<string>();
+   ```
+
+2. Iremos alterar o método do `OnInit` de forma que a gente possa mexer no `filter`.
+
+   1. A variável `debounce` possui um método `subscribe` que recebe o nosso filtro;
+   2. Iremos importar também o `debonceTime` do `rxjs/operators` que será responsável por passar o tempo que o evento irá verificar;
+
+   ```typescript
+   import { Component, OnInit, Input } from '@angular/core';
+   import { PhotoService } from '../photo/photo.service'
+   import { ActivatedRoute } from '@angular/router';
+   import { Photo } from '../photo/photo';
+   import { Subject } from 'rxjs';
+   import { debounceTime } from 'rxjs/operators';
+   
+   @Component({
+     selector: 'ap-photo-list',
+     templateUrl: './photo-list.component.html',
+     styleUrls: ['./photo-list.component.css']
+   })
+   export class PhotoListComponent implements OnInit {
+   
+     photos: Photo[] = [];
+     filter:string = '';
+     debounce: Subject<string> = new Subject<string>();
+   
+     constructor(private activatedRoute: ActivatedRoute) { }
+   
+     ngOnInit(): void {
+       this.photos = this.activatedRoute.snapshot.data.photos;
+       this.debounce
+         .pipe(debounceTime(300))
+         .subscribe(filter => this.filter = filter);
+     }
+   }
+   ```
+
+3. Agora, só precisamos informar no `Keyup` que estamos utilizando o Debounce. Então iremos alterar o `list.html`
+
+   ```html
+   <input
+          class="rounded"
+          type="search"
+          placeholder="search..."
+          autofocus
+          (keyup)="debounce.next($event.target.value)">
+   ```
+
+
+
+## Paginação
+
+A paginação é feita através do back-end, ou seja, temos uma URI: `localhost:3000/user/flavio/photos?page=1` que vai alterando a quantidade de páginas que é exibida.
+
+* Quando se trata de requisições do back-end, vamos mexer na nossa classe `Service`!
+
+A nossa paginação irá exibir no máximo 12 imagens por página (lógica já implementada no back-end):
+
+1. Como utilizamos o `resolver` iremos verificar que usamos o método `listFromUser(userName)` e agora iremos com a paginação ter um novo método no `Service`:
+
+   ```typescript
+   export class PhotoListResolver implements Resolve<Observable<Photo[]>> {
+   
+     constructor(private _service: PhotoService) { }
+     
+     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Photo[]> {
+       const userName = route.params.userName;
+       return this._service.listFromUserPaginated(userName, 1);
+     }
+   }
+   
+   
+   const API = 'http://localhost:3000/';
+   @Injectable({ providedIn: 'root' })
+   export class PhotoService {
+   
+   	//localhost:3000/flavio/photos?page=1
+       listFromUserPaginated(userName: string, page:number) {
+           //irá fazer um page = x
+           const pageParam = new HttpParams().append('page', page.toString());
+   
+           // com a ',' iremos fazer um @QueryParam, parecido com o Java
+           return this.http
+               .get<Photo[]>(API + userName + '/photos' , { params: pageParam});
+       }
+       
+   }
+   ```
+
+
+
+### PageButton
+
+Por enquanto, temos que ficar alterando no método `resolve` as páginas para vermos as demais fotos, porém sabemos que isto não é ideal, queremos clicar em um botão que irá carregar as demais fotos **caso a foto exista**. Para isto, iremos criar um método `load()` que irá verificar se existem mais elementos a serem exibidos!
+
+1. Por se tratar de um novo componente (novo botão), iremos cariar o componente `LoadButtonComponent`, através do método `ng g c load-button`;
+
+   ```typescript
+   import { Component, OnInit } from '@angular/core';
+   
+   @Component({
+     selector: 'ap-load-button',
+     templateUrl: './load-button.component.html',
+     styleUrls: ['./load-button.component.css']
+   })
+   export class LoadButtonComponent implements OnInit {
+   
+     constructor() { }
+   
+     ngOnInit(): void {
+     }
+   
+   }
+   ```
+
+2. Adicionaremos o conteúdo HTML abaixo no `load-button.component.html`
+
+   ```html
+   <div class="text-center">
+       <button class="btn btn-primary">Load more</button>
+   </div>
+   
+   <p class="text-center text-muted">No more data to load</p>
+   ```
+
+3. Para que este componente apareça no `photo-list.html` temos que adicionar o `selector` de `load-button` :
+
+   ```html
+   <ap-photos 
+       [photos]="photos | filterByDescription: filter">
+   </ap-photos>
+   
+   <ap-load-button></ap-load-button>
+   ```
+
+4. Agora vamos criar uma variável no `load-button.ts` que irá ser responsável em saber se possuem mais fotos a serem exibidas:
+
+   ```typescript
+   export class LoadButtonComponent implements OnInit {
+   
+     hasmore: boolean = false;
+       
+     //demais codigo
+   }
+   ```
+
+5. Através dessa variável, podemos fazer um `*nfIf` no nosso `load-button.html`. Também usaremos a TAG `<ng-template>` para fazermos um `else`:
+
+   ```html
+   <div class="text-center" *ngIf="hasMore; else messageTemplate">
+       <button class="btn btn-primary">Load more</button>
+   </div>
+   
+   <ng-template #messageTemplate>
+       <p class="text-center text-muted">No more data to load</p>
+   </ng-template>
+   ```
+
+   
 
