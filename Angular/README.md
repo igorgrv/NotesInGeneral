@@ -2235,9 +2235,18 @@ Vamos aplicar um pipe nas fotos, que irá fazer um **filtro pela descrição** b
    1. iremos utilizar o **`*ngIf`** que irá verificar se o elemento `photos` (array do `photos.component.ts`) tem algum elemento!
 
    ```html
+   <!-- photos.component.html -->
    <p class="text-center text-muted" *ngIf="!photos.length">
        Sorry, no photos
    </p>
+   
+   <ol class="list-unstyled">
+       <li *ngFor="let col of row" class="row">
+           <div *ngFor="let photo of col" class="col-4">
+               <ap-photo [url]="photo.url" [description]="photo.description"></ap-photo>
+           </div>
+       </li>
+   </ol>
    ```
 
 ## Resolver
@@ -2366,6 +2375,10 @@ E se colocássemos um tempo? O **Debounce** serve para que a gente consiga coloc
          .pipe(debounceTime(300))
          .subscribe(filter => this.filter = filter);
      }
+       
+     ngOnDestroy(): void {
+       this.debounce.unsubscribe();
+     }
    }
    ```
 
@@ -2467,18 +2480,18 @@ Por enquanto, temos que ficar alterando no método `resolve` as páginas para ve
    <ap-load-button></ap-load-button>
    ```
 
-4. Agora vamos criar uma variável no `load-button.ts` que irá ser responsável em saber se possuem mais fotos a serem exibidas:
+4. Agora vamos criar uma variável no `load-button.ts` que irá ser responsável em saber se possuem mais fotos a serem exibidas e como esta variável será alterada conforme exista mais dados ou não, iremos por o `@Input`
 
    ```typescript
    export class LoadButtonComponent implements OnInit {
    
-     hasmore: boolean = false;
+     @Input() hasmore: boolean = false;
        
      //demais codigo
    }
    ```
 
-5. Através dessa variável, podemos fazer um `*nfIf` no nosso `load-button.html`. Também usaremos a TAG `<ng-template>` para fazermos um `else`:
+5. Através dessa variável, podemos fazer um `*ngIf` no nosso `load-button.html`. Também usaremos a TAG `<ng-template>` para fazermos um `else`:
 
    ```html
    <div class="text-center" *ngIf="hasMore; else messageTemplate">
@@ -2488,6 +2501,472 @@ Por enquanto, temos que ficar alterando no método `resolve` as páginas para ve
    <ng-template #messageTemplate>
        <p class="text-center text-muted">No more data to load</p>
    </ng-template>
+   ```
+
+6. Com a parte de layout pronta, precisaremos agora fazer com que a variável `hasMore` seja modificada e como vamos implementa-la no `photos-list.html` iremos ter que declara-la no `photo-list.ts` também, pois desta forma poderemos fazer um `data-binding` da variável `hasMore`
+
+   ```typescript
+   export class PhotoListComponent implements OnInit {
+   
+     photos: Photo[] = [];
+     filter:string = '';
+     debounce: Subject<string> = new Subject<string>();
+     hasMore: boolean = false;
+   ```
+
+   ```html
+   <ap-load-button [hasMore]="hasMore"></ap-load-button>
+   ```
+
+   1. Cada vez que o botão ser apertado, irá ser verificado se o botão se manterá `true`;
+
+7. Como iremos ter que carregar as imagens ao clique do botão, este papel é do `Service`, então iremos precisar trazer alguns valores, como o `userName e currentPage`, que será utilizado pelo método `listFromUserPaginated`
+
+   ```typescript
+   hasMore: boolean = false;
+   currentPage: number = 1;
+   userName: string = '';
+   
+   constructor(
+       private activatedRoute: ActivatedRoute, 
+       private photoService: PhotoService
+   ) { }
+   ```
+
+
+
+## Submódulos
+
+Atualmente temos a seguinte estrutura:
+
+```
+|- errors (possui módulo)
+|-	|-	not-found
+
+|- photos (possui módulo)
+|-	|-	photo
+|-	|-	photo-form
+|-	|-	photo-list
+|-	|-	|-	load-button
+|-	|-	|-	photos
+```
+
+Temos apenas 2 módulos (alem do `app.module`) que encapsula todos os Componentes do projeto, porém se torna algo “feio” e mal visto, veja o `photos.module.ts` a quantidade de informações:
+
+```typescript
+@NgModule({
+  declarations: [ 
+    PhotoComponent, 
+    PhotoListComponent,
+    PhotoFormComponent, 
+    PhotosComponent, 
+    FilterByDescriptionPipe, LoadButtonComponent 
+  ],
+  exports: [ 
+    PhotoComponent 
+  ],
+  imports: [
+    HttpClientModule,
+    CommonModule
+  ]
+})
+export class PhotosModule { }
+```
+
+O ideal seria fazer submódulos, de forma que fiquemos com as declarações abaixo no `photos.module`
+
+```typescript
+@NgModule({
+    imports: [
+        PhotoModule,
+        PhotoFormModule,
+        PhotoListModule
+    ]
+})
+export class PhotosModule { }
+
+
+//PhotoModule
+@NgModule({
+  declarations: [ PhotoComponent ],
+  imports: [ 
+    CommonModule,
+    HttpClientModule
+   ],
+  exports: [ PhotoComponent ]
+})
+export class PhotoModule { }
+
+
+//PhotoFormModule
+@NgModule({
+  declarations: [ PhotoFormComponent ],
+  imports: [
+    CommonModule
+  ]
+})
+export class PhotoFormModule { }
+
+
+//PhotoListModule
+@NgModule({
+  declarations: [ 
+    PhotoListComponent,
+    PhotosComponent,
+    FilterByDescriptionPipe,
+    LoadButtonComponent
+   ],
+  imports: [
+    CommonModule,
+    PhotoModule
+  ]
+})
+export class PhotoListModule { }
+
+
+//AppModule
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    PhotosModule,
+    AppRoutingModule,
+    ErrorsModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+
+
+## Font Awesome
+
+A biblioteca Font Awesome, possui uma série de ícones, assim como o `glyphicons`.  
+
+* Para utilizar o Font Awesome, temos que instalar via `npm`: `npm i font-awesome`.
+
+* Por ser um CSS global, teremos que passar no `style` do `angular.json`:
+
+  ```json
+  "styles": [
+      "src/styles.css",
+      "node_modules/bootstrap/dist/css/bootstrap.min.css",
+      "node_modules/font-awesome/css/font-awesome.css"
+  ],
+  ```
+
+Podemos adicionar uma “lupa” ao nosso projeto, utilizando a TAG abaixo:
+
+```html
+<i aria-hidden="true" class="fa fa-search mr-2"></i>
+```
+
+Aproveitamos e também inserimos as opções de curtida e comentário!
+
+```html
+<ol class="list-unstyled">
+    <li *ngFor="let col of row" class="row no-gutters">
+        <div *ngFor="let photo of col" class="col-4">
+            <ap-photo [url]="photo.url" [description]="photo.description"></ap-photo>
+            <div class="text-center">
+                <i aria-hidden="true" class="fa fa-heart-o fa-1x mr-2"></i>{{ photo.likes }}
+                <i aria-hidden="true" class="fa fa-comment-o fa-1x mr-2 ml-2"></i>{{ photo.comments }}
+            </div>
+        </div>
+    </li>
+</ol>
+```
+
+
+
+## Ng-content
+
+Uma forma “mais bonita” de exibirmos as fotos, seria colocarmos as fotos dentro de `cards` do bootstrap! O Layout padrão para um `card`:
+
+```html
+<div class="card border-light text-center">
+    <h4 class="card-header">TITULO DO CARD</h4>
+    <div class="card-block text-justify">
+        <!-- aqui entra o conteúdo -->
+    </div>
+</div>
+```
+
+Como vamos inserir **um novo conteúdo**, como boa prática aprendemos que é ideal criarmos um **novo componente**, ´porém os `cards` são **compartilháveis**, então uma boa prática é **cria a pasta `shared`** e então a pasta **`components`** indicando que ali terão componentes
+
+1. Com `ng g c shared/components/card` iremos criar o componente `card`;
+
+2. Criaremos também o módulo: `ng g m shared/components/card` - pois iremos compartilhar nosso `card` com outros componentes;
+
+3. No `card.component.html` iremos inserir o conteúdo do `card` com um `title`:
+
+   ```html
+   <div class="card border-light text-center">
+       <h4 class="card-header">{{ title }}</h4>
+       <div class="card-block text-justify">
+           <ng-content></ng-content>
+       </div>
+   </div>
+   ```
+
+4. No `card.ts` iremos adicionar o `title` como uma variável a ser modificada:
+
+   ```typescript
+   @Component({
+     selector: 'ap-card',
+     templateUrl: './card.component.html',
+     styleUrls: ['./card.component.css']
+   })
+   export class CardComponent implements OnInit {
+   
+     @Input() title:string = '';
+   
+     constructor() { }
+   
+     ngOnInit(): void {
+     }
+   
+   }
+   ```
+
+5. Agora precisamos informar ao `card.module.ts` que iremos exportar o `CardComponent` e também teremos de importar no `photo-list.module` e no `app.module`;
+
+6. Por último, iremos inserir o seletor `<ap-card [title]="photo.description">` no `photos.html`
+
+Porém, se olharmos como ficou a tela **as fotos sumiram** com esta abordagem, mas pq? <br>
+
+O que acontece, é que o Angular não sabe onde inserir as fotos a não ser que seja declarado o `<ng-content>` onde o conteúdo será exibido em outro componente!
+
+```html
+<div class="card border-light text-center">
+    <h4 class="card-header">{{ title }}</h4>
+    <div class="card-block text-justify">
+        <ng-content></ng-content>
+    </div>
+</div>
+```
+
+
+
+## Output Property - Acessando propriedades de outros Componentes
+
+Atualmente, nosso `photo-list.component.html` está com esta estrutura:
+
+```html
+<div class="text-center mt-3 mb-3">
+    <form>
+        <i aria-hidden="true" class="fa fa-search mr-2"></i>
+        <input
+            class="rounded"
+            type="search"
+            placeholder="search..."
+            autofocus
+            (keyup)="debounce.next($event.target.value)"
+        >
+    </form>
+</div>
+
+<ap-photos 
+    [photos]="photos | filterByDescription: filter">
+</ap-photos>
+
+<ap-load-button [hasMore]="hasMore" (click) = "load()"></ap-load-button>
+```
+
+Podemos ver que resta movermos o filtro para um componente, de forma que a gente fique com a `photo-list.html` como:
+
+```html
+<ap-filtro></ap-filtro>
+<ap-photos [photos]="photos | filterByDescription: filter"></ap-photos>
+<ap-load-button [hasMore]="hasMore" (click) = "load()"></ap-load-button>
+```
+
+<br>
+
+1. Vamos criar o componente `search.component`, com o `ng g c photos/photo-list/search`;
+
+2. No `photoList.html` iremos remover todo elemento que pertencerá ao `search.html` e como consequência, iremos remover tudo que pertence ao `search` do `photoList.ts` e passar para o `search.ts`:
+
+   ```html
+   <!-- photo-list.component.html -->
+   <ap-search></ap-search>
+   
+   <ap-photos 
+       [photos]="photos | filterByDescription: filter">
+   </ap-photos>
+   
+   <ap-load-button [hasMore]="hasMore" (click) = "load()"></ap-load-button>
+   
+   
+   <!-- search.component.html -->
+   <div class="text-center mt-3 mb-3">
+       <form>
+           <i aria-hidden="true" class="fa fa-search mr-2"></i>
+           <input
+               class="rounded"
+               type="search"
+               placeholder="search..."
+               autofocus
+               (keyup)="debounce.next($event.target.value)"
+           >
+       </form>
+   </div>
+   ```
+
+   ```typescript
+   //photo-list.component.ts
+   export class PhotoListComponent implements OnInit {
+   
+     photos: Photo[] = [];
+     filter:string = '';
+     hasMore: boolean = true;
+     currentPage: number = 1;
+     userName: string = '';
+   
+     constructor(
+       private activatedRoute: ActivatedRoute, 
+       private photoService: PhotoService
+       ) { }
+   
+     ngOnInit(): void {
+       this.userName = this.activatedRoute.snapshot.params.userName;
+       this.photos = this.activatedRoute.snapshot.data.photos;
+     }
+   
+     load(){
+       this.photoService
+         .listFromUserPaginated(this.userName, ++this.currentPage)
+         .subscribe(photos => {
+           this.photos = this.photos.concat(photos);
+           if(!photos.length) {
+             this.hasMore = false;
+           }
+         })
+     }
+   
+   }
+   
+   
+   //search.component.ts
+   export class SearchComponent implements OnInit, OnDestroy {
+   
+     debounce: Subject<string> = new Subject<string>();
+   
+     constructor() { }
+   
+     ngOnInit(): void {
+       this.debounce
+         .pipe(debounceTime(300))
+         
+         //Como iremos utilizar o Filtro?
+         .subscribe(filter => this.filter = filter);
+     }
+   
+     ngOnDestroy(): void {
+       this.debounce.unsubscribe();
+     }
+   
+   }
+   ```
+
+3. Porém, teremos alguns problemas, pois nosso `array` de `photos` fica dentro do `photo-list` e ao movermos nosso filtro teremos de acessa-lo…
+
+   1. Quando queremos acessar propriedades de outros componentes, podemos utilizar um **Evento customizado!**
+
+4. No nosso `search.ts` iremos criar um `EventEmitter` do `@Angular/core` com a propriedade `@output`;
+
+   1. O nome da variável do evento, tem que ser o mesmo nome que iremos utilizar no seletor;
+   2. O `EventEmitter` possui o método `emit` que dispara o valor;
+
+   ```typescript
+   export class SearchComponent implements OnInit, OnDestroy {
+   
+     @Output() onTyping = new EventEmitter<string>();
+     debounce: Subject<string> = new Subject<string>();
+   
+     constructor() { }
+   
+     ngOnInit(): void {
+       this.debounce
+         .pipe(debounceTime(300))
+         .subscribe(filter => this.onTyping.emit(filter));
+     }
+   
+     ngOnDestroy(): void {
+       this.debounce.unsubscribe();
+     }
+   
+   }
+   ```
+
+   ```Html
+   <ap-search 
+       (onTyping)="filter = $event">
+   </ap-search>
+   
+   <ap-photos 
+       [photos]="photos | filterByDescription: filter">
+   </ap-photos>
+   
+   <ap-load-button 
+       [hasMore]="hasMore" 
+       (click) = "load()">
+   </ap-load-button>
+   ```
+
+   
+
+Para melhorar a aplicação, podemos limpar o filtro caso o “Load more” não possua dados…
+
+1. Vamos no `photo-list.ts` e no nosso `load()` iremos passar para o filtro uma `string` vazia, desta forma ele irá limpar o filtro:
+
+   ```typescript
+   load(){
+       this.photoService
+         .listFromUserPaginated(this.userName, ++this.currentPage)
+         .subscribe(photos => {
+           this.filter = '';
+           this.photos = this.photos.concat(photos);
+           if(!photos.length) {
+             this.hasMore = false;
+           }
+         })
+     }
+   ```
+
+2. Para limpar os dados do `<input>` iremos trabalhar com a propriedade `value` do `input`, sendo assim, vamos avisar no `search.ts`  que iremos mexer nesse elemento:
+
+   ```typescript
+   export class SearchComponent implements OnInit, OnDestroy {
+   
+     @Output() onTyping = new EventEmitter<string>();
+     @Input() value = '';
+   ```
+
+3. Agora precisamos informar que o `value` será o valor do `filter`, lá no `photoList.html`:
+
+   ```html
+   <ap-search 
+       (onTyping)="filter = $event"
+       [value]="filter">
+   </ap-search>
+   ```
+
+4. E por último, para que o `photoList.html` consiga alterar esta propriedade, precisamos habilita-la no `search.html`:
+
+   ```html
+   <input
+          class="rounded"
+          type="search"
+          placeholder="search..."
+          autofocus
+          (keyup)="debounce.next($event.target.value)"
+          [value]="value"
+   >
    ```
 
    
