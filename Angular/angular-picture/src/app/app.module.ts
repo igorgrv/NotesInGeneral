@@ -1,11 +1,12 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+
 import { AppComponent } from './app.component';
 import {AppRoutingModule} from './app-routing.module';
-
 import { PhotosModule } from './photos/photos.module';
 import { ErrorsModule } from './errors/errors.module';
 import { CardModule } from './shared/components/card/card.module';
+import { HomeModule } from './home/home.module';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { CardModule } from './shared/components/card/card.module';
     PhotosModule,
     AppRoutingModule,
     ErrorsModule,
-    CardModule
+    CardModule,
+    HomeModule
   ],
   providers: [],
   bootstrap: [AppComponent]

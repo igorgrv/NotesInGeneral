@@ -1,6 +1,7 @@
 # Sumário
 1. [TypeScript](#typescript)
 2. [WebPack](#webpack)
+3. [Angular](#angular)
 
 # TypeScript <a name="typescript"></a>
 
@@ -1281,7 +1282,7 @@ O WebPack dispensa a utilização de outros loaders, justamente porque ele cria 
 
 
 
-# Angular
+# Angular<a name="angular"></a>
 
 Preparando o ambiente, recursos necessários:
 
@@ -1315,7 +1316,7 @@ ng serve --open
 
 Caso de um erro no comando `ng serve --open` devemos reinstalar o `rxjs` com o comando:
 
-  `npm install rxjs@6.0.0 --save` 
+  `npm i rxjs@6.0.0 --save` 
 
 ## Componentes
 
@@ -1489,7 +1490,11 @@ Para **adicionar** ao projeto, teremos que ir até o arquivo `angular.json` e ad
     <img class="img-thumbnail" [src]="urlTeste" [alt]="altTeste">
     ```
 
+    * Caso não funcione, devemos adicionar no `style.css` a TAG abaixo:
     
+      ```css
+      @import "~bootstrap/dist/css/bootstrap.css"
+      ```
 
 ## Componente Dinâmico
 
@@ -1509,12 +1514,12 @@ export class PhotoComponent {
 ```
 
 ```html
-//photo.module.html
+//photo.component.html
 <p>photo works!</p>
 <img [src]="url" [alt]="description">
 ```
 
-Assim, no `app.module.html` podemos utilizar o que quisermos!:
+Assim, no `app.component.html` podemos utilizar o que quisermos!:
 
 ```html
 <ap-photo url="https://miro.medium.com/max/3200/1*7UAtB_mAAVYC8ju_cb7gcQ.png" description="teste"></ap-photo>
@@ -1990,7 +1995,7 @@ O problema desta abordagem, é que se olharmos o HTML, foi gerado uma única `ro
    //photo-list.component.ts
    export class PhotoListComponent implements OnInit {
    
-     @Input() photosList: Photo[] = [];
+     @Input() photos: Photo[] = [];
    
      constructor(
        private photoService: PhotoService, 
@@ -2001,7 +2006,7 @@ O problema desta abordagem, é que se olharmos o HTML, foi gerado uma única `ro
        const userName = this.activatedRoute.snapshot.params.userName;
        this.photoService
          .listFromUser(userName)
-         .subscribe(photos => this.photosList = photos);
+         .subscribe(photos => this.photos = photos);
      }
    }
    
@@ -2009,7 +2014,7 @@ O problema desta abordagem, é que se olharmos o HTML, foi gerado uma única `ro
    //photos.component.ts
    export class PhotosComponent implements OnInit {
    
-     @Input() photosComponent: Photo[] = []
+     @Input() photos: Photo[] = []
      constructor() { }
    
      ngOnInit(): void {
@@ -2021,7 +2026,7 @@ O problema desta abordagem, é que se olharmos o HTML, foi gerado uma única `ro
    ```html
    <!-- photos.component.html -->
    <ol class="list-unstyled row">
-       <li *ngFor="let photo of photosComponent" class="col-4">
+       <li *ngFor="let photo of photos" class="col-4">
            <ap-photo [url]="photo.url" [description]="photo.description"></ap-photo>
        </li>
    </ol>
@@ -2967,6 +2972,254 @@ Para melhorar a aplicação, podemos limpar o filtro caso o “Load more” não
           (keyup)="debounce.next($event.target.value)"
           [value]="value"
    >
+   ```
+
+   
+
+## Autenticação
+
+### Exibir tela de Login
+
+A autenticação será feito através de um componente chamado `SignIn`;
+
+1. Vamos criar o componente, que ficará em uma nova pasta chamada `Home` que também terá o seu respectivo módulo;
+
+   ```
+   ng g m home
+   ng g c home/sigin
+   ```
+
+2. O Template utilizado na página HTML será:
+
+   ```html
+   <h4 class="text-center">Login</h4>
+   
+   <form class="form mt-4">
+   
+       <div class="form-group">
+           <input 
+               class="form-control" 
+               placeholder="user name" 
+               autofocus>  
+       </div>
+   
+       <div class="form-group">
+           <input
+               type="password" 
+               class="form-control" 
+               placeholder="password">              
+       </div>
+   
+       <button 
+           type="submit" 
+           class="btn btn-primary btn-block">
+           login
+       </button>
+   
+   </form>
+   
+   <p>Not a user?<a>Register now</a></p>
+   ```
+
+3. Para que nossa página seja exibida na tela inicial, teremos que alterar nosso `app.routing`:
+
+   ```typescript
+   const routes: Routes = [
+       {
+           path: '',
+           component: SignInComponent
+       },
+   ```
+
+4. Por fim, lembrar de adicionar o módulo `HomeModule` no `AppModule`;
+
+
+
+### Pegar dados do template
+
+Para pegarmos dados do template, iremos trabalhar com o módulo **`ReactiveFormsModule`** (que deverá ser importado no `homeModule`). Com este Modulo, teremos acesso a uma classe que nos ajudará a **vincular o form com o componente**. Esta classe é chamada de `FormGroup`;
+
+1. No `SignInComponent` iremos atribuir uma variável para vincular ao form:
+
+   ```typescript
+   loginForm: FormGroup;
+   ```
+
+2. Com esta variável, iremos vincular nosso formulário:
+
+   ```html
+   <form [formGroup]="loginForm" class="form mt-4">
+   ```
+
+3. Para acessarmos os elementos do `<form>` iremos utilizar outra classe, chamada **`FormBuilder`**, que deverá ser injetada:
+
+   ```typescript
+   export class SigninComponent implements OnInit {
+   
+     loginForm:FormGroup;
+   
+     constructor(private formBuilder:FormBuilder) {
+       this.formBuilder = formBuilder;
+     }
+   ```
+
+4. Dentro do `onInit()` iremos acessar as propriedades, utilizando nosso builder:
+
+   ```typescript
+   onInit():void {
+       this.loginForm = this.formBuilder.group({
+       	userName: [''],
+           password: ['']
+   	});
+   }
+   ```
+
+5. Agora para o Builder reconhecer o `<form>` vamos assinar nossos `inputs` com a TAG `formControlName`
+
+   ```html
+   <input formControlName="password" ... >
+   ```
+
+
+
+### Validação de Campos
+
+A validação dos campos, é feito com uma classe que possui vários tipos de validadores, chamada `Validator`. No nosso caso, iremos utilizar o `.required`:
+
+```typescript
+ngOnInit(): void {
+    this.loginForm = this.formBuilder.group({
+      userName: ['', Validators.required],  
+      password: ['', Validators.required]
+    });
+  }
+```
+
+Desta forma, já não é mais possível deixar os campos em branco, porém o usuário ainda não sabe disto… precisamos demonstrar que falta algo para ele, **vamos demonstrar que o botão será liberado** somente quando os dois campos forem preenchidos…<br>
+
+Iremos mexer no elemento `disabled` do HTML e falar que irá ser `true` se tiver algo `invalid`:
+
+```html
+<button [disabled]="loginForm.invalid" ... > 
+```
+
+Mas o usuário, ainda não sabe o que fazer para liberar o botão, então vamos criar uma mensagem debaixo de cada `input`:
+
+```html
+<small class="text-danger d-block mt-2"> User name is required! </small>
+<small class="text-danger d-block mt-2"> Password is required! </small>
+```
+
+Porém, queremos que a mensagem desapareça caso o usuário tenha digitado algo, para isso podemos fazer um `*ngIf=loginForm.get('elemento').erros?.required`:
+
+```html
+<small
+    *ngIf="loginForm.get('userName').errors?.required"
+    class="text-danger d-block mt-2"
+>
+    User name is required!
+</small>
+```
+
+
+
+### Validando Autenticação
+
+Com a validação de campos feitas, precisamos validar se aquele usuário e senha existem 
+
+* API Possui um caminho que recebe um `userName` e um `password`, na URI `localhost:3000/user/login?username=xxx&password=xxx`;
+
+ Para isto iremos criar um `Service` de autenticação, que irá encapsular a validação com o método `authenticate()`.
+
+1. Crie o `Service`, na pasta `core/auth` -> `ng g s core/auth`
+
+2. No construtor, iremos injetar o `HttpClient`, para que a gente use o método `post`;
+
+3. Crie o método `authenticate()` -> que irá fazer o POST, para a URI;
+
+   ```typescript
+   export class AuthService {
+     constructor(private http:HttpClient) { }
+   
+     authenticate(userName:string, password:string){
+       return this.http.post(API + 'user/login' , {userName, password});
+     }
+   }
+   ```
+
+4. Na classe `SignIn.ts` iremos passar nosso `Service` no construtor e também a classe `Router` para que seja feito o roteamento para outra URI. Vamos criar o método `login()`, que será responsável pela implementação do `Service`
+
+   ```typescript
+   constructor(
+       private formBuilder: FormBuilder,
+       private authService: AuthService,
+       private router:Router
+     ) {
+       this.formBuilder = formBuilder;
+   }
+   
+   login() {
+       const userName = this.loginForm.get('userName').value;
+       const password = this.loginForm.get('password').value;
+   
+       this.authService
+           .authenticate(userName, password)
+           .subscribe(
+               ()=> this.router.navigateByUrl('user/' + userName),
+               err=> {
+                   console.log(err);
+                   this.loginForm.reset();
+                   alert('UserName or Password is invalid!');
+               }
+       	);
+   }
+   ```
+
+5. Precisamos avisar no `form` do `SigIn.html` que o evento de `submit` irá chamar a função `login()`:
+
+   ```html
+   <form [formGroup]="loginForm" class="form mt-4" (submit)="login()">
+   	<!-- código omitido -->
+   </form>
+   ```
+
+
+
+## ViewChield: aplicando AutoFocus
+
+No cenário acima, se quiséssemos que o `autofocus` funcionasse após o usuário ter digitado algum dado incorreto, teríamos que trabalhar com o `ElementRef`.<br>
+
+Vamos fazer com que **ao usuário digitar um dado incorreto, seja acessado o `focus()` do `<input>`**:
+
+1. Vamos atribuir uma variável do tipo `ElementRef`, na classe `SigIn.ts`, com o elemento `<HTMLInputElement>`;
+
+   1. Esta variável, terá a anotação `@ViewChield('userNameInput')` que fará a comunicação com o `<input>`, também com a mesma anotação:
+
+   ```typescript
+   export class SigninComponent implements OnInit {
+     loginForm: FormGroup;
+     @ViewChild('userNameInput') userName: ElementRef<HTMLInputElement>;
+   ```
+
+   ```html
+   <input #userNameInput
+               formControlName="userName"
+               class="form-control"
+               placeholder="user name"
+               autofocus>
+   ```
+
+2. Feito a anotação, iremos no método `login()` para que após limparmos o formulário, a gente faça o `focus()`:
+
+   ```typescript
+   this.authService.authenticate(userName, password).subscribe(
+       () => this.router.navigateByUrl('user/' + userName),
+       (err) => {
+           this.loginForm.reset();
+           this.userNameInput.nativeElement.focus();
+           alert('UserName or Password is invalid!');
+       }
+   );
    ```
 
    

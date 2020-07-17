@@ -1,3 +1,29 @@
+git clone repositorioHttps;
+git checkout develope
+git checkout -b alteracao-no-readme-igor
+--- desenvolve --
+git add .
+git commit -m "detalhar o que foi feito"
+
+git checkout develope
+git pull
+git merge alteracao-no-readme-igor
+
+
+
+
+---------------------------------------------------
+git diff, mostra as alterações por linha
+
+git config local --local user.name "igor"
+git config local --local user.email "igor"
+
+git branch -a | lista todas as branchs (locais e remotas)
+
+git stash | não comitou mas teve alteração, entao ele tira do fluxo e deixa arquivado
+
+
+
 VERSIONAMENTO DE CODIGO
 
 *Para que precisamos versionar um código? De certa forma, mexer em um projeto pode ser assustador, pois podemos mexer em algo e danificar
