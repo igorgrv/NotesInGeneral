@@ -1220,3 +1220,30 @@ Para que a gente “barre” o acesso de quem não tem o `loggedUser`, iremos cr
 </body>
 ```
 
+
+
+## Struts Annotation
+
+E se deixassemos o arquivo `struts.xml` de lado e apenas utilizassemos algo como:
+
+* `@Action`
+* `@Results`
+
+Seria muito mais fácil de escrever mais fácil de entender. Para isto precisaremos de duas dependências novas:
+
+```xml
+<!-- https://mvnrepository.com/artifact/org.ow2.asm/asm -->
+<dependency>
+    <groupId>org.ow2.asm</groupId>
+    <artifactId>asm</artifactId>
+    <version>8.0.1</version>
+</dependency>
+
+
+<!-- https://mvnrepository.com/artifact/org.apache.struts/struts2-convention-plugin -->
+<dependency>
+    <groupId>org.apache.struts</groupId>
+    <artifactId>struts2-convention-plugin</artifactId>
+</dependency>
+```
+
