@@ -524,7 +524,7 @@ public static void main(String[] args) {
 
   * O Template Method cairia como uma luva, já que ele possibilita que o desenvolvedor escreva a "estrutura" do algoritmo apenas uma vez, e a reutilize nas implementações específicas de cada um dos algoritmos.
   
-* _O corpo dos métodos são parecidos? Com o Template Method, a ideia é criar uma **classe abstrata** que implemente esses metodos, fazendo com quem extende-la siga aquele padrão! _
+* _O corpo dos métodos são parecidos? Com o Template Method, a ideia é criar uma **classe abstrata** que implemente esses metodos, fazendo com quem extende-la siga aquele padrão!_
 
   <img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/templatepat.png?raw=true" width="700" height="450">
 

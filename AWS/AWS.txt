@@ -71,21 +71,21 @@ CRIANDO UMA instancia CUSTOMIZADA (COM IMAGENS PRe DEFINIDAS)
     tera o campo "user data" -> este campo e responsavel por receber um script "linux" para criar os servicos necessarios
 
     exemplo de "user data" script (arquivo do tip .sh):
-      #!/bin/bash
-      #Atualizando os pacotes
-      yum update -y
-      #Configurando os repositorios
-      amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
-      #Instalando o apache e o mysql
-      yum install -y httpd mariadb-server
-      #inicializacaoo automatica
-      systemctl start httpd
-      systemctl enable httpd
-      systemctl start mariadb
-      systemctl enable mariadb
-      #Ajustando o permissionamento
-      usermod -a -G apache ec2-user
-      chown -R ec2-user:apache /var/www
+#!/bin/bash
+#Atualizando os pacotes
+yum update -y
+#Configurando os repositorios
+amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
+#Instalando o apache e o mysql
+yum install -y httpd mariadb-server
+#inicializacaoo automatica
+systemctl start httpd
+systemctl enable httpd
+systemctl start mariadb
+systemctl enable mariadb
+#Ajustando o permissionamento
+usermod -a -G apache ec2-user
+chown -R ec2-user:apache /var/www
 
   *CRIANDO UMA IMAGEM
     *Baseado na instancia customizada, com o script acima, podemos selecionar a instancia -> Image -> Create Image

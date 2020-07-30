@@ -351,7 +351,7 @@ for(int multiplo = 1; multiplo <= 100; multiplo ++) {
 }
 ```
 
-# <a name="oo"></a>Orientação a objetos
+#  <a name="oo"></a>Orientação a objetos
 ## <a name="oqueeoo"></a> O que é a orientação a objetos?
 A orientação a objetos veio para resolver problemas de repetibilidade de códigos. <br>_Ex.: imagine que um sistema, com **10 desenvolvedores**, possui diversos formulários que utilizam o CPF do cliente. Em um sistema **procedural** será necessário copiar e colar o mesmo trecho de código para que seja utilizado o campo CPF. Agora, imagine se inves do CPF for utilizado um CNPJ... terá de ser alterado **todas as linhas de código** que utilizam CPF e todos desenvolvedores terão de se atentar!_<br> A proposta da **O.O.** é de fazer **dados/atributos** e **métodos/comportamentos** andarem juntos!
 
