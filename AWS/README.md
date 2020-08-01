@@ -113,7 +113,7 @@ A Amazon possui uma grande gama de:
 
   * Lambda
 
-# Questions - Session 1
+# Questions - Session 3
 
 
 
@@ -204,7 +204,7 @@ Para instalar basta acessar [AWS CLI Install for Windows](https://docs.aws.amazo
 5. No console do Windows, digitaremos `aws configure` e entraremos com as credenciais e a região `sa-east-1`
 6. Com o `aws cli` configurado, podemos chamar os comandos como `aws iam list-users` que nos retornará um .json com os usuários;
 
-# Questions - Session 2
+# Questions - Session 4
 
 ```
 What is a proper definition of IAM Roles? 
@@ -423,19 +423,136 @@ Cada empresa/cliente possui um tipo de aplicação e para isto existem **tipos d
 
 ![HotelExample](C:\Users\867695\Pictures\HotelExample.PNG)
 
+# Questions - Session 5
+
+**Which EC2 Purchasing Option can provide the biggest discount, but is not suitable for critical jobs or databases?**
+
+* Spot Instances
+
+**Which network security tool can you use to control traffic in and out of EC2 Instances?**
+
+* Security Group;
+
+**Under the Shared Responsibility Model, who is responsible for operating-system patches and updates on EC2 Instances?**
+
+	* The customer
+
+**How long can you reserve an EC2 Reserved Instance?**
+
+	* 1 or 3 years;
+
+**Which of the following is NOT an EC2 Instance Purchasing Option?**
+
+* Connect Instances
+
+**Which EC2 Purchasing Option should you use for an application you plan on running on a server continuously for 1 year?**
+
+* Reserved Instances;
+
+## EC2 - Storage
+
+Uma instância pode ter 3 tipos de meios de armazenamento de dados:
+
+* EBS - _Elastic Block Store_;
+* EC2 Instance Store;
+* EFS - _Elastic File System_;
+
+### EBS Volume
+
+ Um volume EBS(_Elastic Block Store_) é uma **unidade de rede** que pode ser atribuida a uma instância enquanto ela funciona;
+
+* Funciona como um adaptador wifi (porém não é físico) que pode armazenar dados (30GB para o Free Tier);
+* Não pode ser ‘movido’ para outra **Zona** (de SP não posso mandar para Nova York);
+  * Porém, é possível fazer um **SNAPSHOT** que seria uma cópia da EBS para outra zona;
+* **Cobrança** pela memória provisionada;
+* Só pode ser atríbuida **um EBS** por instância;
+* Podesse escolher em **manter EBS** mesmo quando a instância for terminada;
+
+#### Criando um EBS
+
+1. Dentro do EC2 > menu esquerdo > Elastic Block Store (Volumes);
+2. Criar Volume > selecionamos o espaço de armazenamento e a Zona (atribuir a zona da instância);
+3. Finalizar > selecionar o volume criado > Actions > Attach volume;
+
+### AMI - Amazon Machine Image
+
+A AMI nada mais é do que uma **imagem da instância**, que irá conter toda configuração, como:
+
+* Sistema escolhido (Linux ou Windows);
+* Script (uma vez que o script é colocado, a imagem irá gravar também);
+
+O que **facilita a criação de outras** instâncias, uma vez que já temos toda a configuração feita;
+
+#### Criando Imagem Personalizada e Utilizando
+
+1. Dentro da instância criada (se não será necessário cria-la com o script);
+2. Clique com direito > Image > create image;
+3. Checar após a criação no menu esquerdo > Images (AMIs);
+4. Assim que criada, basta lançar uma nova instância **selecionando My IMIs** e não preencher mais nada;
+
+### EC2 Instance Store
+
+Uma unidade **EBS** é uma unidade de rede mas com uma **performance não tão boa**. Se for necessário uma **alta performance** se é aconselhável a utilizar uma **EC2 Instance Store**, que é:
+
+* Um hardware físico que fica conectado a instância;
+* Caso a instância seja terminada, os dados serão perdidos;
+* Muito utilizado para buffers/caches/conteúdos temporários;
+* Backups são de responsábilidade do usuário;
+
+### EFS Volume
+
+Este é o volume mais caro, mas também com mais benefícios. O **EFS (Elastic File System)**, pode:
+
+* Estar presente em várias instâncias (não somente em uma, como o EBS);
+* Pode estar em diferentes regiões, sem a necessidade do SNAPSHOT;
+* Se paga por uso, não é necessário reservar igual no EBS;
+* 3x mais caro que um EBS padrão;
 
 
 
+# Questions - Sessions 6
+
+**Which EC2 Storage would you use to create a shared network file system for your EC2 Instances?**
+
+- EFS Volume
+
+**What are AMIs NOT used for?**
+
+* Add your own IP Adress;
+
+**EBS Volumes CANNOT be attached to multiple EC2 instances at a time.**
+
+* True
+
+**An EBS Volume is a network drive you can attach to your instances while they run, so your instances' data persist even after their termination.**
+
+* True
+
+**Which statement is CORRECT regarding EC2 Instance Store?**
+
+* It has a better I/O performance, but the data is lost if the EC2 instance is terminated
+
+**What is an EBS Snapshot?**
+
+* Is a backup of your EBS Instance at that point in time
+
+**Where can you find a third party's AMI so you can use it to launch your EC2 Instance?**
+
+* AWS Marketplace
+
+**What is an EBS Volume tied to?**
+
+* An A.Z.
 
 
 
+## Load Balancer & Auto Scaling
 
+Antes de entender o que é o **Load Balancer e Auto Scaling**, precisamos entender os conceitos de:
 
-
-
-
-
-
-
-
-
+* `Scability` (Escabilidade)
+  * _Vertical_:
+  * _Horizontal (Utilizado pela Amazon)_: 
+* `High Availability` (Alta disponibilidade)
+* `Elasticity` (Elasticidade)
+* `Agility` (Agilidade)
