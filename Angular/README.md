@@ -2014,7 +2014,7 @@ O problema desta abordagem, é que se olharmos o HTML, foi gerado uma única `ro
    //photos.component.ts
    export class PhotosComponent implements OnInit {
    
-     @Input() photos: Photo[] = []
+     @Input() photosComponent: Photo[] = []
      constructor() { }
    
      ngOnInit(): void {
@@ -2263,7 +2263,7 @@ Para que será utilizado?
 * Queremos que a mensagem _“Sorry, no photos”_ não seja exibida ao carregarmos a página!
 * É uma boa prática, assim como um `Service` de se utilizar o `Resolver` nos componentes que irão fazer requisições
 
-
+  
 
 1. Iremos criar dentro de `photo-list` o nosso `photo-list.resolver.ts` ;
 
@@ -2520,7 +2520,7 @@ Por enquanto, temos que ficar alterando no método `resolve` as páginas para ve
    ```
 
    ```html
-   <ap-load-button [hasMore]="hasMore"></ap-load-button>
+   <ap-load-button [hasMore]="hasMore" (click)="load()"></ap-load-button>
    ```
 
    1. Cada vez que o botão ser apertado, irá ser verificado se o botão se manterá `true`;
@@ -2528,14 +2528,32 @@ Por enquanto, temos que ficar alterando no método `resolve` as páginas para ve
 7. Como iremos ter que carregar as imagens ao clique do botão, este papel é do `Service`, então iremos precisar trazer alguns valores, como o `userName e currentPage`, que será utilizado pelo método `listFromUserPaginated`
 
    ```typescript
-   hasMore: boolean = false;
-   currentPage: number = 1;
-   userName: string = '';
+   export class PhotoListComponent implements OnInit {
+     photos: iPhoto[] = [];
+     filter: string = '';
+     hasMore: boolean = true;
+     username: string = '';
+     currentPage: number = 1;
    
-   constructor(
-       private activatedRoute: ActivatedRoute, 
-       private photoService: PhotoService
-   ) { }
+     constructor(private _route: ActivatedRoute, private _service: PhotoService) {}
+   
+     ngOnInit(): void {
+       this.username = this._route.snapshot.params.username;
+       this.photos = this._route.snapshot.data.photos;
+     }
+   
+     load() {
+       this._service
+         .listFromPage(this.username, ++this.currentPage)
+         .subscribe((photos) => {
+           this.filter = '';
+           this.photos = this.photos.concat(photos);
+           if (!photos.length) {
+             this.hasMore = false;
+           }
+         });
+     }
+   }
    ```
 
 
@@ -3037,7 +3055,13 @@ A autenticação será feito através de um componente chamado `SignIn`;
 
 ### Pegar dados do template
 
-Para pegarmos dados do template, iremos trabalhar com o módulo **`ReactiveFormsModule`** (que deverá ser importado no `homeModule`). Com este Modulo, teremos acesso a uma classe que nos ajudará a **vincular o form com o componente**. Esta classe é chamada de `FormGroup`;
+Para pegarmos dados do template, iremos trabalhar com o módulo **`ReactiveFormsModule`** (que deverá ser importado no `homeModule`). 
+
+```typescript
+import {ReactiveFormsModule} from '@angular/forms';
+```
+
+Com este Modulo, teremos acesso a uma classe que nos ajudará a **vincular o form com o componente**. Esta classe é chamada de `FormGroup`;
 
 1. No `SignInComponent` iremos atribuir uma variável para vincular ao form:
 
@@ -3079,8 +3103,19 @@ Para pegarmos dados do template, iremos trabalhar com o módulo **`ReactiveForms
    ```html
    <input formControlName="password" ... >
    ```
+   
+6. Para **teste**:
 
+   ```typescript
+   ngOnInit(): void {
+       this.loginForm = this.formBuilder.group({
+           userName: ['flavio'],
+           password: ['123']
+       });
+   }
+   ```
 
+   1. os campos irão ser preenchidos automaticamente, pois estamos manipulando o HTML.
 
 ### Validação de Campos
 
@@ -3112,12 +3147,13 @@ Mas o usuário, ainda não sabe o que fazer para liberar o botão, então vamos 
 
 Porém, queremos que a mensagem desapareça caso o usuário tenha digitado algo, para isso podemos fazer um `*ngIf=loginForm.get('elemento').erros?.required`:
 
+* ***Safe navigation operator\***, é o método com o ‘?’, que pergunta se aquele elemento existe
+
 ```html
 <small
     *ngIf="loginForm.get('userName').errors?.required"
     class="text-danger d-block mt-2"
->
-    User name is required!
+> User name is required!
 </small>
 ```
 
@@ -3147,7 +3183,7 @@ Com a validação de campos feitas, precisamos validar se aquele usuário e senh
    }
    ```
 
-4. Na classe `SignIn.ts` iremos passar nosso `Service` no construtor e também a classe `Router` para que seja feito o roteamento para outra URI. Vamos criar o método `login()`, que será responsável pela implementação do `Service`
+   1. Na classe `SignIn.ts` iremos passar nosso `Service` no construtor e também a classe `Router` para que seja feito o roteamento para outra URI. Vamos criar o método `login()`, que será responsável pela implementação do `Service`
 
    ```typescript
    constructor(
@@ -3185,7 +3221,7 @@ Com a validação de campos feitas, precisamos validar se aquele usuário e senh
 
 
 
-## ViewChield: aplicando AutoFocus
+#### ViewChield & ElementRef - Mexendo no DOM
 
 No cenário acima, se quiséssemos que o `autofocus` funcionasse após o usuário ter digitado algum dado incorreto, teríamos que trabalhar com o `ElementRef`.<br>
 
@@ -3203,10 +3239,10 @@ Vamos fazer com que **ao usuário digitar um dado incorreto, seja acessado o `fo
 
    ```html
    <input #userNameInput
-               formControlName="userName"
-               class="form-control"
-               placeholder="user name"
-               autofocus>
+          formControlName="userName"
+          class="form-control"
+          placeholder="user name"
+          autofocus>
    ```
 
 2. Feito a anotação, iremos no método `login()` para que após limparmos o formulário, a gente faça o `focus()`:
@@ -3222,5 +3258,160 @@ Vamos fazer com que **ao usuário digitar um dado incorreto, seja acessado o `fo
    );
    ```
 
-   
+
+## Header  - Template
+
+A aplicação até o momento não possui um header, portanto, como será **utilizado por toda aplicação** iremos deixar em `core/header`
+
+```html
+<header class="fixed-top">
+    <nav class="navbar navbar-light bg-white">
+        <a class="navbar-brand">ALURAPIC</a>
+        <div>
+            <i class="fa fa-user-circle"></i>
+            <a>Aqui deve entrar o username</a>
+        </div>
+    </nav>
+</header>
+```
+
+* Será necessário dar um padding-top no `index.html`
+
+  ```html
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="utf-8" />
+      <title>IgorGram</title>
+      <base href="/" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="icon" type="image/x-icon" href="favicon.ico" />
+      <style>
+        body {
+          padding-top: 60px;
+        }
+      </style>
+    </head>
+    <body>
+      <app-root></app-root>
+    </body>
+  </html>
+  ```
+
+Como iremos **expor** o header, devemos criar um modulo para o core e exportar este componte para que seja importado pelo `app.module.ts`.
+
+```typescript
+//core.module.ts
+@NgModule({
+  declarations: [HeaderComponent],
+  imports: [CommonModule],
+  exports: [HeaderComponent],
+})
+export class CoreModule {}
+
+
+//app.module.ts
+@NgModule({
+  declarations: [AppComponent],
+  imports: [BrowserModule, AppRoutingModule, PhotosModule, HomeModule, CoreModule],
+  providers: [],
+  bootstrap: [AppComponent],
+})
+export class AppModule {}
+```
+
+## Token
+
+Uma boa prática após ter feito um login é saber **qual usuário** e **se está logado**, para isto, nada melhor do que o uso de um **token**!<br>
+
+Quando fazemos uma **requisição** para a API, recebemos uma **resposta**, onde esta resposta **contém um HEADER** e neste header conterá informações como o `x-access-token` - mas **como acessa-lo?**
+
+### Capturando
+
+Sabemos que só temos acesso a resposta quando fazemos um `subscribe`, porém **é responsabilidade do serviço** de pegar o Token. Então para isso, utilizaremos o **`pipe()`** e o **`tap`** (rxjs/operators).
+
+* Pipe -> serve como um filtro antes do `subscribe` oq nosso caso será utilizado no serviço;
+* Tap -> utilizado para **acessar a resposta**;
+
+**PORÉM,** é precisamos **habilitar** o serviço a passar os dados da resposta, com o uso do `observe`
+
+```typescript
+authenticate(userName: string, password: string) {
+    return this.client
+      .post(API + 'user/login', { userName, password }, { observe: 'response' })
+      .pipe(
+        tap((res) => {
+          const authToken = res.headers.get('x-access-token');
+          console.log(authToken);
+        })
+      );
+  }
+```
+
+### Gravando  LocalStorage
+
+Como ja sabemos ‘pegar’ o Token, está na hora de armazena-lo, mas **onde e como?** <br>Os navegadores nos possibilitam salvar o token em um espaço chamado **LocalStorage** e para armazena-lo, basta que seja utilizado um `window.localStorage.setItem('titulo', token)` e como **boa prática**, iremos criar um **serviço** responsável por **verificar se existe, pegar, setar e excluir**!<br><br>`Token.service.ts`:
+
+```typescript
+const KEY = 'authToken';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class TokenService {
+  hasToken() {
+    return !!this.getToken();
+  }
+
+  getToken() {
+    return window.localStorage.getItem(KEY);
+  }
+
+  setToken(token) {
+    window.localStorage.setItem(KEY, token);
+  }
+
+  removeToken() {
+    window.localStorage.removeItem(KEY);
+  }
+}
+```
+
+`auth.service.ts`:
+
+```typescript
+export class AuthService {
+  constructor(private client: HttpClient, private tokenService:TokenService) {
+    this.client = client;
+    this.tokenService = tokenService;
+  }
+
+  authenticate(userName: string, password: string) {
+    return this.client
+      .post(API + 'user/login', { userName, password }, { observe: 'response' })
+      .pipe(
+        tap((res) => {
+          const authToken = res.headers.get('x-access-token');
+          this.tokenService.setToken(authToken);
+        })
+      );
+  }
+}
+```
+
+### Descriptografando
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

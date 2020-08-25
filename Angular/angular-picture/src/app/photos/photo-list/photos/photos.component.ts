@@ -17,7 +17,6 @@ export class PhotosComponent implements OnChanges {
     if(changes.photos){
       this.row = this.groupColumns(this.photos);
     }
-    console.log(this.photos.length);
   }
 
   groupColumns(photos: Photo[]) {

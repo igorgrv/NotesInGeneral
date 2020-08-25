@@ -483,7 +483,7 @@ A AMI nada mais é do que uma **imagem da instância**, que irá conter toda con
 
 O que **facilita a criação de outras** instâncias, uma vez que já temos toda a configuração feita;
 
-#### Criando Imagem Personalizada e Utilizando
+#### Criando Imagem Personalizada
 
 1. Dentro da instância criada (se não será necessário cria-la com o script);
 2. Clique com direito > Image > create image;
@@ -548,11 +548,205 @@ Este é o volume mais caro, mas também com mais benefícios. O **EFS (Elastic F
 
 ## Load Balancer & Auto Scaling
 
-Antes de entender o que é o **Load Balancer e Auto Scaling**, precisamos entender os conceitos de:
+Antes de entender o que é o **Load Balancer e Auto Scaling**, precisamos entender os conceitos de:	
 
-* `Scability` (Escabilidade)
-  * _Vertical_:
-  * _Horizontal (Utilizado pela Amazon)_: 
-* `High Availability` (Alta disponibilidade)
-* `Elasticity` (Elasticidade)
-* `Agility` (Agilidade)
+| Conceito                                    | Significado                                                  |
+| ------------------------------------------- | ------------------------------------------------------------ |
+| `Scability` (Escabilidade) - Vertical       | É quando se aumenta a ‘tamanho’ da instância, por exemplo, se rodamos a instância em t2.micro iremos rodar em t2.large; |
+| `Scability` (Escabilidade) - Horizontal     | Invés de aumentar o tamanho, se aumenta a quantidade (**padrão para a ec2**); |
+| `High Availability` (Alta disponibilidade): | Significa deixar as instâncias em **zonas diferentes**, para caso aconteça algo evitar **desastres, como falta de energia**; |
+| `Elasticity` (Elasticidade)                 | É em si o conceito de **Auto Scaling**, onde o sistema se escala baseado no uso da instância |
+| `Agility` (Agilidade)                       | É o conceito de que na nuvem, tudo fica a distância de um clique! |
+
+### ELB - Elastic Load Balancer
+
+O Load Balancer funciona como um **direcionador do tráfego** de dados, ou seja, invés de cada usuário acessar uma instância, o Load balancer vai ver qual a instância está mais ‘tranquila’ e enviar o usuário para ela;
+
+![loadBalancer](https://d2h0cx97tjks2p.cloudfront.net/blogs/wp-content/uploads/sites/2/2018/07/Classic-Load-balancers.png)
+
+#### Criando Load Balancer
+
+1. Para que o Load Balancer saiba para quem direcionar o tráfego, é necessário **pelo menos 2 instâncias** (seguindo o conceito de `high avalability` instanciar em áreas diferentes);
+2. Iremos selecionar o tipo **HTTP**;
+3. Dar um nome e selecionar todas as zonas (a-b-c);
+4. Criar um novo `security group`, habilitando a porta 80 para qualquer IP;
+5. Em `Target Group`, apenas damos um nome e deixamos como está;
+6. Adicionamos as instâncias que iremos querer que o Load Balancer gerencie > Finish;
+   1. Para testar, basta selecionarmos o Load Balancer e copiar o **DNS Name**;
+
+### ASG - Auto Scaling Group
+
+O **ASG** é responsável por gerenciar o tráfego no sentido de **instanciar ou remover** novas instâncias baseado no consumo dos usuários, ou seja, **se tivermos MUITAS requisições** o ASG irá verificar o cosumo na CPU das instâncias e criar novas instâncias (iguais) de forma que o **usuário não seja impactado**.<br>Os benefícios, são:
+
+* Permite ter um **mínimo e máximo** de instâncias;
+* Automaticamente registra/retira instâncias;
+* Checa se a instância está ‘saudável’ e caso não esteja as substitui;
+* **Poupa gastos**, de forma que irá rodar somente o que precisamos;
+
+A imagem abaixo ilustra o funcionamento com o **ELB + ASG**;
+
+![Asg](https://media.amazonwebservices.com/blog/2014/elb_auto_scale_instances_2.png)
+
+#### Criando Auto Scaling
+
+1. No canto esquerdo, vamos até **Auto Scaling Groups**;
+
+2. Damos um nome e **criamos um novo template** (o template será o padrão para as instâncias, de modo que cada instância criada irá ser igual a este template);
+
+   1. O template deve ser configurado com os mesmos padrões de uma instância (mesmo security Group, mesmo bootstrap Data)
+
+      ```sh
+      #!/bin/bash
+      # Use this for your user data (script from top to bottom)
+      # install httpd (Linux 2 version)
+      yum update -y
+      yum install -y httpd
+      systemctl start httpd
+      systemctl enable httpd
+      echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
+      ```
+
+3. Voltamos a aba da criação do ASG e seleciomos o template recém criado;
+
+4. Next > selecionamos em SUBNET todas as zonas (high avalability);
+
+5. Next > Habilitamos o Load Balancer e selecionamos o Target Group > Habilitamos o `Health` para o ELB;
+
+6. Next > Aqui iremos informar quantas instancias queremos, o mínimo e o máximo de instâncias > Selecionamos `Target Tracking` e o meio que queremos que seja criado as instancias;
+
+   1. Queremos que se a CPU chegar a 50% de uso iremos chamar outra instância;
+
+7. Next > next> next > Create Auto Scaling Group;
+
+
+
+# Questions - Sessions 7
+
+**What is the main purpose of High Availability in the Cloud?**
+
+* Application thriving even in case of a disaster;
+
+**Which AWS offered Load Balancer should you use to handle hundreds of thousands of connections with low latency?**
+
+* Network Load Balancer (Elastic Load Balancer is the name of the service);
+
+**Changing an EC2 Instance Type from a t3a.medium to a t3a.2xlarge is an example of?**
+
+* Vertical Scaling;
+
+**What can you use to handle quickly and automatically the changing load on your websites and applications by adding compute resources?**
+
+* An Auto Scaling Group;
+
+**Which of the following statements is INCORRECT regarding Auto Scaling Groups?**
+
+* Automatically changing the EC2 types
+
+**Which Load Balancer is best suited for HTTP/HTTPS load balancing traffic?**
+
+* Application Load Balancer (Classic Load Balancer is the previus version)
+
+**Which AWS service offers easy horizontal scaling of compute capacity?**
+
+* ASG;
+
+**Which of the following statements is NOT a feature of Load Balancers?**
+
+* ​	Back-end Autoscaling
+
+## S3
+
+O Serviço S3 **funciona como um “balde/bucket”**, ou melhor **COMO UM GOOGLE DRIVE** onde podemos **colocar itens** como:
+
+* imagens, vídeos, arquivos de texto, entre outros.
+
+ A propaganda da AWS é **`infinitely scaling`** (escala infinita). 
+
+* Para criar um balde **o nome precisar ser único** (para todas regiões), mas a criação deve estar em **uma única região**;
+  * Por conveção deve se iniciar com _minúscula_, não ter letras maiúsculas;
+* Todo **objeto (file)** possui uma **KEY** (caminho completo, podendo ser composto pelo `prefix + object name`):
+  * `s3://my-bucket/`**`my_file.txt`** 
+  * `s3://my-bucket/`**`my_folder/another_folder/my_file.txt`** ;
+* Um arquivo tem o tamanho máximo de **5Tb** , caso seja necessário um tamanho maior, é possível utilizar o **multi-part upload**;
+
+
+
+#### Criando um S3
+
+1. Dentro do AWS Console > procuramos por S3;
+2. Damos um nome global > selecionamos a região > create bucket;
+3. Com o bucket criado ja é possível **adicionar itens**;
+   1. Clique no bucket > clique em _Upload_ > selecione o item;
+   2. É possível criar uma pasta também!
+
+### S3 - Security
+
+Por padrão, quando criamos um serviço S3, deixamos todo acesso externo bloqueado, mas quando falamos **acesso interno** ou seja, a **usuários do AWS Console**, temos alguns meios e fazer esta verificação:
+
+* **User Based** -> Acesso através de direitos concedidos pela IAM;
+* **Resource Based**
+  * **Bucket policies** -> É a regra aplicada diretamente ao bucket, permitindo ou não, acesso/uploads no bucket em específico;
+  * **Bucket Acess Control List (ACL)** -> É a regra a nível de objeto (file);
+
+Exemplos:
+
+* Usuário publico quer acessar os arquivos que está em um bucket
+
+  * Só é possível caso tenha uma **_bucket policie_** anexada ao bucket;
+
+  ![S3bucketPolicie](C:\Users\867695\Pictures\S3bucketPolicie.PNG)
+
+* Usuário IAM quer acessar os arquivos que está em um bucket
+
+  * Só é possível caso tenha uma **_User Based_** anexada ao usuário pela IAM;
+
+  ![S3Iam](C:\Users\867695\Pictures\S3Iam.PNG)* Instância EC2 quer acessar o bucket
+
+  * Só é possível caso tenha uma **_EC2 instance Role_** anexada a instância;
+
+  ![S3EC2Instance](C:\Users\867695\Pictures\S3EC2Instance.PNG)
+
+#### Alterando a segurança
+
+Para deixar pública, precisamos fazer algumas alterações, como:
+
+1. Ir no bucket que queremos alterar;
+
+2. Em `Permissions` > `Block public access` > Edit > Retirar as flags;
+
+3. Em `Bucket Policy` > `Policy Generator`;
+
+   1. Type of policy > `S3 Bucket Policy`;
+
+   2. Effect > Allow;
+
+   3. Principal > *;
+
+   4. Aws Service > `Amazon S3`;
+
+   5. Actions > `get object`;
+
+   6. ARN > (pode ser localizada no `bucket policy`) > `arn:aws:s3:::demo-igor-bucket/*`
+
+   7. Add statement > Generate Policy 
+
+      ```json
+      {
+        "Id": "Policy1596731255097",
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Sid": "Stmt1596731253177",
+            "Action": [
+              "s3:GetObject"
+            ],
+            "Effect": "Allow",
+            "Resource": "arn:aws:s3:::demo-igor-bucket/*",
+            "Principal": "*"
+          }
+        ]
+      }
+      ```
+
+   8. Copiar o .json e colar no `bucket policy`
+

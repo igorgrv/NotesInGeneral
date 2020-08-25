@@ -49,7 +49,7 @@ Iniciando a API (como a API não está publica, iremos instacia-la localmente):
 
 <br>
 
-Instalando dependências necessárias:
+No igor-gram -> Instalando dependências necessárias:
 
 ```
 npm i boostrap
@@ -79,8 +79,6 @@ import { RouterModule } from '@angular/router';
 
 
 ## Componentes/Módulos
-
-1º Passo antes de mexer com os componentes é limpar o `app.component.html` e deixar somente a TAG `<router-outlet>` .<br><br>
 
 Os componentes tem que ir sendo criados conforme nossa necessidade. Vamos pensar primeiro na ideia do projeto, que será:
 
@@ -200,27 +198,6 @@ Com a Interface pronta, precisaremos criar a classe de Serviço `FotoService` qu
      }
    ```
 
-6. Com o Service pronto, podemos implementa-lo na `FotoList.ts`:
-
-   ```typescript
-   export class FotoListComponent implements OnInit {
-   
-     fotos:iFoto[] = []
-   
-     constructor(private fotoService: FotoService) { 
-       this.fotoService = fotoService;
-     }
-   
-     ngOnInit(): void {
-       this.fotoService
-         .listaFotoPeloUsuario('flavio')
-         .subscribe(fotos => this.fotos = fotos);
-     }
-   
-   }
-   ```
-
-   
 
 ### Componente fotos/foto-lista
 
