@@ -2254,7 +2254,7 @@ Vamos aplicar um pipe nas fotos, que irá fazer um **filtro pela descrição** b
    </ol>
    ```
 
-## Resolver
+## Resolver (Service melhorado)
 
 O Resolver é o cara responsável por carregar todos os dados durante a navegação para rota, para que então disponibilize a um componente.<br>
 
@@ -3401,15 +3401,633 @@ export class AuthService {
 
 ### Descriptografando
 
+Para trabalharmos com o Token, é necessário descriptografa-lo e para isto iremos utilizar o **JWT DECODE**.
 
+```
+npm i jwt-decode@2.2.0
+```
 
+e para utiliza-lo devemos fazer um `import all`
 
+```typescript
+import * as jwt_decode from 'jwt-decode'
+```
 
+o `jwt_decode` espera receber um token como entrada e um `alias` **tipado com uma interface**;
 
+```typescript
+const user = jwt_decode(token) as User;
+```
 
+### Capturando valores do token
 
+Até o momento, estamos trabalhando com o `TokenService` dentro do serviço `AuthService`, porém quem se autentica é o **usuário**, portanto, vamos **encapsular o `TokenService`** no `UserService` (que posteriormente terá as informações do usuário).
 
+1. Gerar o nome modelo de Serviço
 
+```
+ng g s core/user/
+```
+
+2. Criar os método `getUser()` e `setToken(token:string)` que será utilizado pelo construtor
+
+```typescript
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+
+  constructor(private tokenService:TokenService) { }
+
+  setToken(token:string) {
+    this.tokenService.setToken(token);
+  }
+
+  getUser(){}
+  
+}
+```
+
+3. Como não será mais utilizado no `AuthService` o `TokenService`, trocaremos para o `UserService`
+
+```typescript
+export class AuthService {
+  constructor(private client: HttpClient, private userService:UserService) {
+    this.client = client;
+    this.userService = userService; //alterado
+  }
+
+  authenticate(userName: string, password: string) {
+    return this.client
+      .post(API + 'user/login', { userName, password }, { observe: 'response' })
+      .pipe(
+        tap((res) => {
+          const authToken = res.headers.get('x-access-token');
+          this.userService.setToken(authToken); //alterado
+        })
+      );
+  }
+}
+```
+
+Agora para **capturarmos o token**, precisaremos utilizar um `Subject` com uma **interface** que contenha os dados do Token
+
+1. Criar a Interface `User`:
+
+   ```typescript
+   export interface User {
+       id: number;
+       name: string;
+       email: string
+   }
+   ```
+
+2. Na `UserService` iremos criar a variavel do `Subject<User>`
+
+   ```typescript
+   export class UserService {
+   
+     private userSubject = new Subject<User>();
+   
+     constructor(private tokenService:TokenService) { }
+       
+       //codigo omitido
+   }
+   ```
+
+Com o Subject, precisaremos utiliza-lo, para que toda vez que alguém fizer um `subscribe` receber o tipo `User` **descriptografado** e ai que entra o nosso `jwt_decode`..
+
+1. Vamos criar o método `decodeAndNotify()` . Este método irá internamente pegar o `Token`, descriptografarr com o `jwt_decode` e então irá fazer um `next()` usando o `Subject`:
+
+   ```typescript
+   export class UserService {
+     private userSubject = new Subject<User>();
+   
+     // metodo omitido
+       
+     decodeAndNotify() {
+       const token = this.tokenService.getToken;
+       const user = jwt_decode(token) as User;
+       this.userSubject.next(user); //passa a quem chamar o setToken um usuario descriptografado
+     }
+   }
+   ```
+
+2. Com o método pronto, iremos **no construtor** verificar se o token existe na aplicação, caso **não haja** o `decodeAndNotify` não será chamado. Após descriptografar, iremos no `getUser()` pegar o retorno do `userSubject` como um `Observable()`
+
+   ```typescript
+   export class UserService {
+     private userSubject = new Subject<User>();
+   
+     constructor(private tokenService: TokenService) {
+       //caso o usuario saia e entre ira verificar se ja tem token cadastrado
+       this.tokenService.hasToken() && this.decodeAndNotify();
+     }
+   
+     setToken(token: string) {
+       this.tokenService.setToken(token);
+       this.decodeAndNotify();
+     }
+   
+     getUser() {
+       return this.userSubject.asObservable(); //retorna um observable q poderemos utilizar
+     }
+   
+   
+     decodeAndNotify() {
+       const token = this.tokenService.getToken();
+       const user = jwt_decode(token) as User;
+       this.userSubject.next(user); //passa a quem chamar o setToken um usuario descriptografado
+     }
+   }
+   ```
+
+### Retornando valores  - BehaviorSubject
+
+Como queremos que no **Header** apareça o **nome do usuário**, iremos no `Header.component.ts` pegar os valores através da classe `UserService`.<br>
+
+O HTML não entende uma variavel do tipo `Obsevable`, portanto quando fazemos um `getUser()` precisamos fazer um `subscribe` nela, que deste modo podemos pegar os valores!
+
+```typescript
+export class HeaderComponent implements OnInit {
+
+  user$:Observable<User>;
+  user:User;
+
+  constructor(private userService:UserService) {
+    this.user$ = this.userService.getUser();
+    this.user$.subscribe(user => this.user = user);
+   }
+}
+```
+
+Agora no HTML é possível pegar os valores através da variável `user`:
+
+* iremos fazer uma pergunta com o `?` -> caso exista valor de `user.name` será exibido, caso não, iremos com o `*ngIf + <ng-template>` exibir outra frase
+
+```html
+<header class="fixed-top">
+  <nav class="navbar navbar-light bg-white">
+    <a class="navbar-brand">ALURAPIC</a>
+    <div *ngIf="user; else login">
+      <em class="fa fa-user-circle"></em>
+      <a class="ml-2"> {{ user?.name }} </a>
+    </div>
+
+    <ng-template #login>
+      <span class="navbar-text">
+        <a class="ml-2"> Please, login! </a>
+      </span>
+    </ng-template>
+  </nav>
+</header>
+```
+
+**PORÉEEM**, quando utilizamos o `Subject` no nosso `UserService`, teremos um **problema**, pois o header vai ser carregado depois do serviço já ter passado a chamada, ou seja, o **header não escutou o `userSubject`**!
+
+* O `BehaviorSubject<>()` guarda o valor **até que alguem o chame**! - É necessário passar no construtor dele um valor default;
+
+```typescript
+export class UserService {
+  private userSubject = new BehaviorSubject<User>(null);
+```
+
+#### Pipe Async
+
+E se pudessemo utilizar o `Observable` diretamente no HTML? Iriamos apagar todo trecho abaixo:
+
+```typescript
+export class HeaderComponent {
+  user$: Observable<User>;
+  user: User; //NÃO EXISTE
+
+  constructor(private userService: UserService) {
+    this.user$ = this.userService.getUser();
+    this.user$.subscribe((user) => (this.user = user)); //NÃO EXISTE
+  }
+
+}
+```
+
+É possível utilizar um `| async ` no html e utilizar o observable!
+
+```html
+<div *ngIf="(user$ | async) as user; else login">
+    <em class="fa fa-user-circle"></em>
+    <a class="ml-2"> {{ user.name }} </a>
+</div>
+```
+
+## Logout
+
+Como o logout é do usuario, iremos implementa-lo no `UserService` um método `logout()`, que deverá:
+
+* Apagar o `Token`;
+* Passar um `null` para o `BehaviorSubject`
+
+```typescript
+logout(){
+    this.tokenService.removeToken();
+    this.userSubject.next(null);
+}
+```
+
+Agora, no `Header.component` criaremos um método `logout()` que irá usar o `userService.logout()` e depois irá **direcionar a tela de login**, ou seja, precisaremos do **`Router.naviagete()`;**
+
+​	* Como a tela de `login` é chamada quando passamos a url (‘’), iremos direcionar para o msm caminho
+
+```typescript
+export class HeaderComponent {
+  user$: Observable<User>;
+
+  constructor(private userService: UserService, private router:Router) {
+    this.user$ = this.userService.getUser();
+  }
+
+  logout(){
+    this.userService.logout();
+    this.router.navigate(['']);
+  }
+
+}
+```
+
+no HTML:
+
+```html
+<div *ngIf="(user$ | async) as user; else login">
+    <em class="fa fa-user-circle"></em>
+    <a class="mr-1"> {{ user.name }} </a>
+    <a (click)="logout()">(logout)</a>
+</div>
+```
+
+## Guarda de Rotas - CanActivate
+
+Atualmente a aplicação tem um comportamento ‘errado’. Se estivermos logados, **conseguimos ir para tela de Login**, o que não faz sentido, uma vez que **ainda estamos logado**. Para que isso não ocorra, teremos que mexer no nosso arquivo `app.routing-routing` de forma que seja **instanciada uma classe** toda vez que determinada rota for chamada!
+
+1. Vamos criar um **`.guard` responsável por bloquear/acessar** a rota, chamado de `AuthGuard`, dentro do _core/auth_;
+
+```
+ng g guard auth/core
+
+// selecionamos o CanActivate como padrao
+```
+
+```typescript
+export class AuthGuard implements CanActivate {
+  
+  canActivate(
+    next: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    
+     //caso retorn true, sera informado que é permitido acessar a rota   
+     return true;
+  }
+
+}
+```
+
+2. O `AuthGuard` irá receber no construtor o `UserService` que por sua vez **deverá informar se o usuario `isLogged()`**;
+
+```typescript
+export class UserService {
+  	private userSubject = new BehaviorSubject<User>(null);
+    // demais métodos
+
+    isLogged(){
+        return this.tokenService.hasToken();
+    }
+}
+
+export class AuthGuard implements CanActivate {
+
+  constructor(private userService:UserService){
+    this.userService = userService;
+  }
+    
+}
+```
+
+3. Agora no `app.routing.module.ts` iremos informar o `canActivate`
+
+```typescript
+const routes: Routes = [
+	{
+        path: '',
+        component: SigninComponent,
+        canActivate: [AuthGuard]
+      },
+];
+```
+
+4. No `AuthService.canActivate()` iremos utilizar o método `isLogged()` para caso seja true, ele redirecione o usuário **de volta a página de Fotos** (precisaremos instanciar o `Router`) e retorne um `false` para o `canActivate()`;
+
+```typescript
+canActivate(
+    next: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    
+      if(this.userService.isLogged()){
+        this.router.navigate(['user', userName]);
+        return false;
+      }
+    
+    return true;
+  }
+```
+
+5. **PORÉM,** não temos a variavel `userName`. Pediremos ao `UserService` para retornar o usuário que esta logado;
+   1. o nome do usuário está no payload, portanto teremos que pega-lo depois de fazer a decodificação com jwt;
+
+```typescript
+export class UserService {
+  private userSubject = new BehaviorSubject<User>(null);
+  private userName: string;
+
+    decodeAndNotify() {
+        const token = this.tokenService.getToken();
+        const user = jwt_decode(token) as User;
+        this.userName = user.name; //pega o username
+        this.userSubject.next(user); 
+    }
+
+    getUserName() {
+        return this.userName;
+    }
+}
+```
+
+6. Agora no `AuthService` pegaremos do `UserService` o `userName`
+
+```typescript
+export class AuthGuard implements CanActivate {
+
+  constructor(private userService:UserService, private router:Router){
+    this.userService = userService;
+  }
+
+  canActivate(
+    next: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+
+      if(this.userService.isLogged()){
+        this.router.navigate(['user', this.userService.getUserName()]);
+        return false;
+      }
+
+    return true;
+  }
+}
+```
+
+## HREF ou RouterLink?
+
+Seguindo o padrão da SPA, o melhor dos mundos é que a gente **não precisa** ficar **recarregando a pagina**, porém quando utilizamos o `href` na tag `<a>` o navegador entende que é uma nova requisição e **recarrega toda a página novamente**… para que isso não ocorra existe o **`routerLink`** !
+
+1. Vamos importar o módulo `RouterModule` no `Core.module`;
+
+```typescript
+@NgModule({
+  declarations: [HeaderComponent],
+  imports: [CommonModule, RouterModule],
+  exports: [HeaderComponent],
+})
+export class CoreModule {}
+```
+
+2. No `header.html` iremos fazer o redirect para a tela de Login **com o routerLink**.
+   1. o `routerLink` funciona igual ao `navigate()` ou seja, precisamos colocar **dentro de um array**;
+
+```html
+<ng-template #login>
+    <span class="navbar-text">
+        <a class="ml-2" [routerLink]="['']"> Please, login! </a>
+    </span>
+</ng-template>
+```
+
+## SignUp - Mais validações
+
+Para registrar novos usuários, utilizaremos um **POST** na API, mas antes iremos criar nosso componente em _home/signup_
+
+* Como o SignIn ja adicionou o `FormsModule` no nosso `home.module` não será necessário inclui-lo novamente, porém todo `<form>` necessita de um `FormsModule` associado!
+
+```
+ng g c home/signup
+```
+
+```html
+<h4 class="text-center"> Register to embrace a new world!</h4>
+
+<form class="form mt-4">
+    <div class="form-group">
+        <input  placeholder="email" class="form-control" autofocus >
+    </div>
+
+    <div class="form-group">
+        <input placeholder="full name" class="form-control">
+    </div>
+
+    <div class="form-group">
+        <input placeholder="user name" class="form-control">
+    </div>
+
+    <div class="form-group">
+        <input type="password" placeholder="password" class="form-control">
+    </div>
+
+    <button class="btn btn-primary btn-block">Register</button>
+
+    <p>Already a user?<a [routerLink]="['']">Sign In!</a></p>
+</form>
+```
+
+Agora precisamos mapear a Rota, para que seja acessado o SignUp
+
+* Iremos mapear o `<a>` do `SignIn.html` para nossa rota!
+
+```typescript
+const routes: Routes = [
+  {
+    path: 'signup',
+    component: SignupComponent,
+  },
+```
+
+```html
+<p>Not a user?<a [routerLink]="['signup']">Register now</a></p>
+```
+
+Os validadores foram feitos anteriormentes, onde sabemos que precisamos:
+
+1. Associar o `<form>` a um `FormGroup` (incluir no HTML e no TypeScript) -> `signUpForm:FormGroup`
+2. No construtor adicionar o `FormBuilder`, que será utilizado para colocarmos os `Validators` nos inputs;
+3. No `OnInit()` adicionar os validadores -> `this.signUpForm = this.builder.group({email:....})`
+4. Nos `<inputs>` adicionar o mesmo nome que foi utilizado no `this.formBuilder.group`; -> `formControlName="email"`
+5. Desabilitar o botão caso o `<form>` tenha algum problema -> `[disabled]="signUpForm"`
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+
+@Component({
+  selector: 'app-signup',
+  templateUrl: './signup.component.html',
+  styleUrls: ['./signup.component.css'],
+})
+export class SignupComponent implements OnInit {
+  signupForm: FormGroup;
+
+  constructor(private builder: FormBuilder) {
+    this.builder = builder;
+  }
+
+  ngOnInit(): void {
+    this.signupForm = this.builder.group({
+      email: ['', [Validators.required, Validators.email]],
+      fullName: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(5),
+          Validators.maxLength(20),
+        ],
+      ],
+      userName: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^[a-z0-9_\-]+$/),
+          Validators.minLength(5),
+          Validators.maxLength(20),
+        ],
+      ],
+      password: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(5),
+          Validators.maxLength(20),
+        ],
+      ],
+    });
+  }
+}
+
+```
+
+```html
+<h4 class="text-center">Register to embrace a new world!</h4>
+
+<form [formGroup]="signupForm" class="form mt-4">
+  <div class="form-group">
+    <input
+      formControlName="email"
+      placeholder="email"
+      class="form-control"
+      autofocus
+    />
+    <small
+      class="text-danger d-block mt-2"
+      *ngIf="signupForm.get('email').errors?.required"
+      >Email is required
+    </small>
+    <small
+      class="text-danger d-block mt-2"
+      *ngIf="signupForm.get('email').errors?.email"
+      >Invalid email
+    </small>
+  </div>
+
+  <div class="form-group">
+    <input
+      formControlName="fullName"
+      placeholder="full name"
+      class="form-control"
+    />
+    <small
+      class="text-danger d-block mt-2"
+      *ngIf="signupForm.get('fullName').errors?.required"
+      >FullName is required
+    </small>
+    <small
+      class="text-danger d-block mt-2"
+      *ngIf="signupForm.get('fullName').errors?.minlength"
+    >
+      Minimum length is 5
+    </small>
+    <small
+      class="text-danger d-block mt-2"
+      *ngIf="signupForm.get('fullName').errors?.maxlength"
+    >
+      Max length is 20
+    </small>
+  </div>
+
+  <div class="form-group">
+    <input
+      formControlName="userName"
+      placeholder="user name"
+      class="form-control"
+    />
+    <small
+      class="text-danger d-block mt-2"
+      *ngIf="signupForm.get('userName').errors?.required"
+      >FullName is required
+    </small>
+    <small
+      class="text-danger d-block mt-2"
+      *ngIf="signupForm.get('userName').errors?.minlength"
+    >
+      Minimum length is 5
+    </small>
+    <small
+      class="text-danger d-block mt-2"
+      *ngIf="signupForm.get('userName').errors?.maxlength"
+    >
+      Max length is 20
+    </small>
+  </div>
+
+  <div class="form-group">
+    <input
+      formControlName="password"
+      type="password"
+      placeholder="password"
+      class="form-control"
+    />
+    <small
+      class="text-danger d-block mt-2"
+      *ngIf="signupForm.get('password').errors?.required"
+      >FullName is required
+    </small>
+    <small
+      class="text-danger d-block mt-2"
+      *ngIf="signupForm.get('password').errors?.minlength"
+    >
+      Minimum length is 5
+    </small>
+    <small
+      class="text-danger d-block mt-2"
+      *ngIf="signupForm.get('password').errors?.maxlength"
+    >
+      Max length is 20
+    </small>
+  </div>
+
+  <button [disabled]="signupForm.invalid" class="btn btn-primary btn-block">
+    Register
+  </button>
+
+  <p>Already a user?<a [routerLink]="['']"> Sign In!</a></p>
+</form>
+
+```
+
+* Atenção ao `maxlength` -> o length é com letra minúscula!
+
+### Validação Assíncrona - usuario ja existe na API?
 
 
 
