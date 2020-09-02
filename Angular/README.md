@@ -3974,7 +3974,7 @@ export class SignupComponent implements OnInit {
     <small
       class="text-danger d-block mt-2"
       *ngIf="signupForm.get('userName').errors?.required"
-      >FullName is required
+      >UserName is required
     </small>
     <small
       class="text-danger d-block mt-2"
@@ -4000,7 +4000,7 @@ export class SignupComponent implements OnInit {
     <small
       class="text-danger d-block mt-2"
       *ngIf="signupForm.get('password').errors?.required"
-      >FullName is required
+      >Password is required
     </small>
     <small
       class="text-danger d-block mt-2"
@@ -4029,7 +4029,354 @@ export class SignupComponent implements OnInit {
 
 ### Validação Assíncrona - usuario ja existe na API?
 
+A ideia é que ao digitarmos o userName seja consultado se o usuário ja existe e informar ao usuário e para isto **teremos que consultar a API**, portanto o nosso formulário irá precisar de uma **validação assincrona**!
 
+1. Vamos criar o `SignUp.service` que irá fazer um `get` na nosso end-point;
 
+   ```typescript
+   const API = 'http://localhost:3000/';
+   
+   @Injectable({
+     providedIn: 'root',
+   })
+   export class SignupService {
+     constructor(private http: HttpClient) {}
+   
+     checkUserNameTaken(userName: string) {
+       return this.http.get(API + 'user/exists/' + userName);
+     }
+   }
+   ```
 
+Com o Serviço gerado, ja conseguimos perguntar ao back-end se o usuario existe, portanto iremos para a validação. Nossa validação deverá ser um **Validator + Service**, chamaremos de `UserNotTakenValidatorService ` dentro do _home/signUp_;
+
+1. Criaremos o nosso ValidatorService e iremos adicionar no construtor o `SignUpService` pois iremos precisar do `get`;
+
+2. Criaremos uma função chamada `checkUsernameTaken()`, que terá **outra função interna** que receberá um `AbstractControl` que é utilizado para retornar a Validação…
+
+   ```typescript
+   @Injectable({
+     providedIn: 'root',
+   })
+   export class UserNotTakenValidatorService {
+     constructor(private signUpService: SignupService) {}
+   
+     checkUserNameTaken() {
+       return (control: AbstractControl) => {
+         return null; //caso devolva null é pq não houve erro
+       };
+     }
+   }
+   ```
+
+3. Feito isto, iremos adicionar no `SignUp.component` nosso ValidatorService e iremos incluir como um parâmetro a mais do array a validação assícrona;
+
+   ```typescript
+   export class SignupComponent implements OnInit {
+   
+       constructor(
+        	private builder: FormBuilder,
+        	private userNotTakenValidatorService: UserNotTakenValidatorService
+       ) {
+           this.builder = builder;
+           this.userNotTakenValidatorService = userNotTakenValidatorService;
+       }
+    
+       ngOnInit(): void {
+       this.signupForm = this.builder.group({
+           userName: [
+           '',
+           [
+             Validators.required,
+             Validators.pattern(/^[a-z0-9_\-]+$/),
+             Validators.minLength(5),
+             Validators.maxLength(20),
+           ],
+           this.userNotTakenValidatorService.checkUserNameTaken()
+         ],
+   }
+   ```
+
+4. No ValidatorService, teremos uma série de métodos a serem implementados! Queremos devolver **null ou objeto**, para que isto ocorrá será necessário utilizarmos:
+
+   1. `control.valueChanges` -> irá verificar os digitos feito pelo usuário;
+   2. `debounceTime` -> como pegamos os digitos, não queremos ficar procurando a cada digito;
+   3. `switchMap` -> pausa chamadas anteriores para ir no service fazer a busca;
+   4. `map` -> como o `switchMap` retorna um true ou false, o `map` retorna null ou o objeto;
+   5. `first` -> indica que todo o processo foi concluído;
+
+   ```typescript
+   export class UserNotTakenValidatorService {
+     constructor(private signUpService: SignupService) {}
+   
+     checkUserNameTaken() {
+       return (control: AbstractControl) => {
+         return control.valueChanges
+           .pipe(debounceTime(300))
+           .pipe(
+             switchMap((userName) =>
+               this.signUpService.checkUserNameTaken(userName)
+             )
+           )
+           .pipe(map((isTaken) => (isTaken ? { userNameTaken: true } : null))) //userNameTaken sera o validator
+           .pipe(first());
+       };
+     }
+   }
+   ```
+
+5. So resta adicionarmos a nova validação ao HTML
+
+   1. Atenção a variavel `userNameTaken` utilizada no ValidatorService
+
+   ```html
+   <small
+          class="text-danger d-block mt-2"
+          *ngIf="signupForm.get('userName').errors?.userNameTaken"
+   >	Username already taken
+   </small>
+   <small 
+       *ngIf="signupForm.get('userName').valid" class="text-success"
+   >   User available
+   </small>
+   ```
+
+## POST na API
+
+Agora que temos o formulário preenchido e validado, precisamos fazer o método POST em nossa API, mas como iremos pegar os campos?
+
+* Podemos pegar os campos 1 a 1:
+
+  ```typescript
+  this.loginForm = this.formBuilder.group({
+      userName: [''],
+      password: ['']
+  });
+  ```
+
+* Podemos pegar **todos elementos** com o `getRawValue()` e através de uma **interface dos inputs** facilitará nosas vida:
+
+  ```typescript
+  signup() {
+      const newUser = this.signupForm.getRawValue() as NewUser;
+  }
+  ```
+
+Vamos atribuir ao form um `(submit)="signup()"` que irá executar a função que fará efetivamente o POST!
+
+1. Vamos alterar o `<form>`
+
+   ```html
+   <form [formGroup]="signupForm" (submit)="signup()" class="form mt-4">
+   ```
+
+2. Criaremos a Interface que representa os `inputs`:
+
+   ```typescript
+   export interface NewUser {
+     userName: string;
+     email: string;
+     fullName: string;
+     password: string;
+   }
+   ```
+
+3. Adicionaremos no `SignUpService` o método POST, chamado `signup()`
+
+   ```typescript
+   signup(newUser:NewUser){
+       return this.http.post(API + 'user/signup', newUser);
+   }
+   ```
+
+4. No `SignUp.component` iremos agora adicionar no construtor o `SignUpService` e tbm o `Router` pq iremos redirecionar o usuario apos fazer o cadastro para o Login!
+
+   ```typescript
+   export class SignupComponent implements OnInit {
+     signupForm: FormGroup;
+   
+     constructor(
+       private builder: FormBuilder,
+       private userNotTakenValidatorService: UserNotTakenValidatorService,
+       private service:SignupService,
+       private router:Router
+     ) {
+       this.builder = builder;
+       this.userNotTakenValidatorService = userNotTakenValidatorService;
+       this.service = service;
+       this.router = router;
+     }
+   
+   signup(){
+       const newUser = this.signupForm.getRawValue() as NewUser;
+       this.service
+         .signup(newUser)
+         .subscribe(
+           () => this.router.navigate(['']),
+           err => console.log(err)
+         );
+     }
+       
+   }
+   ```
+
+## Rotas Filhas - Children
+
+Vamos imaginar o cenário que queremos que **determinada imagem apareça em toda página**, como aplicar? Bom, **se é em TODA PÁGINA** podemos incluir dentro do `app.component.html`, assim como fizemos com o `Header`.<br>
+
+Mas e se quisermos **uma imagem na página de sigin e signup**? Como podemos pensar em **copiar** a imagem **e colar** nas duas páginas, o que é sinal de `smell code`.<br>
+
+Quando temos um cenário como este, o ideal é **utilizar Rotas Filhas**!
+
+* Implemente a imagem abaixo no canto esquerdo das telas de Signin e Signup;
+
+  <img src="https://s3.amazonaws.com/caelum-online-public/901-angular-parte2/img/home.jpg" width=500>
+
+Como iremos atuar com dois componentes que estão dentro de `home` iremos criar o componente `home.component.ts e html` e as páginas `SignIn` e `SinUp` irão aparece a partir da TAG **`<router-outlet>`**:
+
+```
+ng g c home/
+```
+
+```html
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 mb-2">
+            <img class="img-fluid d-none d-sm-block"
+                src="/assets/img/home.jpg" alt="Welcome">
+        </div>
+        <div class="col-md-6">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>
+```
+
+Agora vem a **rota filha** que deve ser mapeado no `app.routing.ts`, como ela funciona? Dentro da parâmetro `children` ficaram as rotas filhas
+
+* Caso tenha validação do tipo `CanActivate` , este deve ir para a rota pai
+
+```json
+{
+    path: '',
+    component: HomeComponent,
+    canActivate: [AuthGuard],
+    children: [
+        {
+            path: 'signup',
+            component: SignupComponent,
+        },
+        {
+            path: '',
+            component: SigninComponent,
+        },
+    ],
+},
+```
+
+**PORÉM,** podemos ver que o nosso `focus()` não está funcionando no SignUp e no SignIn não funciona ao voltarmos para ele (uma vez que a página não é mais recarregada).<br>
+
+No `SignIn.ts` iremos colocar para fazer um `focus()` assim que o elemento for iniciado!
+
+```typescript
+export class SigninComponent implements OnInit {
+
+  @ViewChild('userNameInput') userNameInput:ElementRef<HTMLInputElement>;
+    
+  ngOnInit(): void {
+      this.loginForm = this.builder.group({
+          username: ['', Validators.required],
+          password: ['', Validators.required],
+      });
+      this.userNameInput.nativeElement.focus();
+  }
+}
+```
+
+No `SignUp.ts` não temos um elemento `@ViewChild`, portanto, iremos adicionar ao `email`:
+
+```typescript
+@ViewChild('emailInput') emailInput: ElementRef<HTMLInputElement>;
+
+ ngOnInit(): void {
+  	//Validators
+	this.emailInput.nativeElement.focus();
+ }
+```
+
+No `signup.html`:
+
+```html
+<input
+       #emailInput
+       formControlName="email"
+       placeholder="email"
+       class="form-control"
+       autofocus
+/>
+```
+
+## Build do Projeto
+
+Para fazer o build do projeto é simples, basta rodarmos um `ng build --prod` e o Angular vai se responsabilizar por fazer todas as otimizações necessárias!<br>
+
+**PORÉM,** temos um problema com as URLs, **caso o back-end** não esteja preparado para **devolver o `index.js`**. Quando o back-end não faz o planejado, devemos tratar dentro de `app.routing.ts` para que para toda URL **seja devolvido um ‘’#‘’**, ficando `http://localhost:4200/#/` ou `http://localhost:4200/#/user/flavio`.
+
+* Se faz necessário habilitar o `useHash`
+
+```typescript
+@NgModule({
+  imports: [RouterModule.forRoot(routes, {useHash: true })],
+  exports: [RouterModule],
+})
+export class AppRoutingModule {}
+```
+
+## Admin vs Visitor - Interceptor
+
+Vamos imaginar o cenário onde queremos que distinguir **o usuário ‘admin’** ou aquele que está apenas visitando. Na nossa aplicação, seria **precisamos verificar se o `Username` do token** é igual ao usuario da página (`user/flavio`).
+
+* Para isto, iremos precisar mandar a cada requisição feita ao back-end o token no header!
+
+Vamos **implementar um interceptador** que irá ver se existe um token e **caso exista** irá fazer um `clone()` do token para as próximas requisições.
+
+1. Em `Auth` iremos criar o Interceptador
+
+```typescript
+ng g interceptor auth/
+```
+
+2. Dentro do interceptador, iremos colocar nosso `TokenService` no construtor
+
+```typescript
+@Injectable()
+export class RequestInterceptor implements HttpInterceptor {
+
+    constructor(private tokenService: TokenService) {}
+
+    intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+        if(this.tokenService.hasToken()){
+            const token = this.tokenService.getToken();
+            request = request.clone({
+                setHeaders:{
+                    'x-access-token':token
+                }
+            });
+        }
+        return next.handle(request);
+    }
+}
+```
+
+3. Até o momento, o handle irá receber nossa `req` modificada, porém precisamos avisar nosso `core.module` que temos um interceptador
+
+```typescript
+providers: [
+    {
+        provide: HTTP_INTERCEPTORS,
+        useClass: RequestInterceptor,
+        multi: true
+    }
+]
+```
 
