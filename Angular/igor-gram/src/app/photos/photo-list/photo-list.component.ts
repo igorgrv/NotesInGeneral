@@ -8,7 +8,6 @@ import { debounceTime } from 'rxjs/operators';
 @Component({
   selector: 'app-photo-list',
   templateUrl: './photo-list.component.html',
-  styleUrls: ['./photo-list.component.css'],
 })
 export class PhotoListComponent implements OnInit {
   photos: iPhoto[] = [];

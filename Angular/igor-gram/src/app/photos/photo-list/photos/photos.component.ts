@@ -10,7 +10,6 @@ import { iPhoto } from '../../photo/iPhoto';
 @Component({
   selector: 'app-photos',
   templateUrl: './photos.component.html',
-  styleUrls: ['./photos.component.css'],
 })
 export class PhotosComponent implements OnChanges {
   @Input() photos: iPhoto[] = [];

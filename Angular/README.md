@@ -4274,6 +4274,31 @@ Agora vem a **rota filha** que deve ser mapeado no `app.routing.ts`, como ela fu
 },
 ```
 
+No sentindo de organização, iremos utilizar da técnica do `pathMatch` e `redirectTo` para que nossa URL fique `home/` `home/signup`
+
+```typescript
+{
+    path: '',
+    pathMatch: 'full',
+    redirectTo: 'home'
+  },
+  {
+    path: 'home',
+    component: HomeComponent,
+    canActivate: [AuthGuard],
+    children: [
+      {
+        path: 'signup',
+        component: SignupComponent,
+      },
+      {
+        path: '',
+        component: SigninComponent,
+      },
+    ],
+  },
+```
+
 **PORÉM,** podemos ver que o nosso `focus()` não está funcionando no SignUp e no SignIn não funciona ao voltarmos para ele (uma vez que a página não é mais recarregada).<br>
 
 No `SignIn.ts` iremos colocar para fazer um `focus()` assim que o elemento for iniciado!
@@ -4331,6 +4356,110 @@ Para fazer o build do projeto é simples, basta rodarmos um `ng build --prod` e 
 })
 export class AppRoutingModule {}
 ```
+
+## Lazy Loading
+
+Dentro do SPA, sabemos que o conceito principal é de que **toda página seja carregada** no momento do acesso, porém, pense em um cenário que determinada página é **raramente acessada**, teria a necessidade de carregarmos ela toda vez? E se pudessemos **faziar o que será carregado**, como por exemplo a tela de **Login e SignUp**?<br>
+
+O lazy loading serve para que a gente **divida a SPA**, de modo que quando fizermos o build, deixaremos nosso arquivo `main` mais ‘leve’.<br>
+
+### Implementando Lazy Loading
+
+Temos que ter em mente é de que **“cada modulo que queremos em lazy loading precisa do próprio `routing.module.ts`!”**
+
+1. Vamos criar o `home-routing.module.ts` fazendo uma copia do arquivo raiz e deixando somente as rotas ja mapeadas do routes;
+
+2. Como o `home-routing` se trata de uma rota filha da raiz, devemos trocar o `forRoot` por `forChild`
+
+   ```typescript
+   const routes: Routes = [
+     {
+       path: '',
+       component: HomeComponent,
+       canActivate: [AuthGuard],
+       children: [
+         {
+           path: '',
+           component: SigninComponent,
+         },
+         {
+           path: 'signup',
+           component: SignupComponent,
+         },
+       ],
+     },
+   ];
+   
+   @NgModule({
+     imports: [RouterModule.forChild(routes)],
+     exports: [RouterModule],
+   })
+   export class HomeRoutingModule {}
+   
+   ```
+
+3. E no `app-routing.module` iremos retirar aquilo q se refere ao `Home` e infomar onde se encontrará nosso modulo com a rota filha com o `loadChildren`
+
+   ```typescript
+   const routes: Routes = [
+     {
+       path: 'user/:username',
+       component: PhotoListComponent,
+       resolve: { photos: PhotoListResolver },
+     },
+     {
+       path: '',
+       pathMatch: 'full',
+       redirectTo: 'home',
+     },
+     {
+       path: 'home',
+       loadChildren: './home/home.module#HomeModule',
+     },
+   ];
+   
+   @NgModule({
+     imports: [RouterModule.forRoot(routes, {useHash: true })],
+     exports: [RouterModule],
+   })
+   export class AppRoutingModule {}
+   ```
+
+4. Devemos retirar também do `app.module` a importação do `HomeModule` e o `HomeModule` precisa importar o `HomeRoutingModule`!
+
+   ```typescript
+   //app.module
+   @NgModule({
+     declarations: [AppComponent],
+     imports: [
+       BrowserModule,
+       PhotosModule,
+       CoreModule,
+       VMessageModule,
+       AppRoutingModule,
+     ],
+     providers: [],
+     bootstrap: [AppComponent],
+   })
+   export class AppModule {}
+   
+   //home.module
+   @NgModule({
+     declarations: [SigninComponent, SignupComponent, HomeComponent],
+     imports: [
+       CommonModule,
+       ReactiveFormsModule,
+       RouterModule,
+       FormsModule,
+       ReactiveFormsModule,
+       VMessageModule,
+       HomeRoutingModule
+     ],
+   })
+   export class HomeModule {}
+   ```
+
+   
 
 ## Admin vs Visitor - Interceptor
 
