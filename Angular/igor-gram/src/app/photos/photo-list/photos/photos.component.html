@@ -1,7 +1,7 @@
 <ol class="list-unstyled">
   <li *ngFor="let col of row" class="row">
     <div *ngFor="let photo of col" class="col-4">
-      <app-photo [url]="photo.url" [description]="teste"> </app-photo>
+      <app-photo [url]="photo.url" [description]="photo.description"> </app-photo>
     </div>
   </li>
 </ol>
