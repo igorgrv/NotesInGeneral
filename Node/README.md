@@ -564,6 +564,44 @@ método(){
 
 ### Gravação - POST
 
+Precisamos criar um `form` e uma **nova rota** para acessar este formulário!
+
+1. Criar o arquivo `form.marko` em `srv/app/view/livros/form`
+
+   ```html
+   <html>
+     <body>
+       <h1>Cadastro de livros</h1>
+       <form action="/livros" method="post">
+         <input type="hidden" id="id" name="id"/>
+         <div>
+           <label for="titulo">Titulo:</label>
+           <input type="text" id="titulo" name="titulo" placeholder="coloque o titulo"/>
+         </div>
+         <div>
+           <label for="preco">Preço:</label>
+           <input type="text" id="preco" name="preco" placeholder="150.25"/>
+         </div>
+         <div>
+           <label for="descricao">Descrição:</label>
+           <textarea cols="20" rows="10" id="descricao" name="descricao" placeholder="fale sobre o livro"/>
+         </div>
+         <input type="submit" value="Salvar"/>
+       </form>
+     </body>
+   </html>
+   ```
+
+2. Adicionar a rota `/livros/form` no arquivo `routes.js`
+
+   ```javascript
+   app.get('/livros/form', (req, resp) => {
+       resp.marko(require('../views/livros/form/form.marko'));
+     });
+   ```
+
+<br>
+
 Para realizar um POST, teremos que adicionar um **novo módulo**, chamado de **`body-parser`**:
 
 ```
