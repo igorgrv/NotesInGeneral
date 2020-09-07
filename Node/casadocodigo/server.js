@@ -1,5 +1,4 @@
-const express = require('express');
-const app = express();
+const app = require('./src/config/custom-express');
 
 app.listen(3000, function () {
   console.log('teste da chamada');
