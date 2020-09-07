@@ -82,12 +82,16 @@ Para criarmos um **servidor com Node** utilizaremos do **Express.js**, mas devem
 
 3. Para instalar o Express, iremos rodar o `npm i express@4.16.3 --save-exact`;
 
+4. Criar o arquivo `server.js` na pasta raíz;
+
 Mas precisamos já começar a **organizar a estrutura de pastas** do projeto
 
 ```
 src
 |--- app	-> fica toda lógica do projeto
 |--- config -> fica toda config. do projeto
+server.js
+package.json
 ```
 
 ### Criando servidor c/ Node
@@ -289,6 +293,18 @@ Portanto, o ideal é colocar dentro do `express.js` as chamadas as rotas, portan
 server.js -> chama custom-express.js -> chama o routes.js
 ```
 
+```javascript
+const express = require('express');
+const app = express();
+const routes = require('../app/routes/routes');
+
+routes(app);
+
+module.exports = app;
+```
+
+
+
 ## Nodemon
 
 O Nodemon nos permite atualizar nosso código e não precisar ficar reiniciando o servidor toda hora!
@@ -321,10 +337,8 @@ Agora é possível rodar o código com `npm start`
 Para começar utilizar o `Marko` precisamos instala-lo com  `npm install marko@4.13.4-1 --save-exact` e também precisamos pedir para nosso **nodemon** para ignorar o arquivo:
 
 ```
-
+nodemon server.js --ignore *.marko.js
 ```
-
-
 
 ### Template Estático
 
@@ -441,6 +455,8 @@ Com a configuração feita, iremos trabalhar com o banco de dados no `routes.js`
 
 ## DAO
 
+### Listagem  - GET
+
 Com o padrão DAO, centralizamos tudo ao que se refere de **aceso ao BD** a uma classe.
 
 1. Criaremos `src/app/dao` a classe `LivrosDao`;
@@ -499,7 +515,7 @@ Com o padrão DAO, centralizamos tudo ao que se refere de **aceso ao BD** a uma 
 
    
 
-### Com Promise
+### Listagem - c/ Promise
 
 E se invés de passarmos um parâmetro ao `lista(callback)` não passassemos parâmetro algum? Isto **é possível com o `Promise`**!<br>
 
@@ -546,4 +562,88 @@ método(){
    });
    ```
 
+### Gravação - POST
+
+Para realizar um POST, teremos que adicionar um **novo módulo**, chamado de **`body-parser`**:
+
+```
+npm i body-parser
+```
+
+Este módulo, é responsável por habilitar a leitura do `req.body` e deverá ser configurado no `express.js`.
+
+1. Devemos fazer um `require` no `body-parser`;
+
+2. Usar o método `use()` do `app`, onde iremos passar o `body-parser`;
+
+3. Utilizar o método `urlEnconded( extended: true)` -> irá permitir retornar um json;
+
+   ```javascript
+   const app = express();
+   const bodyParser = require ('body-parser');
    
+   app.use(
+     bodyParser.urlencoded({
+       extended: true,
+     })
+   );
+   
+   const routes = require('../app/routes/routes');
+   routes(app);
+   ```
+
+Deste modo, podemos receber do um `json` do `console.log`!
+
+```json
+{ id: '', titulo: 'teste', preco: '12', descricao: 'teste2' }
+```
+
+Agora devemos fazer a inserção no banco de dados!
+
+1. Dentro da classe `LivrosDao` iremos criar o método `adiciona()` que deverá receber um `livro` (proveniente do req.body);
+
+2. Dentro do método `adiciona(livro)` iremos utilizar a `promise` e o método `run()` de `db`;
+
+   1. O método `run()` irá receber 3 parâmetros:
+      1. String SQL;
+      2. Os valores a serem substituidos do `?,?,?`;
+      3. Retorno do resolve e reject em caso de erro;
+
+   ```javascript
+   // adiciona({titulo,preco,descricao}) -> tbm é possivel, inves de passar o objeto
+   adiciona(livro) {
+       return new Promise((resolve, reject) => {
+           this._db.run(
+               `
+               INSERT INTO LIVROS (
+               titulo,
+               preco,
+               descricao
+               ) values (?, ?, ?)
+               `,
+               [livro.titulo, livro.preco, livro.descricao],
+               function (err) {
+                   if (err) {
+                       console.log(err);
+                       return reject('Erro na inserção do BD');
+                   }
+                   resolve();
+               }
+           );
+       });
+   }
+   ```
+
+Agora podemos alterar o `routes.js` passando o novo método adiciona, onde queremos após ter sido feita a requisição, seja redirecionado para tela `/livros`:
+
+```javascript
+app.post('/livros', (req, resp) => {
+    console.log(req.body);
+    const livroDao = new LivrosDao(db);
+    livroDao
+      .adiciona(req.body)
+      .then(resp.redirect('/livros'))
+      .catch((err) => console.log(err));
+});
+```
+
