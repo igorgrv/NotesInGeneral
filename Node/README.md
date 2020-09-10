@@ -455,7 +455,7 @@ Com a configuração feita, iremos trabalhar com o banco de dados no `routes.js`
 
 ## DAO
 
-### Listagem  - GET
+### GET ALL
 
 Com o padrão DAO, centralizamos tudo ao que se refere de **aceso ao BD** a uma classe.
 
@@ -515,7 +515,7 @@ Com o padrão DAO, centralizamos tudo ao que se refere de **aceso ao BD** a uma 
 
    
 
-### Listagem - c/ Promise
+### GET ALL - c/ Promise
 
 E se invés de passarmos um parâmetro ao `lista(callback)` não passassemos parâmetro algum? Isto **é possível com o `Promise`**!<br>
 
@@ -562,7 +562,7 @@ método(){
    });
    ```
 
-### Gravação - POST
+### POST + body-parser
 
 Precisamos criar um `form` e uma **nova rota** para acessar este formulário!
 
@@ -602,7 +602,7 @@ Precisamos criar um `form` e uma **nova rota** para acessar este formulário!
 
 <br>
 
-Para realizar um POST, teremos que adicionar um **novo módulo**, chamado de **`body-parser`**:
+Para realizar um POST, teremos que adicionar um **MIDDLEWARE**, chamado de **`body-parser`**:
 
 ```
 npm i body-parser
@@ -613,6 +613,32 @@ Este módulo, é responsável por habilitar a leitura do `req.body` e deverá se
 1. Devemos fazer um `require` no `body-parser`;
 
 2. Usar o método `use()` do `app`, onde iremos passar o `body-parser`;
+
+   ```javascript
+   // o método use() é utilizado para acrescentar um middleware
+   // 1º parâmetro é a URL que acionará o middleware e o 2º a função que define oq o mid. irá fazer
+   
+   // A função, recebe 3 parâmetros (req, res, next) - o next avança para o prox. mid.
+   // caso não haja mais nenhum mid. ele irá terminar a func. ativa
+   app.use('*', (req, res, next) => {
+      console.log('1.1');
+      next();
+      console.log('1.2');
+   });
+   
+   app.use('*', (req, res, next) => {
+      console.log('2.1');
+      next();
+      console.log('2.2');
+   });
+   
+   app.get('/livros', function(req, resp) {
+          console.log('listagem livros')
+   }
+   
+   // irá imprimir
+   // 1.1 2.1 listagem livros 2.2 1.2
+   ```
 
 3. Utilizar o método `urlEnconded( extended: true)` -> irá permitir retornar um json;
 
@@ -685,3 +711,368 @@ app.post('/livros', (req, resp) => {
 });
 ```
 
+### GET BY ID
+
+Para buscar por id, iremos utilizar o método `get` do `db`, onde invés de devolvermos todos os resultado, iremos devolver o id em específico:
+
+```javascript
+buscaPorId(id) {
+    return new Promise((resolve, reject) => {
+        this._db.get(
+            `
+            	SELECT * FROM livros WHERE id = ?
+            `,
+            [id],
+            (err, livro) => {
+                if (err) return reject('Nenhum livro encontrado');
+                return resolve(livro);
+            }
+        );
+    });
+}
+```
+
+### DELETE + Arquivos Estáticos
+
+Como o `Delete` não queremos que tenha nenhum retorno, podemos utilizar o método `run` do `db`:
+
+```javascript
+remove(id) {
+    return new Promise((resolve, reject) => {
+        this._db.run(
+            `
+            DELETE FROM livros WHERE id = ?
+            `,
+            [id],
+            (err) => {
+                if (err) return reject('Nenhum livro encontrado para remoção');
+                resolve();
+            }
+        );
+    });
+}
+```
+
+Com o DAO pronto, agora precisamos:
+
+* Adicionar ao `lista.marko` uma tag `<a>` para que seja feita a remoção;
+* Criar o arquivo estático do ajax para efetuar remoção;
+  * Adiciona um middleware para o arquivo estático;
+* Registrar a rota para que seja chamado o metodo `remove(id)`;
+
+Começando pelo alteração no `lista.marko`:
+
+```html
+<table id="livros">
+    <tr>
+        <td>ID</td>
+        <td>Título</td>
+        <td>Preço</td>
+        <td>Editar</td>
+        <td>Remover</td>
+    </tr>
+    <tr id="livro_${livro.id}" for (livro in data.livros)>
+        <td>${livro.id}</td>
+        <td>${livro.titulo}</td>
+        <td>${livro.preco}</td>
+        <td><a href="#">Editar</a></td>
+        <td><a href="#" data-ref="${livro.id}" data-type="remocao">Remover</a></td>
+    </tr>
+</table>
+
+<!-- arquivo responsavel por fazer a remoção via ajax -->
+<script src="/estatico/js/remove-livro.js"></script>
+```
+
+O arquivo `remove-livro.js` deverá ficar na pasta `src/app/public/js` (no HTML deve ficar com a rota cadastrada no `express.js`);
+
+```javascript
+let tabelaLivros = document.querySelector('#livros');
+tabelaLivros.addEventListener('click', (evento) => {
+  let elementoClicado = evento.target;
+
+  if (elementoClicado.dataset.type == 'remocao') {
+    let livroId = elementoClicado.dataset.ref;
+    fetch(`http://localhost:3000/livros/${livroId}`, { method: 'DELETE' })
+      .then((resposta) => {
+        let tr = elementoClicado.closest(`#livro_${livroId}`);
+        tr.remove();
+      })
+      .catch((erro) => console.log(erro));
+  }
+});
+
+```
+
+Dentro do `express.js` iremos cadastrar uma rota e um middleware para este arquivo estático!
+
+```javascript
+// devemos colocar antes do body-parser
+app.use('/estatico', express.static('src/app/public'));
+app.use(bodyParser.urlencoded({ extended: true }));
+```
+
+Por último, devemos fazer o cadastro da rota, conforme definido no `remove-livro.js`, com o `app.delete`:
+
+```javascript
+app.delete('/livros/:id', (req, resp) => {
+   const id = req.params.id;
+    
+    const livroDao = new LivroDao(db);
+    livroDao
+        .remove(id)
+    	.then( () => resp.status(200).end())
+    	.catch((err) => console.log(err));
+});
+```
+
+
+
+### UPDATE  +  method-override
+
+Segue o mesmo padrão do `POST` e `DELETE` para a classe `LivroDao`;
+
+```javascript
+atualiza(livro) {
+    return new Promise((resolve, reject) => {
+        this._db.run(
+            `
+            UPDATE livros
+            SET titulo = ?,
+            preco = ?,
+            descricao = ?
+            WHERE id = ?
+            `,
+            [livro.titulo, livro.preco, livro.descricao, livro.id],
+            (err) => {
+                if (err) return reject('Nenhum livro encontrado para remoção');
+                resolve();
+            }
+        );
+    });
+}
+```
+
+Para realizar uma atualização dos dados, iremos **utilizar o mesmo formulário para adição** e para isto, precisaremos:<br>
+
+No `form.marko`:
+
+* Inserir um `value` para cada `<input>` -> contendo a variável que será definida no `routes.js` (`${data.livro.id}`);
+* Adicionar uma `<div>` com um `if` verificando se existe algum id preenchido;
+* Incluir o `<input hidden>` que o **middleware Method-Override**  pede, com o tipo `PUT`;
+
+```html
+<form action="/livros" method="post">
+    <div if(data.livro.id)>
+        <input type="hidden" name="_method" value="PUT">
+        <input type="hidden" id="id" name="id" value="${data.livro.id}" />
+    </div>
+    <div>
+        <label for="titulo">Titulo:</label>
+        <input type="text" id="titulo" name="titulo" value="${data.livro.titulo}" placeholder="coloque o titulo" />
+    </div>
+    <div>
+        <label for="preco">Preço:</label>
+        <input type="text" id="preco" name="preco" value="${data.livro.preco}" placeholder="150.25" />
+    </div>
+    <div>
+        <label for="descricao">Descrição:</label>
+        <textarea cols="20" rows="10"  id="descricao" name="descricao" placeholder="fale sobre o livro">${data.livro.descricao}</textarea>
+    </div>
+
+    <input type="submit" value="Salvar" />
+</form>
+```
+
+No `express.js`:
+
+* Instalar com `npm i method-override`;
+* Adicionar o middleware **depois do `body-parser`**!
+
+```javascript
+const bodyParser = require('body-parser');
+const methodOverride = require ('method-override');
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+  methodOverride(function (req, res) {
+    if (req.body && typeof req.body === 'object' && '_method' in req.body) {
+      var method = req.body._method;
+      delete req.body._method;
+      return method;
+    }
+  })
+);
+```
+
+No `routes.js`:
+
+* Teremos de alterar o `app.get('/livros/form')` para que seja passado um `livro : {}`;
+* Adicionar o método `app.put` que será identico ao `app.post` porém usando o `livroDao.atualiza`;
+* Adicionar um `app.get('/livros/form/:id')` para a TAG `<a>` que ficará no `list.marko`;
+
+```javascript
+app.get('/livros/form', (req, resp) => {
+    resp.marko(require('../views/livros/form/form.marko'), { livro: {} });
+});
+
+app.put('/livros', (req, resp) => {
+    console.log(req.body);
+    const livroDao = new LivroDao(db);
+    livroDao
+        .atualiza(req.body)
+        .then(resp.redirect('/livros'))
+        .catch((err) => console.log(err));
+});
+```
+
+No `list.marko`:
+
+* Adicionar a URL a TAG `<a>`:
+
+```html
+<tr id="livro_${livro.id}" for (livro in data.livros)>
+    <td>${livro.id}</td>
+    <td>${livro.titulo}</td>
+    <td>${livro.preco}</td>
+    <td><a href="/livros/form/${livro.id}">Editar</a></td>
+    <td><a href="#" data-ref="${livro.id}" data-type="remocao">Remover</a></td>
+</tr>
+```
+
+
+
+## Tratando erros  404 e 500
+
+Atualmente se entrarmos em uma **rota inexistente** iremos tomar um **erro 404** (página não encontrada), assim como como se inserirmos uma rota **com id** incorreto, iremos tomar um **erro 500** (erro no back-end).<br>
+
+Para direcionarmos a uma nova página iremos **precisar de um Middleware** que verifique o erro e direcione para uma página de erro!<br>**PORÉM,** precisamos nos atentar que **ERROS VÃO NO FINAL DO EXPRESS**, pois se trata de um middleware onde a ordem importa!.
+
+* Middleware para o erro 404:
+
+  ```javascript
+  app.use((req, res, next) => (
+    res.status(404).marko(require('../app/views/base/erros/404.marko'))
+  ));
+  ```
+
+* Middleware para o error 500 -> devemos **atribuir 4º parâmetro** para que o express entenda que se trata de um erro do servidor
+
+  ```javascript
+  app.use((error, req, res, next) => (
+    res.status(500).marko(require('../app/views/base/erros/500.marko'))
+  ));
+  ```
+
+HTML:
+
+```html
+<!-- 500.marko -->
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/estatico/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/estatico/css/fontawesome.min.css" />
+    <link rel="stylesheet" href="/estatico/css/casadocodigo.css" />
+</head>
+<body>
+    <header class="cabecalhoPrincipal">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-4">
+                    <h1 class="logo"><img src="/estatico/imagens/logo-casadocodigo.svg" alt="Casa do Código" /></h1>
+                </div>
+                <div class="cabecalhoPrincipal-navegacao col-8">
+                    <a href="#" class="login">
+                        <i class="fas fa-sign-in-alt"></i>Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="conteudoPrincipal">
+        <div class="container">
+            <h1>Opss!</h1>
+            
+            <p>Houve um problema. Tente mais tarde.</p>
+            <a href="/">Voltar</a>
+        </div>
+    </main>
+    <footer class="rodape">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-4">
+                    <img src="/estatico/imagens/logo-rodape.svg" class="logo-rodape" />
+                </div>
+                <div class="col-8">
+                    <ul class="redesSociais">
+                        <li><a href="http://www.facebook.com/casadocodigo" class="compartilhar-facebook" target="_blank">/CasaDoCodigo</a></li>
+                        <li><a href="http://www.twitter.com/casadocodigo" class="compartilhar-twitter" target="_blank">@casadocodigo</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
+```
+
+
+
+## Validações - express-validator
+
+O **Express-validator** é uma biblioteca cheia de validações já pré-definidas, ou que podem ser customizadas também! Que nos auxilia nas etapas de verificação dos campos.
+
+Para fazer as validações com o `express-validator`, precisaremos:
+
+1. Instalar o `express-validator`: `npm i express-validator`;
+
+2. Adicionar no `routes.js` a constante `check, validationResult` do `express-validator`;
+
+3. No `app.post` iremos fazer a validação, onde basta criaremos um `array` antes da chamada `req, res`, passando um `check` nos campos;
+
+4. No callback, é chamada a função `validationResult(req)`;
+
+   ```javascript
+   const { check, validationResult } = require ('express-validator');
+   
+   app.post(
+       '/livros',
+       [
+           check('titulo').isLength({ min: 5 }).withMessage('Necessário ter no mínimo 5 caracteres'),
+           check('preco').isCurrency().withMessage('Necessário ser um valor correto'),
+       ],
+       (req, resp) => {
+           console.log(req.body);
+   
+           const erros = validationResult(req);
+           console.log(JSON.stringify(erros));
+           if (!erros.isEmpty()) {
+               return resp.marko(require('../views/livros/form/form.marko'), {
+                   livro: req.body,
+                   errosValidacao: erros.array(),
+               });
+           }
+           const livroDao = new LivroDao(db);
+           livroDao
+               .adiciona(req.body)
+               .then(resp.redirect('/livros'))
+               .catch((err) => console.log(err));
+       }
+   );
+   ```
+
+   ```html
+   <div class="container">
+       <h1>Cadastro de livros</h1>
+   
+       <div if(data.errosValidacao)>
+           <div class="alert alert-danger" for(erro in data.errosValidacao)>
+               ${erro.param} - ${erro.msg}
+           </div>
+       </div>
+   
+       <form action="/livros" method="post">
+   ```
+
+   
