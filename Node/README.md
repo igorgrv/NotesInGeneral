@@ -614,6 +614,8 @@ Este módulo, é responsável por habilitar a leitura do `req.body` e deverá se
 
 2. Usar o método `use()` do `app`, onde iremos passar o `body-parser`;
 
+   1. Exemplo:
+
    ```javascript
    // o método use() é utilizado para acrescentar um middleware
    // 1º parâmetro é a URL que acionará o middleware e o 2º a função que define oq o mid. irá fazer
@@ -1075,4 +1077,204 @@ Para fazer as validações com o `express-validator`, precisaremos:
        <form action="/livros" method="post">
    ```
 
+# MVC
+
+![mvc](https://caelum-online-public.s3.amazonaws.com/1021-node-mvc-autenticacao-autorizacao/Transcri%C3%A7%C3%B5es/Imagens/casadocodigo7.png)
+
+## Controller
+
+Atualmente nosso arquivo `routes.js` esta com **muita responsabilidade** e para isto o **padrão MVC** cai como uma luva!<br>
+
+O Controller será responsável por cada `function(req,res)` do `routes`, para isto, precisaremos:
+
+1. Criar dentro de `app/controllers` as classes `base-controller.js` e  `livro-controller.js`
+
+2. Estas classes terão todas as funções utilizadas no `routes.js`;
+
+3. No `routes.js` iremos chamar ambas as classes e seus respectivos métodos;
+
+   ```javascript
+   // routes.js
+   const { check } = require('express-validator');
    
+   const LivroController = require('../controllers/livro-controller');
+   const livroController = new LivroController();
+   
+   const BaseController = require('../controllers/base-controller');
+   const baseController = new BaseController();
+   
+   module.exports = (app) => {
+     app.get('/', baseController.home());
+   
+     app.get('/livros', livroController.lista());
+   
+     app.get('/livros/form', livroController.formularioCadastro());
+   
+     app.post(
+       '/livros',
+       [
+         check('titulo').isLength({ min: 5 }).withMessage('Necessário ter no mínimo 5 caracteres'),
+         check('preco').isCurrency().withMessage('Necessário ser um valor correto'),
+       ],
+       livroController.cadastra()
+     );
+   
+     app.get('/livros/form/:id', livroController.formularioEdicao());
+   
+     app.put('/livros', livroController.edita());
+   
+     app.delete('/livros/:id', livroController.remove());
+   };
+   ```
+
+   ```javascript
+   // base-controller.js
+   class BaseController {
+     home() {
+       return (req, res) => res.marko(require('../views/base/home/home.marko'));
+     }
+   }
+   
+   module.exports = BaseController;
+   
+   
+   // livro-controller.js
+   const LivroDao = require('../dao/LivroDao');
+   const db = require('../../config/database');
+   const { validationResult } = require('express-validator');
+   
+   class LivroController {
+     lista() {
+       return (req, res) => {
+         const livroDao = new LivroDao(db);
+         livroDao
+           .lista()
+           .then((livros) =>
+             res.marko(require('../views/livros/lista/lista.marko'), {
+               livros: livros,
+             })
+           )
+           .catch((erro) => console.log(erro));
+       };
+     }
+   
+     formularioCadastro() {
+       return (req, resp) => {
+         resp.marko(require('../views/livros/form/form.marko'), { livro: {} });
+       };
+     }
+   
+     cadastra() {
+       return (req, resp) => {
+         console.log(req.body);
+   
+         const erros = validationResult(req);
+         console.log(JSON.stringify(erros));
+         if (!erros.isEmpty()) {
+           return resp.marko(require('../views/livros/form/form.marko'), {
+             livro: req.body,
+             errosValidacao: erros.array(),
+           });
+         }
+         const livroDao = new LivroDao(db);
+         livroDao
+           .adiciona(req.body)
+           .then(resp.redirect('/livros'))
+           .catch((err) => console.log(err));
+       };
+     }
+   
+     formularioEdicao() {
+       return (req, resp) => {
+         const { id } = req.params;
+   
+         const livroDao = new LivroDao(db);
+         livroDao
+           .buscaPorId(id)
+           .then((livro) => {
+             resp.marko(require('../views/livros/form/form.marko'), {
+               livro: livro,
+             });
+           })
+           .catch((err) => console.log(err));
+       };
+     }
+   
+     edita() {
+       return (req, resp) => {
+         console.log(req.body);
+         const livroDao = new LivroDao(db);
+         livroDao
+           .atualiza(req.body)
+           .then(resp.redirect('/livros'))
+           .catch((err) => console.log(err));
+       };
+     }
+   
+     remove() {
+       return (req, resp) => {
+         const id = req.params.id;
+   
+         const livroDao = new LivroDao(db);
+         livroDao
+           .remove(id)
+           .then(() => resp.status(200).end())
+           .catch((err) => console.log(err));
+       };
+     }
+   }
+   
+   module.exports = LivroController;
+   
+   ```
+
+### Encapsulando as rotas
+
+Dentro do `LivroController` vemos que repetimos a rota `/livros` e no `routes.js` repetimos varias vezes também! Um bom modo de encapsular as rotas é **criar um método estático** chamados `rotas()` que erá **responsável por dedevolver** um objeto javascript com todas as rotas!
+
+```javascript
+class LivroController {
+    static rotas() {
+        return {
+            lista: '/livros',
+            cadastro: '/livros/form',
+            edicao: '/livros/form/:id',
+            delecao: '/livros/:id',
+        };
+    }
+}
+```
+
+Desta forma os métodos irão chamar `rotas().lista`:
+
+```javascript
+.then(resp.redirect(LivroController.rotas().lista))
+```
+
+e no `routes.js`:
+
+```javascript
+module.exports = (app) => {
+    app.get('/', baseController.home());
+
+    app.get(LivroController.rotas().lista, livroController.lista());
+
+    app.get(LivroController.rotas().cadastro, livroController.formularioCadastro());
+
+    app.post(
+        LivroController.rotas().lista,
+        [
+            check('titulo').isLength({ min: 5 }).withMessage('Necessário ter no mínimo 5 caracteres'),
+            check('preco').isCurrency().withMessage('Necessário ser um valor correto'),
+        ],
+        livroController.cadastra()
+    );
+
+    app.get(LivroController.rotas().edicao, livroController.formularioEdicao());
+
+    app.put(LivroController.rotas().lista, livroController.edita());
+
+    app.delete(LivroController.rotas().delecao, livroController.remove());
+};
+```
+
