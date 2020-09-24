@@ -1,6 +1,7 @@
 const LivroDao = require('../dao/LivroDao');
 const db = require('../../config/database');
 const { validationResult } = require('express-validator');
+const template = require('../views/template');
 
 class LivroController {
   static rotas() {
@@ -18,7 +19,7 @@ class LivroController {
       livroDao
         .lista()
         .then((livros) =>
-          res.marko(require('../views/livros/lista/lista.marko'), {
+          res.marko(template.livro.lista, {
             livros: livros,
           })
         )
@@ -28,7 +29,7 @@ class LivroController {
 
   formularioCadastro() {
     return (req, resp) => {
-      resp.marko(require('../views/livros/form/form.marko'), { livro: {} });
+      resp.marko(template.livro.form, { livro: {} });
     };
   }
 
@@ -39,7 +40,7 @@ class LivroController {
       const erros = validationResult(req);
       console.log(JSON.stringify(erros));
       if (!erros.isEmpty()) {
-        return resp.marko(require('../views/livros/form/form.marko'), {
+        return resp.marko(template.livro.form, {
           livro: req.body,
           errosValidacao: erros.array(),
         });
@@ -60,7 +61,7 @@ class LivroController {
       livroDao
         .buscaPorId(id)
         .then((livro) => {
-          resp.marko(require('../views/livros/form/form.marko'), {
+          resp.marko(template.livro.form, {
             livro: livro,
           });
         })

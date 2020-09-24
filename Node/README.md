@@ -1278,3 +1278,344 @@ module.exports = (app) => {
 };
 ```
 
+### Agregação de rotas + app.route
+
+O `routes.js` esta melhor, porém ainda possui algumas rotas iguais, como:
+
+```javascript
+app.get(LivroController.rotas().cadastro, livroController.formularioCadastro());
+app.post(LivroController.rotas().cadastro, Livro.validacoes(), livroController.cadastra());
+app.put(LivroController.rotas().cadastro, livroController.edita());
+```
+
+Para este caso o `express` fornece um método chamado `route()` que nos permite **passar a URL** e os método HTTP que esta URL possuirá!
+
+1. No `routes.js` iremos adicionar o método `app.route()` passando o `LivroController.rotas().cadastro`;
+
+2. Como **método complementar** iremos adicionar o `get, post e put`;
+
+   ```javascript
+   app.route(LivroController.rotas().cadastro)
+       .get(livroController.formularioCadastro())
+       .post(Livro.validacoes(), livroController.cadastra())
+       .put(livroController.edita());
+   ```
+
+## Model
+
+De toda refatoração feita, ainda no arquivo `routes.js` ficaram as **validações**, o que não é de responsabilidade do `routes`, portanto, por se tratar de um validação de `livro` iremos:
+
+1. Criar a pasta `src/app/model` e dentro inserir a classe `livro.js`;
+
+2. Iremos retirar o código do `routes.js` que se refere a validações:
+
+   ```javascript
+   // const { check } = require('express-validator'); -> irá para livro
+   
+   const LivroController = require('../controllers/livro-controller');
+   const livroController = new LivroController();
+   
+   module.exports = (app) => {
+       app.post(
+           LivroController.rotas().lista,
+          // irá para o livro.js
+          //
+          // [
+          //     check('titulo').isLength({ min: 5 }).withMessage('Necessário ter no mínimo 5 caracteres'),
+          //     check('preco').isCurrency().withMessage('Necessário ser um valor correto'),
+          // ],
+           livroController.cadastra()
+       );
+       
+   }
+   ```
+
+3. Adicionaremos no `livro.js` e substituiremos no `routes.js`, que agora chamará o **model** `livro`;
+
+   1. **_para que seja possível utilizar a função `valicadacoes()` é necessário utilizar o `static`_**;
+
+   ```javascript
+   const { check } = require('express-validator');
+   
+   class Livro {
+   
+       static validacoes() {
+           return [
+               check('titulo').isLength({ min: 5 }).withMessage('Necessário ter no mínimo 5 caracteres'),
+               check('preco').isCurrency().withMessage('Necessário ser um valor correto'),
+           ];
+       }
+   
+   }
+   
+   module.exports = Livro;
+   ```
+
+## View
+
+### Encapsulando o template
+
+Havíamos criado a **view** e inserimos todos os nossos **templates**, **PORÉM** toda vez que vamos utilizar o template, temos que escrever `require(../app/view/base/home/home.marko)`, o que é ruim e feio. Para **encapsularmos** o **template** iremos:
+
+1. Criar dentro das pastas `view/base` e `view/livro` o arquivo `index.js`, que irá conter os layouts que estamos utilizando, através de um **objeto javascript _(titulo: chave)_**;
+
+   ```javascript
+   //index.js -> base
+   module.exports = {
+     erro404: require('./erros/404.marko'),
+     erro500: require('./erros/500.marko'),
+     home: require('./home/home.marko'),
+   };
+   
+   //index.js -> livro
+   module.exports = {
+     lista: require('./lista/lista.marko'),
+     form: require('./form/form.marko'),
+   };
+   ```
+
+2. Então criamos na pasta `view` o arquivo `template` que irá fazer um `require` na **base e no livro**:
+
+   1. **_não é necessário expor o `index.js`, pois por padrão o NodeJs faz isto!_**
+
+   ```javascript
+   // template.js
+   module.exports = {
+   	base: require('./base'),
+   	livro: require('./livros')
+   }
+   ```
+
+3. Agora basta ajustarmos nos `Controllers` e no `express` quando há erros:
+
+   ```javascript
+   // BaseController
+   const template = require('../views/template');
+   
+   class BaseController {
+     home() {
+       return (req, res) => res.marko(template.base.home);
+     }
+   }
+   
+   //-------------------------------------------------------------
+   // LivroController
+   const template = require('../views/template');
+   
+   class LivroController {
+     formularioCadastro() {
+       return (req, resp) => {
+         resp.marko(template.livro.form, { livro: {} });
+       };
+     }   
+   }
+   //-------------------------------------------------------------
+   // express.js
+   const template = require('../app/views/template');
+   
+   app.use((req, res, next) => res.status(404).marko(template.base.erro404));
+   app.use((error, req, res, next) => res.status(500).marko(template.base.erro500));
+   ```
+
+# Autenticação
+
+## Como funciona?
+
+![nodejsAutenticacao](C:\Users\867695\Pictures\nodejsAutenticacao.PNG)
+
+Na prática a aplicação faz a **serialização** das informações passadas pelo formulário para **dentro de uma sessão**. Com a criação da sessão, será **devolvido** um ID de forma que **toda qualquer requisição** proveniente daquele ID será já autenticado. O **trafégo** ocorrerá via **cookie**!
+
+## Template Login
+
+Para que seja realizado a **autenticação** será necessário incluirmos uma [página](https://caelum-online-public.s3.amazonaws.com/1021-node-mvc-autenticacao-autorizacao/04/login.zip) para **efetuar o login**, no formato `marko`!
+
+1. Adicionaremos a [página](https://caelum-online-public.s3.amazonaws.com/1021-node-mvc-autenticacao-autorizacao/04/login.zip) na `views/base/login`;
+
+2. Incluiremos no `index.js` da base;
+
+   ```javascript
+   module.exports = {
+     erro404: require('./erros/404.marko'),
+     erro500: require('./erros/500.marko'),
+     home: require('./home/home.marko'),
+     login: require('./login/login.marko'),
+   };
+   ```
+
+3. Incluiremos no método `static` da `BaseController` a nova rota `/login`;
+
+   1. Adicionaremos um método `efetuaLogin()`  que não fará nada a princípio;
+
+   ```javascript
+   const template = require('../views/template');
+   
+   class BaseController {
+       static routes() {
+           return {
+               home: '/',
+               login: '/login',
+           };
+       }
+   
+       login() {
+           return (req,res) => res.marko(template.base.login);
+       }
+   
+       efetuaLogin() {
+           return (req, res) => {
+               console.log('efetuou login');
+           };
+       }
+   
+   }
+   ```
+
+4. Incluiremos no `base-routes.js` a rota para `/login`;
+
+   1. Teremos um método `get` para exibir o formulário e o `post` para fazer o login;
+
+   ```javascript
+   const BaseController = require('../controllers/base-controller');
+   const baseController = new BaseController();
+   
+   module.exports = (app) => {
+       const baseRoutes = BaseController.routes();
+   
+       app.get(baseRoutes.home, baseController.home());
+       app.route(baseRoutes.login)
+           .get(baseController.login())
+           .post(baseController.efetuaLogin());
+   }
+   ```
+
+## Sessão/Autenticação
+
+Para utilizarmos a autenticação/sessão será necessário utilizar os módulos abaixo:
+
+```
+npm i uuid express-session passport passport-local
+```
+
+Iremos mapear a busca de usuários pelo email, com o `usuario-dao.js`:
+
+```javascript
+class UsuarioDao {
+    constructor(db) {
+        this._db = db;
+    }
+
+    buscaPorEmail(email) {
+        return new Promise((resolve, reject) => {
+            this._db.get(
+                `
+                SELECT *
+                FROM usuarios
+                WHERE email = ?
+                `,
+                [email],
+                (erro, usuario) => {
+                    if (erro) {
+                        return reject('Não foi possível encontrar o usuário!');
+                    }
+                    return resolve(usuario);
+                }
+            );
+        });
+    }
+}
+
+module.exports = UsuarioDao;
+```
+
+Para configurar a sessão, iremos:
+
+1. Criar o arquivo `sessao-autenticacao.js` dentro da pasta `app/config`;
+
+2. Adicionar os pacotes `uuid | sessao  | passport | passport-local` como constantes que irá importar os módulos;
+
+   1. Para o `passport-local` será utilizado a classe `Strategy`;
+
+   ```javascript
+   const uuid = require('uuid/v4');
+   const sessao = require('express-session');
+   const passport = require('passport');
+   const LocalStrategy = require('passport-local').Strategy;
+   
+   module.exports = (app) => {
+       //configuração da sessão e da autenticação.
+   }
+   ```
+   
+3. No arquivo `express.js` iremos precisar passar o express para o `sessao-autenticacao.js`
+
+   ```javascript
+   //express.js
+   const sessao = require('../config/sessao-autenticacao');
+   sessao(app);
+   ```
+
+4. Dentro do `module.exports` utiizaremos o método `use` do `passport`, que recebe um `Strategy`;
+
+   ```javascript
+   module.exports = (app) => {
+       passport.use(new LocalStrategy());
+   }
+   ```
+
+5. O `Strategy` recebe 2 parâmetros:
+
+   1º parâmetro: **objeto javascript**, contendo o `userNameField e passWordField` (que recebem o `name` do `input`);
+
+   2º parâmetro: função que receberá `(email, senha, done)` -> `done()` é uma função responsável por fazer determinada ação após o termino da verificação;
+
+   ```javascript
+   module.exports = (app) => {
+     passport.use(
+       new LocalStrategy(
+         {
+           usernameField: 'email',
+           passwordField: 'senha',
+         },
+         (username, password, done) => {
+             //Chama classe UsuarioDao para verificar email
+         }
+       )
+     );
+   };
+   ```
+
+6. Mapearemos o `UsuarioDao` e o `DB`:
+
+   ```javascript
+   const db = require('./database');
+   const UsuarioDao = require('../app/dao/usuario-dao');
+   const usuarioDao = new UsuarioDao(db);
+   ```
+
+7. Dentro do 2º parâmetro do construtor, chamaremos o método `buscaPorEmail` que espera receber o `username`;
+
+8. O método `buscaPorEmail` retorna um `Promise`, então podemos fazer um `then()` pegando o **usuário!** portanto, caso exista o usuário e a **senha** coincida com o `password`, podemos utilizar o método `done()` que recebe 3 parâmetros:
+
+   ​	1º parâmetro: erro (caso não exista, retornamos `null`);
+
+   ​	2º parâmetro: usuario autenticado (caso não seja autenticado, retornamos `false`);
+
+   ​	3º parâmetro: objeto javascript informando oq aconteceu (neste caso iremos passar uma mensagem);
+
+   ```javascript
+   (username, password, done) => {
+       usuarioDao
+           .buscaPorEmail(username)
+           .then((usuario) => {
+               if(!usuario || usuario.senha != password) {
+                   return done(null, false, { mensagem: 'usuário ou senha não existem!' });
+               }
+   
+           	return done (null, usuario);
+       	})
+           .catch((err) => done(err, false));
+   }
+   ```
+
+   
+

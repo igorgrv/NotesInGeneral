@@ -1,10 +1,13 @@
-require('marko/node-require').install();
-require('marko/express');
-
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
+const template = require('../app/views/template');
+const sessao = require('../config/sessao-autenticacao');
+sessao(app);
+
+require('marko/node-require').install();
+require('marko/express');
 
 app.use('/estatico', express.static('src/app/public'));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -17,11 +20,11 @@ app.use(
     }
   })
 );
+
 const routes = require('../app/routes/routes');
 routes(app);
 
-app.use((req, res, next) => res.status(404).marko(require('../app/views/base/erros/404.marko')));
-
-app.use((error, req, res, next) => res.status(500).marko(require('../app/views/base/erros/500.marko')));
+app.use((req, res, next) => res.status(404).marko(template.base.erro404));
+app.use((error, req, res, next) => res.status(500).marko(template.base.erro500));
 
 module.exports = app;
