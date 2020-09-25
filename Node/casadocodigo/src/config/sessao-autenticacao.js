@@ -27,4 +27,31 @@ module.exports = (app) => {
       }
     )
   );
+
+  passport.serializeUser((usuario, done) => {
+    const usuarioSessao = {
+      nome: usuario.nome_completo,
+      email: usuario.email,
+    };
+
+    done(null, usuarioSessao);
+  });
+
+  passport.deserializeUser((usuarioSerializado, done) => {
+    done(null, usuarioSerializado);
+  });
+
+  app.use(
+    sessao({
+      secret: 'igor',
+      genid: (req) => {
+        return uuid();
+      },
+      resave: false,
+      saveUninitialized: false,
+    })
+  );
+
+  app.use(passport.initialize());
+  app.use(passport.session());
 };

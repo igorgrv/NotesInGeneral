@@ -1488,13 +1488,17 @@ Para que seja realizado a **autenticação** será necessário incluirmos uma [p
    }
    ```
 
-## Sessão/Autenticação
+## Config. Autenticação
+
+### Modulos
 
 Para utilizarmos a autenticação/sessão será necessário utilizar os módulos abaixo:
 
 ```
 npm i uuid express-session passport passport-local
 ```
+
+### UsuarioDao
 
 Iremos mapear a busca de usuários pelo email, com o `usuario-dao.js`:
 
@@ -1527,7 +1531,7 @@ class UsuarioDao {
 module.exports = UsuarioDao;
 ```
 
-Para configurar a sessão, iremos:
+### Autenticação do Usuario
 
 1. Criar o arquivo `sessao-autenticacao.js` dentro da pasta `app/config`;
 
@@ -1610,12 +1614,144 @@ Para configurar a sessão, iremos:
                if(!usuario || usuario.senha != password) {
                    return done(null, false, { mensagem: 'usuário ou senha não existem!' });
                }
-   
            	return done (null, usuario);
        	})
            .catch((err) => done(err, false));
    }
    ```
 
-   
+### Serialização
+
+A serialização do usuário é feita utilizando o método `serializeUser` do módulo `passport`. A função, recebe 2 parâmetros:
+
+1. parâmetro: é o `usuario` que estará vindo do **banco de dados**;
+2. parâmetro: função `done`;
+
+```javascript
+passport.serializeUser((usuario, done) => {
+    // passaremos os valores que serão serializados
+});
+```
+
+Dentro da função, iremos:
+
+1. Criar uma `const usuarioSessao` que será um **objeto javascript**, contendo as informações do **nome do usuário** e **email**;
+
+2. Passaremos o `usuarioSessao` na função `done()`;
+
+   ```javascript
+   passport.serializeUser((usuario, done) => {
+       const usuarioSessao = {
+           nome: usuario.nome_completo,
+           email: usuario.email
+       };
+       done(null, usuarioSessao);
+   });
+   ```
+
+### Desserialização
+
+A desserialização é mais simples, apenas irá pegar o valor do **usuário serializado** e passar dentro da função `done()`;
+
+* Lembrando que dentro da variável `passport` o usuario **já esta serializado!**;
+
+```javascript
+passport.deserializeUser((usuarioSerializado, done) => {
+    done(null, usuarioSerializado);
+});
+```
+
+## Sessão
+
+A configuração da **sessão** irá ficar no arquivo `sessao-autenticacao.js`, logo após a desserialização!
+
+* Para configurarmos a sessão, é necessário criarmos um **`secret` e uma chave aleatória com `uuid`**;
+
+A sessão é configurada em um **middleware**, portanto utilizaremos o famoso `app.use()`, passando nossa `const sessao`:
+
+```javascript
+app.use(
+    sessao({
+        secret: 'igor',
+        genid: (req) => {
+            return uuid();
+        },
+        resave: false,
+        saveUninitialized: false,
+    })
+);
+```
+
+**Inicializando** a Sessão e a Autenticação:
+
+```javascript
+app.use(passport.initialize());
+app.use(passport.session());
+```
+
+### Sessão + Autenticação
+
+```javascript
+const uuid = require('uuid/v4');
+const sessao = require('express-session');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+
+const db = require('./database');
+const UsuarioDao = require('../app/dao/usuario-dao');
+const usuarioDao = new UsuarioDao(db);
+
+module.exports = (app) => {
+  passport.use(
+    new LocalStrategy(
+      {
+        usernameField: 'email',
+        passwordField: 'senha',
+      },
+      (username, password, done) => {
+        usuarioDao
+          .buscaPorEmail(username)
+          .then((usuario) => {
+            if (!usuario || usuario.senha != password) {
+              return done(null, false, { mensagem: 'usuário ou senha não existem!' });
+            }
+            return done(null, usuario);
+          })
+          .catch((err) => done(err, false));
+      }
+    )
+  );
+
+  passport.serializeUser((usuario, done) => {
+    const usuarioSessao = {
+      nome: usuario.nome_completo,
+      email: usuario.email,
+    };
+
+    done(null, usuarioSessao);
+  });
+
+  passport.deserializeUser((usuarioSerializado, done) => {
+    done(null, usuarioSerializado);
+  });
+
+  app.use(
+    sessao({
+      secret: 'igor',
+      genid: (req) => {
+        return uuid();
+      },
+      resave: false,
+      saveUninitialized: false,
+    })
+  );
+
+  app.use(passport.initialize());
+  app.use(passport.session());
+};
+```
+
+
+
+## Implementando Autenticação
 
