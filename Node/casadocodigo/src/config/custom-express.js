@@ -1,3 +1,6 @@
+require('marko/node-require').install();
+require('marko/express');
+
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -6,8 +9,6 @@ const template = require('../app/views/template');
 const sessao = require('../config/sessao-autenticacao');
 sessao(app);
 
-require('marko/node-require').install();
-require('marko/express');
 
 app.use('/estatico', express.static('src/app/public'));
 app.use(bodyParser.urlencoded({ extended: true }));

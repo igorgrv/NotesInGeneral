@@ -1495,7 +1495,7 @@ Para que seja realizado a **autenticação** será necessário incluirmos uma [p
 Para utilizarmos a autenticação/sessão será necessário utilizar os módulos abaixo:
 
 ```
-npm i uuid express-session passport passport-local
+npm install uuid@3.3.2 express-session@1.15.6 passport@0.4.0 passport-local@1.0.0 --save-exact
 ```
 
 ### UsuarioDao
@@ -1755,10 +1755,99 @@ module.exports = (app) => {
 
 ## Implementando Autenticação
 
-Voltando ao `base-controller.js` iremos implementar de fato a **a sessão**.
+Voltando ao `base-controller.js` iremos implementar de fato a **a sessão**. Relembrando, quando fazemos o `post` na URL `/login` estamos chamando o método `efetuaLogin()`;
 
-* Relembrando, quando fazemos o `post` na URL `/login` estamos chamando o método `efetuaLogin()`;
+1. Dentro do método `efetuaLogin()`, iremos chamar o `passport` , porém como?
 
-Dentro do método `efetuaLogin()`:
+   1. Será necessário no método `sessao-autenticacao.js` **atribuir na requisição** o `passport`:
 
-1. 
+      ```javascript
+      app.use(passport.initialize());
+      app.use(passport.session());
+      
+      app.use((req,res,next) => {
+          req.passport = passport;
+          next();
+      });
+      ```
+
+2. Com o `passport` atribuido na requisição, podemos fazer uso do `app.passport`, portanto no arquivo `base-controller.js`, iremos criar a `const passport` que irá receber o  `app.passport`;
+
+3. O `passport` possui o método `authenticate` que recebe os mesmos 3 parâmetros (erro, usuario, informação) e **deve receber o tipo de armazenamento, que nosso caso é `‘local'`**;
+
+4. Dentro deste método iremos verificar se há algum erro ou informação, caso não haja, sabemos que o usuário foi autenticado e podemos redirecionar para `lista` com o método `login()`;
+
+   ```javascript
+   efetuaLogin() {
+       return (req, res, next) => {
+           const passport = req.passport;
+           passport.authenticate('local', (error, username, info) => {
+               if (info) return res.marko(template.base.login);
+               if (error) return next(error);
+               req.login(username, (erro) => {
+                 if (erro) {
+                   return next(erro);
+                 }
+                 return resp.redirect(LivroController.rotas().lista);
+               });
+           });
+       };
+   }
+   ```
+
+5. Por último, a função `authenticate` retorna outra função q precisa receber o `req, res, next`!
+
+   ```javascript
+   efetuaLogin() {
+       return (req, res, next) => {
+           const passport = req.passport;
+           passport.authenticate('local', (error, username, info) => {
+               if (info) return res.marko(template.base.login);
+               if (error) return next(error);
+               
+               req.login(username, (erro) => {
+                 if (erro) {
+                   return next(erro);
+                 }
+                 return resp.redirect(LivroController.rotas().lista);
+               });
+           })(req, res, next);
+       };
+   }
+   ```
+
+## Autorizando
+
+Na aplicação, o que queremos é que somente usuários **autenticados** consigam acessar as rotas **/livro**** então, iremos no `LivroController` fazer esta validação!
+
+1. Devemos criar a rota necessária, que chamaremos de `autenticada`
+
+```javascript
+// LivroController
+static rotas() {
+    return {
+        autenticadas: '/livros*',
+        lista: '/livros',
+        cadastro: '/livros/form',
+        edicao: '/livros/form/:id',
+        delecao: '/livros/:id',
+    };
+}
+```
+
+2. Com a rota criada, em `livro-routes` iremos utilizar o middleware para verificar se o usuário esta autenticado, ou não!
+
+   ```javascript
+   module.exports = (app) => {
+       app.use(LivroController.rotas().autenticadas, (req, resp, next) => {
+           if (req.isAuthenticated()) {
+               next(); // caso esteja autenticado, irá prosseguir
+           } else {
+               resp.redirect(BaseController.routes().login);
+           }
+       });
+       
+       // demais rotas e middlewares
+   ```
+
+   
