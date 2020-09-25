@@ -1755,3 +1755,10 @@ module.exports = (app) => {
 
 ## Implementando Autenticação
 
+Voltando ao `base-controller.js` iremos implementar de fato a **a sessão**.
+
+* Relembrando, quando fazemos o `post` na URL `/login` estamos chamando o método `efetuaLogin()`;
+
+Dentro do método `efetuaLogin()`:
+
+1. 
