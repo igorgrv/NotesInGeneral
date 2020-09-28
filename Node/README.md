@@ -1495,7 +1495,7 @@ Para que seja realizado a **autenticação** será necessário incluirmos uma [p
 Para utilizarmos a autenticação/sessão será necessário utilizar os módulos abaixo:
 
 ```
-npm install uuid@3.3.2 express-session@1.15.6 passport@0.4.0 passport-local@1.0.0 --save-exact
+npm install uuid@3.3.2 express-session passport passport-local
 ```
 
 ### UsuarioDao
