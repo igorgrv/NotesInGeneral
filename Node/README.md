@@ -1851,3 +1851,262 @@ static rotas() {
    ```
 
    
+
+# REST
+
+## Requisitos
+
+* Node Js;
+* MySql;
+* Postman;
+* Express;
+
+## Estrutura de pastas
+
+```
+| - src
+|
+| - - app
+| - - - - controller
+| - - - - dao
+| - - - - model
+| - - - - routes
+| - - - - views
+| - - - - public
+| - - - - - - css
+| - - - - - - js
+| - - - - - - images
+|
+| - - config
+| - - - - express.js
+| - - - - database.js
+| - - - - sessao-autenticacao.js
+|
+| - server.js
+```
+
+## Dependencias utilizadas
+
+```bash
+npm i express nodemon consign body-parser mysql
+```
+
+
+
+## Iniciando
+
+Se inicia o projeto, criando a pasta e depois rodando o `npm init`;
+
+1. Criar o `express` -> exportar o `app`;
+
+   ```javascript
+   const express = require('express');
+   
+   module.exports = () => {
+       const app = express();
+   
+       return app;
+   };
+   ```
+
+2. Criar o `index.js` -> será o servidor q executa o `listen()`
+
+   ```javascript
+   const customExpress = require('./src/config/custom-express');
+   const app = customExpress();
+   
+   app.listen(3000, () => console.log('executando na porta 3000'));
+   ```
+
+### GET
+
+1. Crie a pasta `src/controllers` e adicione o arquivo `atendimentos.js`
+
+   ```javascript
+   module.exports = (app) => {
+       app.get('/atendimentos', (req, res) => {
+           res.send('olá atendimentos');
+       });
+   }
+   ```
+
+   Para que funcione, será **preciso utilizar o `consign`!**
+
+#### Consign
+
+O Consign é responsável por agrupar todas as rotas que estão sendo criadas e coloca tudo dentro do `app`!
+
+1. Declare ele no `custom-express.js`
+
+   ```javascript
+   const express = require('express');
+   const consign = require('consign');
+   ```
+
+2. Declare o que o `consign` irá agrupar
+
+   ```javascript
+   module.exports = () => {
+     const app = express();
+   	consign().include('src/app/controllers').into(app);
+   
+   	return app;
+   };
+   ```
+
+### POST
+
+Para utilizar o `post` iremos precisar instalar o `body-parser` e chama-lo no `customExpress`:
+
+```javascript
+const consign = require('consign');
+const bodyParser = require('body-parser');
+
+module.exports = () => {
+  const app = express();
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.json());
+    
+  // demais metodos
+}
+```
+
+ Para criar o `post` iremos criar o metodo abaixo testar via **postman**:
+
+```javascript
+app.post('/atendimentos', (req, res) => {
+    res.send('olá atendimentos POST');
+});
+```
+
+Postman: `localhost:3000/atendimentos` com o método **POST**;<br>
+
+#### Utilizando o Body
+
+1. No postman, em `headers` configuremos para o `content-type` ser o `json`;
+
+2. Com o `body-parser` configurado para receber tratar o json, iremos dar um `console.log(req.body)`, para exibir o que está sendo passado no `json`;
+
+   ```javascript
+   app.post('/atendimentos', (req, res) => {
+       console.log(req.body);
+       res.send('olá atendimentos POST');
+   });
+   ```
+
+3. No postman, em `body`, iremos selecionar o tipo `raw` e passar um `json`:
+
+   ```json
+   { 
+       "nome": "igor"
+   }
+   ```
+
+**Podemos consumir com o [CURL](https://www.hostinger.com.br/tutoriais/comando-curl-linux/)** invés do Postman
+
+## SQL
+
+Iremos criar o BD no **MySQL Workbench**
+
+1. Crie o BD, chamado `agenda-petshop`;
+
+2. Instalamos a dependência com `npm i mysql`;
+
+3. No Projeto, criamos a pasta `src/infra` e o arquivo `connection.js`;
+
+   1. Este arquivo ficará as configurações do BD:
+
+      ```javascript
+      const mysql = require('mysql');
+      
+      const connection = mysql.createConnection({
+        host: 'localhost',
+        port: '3306',
+        user: 'root',
+        password: 'root',
+        database: 'agenda-petshop',
+      });
+      
+      module.exports = connection;
+      ```
+
+4. No `index.js` iremos **conectar o BD**:
+
+   ```javascript
+   const customExpress = require('./src/config/custom-express');
+   
+   const connection = require('./src/app/infra/connection');
+   connection.connect((error) => {
+   	if(error) console.log('Erro ao conectar: ' + error);
+   	console.log('Conectado ao bd...');
+   
+       // só irá abrir o express caso não tenha erro no banco de dados
+   	const app = customExpress();
+   	app.listen(3000, () => console.log('executando na porta 3000'));
+   });
+   
+   ```
+
+   Caso dê erro, execute no MySQL:
+
+   ```sql
+   ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';
+   flush privileges;
+   ```
+
+### Tabelas
+
+1. Criemos o arquivo `tables.js` dentro de `src/infra`;
+
+2. Este arquivo conterá a classe `Table`, que irá receber o método `init()`, que espera receber uma `connection`;
+
+   ```javascript
+   class Table {
+       init(connection) {
+           console.log('Tabelas foram criadas no BD...');
+       }
+   }
+   
+   module.exports = new Table();
+   ```
+
+3. No `index.js` iremos fazer um `require` para esta classe, passando a `connection`:
+
+   ```javascript
+   const customExpress = require('./src/config/custom-express');
+   const Table = require('./src/app/infra/table');
+   const connection = require('./src/app/infra/connection');
+   
+   connection.connect((error) => {
+   	if(error) console.log('Erro ao conectar: ' + error);
+   	console.log('Conectado ao bd...');
+   
+       Table.init(connection);
+   	const app = customExpress();
+   	app.listen(3000, () => console.log('executando na porta 3000'));
+   });
+   ```
+
+4. Agora só precisamos criar um método na `table.js` que cria a tabela, através do `connection.query`
+
+   ```javascript
+   class Table {
+       init(connection) {
+           console.log('Tabelas foram criadas no BD...');
+           this.connection = connection;
+           this.creatAtentimentos();
+       }
+   
+       creatAtentimentos() {
+           const sql = 'CREATE TABLE Atendimentos (id int NOT NULL AUTO_INCREMENT, cliente varchar(50) NOT NULL, pet varchar(20), servico varchar(20) NOT NULL, status varchar(20) NOT NULL, observacoes text, PRIMARY KEY(id))'
+           
+           this.connection.query(sql, (error) => {
+               if(error) console.log('Erro criar TB Atendimento: ' + error);
+               console.log('TB - Atendimento criado com sucesso')
+           })
+       }
+   }
+   ```
+
+   
+

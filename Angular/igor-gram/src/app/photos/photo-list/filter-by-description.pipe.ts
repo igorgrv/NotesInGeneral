@@ -1,6 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { iPhoto } from '../photo/iPhoto';
-import { filter } from 'rxjs/operators';
 
 @Pipe({
   name: 'filterByDescription',

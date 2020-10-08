@@ -1304,6 +1304,26 @@ O Angular é um Framework SPA, que nos permite criar componentes reutilizáveis 
   * O Angular sempre trabalha com as duas últimas versões do navegador.
   * O **Angularjs** foi a versão `1.x` enquanto a partir da versão `2.x` foi chamado somente de **Angular**, cujo o código foi totalmente reescrito.
 
+### Plug-ins VSCode
+
+* Auto Import;
+* Atom Dark Theme;
+* Angular snippets;
+* Material icon theme;
+* Html snippets;
+* Angular 10 snippets;
+* Angula extension pack;
+
+### Debug no Angular
+
+Com o plug-in **Debugger for Chrome** instalado, iremos na aba `Debug` do VSCode:
+
+1. Clicaremos em **create a launch.json**;
+2. Colocaremos a porta **4200**;
+3. Iniciaremos o servidor com o `ng server`;
+4. Colocaremos os breakpoints;
+5. Daremos ‘play’ no Debug;
+
 ## Criando um projeto
 
 Após ter realizado a instalação do Angular pelo comando `npm i -g @angular/cli`, devemos criar um projeto seguindo os comandos abaixo:
@@ -2445,25 +2465,7 @@ A nossa paginação irá exibir no máximo 12 imagens por página (lógica já i
 
 Por enquanto, temos que ficar alterando no método `resolve` as páginas para vermos as demais fotos, porém sabemos que isto não é ideal, queremos clicar em um botão que irá carregar as demais fotos **caso a foto exista**. Para isto, iremos criar um método `load()` que irá verificar se existem mais elementos a serem exibidos!
 
-1. Por se tratar de um novo componente (novo botão), iremos cariar o componente `LoadButtonComponent`, através do método `ng g c load-button`;
-
-   ```typescript
-   import { Component, OnInit } from '@angular/core';
-   
-   @Component({
-     selector: 'ap-load-button',
-     templateUrl: './load-button.component.html',
-     styleUrls: ['./load-button.component.css']
-   })
-   export class LoadButtonComponent implements OnInit {
-   
-     constructor() { }
-   
-     ngOnInit(): void {
-     }
-   
-   }
-   ```
+1. Por se tratar de um novo componente (novo botão), iremos cariar o componente `LoadButtonComponent`, através do método `ng g c load-button`
 
 2. Adicionaremos o conteúdo HTML abaixo no `load-button.component.html`
 
@@ -3013,32 +3015,20 @@ A autenticação será feito através de um componente chamado `SignIn`;
    <h4 class="text-center">Login</h4>
    
    <form class="form mt-4">
+     <div class="form-group">
+       <input class="form-control" placeholder="user name" autofocus />
+     </div>
    
-       <div class="form-group">
-           <input 
-               class="form-control" 
-               placeholder="user name" 
-               autofocus>  
-       </div>
+     <div class="form-group">
+       <input type="password" class="form-control" placeholder="password" />
+     </div>
    
-       <div class="form-group">
-           <input
-               type="password" 
-               class="form-control" 
-               placeholder="password">              
-       </div>
-   
-       <button 
-           type="submit" 
-           class="btn btn-primary btn-block">
-           login
-       </button>
-   
+     <button type="submit" class="btn btn-primary btn-block">login</button>
    </form>
    
    <p>Not a user?<a>Register now</a></p>
    ```
-
+   
 3. Para que nossa página seja exibida na tela inicial, teremos que alterar nosso `app.routing`:
 
    ```typescript
@@ -3268,7 +3258,7 @@ A aplicação até o momento não possui um header, portanto, como será **utili
     <nav class="navbar navbar-light bg-white">
         <a class="navbar-brand">ALURAPIC</a>
         <div>
-            <i class="fa fa-user-circle"></i>
+            <em class="fa fa-user-circle"></em>
             <a>Aqui deve entrar o username</a>
         </div>
     </nav>
@@ -3482,7 +3472,7 @@ Agora para **capturarmos o token**, precisaremos utilizar um `Subject` com uma *
    }
    ```
 
-2. Na `UserService` iremos criar a variavel do `Subject<User>`
+2. No `UserService` iremos criar a variavel do `Subject<User>`
 
    ```typescript
    export class UserService {
@@ -3616,6 +3606,12 @@ export class HeaderComponent {
     <em class="fa fa-user-circle"></em>
     <a class="ml-2"> {{ user.name }} </a>
 </div>
+
+<ng-template #login>
+    <span class="navbar-text">
+        <a class="ml-2" href=""> Please, login! </a>
+    </span>
+</ng-template>
 ```
 
 ## Logout
@@ -3669,7 +3665,7 @@ Atualmente a aplicação tem um comportamento ‘errado’. Se estivermos logado
 1. Vamos criar um **`.guard` responsável por bloquear/acessar** a rota, chamado de `AuthGuard`, dentro do _core/auth_;
 
 ```
-ng g guard auth/core
+ng g guard core/auth
 
 // selecionamos o CanActivate como padrao
 ```
@@ -3702,8 +3698,9 @@ export class UserService {
 
 export class AuthGuard implements CanActivate {
 
-  constructor(private userService:UserService){
+  constructor(private userService:UserService, private router: Router){
     this.userService = userService;
+    this.router = router;
   }
     
 }
@@ -4507,5 +4504,27 @@ providers: [
         multi: true
     }
 ]
+```
+
+
+
+## i18n
+
+```
+ng xi18n --output-path src/locale
+```
+
+```typescript
+<p bradTitle="pagina" i18n="opções pré-aprovadas | São as opções pré-aprovadas para o cliente">
+    Confira as opções pré-aprovadas que temos pra você
+</p>
+```
+
+
+
+## JSON-SERVER
+
+```
+npx json-server --watch parcelas.json texts.json
 ```
 
