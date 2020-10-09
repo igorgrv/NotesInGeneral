@@ -7,7 +7,9 @@ module.exports = () => {
 	app.use(bodyParser.urlencoded({ extended: true }));
 	app.use(bodyParser.json());
 
-  consign().include('src/app/controllers').into(app);
+  consign()
+    .include('src/app/routes')
+    .into(app);
 
   return app;
 };

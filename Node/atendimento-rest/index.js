@@ -8,5 +8,5 @@ connection.connect((error) => {
 
 	Table.init(connection);
 	const app = customExpress();
-	app.listen(3000, () => console.log('executando na porta 3000'));
+	app.listen(3000, () => console.log('Servidor rodando na porta 3000'));
 });

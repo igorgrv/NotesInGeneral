@@ -1,4 +1,24 @@
-# NodeJS
+const existemErros = erros.length;
+
+  if (existemErros) {
+
+   res.status(400).json(erros);
+
+  } else {
+
+   const sql = 'INSERT INTO atendimentos SET ?';
+
+
+
+   connection.query(sql, atendimentoDate, (error, result) => {
+
+​    if (error) res.status(400).json(error);
+
+​    else res.status(200).json(result);
+
+   });
+
+  }NodeJS
 
 O Node é uma plataforma que foi criada para o **desenvolvimento de aplicações _backend_** utilizando o **JavaScript**! Para iniciar neste mundo, é **necessário baixar o** [NodeJs](https://nodejs.org/en/) e instala-lo, para que seja possível acessarmos via **cmd**. Vamos testar com um `npm -version`.
 
@@ -1888,7 +1908,7 @@ static rotas() {
 ## Dependencias utilizadas
 
 ```bash
-npm i express nodemon consign body-parser mysql
+npm i express nodemon consign body-parser mysql moment
 ```
 
 
@@ -2098,7 +2118,7 @@ Iremos criar o BD no **MySQL Workbench**
        }
    
        creatAtentimentos() {
-           const sql = 'CREATE TABLE Atendimentos (id int NOT NULL AUTO_INCREMENT, cliente varchar(50) NOT NULL, pet varchar(20), servico varchar(20) NOT NULL, status varchar(20) NOT NULL, observacoes text, PRIMARY KEY(id))'
+           const sql = 'CREATE TABLE IF NOT EXIST Atendimentos (id int NOT NULL AUTO_INCREMENT, cliente varchar(50) NOT NULL, pet varchar(20), servico varchar(20) NOT NULL, status varchar(20) NOT NULL, observacoes text, PRIMARY KEY(id))'
            
            this.connection.query(sql, (error) => {
                if(error) console.log('Erro criar TB Atendimento: ' + error);
@@ -2109,4 +2129,305 @@ Iremos criar o BD no **MySQL Workbench**
    ```
 
    
+
+## Persistindo os dados
+
+Por enquanto estamos somente configurando o BD/Tabelas, para persistir os dados, teremos de **criar um Model**, que será responsável por realizar o **CRUD** da aplicação!
+
+### INSERT
+
+1. Criaremos a pasta `src/model` e o arquivo `atendimento.js`, que irá ter o método responsável pela **adicao**:
+
+   ```javascript
+   class Atendimento {
+   	adiciona(atendimento) {
+   
+   	}
+   }
+   module.exports = Atendimento;
+   ```
+
+2. Para realizar a inserção no BD, é necessário utilizar a `connection`, portanto iremos dar um `require()` na conexão e depois com o método `query`, iremos passar:
+
+   1. Sintax SQL, o objeto e uma função de callback, para nos informar o que esta acontecendo;
+
+   ```javascript
+   const connection = require('../infra/connection');
+   
+   class Atendimento {
+       adiciona(atendimento) {
+           const sql = 'INSERT INTO atendimentos SET ?';
+   
+           connection.query(sql, atendimento, (error, result) => {
+               if (error) console.log('erro ao inserir no atendimentos: ' + error);
+               console.log(result);
+           });
+           
+   /*
+   conexao.query(`INSERT INTO Servicos(nome, preco) VALUES('${nome}', '${preco}')`, (erro, resultados) => {
+    */
+       }
+   }
+   module.exports = Atendimento;
+   ```
+
+3. No `Controller` iremos dar um `require` no model  `atendimento` e passar o `req.body`
+
+   ```javascript
+   const Atendimento = require('../model/atendimento');
+   
+   module.exports = (app) => {
+   
+       app.post('/atendimentos', (req, res) => {
+           Atendimento.adiciona(req.body);
+           res.send('olá atendimentos POST');
+       });
+   };
+   ```
+
+4. No Postman, em `body` iremos incluir os campos como `x-www-form`
+
+   ```
+   cliente:igor
+   pet:Sonic
+   servico:tosa
+   status:agendado
+   observacoes:muito bondoso
+   ```
+
+   
+
+#### Acrescentando campo DateTime
+
+Queremos que quando gravarmos o um registro, que apareça a data e horário que este registro foi efetuado! E para trabalhar com **Datas** nada melhor do que o **`moment`** -> `npm i moment`
+
+1. Iremos alterar a tabela direto no MySql:
+
+   ```sql
+   ALTER TABLE `agenda-petshop`.atendimentos add data datetime NOT NULL, add dataCriacao datetime NOT NULL;
+   ```
+
+2. Alterar o `CREATE TABLE` da classe `table`, acrescentando a `data` e `dataCriacao`
+
+   ```javascript
+   "pet varchar(20),data datetime NOT NULL, dataCriacao datetime NOT NULL, servico varchar(20) NOT NULL"
+   ```
+
+3. No `atendimento` da classe **Model**, iremos alterar o método `adiciona()` para que quando for recebermos a data, a gente tratar ela (pois poderá vir com um padrão diferente do PT-BR e o banco de dados aceitará um tipo só)
+
+   ```javascript
+   const moment = require('moment');
+   const connection = require('../infra/connection');
+   
+   class Atendimento {
+     adiciona(atendimento) {
+       const dataCriacao = moment().format('YYYY-MM-DD hh:mm:ss');
+       const data = moment(atendimento.data, 'DD/MM/YYYY').format('YYYY-MM-DD hh:mm:ss');
+       const atendimentoDate = {...atendimento, dataCriacao, data};
+       const sql = 'INSERT INTO atendimentos SET ?';
+   
+       connection.query(sql, atendimentoDate, (error, result) => {
+         if (error) console.log('erro ao inserir no atendimentos: ' + error);
+         else console.log(result);
+       });
+     }
+   }
+   module.exports = new Atendimento;
+   ```
+
+#### Status HTTP
+
+Até o momento retornamos um `console.log` informando o que foi feito, mas e se retornassemos uma mensagem? um objeto? um status da requisição?
+
+1. No `Atendimento` do controller, iremos passar o `res` como parâmetro do `adiciona()`
+
+   ```javascript
+   app.post('/atendimentos', (req, res) => {
+       Atendimento.adiciona(req.body, res);
+   });
+   ```
+
+2. Dentro do `atendimento` do Model, iremos receber o `res` e no lugar dos `console.log` iremos passar um `res.status.json`
+
+   ```javascript
+   adiciona(atendimento, res) {
+       const dataCriacao = moment().format('YYYY-MM-DD hh:mm:ss');
+       const data = moment(atendimento.data, 'DD/MM/YYYY').format('YYYY-MM-DD hh:mm:ss');
+       const atendimentoDate = {...atendimento, dataCriacao, data};
+       const sql = 'INSERT INTO atendimentos SET ?';
+   
+       connection.query(sql, atendimentoDate, (error, result) => {
+           if (error) res.status(400).json(error);
+           else res.status(200).json(result);
+       });
+   }
+   ```
+
+#### Validações
+
+E se passarmos um campo em branco? E se a data marcada para o pet for antes da data atual? Temos que aplicar validações!<br>A idéia é de criar um **array de Validacoes**, que irá encapsular `booleans` e irá retornar uma mensagem em caso de erro;
+
+1. Iremos criar os `booleans`;
+
+   1. A data só pode ser maior ou igual a data atual:
+
+      ```javascript
+      const dataEhValida = moment(data).isSameOrAfter(atendimentoDate);
+      ```
+
+   2. O cliente tem que ter no mínimo 5 caractéres:
+
+      ```javascript
+      const clientEhValido = atendimento.cliente.length >= 5;
+      ```
+
+2. Agrupando as validações:
+
+   ```javascript
+   const validacoes = [
+       {
+           campo: 'data',
+           valido: dataEhValida,
+           mensagem: 'Data deve ser maior ou igual a data atual',
+       },
+       {
+           campo: 'cliente',
+           valido: clientEhValido,
+           mensagem: 'Cliente deve ter no mínimo 5 caracteres',
+       },
+   ];
+   ```
+
+3. Agora iremos **filtrar** `validacoes` pegando somente se algum campo tiver erro
+
+   ```javascript
+   const erros = validacoes.filter(campo => !campo.valido);
+   ```
+
+4. Iremos checar se `erros` possui algum elemento e caso possua, retornamos estes `erros`:
+
+   ```javascript
+   const existemErros = erros.length;
+   
+   if (existemErros) {
+       res.status(400).json(erros);
+   } else {
+       const sql = 'INSERT INTO atendimentos SET ?';
+   
+       connection.query(sql, atendimentoDate, (error, result) => {
+           if (error) res.status(400).json(error);
+           else res.status(200).json(result);
+       });
+   }
+   ```
+
+   
+
+### GET - All
+
+Para realizar o **getAll** basta recebermos o `res` e realizarmos um `SELET * FROM atendimentos`.
+
+1. No `atendimento` controller:
+
+   ```javascript
+   const Atendimento = require('../model/atendimento');
+   
+   module.exports = (app) => {
+     app.get('/atendimentos', (req, res) => {
+       Atendimento.getAll(res);
+     });
+   ```
+
+2. No `atendimento` model, iremos criar o método `getAll`:
+
+   ```javascript
+   getAll(res) {
+       const sql = "SELECT * FROM atendimentos";
+       connection.query(sql, (err,result) => {
+           if(err) res.status(400).json(err);
+           res.status(200).json(result);
+       })
+   }
+   ```
+
+### GET - One
+
+Para pegar um cliente, será parecido como o método de pegar todos, porém iremos receber um id
+
+1. No `atendimento` controller:
+
+   ```javascript
+   const Atendimento = require('../model/atendimento');
+   
+   module.exports = (app) => {
+    
+     app.get('/atendimentos/:id', (req, res) => {
+       const id = req.params.id;
+       console.log(id);
+       Atendimento.getCliente(res, id);
+     });
+   ```
+
+2. No `atendimento` model, iremos criar o método `getOne`:
+
+   ```javascript
+   getCliente(res, id) {
+       const sql = 'SELECT * FROM atendimentos WHERE id = ?';
+       connection.query(sql, id, (err, result) => {
+           const atendimento = result[0];
+           if (err) res.status(400).json(err);
+           res.status(200).json(atendimento);
+       });
+   }
+   ```
+
+
+
+### UPDATE
+
+O update será uma junção do `post` com o `get`, portanto precisa receber um `body` e um `id`
+
+```javascript
+app.patch('/atendimentos/:id', (req, res) => {
+    const id = req.params.id;
+    Atendimento.updateCliente(res, req.body, id);
+});
+```
+
+E previamente devemos fazer um tratamento da data, para não termos problema
+
+```javascript
+updateCliente(res, atendimento, id) {
+    if(atendimento.data) {
+        atendimento.data = moment(atendimento.data, 'DD/MM/YYYY').format('YYYY-MM-DD hh:mm:ss');
+    }
+    const sql = 'UPDATE atendimentos SET ? WHERE id = ?';
+    connection.query(sql, [atendimento, id], (err, result) => {
+        if (err) res.status(400).json(err);
+        res.status(200).json(atendimento);
+    });
+}
+```
+
+### DELETE
+
+O Delete segue o mesmo padrão para o `getOne`, mudando apenas o método http:
+
+```javascript
+app.delete('/atendimentos/:id', (req, res) => {
+    const id = req.params.id;
+    Atendimento.deleteCliente(res, id);
+});
+```
+
+```javascript
+deleteCliente(res, id) {
+    const sql = 'DELETE FROM atendimentos WHERE id = ?';
+
+    connection.query(sql, id, (err, result) => {
+        if (err) res.status(400).json(err);
+        res.status(200).json(id);
+    });
+}
+```
 
