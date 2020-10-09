@@ -1,24 +1,4 @@
-const existemErros = erros.length;
 
-  if (existemErros) {
-
-   res.status(400).json(erros);
-
-  } else {
-
-   const sql = 'INSERT INTO atendimentos SET ?';
-
-
-
-   connection.query(sql, atendimentoDate, (error, result) => {
-
-​    if (error) res.status(400).json(error);
-
-​    else res.status(200).json(result);
-
-   });
-
-  }NodeJS
 
 O Node é uma plataforma que foi criada para o **desenvolvimento de aplicações _backend_** utilizando o **JavaScript**! Para iniciar neste mundo, é **necessário baixar o** [NodeJs](https://nodejs.org/en/) e instala-lo, para que seja possível acessarmos via **cmd**. Vamos testar com um `npm -version`.
 
