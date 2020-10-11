@@ -1868,21 +1868,16 @@ static rotas() {
 |
 | - - app
 | - - - - controller
-| - - - - dao
 | - - - - model
 | - - - - routes
-| - - - - views
-| - - - - public
-| - - - - - - css
-| - - - - - - js
-| - - - - - - images
+| - - - - infra
+| - - - - - - connection.js
+| - - - - - - tables.js
 |
 | - - config
-| - - - - express.js
-| - - - - database.js
-| - - - - sessao-autenticacao.js
+| - - - - custom-express.js
 |
-| - server.js
+| - index.js
 ```
 
 ## Dependencias utilizadas
@@ -2098,7 +2093,7 @@ Iremos criar o BD no **MySQL Workbench**
        }
    
        creatAtentimentos() {
-           const sql = 'CREATE TABLE IF NOT EXIST Atendimentos (id int NOT NULL AUTO_INCREMENT, cliente varchar(50) NOT NULL, pet varchar(20), servico varchar(20) NOT NULL, status varchar(20) NOT NULL, observacoes text, PRIMARY KEY(id))'
+           const sql = 'CREATE TABLE IF NOT EXISTS Atendimentos (id int NOT NULL AUTO_INCREMENT, cliente varchar(50) NOT NULL, pet varchar(20), servico varchar(20) NOT NULL, status varchar(20) NOT NULL, observacoes text, PRIMARY KEY(id))'
            
            this.connection.query(sql, (error) => {
                if(error) console.log('Erro criar TB Atendimento: ' + error);
@@ -2410,4 +2405,14 @@ deleteCliente(res, id) {
     });
 }
 ```
+
+
+
+# MongoDB
+
+MongoDB é um banco de dados **NoSQL**, que possui algumas diferenças em relação a um banco de dados **SQL**, ou seja, MongoDB é um banco **não relacional** e o **MySQL é um banco relacional**.
+
+<br>
+
+Differença entre ambos bancos:
 
