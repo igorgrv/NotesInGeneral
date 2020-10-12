@@ -2416,3 +2416,298 @@ MongoDB é um banco de dados **NoSQL**, que possui algumas diferenças em relaç
 
 Differença entre ambos bancos:
 
+![nosql](https://github.com/igorgrv/NotesInGeneral/blob/master/images/nosql_sql.PNG?raw=true)
+
+## Conectando ao MongoDB
+
+Para utilizar o MongoDB em uma aplicação node, precisaremos instalar a dependência:
+
+```bash
+npm i mongodb@3.1.10
+```
+
+Após a instalação da dependência, podemos realizar a **conexão com o mongo**.
+
+1. Caso seja inicializado local, precisa subir o arquivo `mongod.exe` que se encontra na pasta bin da aplicação;
+2. Para rodar remoto, o [Mongo Atlas Account](https://account.mongodb.com/account/) pede um Login para criação dos clusters;
+3. Com um cluster criado, basta clicarmos em Connect -> Connect your application -> copiar a URL dada, e substituir para a senha;
+
+Criando o arquivo `mongodb.js`, realizaremos a conexão com o banco de dados:
+
+```javascript
+const mongodb = require('mongodb');
+const MongoClient = mongodb.MongoClient;
+
+//const connectionUrlRemota = 'mongodb+srv://igor-accenture:<password>@usersign.pr5k3.mongodb.net/UserSign?retryWrites=true&w=majority';
+const connectionUrl = 'mongodb://127.0.0.1:27017';
+
+MongoClient.connect(connectionUrl, { useNewUrlParser: true}, (error, client) => {
+    if(error){
+        return console.log('erro ao conectar no BD: ' + error);
+    }
+    return console.log('Connectado com sucesso');
+})
+```
+
+### Criando Collection e inserindo dados
+
+Com o `client` na função de call-back, basta que seja informado **qual o Cluster** e referencia uma Collection na chamada:
+
+```javascript
+const connectionUrl = 'mongodb+srv:...';
+const cluster = 'UsuarioSign';
+
+MongoClient.connect(connectionUrl, { useNewUrlParser: true }, (error, client) => {
+    if (error) {
+        return console.log('erro ao conectar no BD: ' + error);
+    }
+
+    const db = client.db(cluster);
+    db.collection('usuario-node').insertOne({
+        nome: 'igor',
+        email: 'igorgrv@hotmail.com',
+        senha: '123456',
+    });
+});
+
+```
+
+
+
+# Mongoose
+
+O Mongoose nos permite trabalhar com o MongoDB de forma simples, assim como a JPA auxilia na inserção de dados em um BD, o **mongoose**, permite:
+
+* Criar as colunas/fields com tipagem;
+* Validar os campos;
+* Relacionar Collections/ Tabelas
+
+<br>
+
+Para utilizar o **mongoose:**
+
+```
+npm i mongoose@5.3.16
+```
+
+Com a conexão ao banco de dados já pré-configurada:
+
+```javascript
+const mongodb = require('mongodb');
+const MongoClient = mongodb.MongoClient;
+
+//const connectionUrl = 'mongodb+srv://connectionRetornadaPeloMongoAtlas';
+const url = 'mongodb://127.0.0.1:27017/UsuarioSign';
+const cluster = 'UsuarioSign';
+
+MongoClient.connect(connectionUrl, { useNewUrlParser: true }, (error, client) => {
+  if (error) {
+    return console.log('erro ao conectar no BD: ' + error);
+  }
+
+  const db = client.db(cluster);
+});
+```
+
+Criamos a o arquivo `mongoose.js` que ficará com as configurações necessárias:
+
+1. Crie o arquivo `mongoose.js` dentro da pasta `src/app/database`;
+
+2. Este arquivo irá passar a mesma URL que foi utilizada no Mongo e também irá conter o mesmo parâmetro, somente com uma adição ao index
+
+   ```javascript
+   const mongoose = require('mongoose');
+   const url = 'mongodb+srv:....;
+   
+   mongoose.connect(url, { useNewUrlParser: true, useCreateIndex: true });
+   ```
+
+## Model
+
+Para que o mongoose saiba persistir, validar os dados, precisamos especificar um **model**, que conterá:
+
+* Fields;
+* Validações
+* Tipagem;
+
+```javascript
+const url = 'mongodb://127.0.0.1:27017/UsuarioSign';
+mongoose.connect(url, { useNewUrlParser: true, useCreateIndex: true });
+
+const Usuario = mongoose.model('Usuario', {
+    nome: {
+        type: String,
+    },
+    email: {
+        type: String,
+    },
+    senha: {
+        type: String,
+    },
+});
+
+// -----------------------------------------------------------
+// utilizado para inserir um usuario no BD
+const usuarioInsert = new Usuario({
+    nome: 'Igor',
+    email: 'igorgrv@hotmail.com',
+    senha: '123456',
+});
+
+usuarioInsert
+  .save()
+  .then(() => {
+    console.log('usuario inserido com sucesso');
+  })
+  .catch((error) => {
+    console.log('erro ao inserir usuario: ' + error);
+  });
+```
+
+## Validação
+
+Os tipos de validações que o mongoose fornece, estão disponívels [neste documento](https://mongoosejs.com/docs/validation.html#validation);<br>
+
+Junto com o mongoose, existe uma **bilioteca para validações**, chamada [**Validator**](https://www.npmjs.com/package/validator):
+
+```bash
+npm i validator@10.9.0
+```
+
+Para utilizar o validator, precisamos dar um `require('validator')`, o que nos permitirá utilizar um monte de validações já pré-disponíveis, como:
+
+* `isEmail()`;
+* `isCreditCard()`;
+
+E também possui funções para ‘tratar’ os valores:
+
+* `required`;
+* `trim`;
+* `lowercase`:
+
+```javascript
+const mongoose = require('mongoose');
+const validator = require('validator');
+
+const url = 'mongodb://127.0.0.1:27017/UsuarioSign';
+mongoose.connect(url, { useNewUrlParser: true, useCreateIndex: true });
+
+const Usuario = mongoose.model('Usuario', {
+  nome: {
+    type: String,
+    required: [true, 'Necessário informar um nome'],
+    trim: true,
+    lowercase: true,
+  },
+  email: {
+    type: String,
+    required: [true, 'Necessário informar um email'],
+    trim: true,
+    lowercase: true,
+    validate(value) {
+      if (!validator.isEmail(value)) {
+        throw new Error('Email invalido');
+      }
+    },
+  },
+  senha: {
+    type: String,
+    required: [true, 'Necessário informar uma senha'],
+    validate(value) {
+      if (value < 0) {
+        throw new Error('senha invalida');
+      }
+    },
+  },
+});
+```
+
+## Estruturando as pastas
+
+`src/app/model`:
+
+* `usuario.js`
+
+  ```javascript
+  const mongoose = require('mongoose');
+  const validator = require('validator');
+  
+  const Usuario = mongoose.model('Usuario', {
+    nome: {
+      type: String,
+      required: [true, 'Necessário informar um nome'],
+      trim: true,
+      lowercase: true,
+    },
+    email: {
+      type: String,
+      required: [true, 'Necessário informar um email'],
+      trim: true,
+      lowercase: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error('Email invalido');
+        }
+      },
+    },
+    senha: {
+      type: String,
+      required: [true, 'Necessário informar uma senha'],
+      validate(value) {
+        if (value < 0) {
+          throw new Error('senha invalida');
+        }
+      },
+    },
+  });
+  
+  module.exports = Usuario;
+  ```
+
+* `telefone.js`:
+
+  ```javascript
+  const mongoose = require('mongoose');
+  
+  const Telefone = mongoose.model('Telefone', {
+    numero: {
+      type: Number,
+      required: true,
+      trim: true,
+      lowercase: true,
+    },
+    ddd: {
+      type: Number,
+      required: true,
+      trim: true,
+      lowercase: true,
+    },
+  });
+  
+  module.exports = Telefone;
+  ```
+
+<br>
+
+`src/db/mongoose`:
+
+* `mongoose.js`
+
+  ```javascript
+  const mongoose = require('mongoose');
+  
+  const url = 'mongodb://127.0.0.1:27017/UsuarioSign';
+  mongoose.connect(url, { useNewUrlParser: true, useCreateIndex: true });
+  ```
+
+## Rest
+
+Para criar uma API Rest iremos utilizar o **express + nodemon**:
+
+<br>
+
+`express.js`:
+
+```
+
+```
