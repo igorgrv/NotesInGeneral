@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { PhotoListComponent } from './photos/photo-list/photo-list.component';
 import { PhotoListResolver } from './photos/photo-list/photo-list.resolver';
 import { PhotoFormComponent } from './photos/photo-form/photo-form.component';
+import { FormGuard } from './core/auth/form-guard.guard';
 
 const routes: Routes = [
   {
@@ -22,11 +23,12 @@ const routes: Routes = [
   {
     path: 'p/add',
     component: PhotoFormComponent,
+    canActivate: [FormGuard],
   },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, {useHash: true })],
+  imports: [RouterModule.forRoot(routes, { useHash: true })],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}

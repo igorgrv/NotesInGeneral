@@ -5016,3 +5016,74 @@ As diretivas, geralmente são utilizadas por mais de um componente, portanto **f
 
    
 
+## CanActivate/Guard - Restringindo acesso
+
+A aplicação no cenário atual, é capaz de acessar a rota `p/add` caso o usuário não possua nenhum login, o que é errado, precisamos redirecionar o usuário para o login!<br>
+
+* Para fazer a guarda de rotas, utilizamos do **`guard`**, onde a rota com `canActivate` irá chamar este `guard` primeiro, antes de chamar o componente!
+
+### Criando Guard
+
+Para criar o `guard` basta executarmos `ng g guard core/auth/formGuard`, onde por default será criado:
+
+```typescript
+@Injectable({
+    providedIn: 'root',
+})
+export class FormGuardGuard implements CanActivate {
+    canActivate(
+    next: ActivatedRouteSnapshot,
+     state: RouterStateSnapshot
+    ):
+    | Observable<boolean | UrlTree>
+        | Promise<boolean | UrlTree>
+        | boolean
+    | UrlTree {
+        return true;
+    }
+}
+```
+
+Para saber se o usuário está logado, precisaremos utilizar o `UserService` e para realizar o redirecionamento precisaremos o `Router`, portanto chamaremos nos contrutores:
+
+```typescript
+export class FormGuardGuard implements CanActivate {
+
+    constructor(private userService: UserService, private router: Router) {
+        this.userService = userService;
+    }
+```
+
+no método `CanActivate`, iremos retornar:
+
+* `true` -> para caso queiramos que a ação permita entrar no componente;
+* `false` -> para caso não queiramos que o usuário entre e então teremos que fazer algo (no caso redirecionar):
+
+```typescript
+canActivate(
+    next: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+):
+    | Observable<boolean | UrlTree>
+        | Promise<boolean | UrlTree>
+        | boolean
+| UrlTree {
+    if (!this.userService.isLogged()) {
+        this.router.navigate(['']);
+        return false;
+    }
+
+    return true;
+}
+```
+
+Agora basta na rota para o `p/add` adicionarmos com a tag `canActivate` este `guard`!
+
+```typescript
+{
+    path: 'p/add',
+        component: PhotoFormComponent,
+            canActivate: [FormGuard],
+},
+```
+
