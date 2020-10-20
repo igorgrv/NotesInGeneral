@@ -2704,10 +2704,353 @@ const Usuario = mongoose.model('Usuario', {
 
 Para criar uma API Rest iremos utilizar o **express + nodemon**:
 
-<br>
+![folder](https://github.com/igorgrv/NotesInGeneral/blob/master/images/foldersEstructure.PNG?raw=true)
 
 `express.js`:
 
+```javascript
+const express = require('express');
+const app = express();
+
+app.use(express.json());
+
+const routes = require('../app/routes/routes');
+routes(app);
+
+module.exports = app;
 ```
 
+`index.js`:
+
+```javascript
+const app = require('./src/config/custom-express');
+const port = process.env.PORT || 3000;
+require('./src/app/database/mongoose');
+
+app.listen(port, () => console.log('executando servidor porta 3000'));
 ```
+
+`mongoose.js`
+
+```javascript
+const mongoose = require('mongoose');
+
+const url = 'mongodb://127.0.0.1:27017/UsuarioSign';
+mongoose.connect(url, { useNewUrlParser: true, useCreateIndex: true });
+```
+
+
+
+### Post
+
+Com o controller e rotas criadas, basta utilizarmos o `mongoose` a nosso favor e realizar um `save()`;
+
+* Uma vez que o `model` está declarado com o `mongoose.model`, este se torna uma **entidade!**
+
+`usuarioController.js`
+
+```javascript
+const Usuario = require('../model/usuario');
+
+class UsuarioController {
+  static routes() {
+    return {
+      signup: '/signup',
+      signin: '/signin',
+      usuarios: '/usuarios',
+      usuarioId: '/usuario/:id',
+    };
+  }
+
+  signup() {
+    return (req, res) => {
+      const usuario = new Usuario(req.body);
+      usuario
+        .save()
+        .then(() => res.status(201).json(usuario))
+        .catch((err) => res.status(400).json(err));
+    };
+  }
+}
+
+module.exports = UsuarioController;
+```
+
+### GetAll - GetById
+
+`getAll:`
+
+```javascript
+usuarios() {
+    return (req, res) => {
+        Usuario.find({})
+            .then((usuarios) => res.status(200).json(usuarios))
+            .catch((err) => res.status(500).json(err));
+    };
+}
+```
+
+`getOne`:
+
+```javascript
+usuario() {
+    return (req, res) => {
+        const _id = req.params.id;
+        Usuario.findById(_id)
+            .then((usuario) => {
+            if (!usuario) {
+                res.status(500).send('Usuário não encontrado');
+            }
+            res.status(200).json(usuario);
+        })
+            .catch((err) => res.status(500).json(err));
+    };
+}
+```
+
+## BCryptJS - Criptografando senha
+
+De forma que a senha armazenada não seja exibida no BD sem criptografia, iremos implementar o **bcrypt**.
+
+```bash
+npm i bcryptjs@2.4.3
+```
+
+Basta darmos um `require` no bycrpt, passar a senha e a quantidade de `salt` (padrão por 8):
+
+```javascript
+const bcryptjs = require('bcryptjs');
+
+const testandoBcrypt = async () => {
+	const password = 'igor123';
+	const hashPassword = await bcryptjs.hash(password, 8);
+
+	console.log('senha: ' + password + ' senhaBcrypt: ' + hashPassword);
+    // senha: igor123 
+    // Bcrypt: 2a$08$0k4gKD7JVijcNn/OrZADkuzcZtTeJfA7qvduk/bt8hecT7JyESN.O
+}
+
+testandoBcrypt();
+```
+
+### validar senha criptografada
+
+E se quisermos validar um login, como faremos se não é possível descriptografar? O Bcrypt disponibiliza o **método `compare`** que recebe um a senha sem criptografia e verifica a com criptografia!
+
+```javascript
+const testandoBcrypt = async () => {
+	const password = 'igor123';
+	const hashPassword = await bcryptjs.hash(password, 8);
+
+	const isMatch = await bcryptjs.compare(password, hashPassword);
+	console.log(isMatch);
+    //true
+}
+```
+
+### Middleware
+
+Para que ao salvar a senha, seja feito a criptografia, utilizaremos um **middleware do mongoose**, chamado `Schema`!
+
+1. Iremos alterar o model `User`, incluindo todo código dentro de um `schema`:
+
+   ```javascript
+   const mongoose = require('mongoose');
+   const validator = require('validator');
+   
+   const usuarioSchema = new mongoose.Schema({
+     nome: {
+       type: String,
+       required: [true, 'Necessário informar um nome'],
+       trim: true,
+       lowercase: true,
+     },
+     email: {
+       type: String,
+       required: [true, 'Necessário informar um email'],
+       trim: true,
+       lowercase: true,
+       validate(value) {
+         if (!validator.isEmail(value)) {
+           throw new Error('Email invalido');
+         }
+       },
+     },
+     senha: {
+       type: String,
+       required: [true, 'Necessário informar uma senha'],
+       validate(value) {
+         if (value < 0) {
+           throw new Error('senha invalida');
+         }
+       },
+     },
+   });
+   
+   const Usuario = mongoose.model('Usuario', usuarioSchema);
+   
+   module.exports = Usuario;
+   ```
+
+O `Schema` nos possibilita a executar métodos **antes** da ação, com o método `pre`, ou **depois** da ação, com o método `post`;
+
+1. Dentro do modelo `User`, iremos utilizar o método `pre`, que recebe o **tipo de evento** e uma `async function (next)` (sem arrowFunction) ;
+
+2. Dentro da `function` iremos referenciar uma constante `user` para o `this`, que aponta para o objeto;
+
+   ```javascript
+   usuarioSchema.pre('save', async function(next) { 
+     const user = this;
+   })
+   ```
+
+3. Com o `user`, temos acesso ao `user.senha` e portanto conseguimos criptografa-la;
+
+   ```javascript
+   usuarioSchema.pre('save', async function (next) {
+     const user = this;
+   
+     user.senha = await bcryptjs.hash(user.senha, 8);
+     console.log(user.senha);
+   
+     next();
+   });
+   ```
+
+## JWT
+
+O JWT (Json Web Token) é utilizado para tokenização!
+
+```bash
+npm i jsonwebtoken@8.4.0
+```
+
+Podemos gerar o token através do método `sign` do `jsonwebtoken`, passando 2 parâmetros (o primeiro será o parâmetro que deve ser único, como o id, e o segundo será o parâmetro com a chave de segurança):
+
+1. Dentro do método `signin` do controller, iremos solicitar o token, que será um método do modelo `usuario`:
+
+   ```javascript
+    signin() {
+       return async (req, res) => {
+         try {
+           const usuario = await Usuario.findByCredentials(req.body.email, req.body.senha);
+           const token = await usuario.generateAuthToken();
+           res.status(200).json({ usuario, token});
+         } catch (err) {
+           res.status(400).json(err);
+         }
+       }
+     }
+   ```
+
+2. Com o `usuarioSchema` do modelo `Usuario`, iremos criar o método `generateAuthToken()`:
+
+   ```javascript
+   usuarioSchema.methods.generateAuthToken = async function () {
+     const user = this;
+     const token = jwt.sign({ _id: user._id.toString() }, 'accenture');
+     return token;
+   };
+   ```
+
+### Bloqueando rotas sem Token
+
+Para que seja verificado se possui um `Authorization`, teremos de criar um **Middleware**;
+
+1. Criaremos a pasta **middleware** e dentro o arquivo `auth.js`
+
+2. Na rota, iremos dar um `require` no `Auth` e nós métodos que queremos bloquear, passaremos na chamada este `Auth`;
+
+   ```javascript
+   const auth = require('../middleware/auth');
+   
+   module.exports = (app) => {
+   	app.post(usuarioRoutes.signup, usuarioController.signup());
+   	app.post(usuarioRoutes.signin, usuarioController.signin());
+     	app.get(usuarioRoutes.usuarios, auth, usuarioController.usuarios());
+     	app.get(usuarioRoutes.usuario, auth, usuarioController.usuario());
+   };
+   ```
+
+3. No Middleware `auth` iremos implementar o middleware:
+
+   ```javascript
+   const auth = async (req, res, next) => {
+   	console.log('entrou no auth');
+   	next();
+   }
+   
+   module.exports = auth;
+   ```
+
+4. Iremos verificar se o `jwt` e o `usuario` estão corretos e também se o `header` possui o `Authorization`:
+
+   ```javascript
+   const jwt = require('jsonwebtoken');
+   const Usuario = require('../model/usuario');
+   
+   const auth = async (req, res, next) => {
+       try {
+           const token = req.header('Authorization').replace('Bearer ', '');
+           const decoded = jwt.verify(token, 'accenture');
+           const user = await Usuario.findOne({ _id: decoded._id });
+           req.user = user;
+           if (!user) {
+               res.status(400).json({ mensagem: 'Não autorizado' });
+           }
+   
+           next();
+       } catch (error) {
+           res.status(400).json({ mensagem: 'Não autorizado' });
+       }
+   };
+   
+   module.exports = auth;
+   ```
+
+   
+
+## Escondendo informações - DTO
+
+Para esconder valores do json, basta:
+
+1. Quando devolvermos o json, passarmos uma função do modelo `user`, como `user.dto()`
+
+   ```javascript
+   signin() {
+       return async (req, res) => {
+         try {
+           const usuario = await Usuario.findByCredentials(req.body.email, req.body.senha);
+           const token = await usuario.generateAuthToken();
+             // passar o usuario.dto()
+           res.status(200).json({ usuario: usuario.dto(), token });
+         } catch (err) {
+           res.status(400).json({ mensagem: 'Usuário e/ou senha inválidos' });
+         }
+       };
+     }
+   ```
+
+2. Então basta criarmos o `dto()` no modelo Usuario:
+
+   ```javascript
+   usuarioSchema.methods.dto = function () {
+     const user = this;
+     const userObject = user.toObject();
+   
+     delete userObject.__v;
+   
+     return userObject;
+   }
+   ```
+
+   
+
+## Swagger
+
+Para utilizar o swagger:
+
+```bash
+npm i swagger-ui-express@4.0.7
+```
+

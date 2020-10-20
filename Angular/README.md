@@ -1382,7 +1382,12 @@ Onde a TAG `<app-root></app-root>` demonstra ser um componente Angular! Onde tod
     * `templaetUrl` -> é onde ficará o HTML;
     * `styleUrls` -> é onde ficará o CSS;
 
-### Data-Binding / AngularExpression
+### Bindings
+
+- **Property binding** i.e. `[]` required to evaluate values
+- **Model binding** i.e. `[()]` required nothing special
+- **Interpolation binding** i.e. `{{}}` could be used with general attributes
+- **Event binding** i.e. `()` worked great with functions
 
 Assim como o Java possui a ExpressionLanguage, o Angular possui o **AngularExpression**, que utiliza como atalho o `{{ }}`.  Então, quando nosso componente declarar uma variável com o nome `title`, esta variável poderá ser acessada no HTML, utilizando `{{ title }}`;
 
@@ -4524,7 +4529,490 @@ ng xi18n --output-path src/locale
 
 ## JSON-SERVER
 
-```
+```bash
 npx json-server --watch parcelas.json texts.json
 ```
+
+## Footer - Template
+
+<img src="https://caelum-online-public.s3.amazonaws.com/940-angular-parte3/01/1_1_1_footer.png" alt="footer" style="zoom: 67%;" />
+
+Faremos uso do **pipe async** para que somente quando o Observable for carregado, q seja exibido as informações (isto evita a necessidade de fazer `subscribe` e de carregar o código com outras coisas!);
+
+```html
+<footer class="mt-5" *ngIf="user$ | async as user">
+    <div class="fixed-bottom bg-white p-1">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-6">
+                    <a [routerLink]="['']">
+                        <em class="fa fa-home fa-2x"></em>
+                    </a>
+                </div>
+                <div class="col-6">
+                    <a [routerLink]="['p', 'add']">
+                        <em class="fa fa-plus-circle fa-2x"></em>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+```
+
+```typescript
+export class FooterComponent implements OnInit {
+
+    user$: Observable<User>;
+
+    constructor(private userService:UserService) { }
+
+    ngOnInit(): void {
+        this.user$ = this.userService.getUser();
+    }
+
+}
+```
+
+1. Adicionar nos modulos;
+
+2. Adicionar no  `app.componente.html`
+
+   ```html
+   <app-header></app-header>
+   <router-outlet></router-outlet>
+   <app-footer></app-footer>
+   ```
+
+## Upload imagens
+
+![upload](https://caelum-online-public.s3.amazonaws.com/940-angular-parte3/01/1_2_1_upload.png)
+
+### Template
+
+```html
+<div class="container">
+    <form class="row">
+        <div class="col-md-6 text-center">
+            <input type="file" accept="image/*">
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <textarea 
+                          class="form-control form-control-sm" 
+                          placeholder="photo description"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="text-muted">
+                    Allow comments
+                    <input type="checkbox">
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+                Upload
+            </button>
+
+            <a class="btn btn-secondary btn-block">Cancel</a>
+        </div>
+    </form>
+</div>
+```
+
+* Uma vez que **se trata de formulário** se faz necessário o uso do `ReactiveFormsModule, FormsModule`, portanto **deve ser importado no `photos.module.ts`**!
+
+* Para auxiliar nas validações, usaremos o `Vmessage`, portanto:
+
+  ```typescript
+  @NgModule({
+      declarations: [PhotoFormComponent],
+      imports: [CommonModule, ReactiveFormsModule, FormsModule, VMessageModule],
+  })
+  export class PhotoFormModule {}
+  ```
+
+### Validações
+
+Para fazer validações, usaremos do **`FormGroup` e `FormBuilder`**, para fazer as validações;
+
+```typescript
+export class PhotoFormComponent implements OnInit {
+
+    photoFormGroup: FormGroup;
+    constructor(private photoFormBuilder:FormBuilder) { }
+
+    ngOnInit(): void {
+        this.photoFormGroup = this.photoFormBuilder.group({
+            file:['', Validators.required],
+            description:['', Validators.maxLength(300)],
+            allowComments:[true]
+        })
+    }
+
+}
+```
+
+Para vincular as validações com o `html`, usaremos as tags `[formGroup]` e `formControlName`, passando o `vmessage` em caso de erros
+
+```html
+<div class="container">
+  <form [formGroup]="photoFormGroup" class="row">
+    <div class="col-md-6 text-center">
+      <input formControlName="file" type="file" accept="image/*" />
+      <ap-vmessage
+        text="Please, select a photo"
+        *ngIf="photoFormGroup.get('file').errors?.required"
+      ></ap-vmessage>
+    </div>
+
+    <div class="col-md-6">
+      <div class="form-group">
+        <textarea
+          formControlName="description"
+          class="form-control form-control-sm"
+          placeholder="photo description"
+        ></textarea>
+        <ap-vmessage
+          text="Maximun size allowed is 300"
+          *ngIf="photoFormGroup.get('description').errors?.maxlength"
+        ></ap-vmessage>
+      </div>
+
+      <div class="form-group">
+        <label class="text-muted">
+          Allow comments
+          <input formControlName="allowComments" type="checkbox" />
+        </label>
+      </div>
+
+      <button [disabled]="photoFormGroup.invalid" type="submit" class="btn btn-primary btn-block">Upload</button>
+
+      <a class="btn btn-secondary btn-block">Cancel</a>
+    </div>
+  </form>
+</div>
+```
+
+### Upload File
+
+Para realizar o `upload`/ `submit` poderiamos simplesmente utilizar do `getRawValue()` que iria pegar toda informação do `PhotoFormGroup`:
+
+```html
+<form [formGroup]="photoFormGroup" class="row" (submit)="upload()">
+```
+
+```typescript
+upload() {
+    const dados = this.photoFormGroup.getRawValue();
+    console.log(dados);
+}
+```
+
+```json
+file: "C:\fakepath\angular.png"
+description: "teste"
+allowComments: true
+```
+
+**PORÉM,** para a API, não serve o valor `file: "C:\fakepath\angular.png"`, a API **espera receber o BINÁRIO** da foto e para isto iremos utilizar o tipo `File`;
+
+```typescript
+export class PhotoFormComponent implements OnInit {
+    photoFormGroup: FormGroup;
+    file: File;
+```
+
+Mas como pegar o valor binário? utilizaremos do evento **`(change)`** que irá pegar o valor do arquivo, com `$event.target.files[0]`, onde iremos pegar um único arquivo com o `[0]`;
+
+```html
+<form [formGroup]="photoFormGroup" class="row" (submit)="upload()">
+    <div class="col-md-6 text-center">
+        <input
+               formControlName="file"
+               type="file"
+               accept="image/*"
+               (change)=" file = $event.target.files[0]"
+               />
+```
+
+```typescript
+upload() {
+    const description = this.photoFormGroup.get('description');
+    const allowComments = this.photoFormGroup.get('allowComments');
+    console.log(this.file);
+}
+```
+
+Desta forma teremos, do arquivo:
+
+```json
+name: "angular.png"
+lastModified: 1601989321166
+lastModifiedDate: Tue Oct 06 2020 10:02:01 GMT-0300 (Brasilia Standard Time) {}
+webkitRelativePath: ""
+size: 2385
+type: "image/png"
+```
+
+### Post - upload
+
+Para realizar o upload em si, iremos fazer um `post` na API, que espera receber:
+
+* Description:string;
+* allowComments:string -> necessário converter o boolean para string;
+* file:File;
+
+Mas e como passar esses valores? Utilizaremos o `FormData`, que possui o método `append`, cuja função é adicionar os parâmetros da requisição e seus valores
+
+```typescript
+upload(description: string, allowComments: boolean, file: File) {
+
+    const formData = new FormData();
+    formData.append('description', description);
+    formData.append('allowComments', allowComments ? 'true' : 'false');
+    formData.append('imageFile', file);
+
+    return this.client.post(API + 'photos/upload', formData);
+}
+```
+
+Agora basta executar o `subscribe` e retornar para a rota que estão as imagens, usando o `Router` (necessário importar o `RouterModule`);
+
+```typescript
+constructor(
+    private photoFormBuilder: FormBuilder,
+    private photoService: PhotoService,
+    private route: Router
+) {}
+
+upload() {
+    const description = this.photoFormGroup.get('description').value;
+    const allowComments = this.photoFormGroup.get('allowComments').value;
+
+    this.photoService
+        .upload(description, allowComments, this.file)
+        .subscribe(() => this.route.navigate(['']));
+}
+```
+
+<img src="https://caelum-online-public.s3.amazonaws.com/940-angular-parte3/01/1_5_1_foto+erro.png" alt="uploadincorreto" style="zoom:80%;" />
+
+**PORÉM,** obtivemos um erro na exibição da imagem, porquê?
+
+* Até o momento, o componente `photos.ts` espera receber da API, um valor **serializado**, chamado de **`data uri`** (como se fosse uma string gigantesca) e estamos passando um **caminho físico**, ou seja, estamos passando **onde está a foto**, porém nosso componente não sabe lidar com os dois caminhos.
+
+  ```html
+  <img class="img-thumbnail" [src]="url" [alt]="description">
+  ```
+
+### @Input() Setter
+
+Para que seja possível receber **valores distintos** em **uma inbound property**, iremos utilizar de um **`set`**, conhecido como **setter**, onde a lógica vai ser:
+
+* É um `data uri`? ou seja, a URL, começa com `data`? Se sim, iremos devolver a url;
+* É um caminho físico? então iremos devolver o `localhost:3000/imgs/` + `url`;
+
+```typescript
+const API = 'http://localhost:3000/imgs/'
+
+@Component({
+    selector: 'app-photo',
+    templateUrl: './photo.component.html',
+    styleUrls: ['./photo.component.css'],
+})
+export class PhotoComponent implements OnInit {
+    private _url: string = '';
+    @Input() description: string;
+    @Input() set url(url: string) {
+        if (!url.startsWith('data')) {
+            this._url = API + url;
+        } else {
+            this._url = url;
+        }
+    }
+
+    get url() {
+        return this._url;
+    }
+```
+
+
+
+## Preview Imagem
+
+### Input hidden - Estilizando botão
+
+O projeto atual, está com um botão simples HTML e queremos muda-lo:
+
+![botaosimples](https://caelum-online-public.s3.amazonaws.com/940-angular-parte3/01/1_2_1_upload.png)
+
+**PORÉM,** o HTML já interpreta para nós que este botão `type=file` irá fazer a função de selecionar um arquivo e **não queremos perder isso**! Para que um novo botão faça a mesma função, iremos utilizar do **tagueamento em angular**;
+
+1. Adicione o atributo `hidden` no botão `file`;
+
+2. Insira o botão estilizado:
+
+   ```html
+   <button type="button" class="btn btn-primary">
+       <em class="fa fa-image fa-4x align-middle"></em>
+   </button>
+   <input
+          hidden
+          formControlName="file"
+          type="file"
+          accept="image/*"
+          (change)="file = $event.target.files[0]"
+          />
+   ```
+
+3. Para que ao clicar no botão estilizado, seja executado o botão `hidden`, iremos utilizar do **_event binding_** `(click)` passando uma tag `(click)="fileInput.click()"`, e iremos atribuir o `#fileInput` dentro do `<input hidden>`:
+
+   ```html
+   <button type="button" (click)="fileInput.click()" class="btn btn-primary">
+       <em class="fa fa-image fa-4x align-middle"></em>
+   </button>
+   <input
+          #fileInput
+          hidden
+          formControlName="file"
+          type="file"
+          accept="image/*"
+          (change)="file = $event.target.files[0]"
+          />
+   ```
+
+![botaoNovo](https://caelum-online-public.s3.amazonaws.com/940-angular-parte3/02/2_1_1_botao+novo.png)
+
+### Preview
+
+Até o momento, o usuário não enxerga aquilo que ele escolheu, o que é ruim, mas como fazer?<br>
+
+O segredo para mostrar a foto que foi selecionada, é converte-la para `data:uri` (não temos como utiliza-la como caminho físico, pq ela não foi adicionada ainda) e **para converter** utilizaremos do **`FileReader`**!
+
+1. Precisamos manipular o evento do `input file`, para isto, iremos alterar o `(change)="file = $event.target.files[0]"`, onde iremos chamar uma função, que receberá o `file`:
+
+   ```html
+   <input
+          #fileInput
+          hidden
+          formControlName="file"
+          type="file"
+          accept="image/*"
+          (change)="handleFile($event.target.files[0])"
+          />
+   ```
+
+2. No `handleFile`, iremos esperar receber um tipo `File`, que iremos converter para `data uri`:
+
+   ```typescript
+   handleFile(file:File){
+       this.file = file;
+   }
+   ```
+
+3. A conversão será feita por um `fileReader`, que iremos atribuir a variável `reader`.
+
+4. O `fileReader`, possui o método `readAsDataURL()`, que passeremos o `file`:
+
+   ```typescript
+   handleFile(file:File){
+       this.file = file;
+       const reader = new FileReader();
+       reader.readAsDataURL(file);
+   }
+   ```
+
+Como esta operação é assíncrona (`readAsDataURL`), precisaremos esperar que a foto seja carregada, com o método `onload`, que possui uma função de callback, que poderemos atribuir ao nosso `preview`, desta forma, assim que for concluído o carregameto, iremos mostrar esse parâmetro `preview:string`;
+
+1. Crie a variável `preview`;
+
+2. Chame o método `onload`, e com a função de callback, guarde o resultado em `preview`:
+
+   ```typescript
+   preview:string;
+   
+   handleFile(file: File) {
+       this.file = file;
+       const reader = new FileReader();
+       reader.onload = (event: any) => (this.preview = event.target.result);
+       reader.readAsDataURL(file);
+   }
+   ```
+
+3. No HTML, iremos criar uma `<div>` com `*ngIf`, que irá verificar se possui alguma string no `preview`, caso possua irá exibir a foto:
+
+   ```html
+   <div class="form-group" *ngIf="!preview; else previewImage">
+       <button
+               type="button"
+               (click)="fileInput.click()"
+               class="btn btn-primary"
+               >
+   ```
+
+4. Caso possua algo no `preview`, iremos chamar o `photo.component` (necessário importar o `PhotoModule`)
+
+   ```html
+   <ng-template #previewImage>
+       <div class="text-center">
+           <app-photo [url]="preview" title="Preview"></app-photo>
+       </div>
+   </ng-template>
+   ```
+
+## Directive 
+
+As diretivas servem para que através do `selector` da diretiva algo ocorra.<br>
+
+Por exemplo:
+
+* Quero que quando for clicado no botão **+** (correspondente a abertura do form para adicionar Foto), seja automaticamente aberto a selação de arquivos!
+
+Se analisarmos, o que precisamos é efetuar um `click()` no `button`, assim que a rota `p/add` for chamada e para isto faremos o uso de uma diretiva!
+
+### Criando Diretiva
+
+As diretivas, geralmente são utilizadas por mais de um componente, portanto **ficam no shared** da aplicação;
+
+1. Crie o módulo, pois iremos exportar, `ng g m shared/directive/immediate-click`;
+
+2. Execute `ng g directive shared/directive/immediate-click`;
+
+3. Abra o arquivo `ImmediateClickDirective` e nele, iremos alterar o `selector` para `[immediateClick]`;
+
+4. No construtor, iremos utilizar do `ElementRef` para executar o `click()`;
+
+5. Implementaremos o `onInit`, para que quando for chamada a classe, seja efetuado o click!
+
+   ```typescript
+   @Directive({
+       selector: '[immediateClick]'
+   })
+   export class ImmediateClickDirective implements OnInit{
+   
+       constructor(private elementref: ElementRef) { }
+   
+       ngOnInit(): void {
+           this.elementref.nativeElement.click();
+       }
+   
+   }
+   ```
+
+6. Exporte a diretiva, pelo `ImmediateClickModule` e importe o módulo no `PhotoFormModule`;
+
+7. Dentro do `PhotoForm.html` iremos chamar o selector `immediateClick`:
+
+   ```html
+   <button
+           immediateClick
+           type="button"
+           (click)="fileInput.click()"
+           class="btn btn-primary"
+           >
+   ```
+
+   
 
