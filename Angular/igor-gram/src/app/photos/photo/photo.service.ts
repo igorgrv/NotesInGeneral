@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { iPhoto } from './iPhoto';
+import { iPhotoComment } from './iPhotoComments';
 
 const API = 'http://localhost:3000/';
 
@@ -30,5 +31,13 @@ export class PhotoService {
     formData.append('imageFile', file);
 
     return this.client.post(API + 'photos/upload', formData);
+  }
+
+  findById(photoId:number) {
+    return this.client.get<iPhoto>(API + 'photos/' + photoId);
+  }
+
+  getComments(photoId:number) {
+    return this.client.get<iPhotoComment[]>(API + 'photos/' + photoId + '/comments');
   }
 }

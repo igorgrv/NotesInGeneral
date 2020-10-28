@@ -2753,39 +2753,44 @@ Com o controller e rotas criadas, basta utilizarmos o `mongoose` a nosso favor e
 const Usuario = require('../model/usuario');
 
 class UsuarioController {
-  static routes() {
-    return {
-      signup: '/signup',
-      signin: '/signin',
-      usuarios: '/usuarios',
-      usuarioId: '/usuario/:id',
-    };
-  }
+    static routes() {
+        return {
+            signup: '/signup',
+            signin: '/signin',
+            usuarios: '/usuarios',
+            usuarioId: '/usuario/:id',
+        };
+    }
 
-  signup() {
-    return (req, res) => {
-      const usuario = new Usuario(req.body);
-      usuario
-        .save()
-        .then(() => res.status(201).json(usuario))
-        .catch((err) => res.status(400).json(err));
-    };
-  }
+    signup() {
+        return async (req, res) => {
+            const usuario = new Usuario(req.body);
+            try {
+                await usuario.save();
+                res.status(201).json
+            } catch (err) {
+                res.status(400).json({mensagem: 'mensagem de erro'}))
+            }
+        };
+    }
 }
 
 module.exports = UsuarioController;
 ```
 
-### GetAll - GetById
+### Get
 
 `getAll:`
 
 ```javascript
 usuarios() {
-    return (req, res) => {
-        Usuario.find({})
-            .then((usuarios) => res.status(200).json(usuarios))
-            .catch((err) => res.status(500).json(err));
+    return async (req, res) => {
+        try {
+            const usuarios = await Usuario.find({});
+            res.status(200).json(usuarios);
+        } catch (err) {
+            res.status(500).json({ mensagem: 'mensagem de erro' });
+        }
     };
 }
 ```
@@ -2794,16 +2799,17 @@ usuarios() {
 
 ```javascript
 usuario() {
-    return (req, res) => {
+    return async (req, res) => {
         const _id = req.params.id;
-        Usuario.findById(_id)
-            .then((usuario) => {
+        try {
+            const usuario = await Usuario.findOne(_id);
             if (!usuario) {
-                res.status(500).send('Usuário não encontrado');
+                res.status(500).send({ mensagem: 'usuário não encontrado' });
             }
-            res.status(200).json(usuario);
-        })
-            .catch((err) => res.status(500).json(err));
+            res.status(200).json({ usuario });
+        } catch (err) {
+            res.status(500).json({ mensagem: 'mensagem de erro' });
+        }
     };
 }
 ```

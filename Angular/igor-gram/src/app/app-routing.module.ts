@@ -4,6 +4,7 @@ import { PhotoListComponent } from './photos/photo-list/photo-list.component';
 import { PhotoListResolver } from './photos/photo-list/photo-list.resolver';
 import { PhotoFormComponent } from './photos/photo-form/photo-form.component';
 import { FormGuard } from './core/auth/form-guard.guard';
+import { PhotoDetailsComponent } from './photos/photo-details/photo-details.component';
 
 const routes: Routes = [
   {
@@ -24,6 +25,10 @@ const routes: Routes = [
     path: 'p/add',
     component: PhotoFormComponent,
     canActivate: [FormGuard],
+  },
+  {
+    path: 'p/:photoId',
+    component: PhotoDetailsComponent,
   },
 ];
 

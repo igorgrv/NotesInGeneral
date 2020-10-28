@@ -5087,3 +5087,166 @@ Agora basta na rota para o `p/add` adicionarmos com a tag `canActivate` este `gu
 },
 ```
 
+## Detalhes da Foto
+
+A idéia vai ser quando clicar em cima da foto, exbir os comentários ou adicionar comentários aquela foto.
+
+1. Crie o componente e módulo -> `ng g m photos/photo-detail`;
+
+2. Adicione a rota `p/:photoId` que irá chamar o componente `PhotoDetailComponent`;
+
+   ```typescript
+   {
+       path: 'p/:photoId',
+       component: PhotoDetailsComponent,
+   },
+   ```
+
+3. Adicionaremos o módulo `PhotoDetailsModule` ao `PhotosModule`;
+
+4. Adicionaremos um `['routerLink']` para esta rota, dentro do componente `Photos.component`, para isto devemos adicionar ao `PhotoListModule` o `RouterModule`
+
+   ```typescript
+     imports: [CommonModule, PhotoModule, RouterModule],
+   ```
+
+   ```html
+   <a [routerLink]="['/p', photo.id]">
+       <app-photo [url]="photo.url" [description]="photo.description"></app-photo>
+       <div class="text-center p-1">
+           <em aria-hidden="true" class="fa fa-heart-o fa-1x mr-2"></em>
+           <em aria-hidden="true" class="fa fa-comment-o fa-1x mr-2 ml-2"></em>
+       </div>
+   </a>
+   ```
+
+5. Para recuperar a informação da foto, iremos pegar o `photoId`, através do `ActivatedRoute`;
+
+   ```typescript
+   export class PhotoDetailsComponent implements OnInit {
+   
+       constructor(private route:ActivatedRoute) { }
+   
+       ngOnInit(): void {
+           const id = this.route.snapshot.params.photoId;
+           console.log(id);
+       }
+   
+   }
+   ```
+
+6. Com o `id`, é possível passar para API que espera receber `/photos/id`
+
+   ```typescript
+   findById(photoId:number) {
+       return this.client.get<iPhoto>(API + 'photos/' + photoId);
+   }
+   ```
+
+7. Faremos o `subscribe` e então iremos incluir o template:
+
+   ```typescript
+   export class PhotoDetailsComponent implements OnInit {
+     photo$: Observable<iPhoto>;
+     photoId: number;
+   
+     constructor(
+       private route: ActivatedRoute,
+       private photoService: PhotoService
+     ) {}
+   
+     ngOnInit(): void {
+       this.photoId = this.route.snapshot.params.photoId;
+       this.photo$ = this.photoService.findById(id);
+     }
+   }
+   ```
+
+   ```html
+   <div class="bg-white border" *ngIf="(photo$ | async) as photo">
+     <div class="row">
+       <div class="col-lg-8">
+         <app-photo
+           [url]="photo?.url"
+           [description]="photo?.description"
+         ></app-photo>
+       </div>
+       <div class="col-lg-4 p-4">
+         <small>
+           <p class="text-left break-word">{{ photo?.description }}</p>
+           <hr />
+         </small>
+         <div class="mt-4">
+           <form>
+             <div class="input-group">
+               <textarea class="form-control"></textarea>
+               <div class="input-group-append">
+                 <button class="btn btn-primary pull-left">Publish</button>
+               </div>
+             </div>
+           </form>
+         </div>
+       </div>
+     </div>
+   </div>
+   ```
+
+8. Necessário importar o `PhotoModule` para usar o seletor `app-photo`;
+
+## Comentário nas Fotos
+
+Quando entramos no detalhe das fotos, queremos que apareça os comentários ja existente daquela Foto;
+
+1. Criaremos a interface `iPhotoComments`:
+
+   ```typescript
+   export interface PhotoComment {
+       date: Date;
+       text: string;
+       userName: string;
+   }
+   ```
+
+2. Iremos chamar o endpoint da API, que busca os comentários, através da rota `/photos/id/comments`, passando como parâmetro a nossa interface:
+
+   ```typescript
+   getComments(photoId: number) {
+       return this.http.get<PhotoComment[]>(API + '/photos/' + photoId + '/comments');
+   }
+   ```
+
+3. Criaremos o componente `PhotoComments`, que será implementado pelo `PhotoDetails`:
+
+   ```bash
+   ng g c photos/photo-details/photo-comments
+   ```
+
+4. Dentro do `PhotoComments.ts`, iremos chamar o service e adicionaremos uma inbound property para recuperar o id
+
+   ```typescript
+   export class PhotoCommentsComponent implements OnInit {
+       comments$: Observable<iPhotoComment[]>;
+       @Input() photoId: number;
+   
+       constructor(private photoService: PhotoService) {}
+   
+       ngOnInit(): void {
+           this.comments$ = this.photoService.getComments(this.photoId);
+       }
+   }
+   ```
+
+5. Dentro do `PhotoDetails` iremos chamar o seletor do `PhotoComments`;
+
+   ```html
+   <div class="col-lg-4 p-4">
+       <small>
+           <p class="text-left break-word">{{ photo?.description }}</p>
+           <hr />
+       </small>
+   
+       <app-photo-comments [photoId]="photoId"></app-photo-comments>
+   ```
+
+   
+
