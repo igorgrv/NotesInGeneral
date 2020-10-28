@@ -1,0 +1,40 @@
+cria dockerfile
+
+from -> especifica de onde ele vai pegar uma imagem
+	- no cao busca o do liberty
+
+env -> variavel de local	
+run -> cria um diretorio com o mkdir
+
+docker build -t barramento
+	- faz o download
+	
+
+	- aparece as imagens
+	
+docker run -d -p 8088:9080 --name barramento
+	- o container tera 8088 na minha maquina 9080
+
+docker images -> imagens existentes na maquina
+docker ps -> containers em execução
+docker ps -a -> containers em execução inclusive os parados
+docker logs -f barramento -> vemos funcionadno
+
+docker exec -it barramento /bin/bash  -> acesso as pastas
+
+cat -> exibe oq tem no arquivo
+
+docker rm 0 barramento --force -> para o container
+docker rmi imagem -> deleta a imagem
+
+kubernates -> ele gerencia os containers
+	- inves de subir, gerenciar, gerenciar outro node, ele escala outros pots/container, nodeBalancer
+	
+docker pull (para baixar a imagem docker.hub)
+dockerfile -> alteramos o FROM para a imagem que foi feita o pull
+
+Sequencia:
+docker build -t barramento --plataform linux . -f docker/Dockerfile (para executar o docker como linux)
+docker run -d -p 9080:8080 --name barramento barramento:latest
+
+
