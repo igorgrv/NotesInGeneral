@@ -29,12 +29,14 @@ docker rmi imagem -> deleta a imagem
 
 kubernates -> ele gerencia os containers
 	- inves de subir, gerenciar, gerenciar outro node, ele escala outros pots/container, nodeBalancer
+
 	
 docker pull (para baixar a imagem docker.hub)
+	- docker pull websphere-liberty
 dockerfile -> alteramos o FROM para a imagem que foi feita o pull
 
 Sequencia:
-docker build -t barramento --plataform linux . -f docker/Dockerfile (para executar o docker como linux)
+docker build -t barramento --platform linux . -f docker/Dockerfile (para executar o docker como linux)
 docker run -d -p 9080:8080 --name barramento barramento:latest
 
 
