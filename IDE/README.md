@@ -44,13 +44,9 @@
 
 [VSCode Java Developer](https://aka.ms/vscode-java-installer-win) -> Kit para instalação e configuração de projetos Java;
 
-## Plugins
+## Tomcat + Maven
 
-* Angular Essentials;
-* Docker;
-* [Tomcat For Java (0.11.2)](https://marketplace.visualstudio.com/items?itemName=adashen.vscode-tomcat);
-
-
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/vscodetomcat.png?raw=true" alt="vscodejava" style="zoom:67%;" />
 
 ## Shortcuts
 
@@ -69,8 +65,76 @@
 | `ctrl + shift + g` | **Painel** git                                               |
 | `ctrl + shift + f` | **Painel** pesquisa                                          |
 | `ctrl + '`         | **Painel** terminal                                          |
-|                    |                                                              |
-|                    |                                                              |
-|                    |                                                              |
-|                    |                                                              |
+| `shift + alt + o`  | Organiza **Imports**                                         |
+
+## settings.json
+
+```json
+{
+    "javascript.preferences.quoteStyle": "single",
+    "typescript.preferences.quoteStyle": "single",
+    "typescript.updateImportsOnFileMove.enabled": "always",
+
+    "window.zoomLevel": 0,
+    "editor.autoIndent": "full",
+    "editor.codeLens": false,
+    "editor.cursorBlinking": "solid",
+    "editor.cursorSmoothCaretAnimation": true,
+    "editor.cursorStyle": "line",
+    "editor.fontLigatures": true,
+    "editor.formatOnPaste": true,
+    "editor.formatOnType": false,
+    "editor.lineHeight": 25,
+    "editor.minimap.enabled": false,
+    "editor.multiCursorModifier": "ctrlCmd",
+    "editor.suggestSelection": "first",
+    "editor.tabCompletion": "on",
+    "editor.tabSize": 2,
+    "editor.wordWrap": "on",
+
+    "workbench.colorTheme": "Atom One Dark",
+    "prettier.printWidth": 120,
+    "prettier.bracketSpacing": true,
+    "prettier.singleQuote": true,
+}
+```
+
+## extensions.json
+
+```json
+{
+    "recommendations": [
+        "mikael.angular-beastcode",
+        "johnpapa.angular-essentials",
+        "akamud.vscode-theme-onedark",
+        "steoates.autoimport",
+        "ms-azuretools.vscode-docker",
+        "eamodio.gitlens",
+        "vscjava.vscode-java-pack",
+        "gabrielbb.vscode-lombok",
+        "pkief.material-icon-theme",
+        "pivotal.vscode-boot-dev-pack",
+        "adashen.vscode-tomcat",
+    ],
+    "unwantedRecommendations": []
+}
+```
+
+### Plugins
+
+* Angular Essentials;
+* Docker;
+* [Tomcat For Java (0.11.2)](https://marketplace.visualstudio.com/items?itemName=adashen.vscode-tomcat);
+* Spring Boot Extension Pack;
+* Lombok Annotation;
+* Snippets (HTML, Angular, css, javascript);
+
+## JavaScript Check
+
+Adicionando `//@ts-check` no inicio dos arquivos `.js` será feita uma validação do código (sem ser em tempo de execução!);
+
+```javascript
+//@ts-check
+const express = requie('express'); //irá reclamar pq é 'require'
+```
 
