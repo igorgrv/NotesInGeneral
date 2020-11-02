@@ -4,8 +4,8 @@
       <a [routerLink]="['/p', photo.id]">
         <app-photo [url]="photo.url" [description]="photo.description"></app-photo>
         <div class="text-center p-1">
-          <em aria-hidden="true" class="fa fa-heart-o fa-1x mr-2"></em>
-          <em aria-hidden="true" class="fa fa-comment-o fa-1x mr-2 ml-2"></em>
+          <em aria-hidden="true" class="fa fa-heart-o fa-1x mr-2"></em>{{ photo.likes }}
+          <em aria-hidden="true" class="fa fa-comment-o fa-1x mr-2 ml-2"></em>{{ photo.comments }}
         </div>
       </a>
     </div>

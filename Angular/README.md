@@ -1284,6 +1284,15 @@ O WebPack dispensa a utilização de outros loaders, justamente porque ele cria 
 
 # Angular<a name="angular"></a>
 
+## Anotações
+
+| Ação/Parâmetro | O que faz                                                    |
+| -------------- | ------------------------------------------------------------ |
+| `tap`          | O operador tap permite executar um efeito colateral, isto é, executar um código arbitrário em sua chamada, sem modificar o resultado do observable. Muito usado para logar informações, mas no exemplo ele é usado para resetar o formulário. |
+| `Renderer`     | É uma abstração para modificarmos propriedades do DOM. Muito útil quando estamos renderizando a aplicação no lado do server, por exemplo, através do Angular Universal. |
+| `of`           | Permite criar um Observable de um tipo qualquer.             |
+| `catchError`   | Permite tratar erros, evitando assim que se propague para quem realizou a inscrição no Observable |
+
 Preparando o ambiente, recursos necessários:
 
 * Angular CLI;
@@ -5221,7 +5230,7 @@ Quando entramos no detalhe das fotos, queremos que apareça os comentários ja e
    ng g c photos/photo-details/photo-comments
    ```
 
-4. Dentro do `PhotoComments.ts`, iremos chamar o service e adicionaremos uma inbound property para recuperar o id
+4. Dentro do `PhotoComments.ts`, iremos chamar o service e adicionaremos uma inbound property para que o `PhotoDetails` passe o `id`;
 
    ```typescript
    export class PhotoCommentsComponent implements OnInit {
@@ -5236,17 +5245,255 @@ Quando entramos no detalhe das fotos, queremos que apareça os comentários ja e
    }
    ```
 
-5. Dentro do `PhotoDetails` iremos chamar o seletor do `PhotoComments`;
+5. Dentro do `PhotoDetails` iremos chamar o seletor do `PhotoComments` , passando o `photoId` (que recuperemos através da rota)
 
    ```html
-   <div class="col-lg-4 p-4">
-       <small>
-           <p class="text-left break-word">{{ photo?.description }}</p>
-           <hr />
-       </small>
+   <app-photo-comments [photoId]="photoId"></app-photo-comments>
+   ```
    
-       <app-photo-comments [photoId]="photoId"></app-photo-comments>
+
+Desta forma, estamos deixando como responsável o `photoDetails` por pular os comentários do `PhotoComments`, basta apenas colocarmos o template dos comentários!
+
+### Template Comentário
+
+```html
+<div *ngIf="comments$ | async as comments">
+    <ul class="list-unstyled">
+        <li *ngFor="let comment of comments">
+            <a
+               class="text-dark font-weight-bold mr-1"
+               [routerLink]="['/user', comment.userName]"
+               >
+                {{ comment.userName }}
+            </a>
+            <em>
+                {{ comment.date | date: "dd-MM-yyyy HH:mm" }}
+            </em>
+            <p class="break-word mb-2">
+                {{ comment.text }}
+            </p>
+        </li>
+    </ul>
+    <div class="mt-4">
+        <form>
+            <div class="input-group">
+                <textarea class="form-control"></textarea>
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary pull-left">
+                        Publish
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+```
+
+### Validando Comentários
+
+A validação será feita no `PhotoDetails`, pois ali que ficará o `<form>`
+
+1. Toda validação requer o `ReactiveFormsModule` no import
+
+   ```typescript
+   @NgModule({
+       declarations: [PhotoDetailsComponent, PhotoCommentsComponent],
+       imports: [
+           CommonModule,
+           PhotoModule,
+           RouterModule,
+           ReactiveFormsModule,
+           VMessageModule,
+       ],
+       exports: [PhotoDetailsComponent, PhotoCommentsComponent],
+   })
+   export class PhotoDetailsModule {}
+   ```
+
+2. A tag `<form>` precisará de um `formGroup` (que precisará de um `formBuilder`). Através do `formBuilder`, conseguimos fazer as validações por campo, onde cada campo será um `formControlName`:
+
+   ```typescript
+   commentGroup: FormGroup;
+   
+   constructor(
+       private route: ActivatedRoute,
+       private photoService: PhotoService,
+       private formBuilder:FormBuilder
+   ) {}
+   
+   ngOnInit(): void {
+       this.photoId = this.route.snapshot.params.photoId;
+       this.photo$ = this.photoService.findById(this.photoId);
+       this.commentGroup = this.formBuilder.group({
+           comment: ['', Validators.maxLength(300)]
+       });
+   }
+   ```
+
+3. Para nível de layout, iremos colocar um `break-word` global, portanto, vamos no arquivo `style.css`:
+
+   1. Este estilo é utilizado no `photoComments`
+
+   ```css
+   .break-word {
+       word-break: break-all
+   }
+   ```
+
+### Salvando comentário
+
+Teremos que atribuir a tag `<form>` a ação do `(submit)`:
+
+```html
+<form [formGroup]="commentGroup" (submit)="saveComment()">
+</form>
+```
+
+```typescript
+saveComment() {
+    const comment = this.commentGroup.get('comment').value as string;
+}
+```
+
+Agora basta que criemos o método `post`, dentro do `photoService`, passando o `id` e o texto:
+
+```typescript
+saveComment(photoId: number, commentText: string) {
+    return this.client.post(API + 'photos/' + photoId + '/comments', {
+        commentText,
+    });
+}
+```
+
+Agora, no método `saveComment()`:
+
+```typescript
+saveComment() {
+    const comment = this.commentGroup.get('comment').value as string;
+    this.photoService.saveComment(this.photoId, comment).subscribe(() => {
+        this.commentGroup.reset();
+        alert('Comentário adicionado com sucesso');
+    });
+}
+```
+
+### Lidando com Refresh - SwitchMap
+
+Quando postamos um comentário e queremos que ele automáticamente faça um refresh do componente, utilizamos do `rxJs`, através do método `switchMap`!
+
+* `switchMap` -> utilizado para quando terminar uma operação que outra seja chamada;
+
+Para utilizar o `switchMap` é necessário o uso do `pipe` ;
+
+* É necessário atribuir o `observable` que irá ter os comentários! No nosso caso `this.comments$`
+
+```typescript
+saveComment() {
+    const comment = this.commentGroup.get('comment').value as string;
+    this.comments$ = this.photoService
+      .saveComment(this.photoId, comment)
+      .pipe(switchMap(() => this.photoService.getComments(this.photoId)))
+      .pipe(
+        tap(() => {
+          this.commentGroup.reset();
+        })
+      );
+}
+```
+
+
+
+## Rotas alternando usuários
+
+Atualmente, se entrarmos na rota `photos/flavio` e irmos para rota `photos/almeida`, um problema irá acontecer! O componente `PhotoList` não será chamado 2x!<br>
+
+Para corrigir este problema, teremos que no `photoList.ts` nos inscrevermos na rota atual!
+
+```typescript
+ngOnInit(): void {
+    this.route.params.subscribe(params => {
+    this.userName = params.username;
+    this.photos = this.route.snapshot.data['photos'];
+})
+```
+
+## Removendo
+
+Service para remover:
+
+```typescript
+removePhoto(photoId: number) {
+    return this.http.delete(API + 'photos/' + photoId);
+}
+```
+
+Dentro do `PhotoDetail` iremos adicionar ao lado da descrição, a opção de curtir e deltar:
+
+```html
+<div class="col-lg-4 p-4">
+    <small>
+        <p class="text-left break-word">{{ photo?.description }}</p>
+        <div class="text-left mb-4">
+            <em class="fa fa-comment-o fa-2x mr-2 ml-2"></em>{{ photo.comments }}
+            <em (click)="remove()" class="fa fa-trash-o fa-2x pull-right"></em>
+        </div>
+        <hr />
+    </small>
+```
+
+O método `remove()` sera responsável por fazer a remoção em si da foto
+
+```typescript
+remove() {
+    this.photoService
+        .removePhoto(this.photoId)
+        .subscribe(() => this.route.navigate(['']));
+}
+```
+
+### Removendo somente se for o Usuario
+
+Esta implementação, possui um problema, pq estamos poderiamos remover a foto de outro usuário!
+
+* Para fazer tratamento das informações do `subscribe`, podemos criar uma **diretiva!**
+
+Iremos criar o componente `PhotoOwnerOnly`:
+
+1. Com o comando `ng g directive photos/photo-details/photo-owner-only/photo-owner-only` iremos gerar a diretiva;
+
+2. Esta diretiva será responsável por alterar o `style` do elemento, caso o usuário seja diferente do usuário dono da `photo`;
+
+3. Devemos deixar uma `inbound property` para receber a Photo e com o `UserService` iremos verificar o usuário:
+
+   ```typescript
+   export class PhotoOwnerOnlyDirective {
+       @Input() ownedPhoto: iPhoto;
+   
+       constructor(
+       private element: ElementRef<any>,
+        private userService: UserService,
+        private renderer: Renderer2
+       ) {}
+   
+       ngOnInit(): void {
+           this.userService.getUser().subscribe((user) => {
+               if (!user || user.id != this.ownedPhoto.userId) {
+                   console.log('entrou no if');
+                   this.renderer.setStyle(
+                       this.element.nativeElement,
+                       'display',
+                       'none'
+                   );
+               }
+           });
+       }
+   }
+   ```
+
+4. Basta utilizarmos no `photoDetails.html`:
+
+   ```html
+   <em photoOwnerOnly [ownedPhoto]="photo" (click)="remove()" class="fa fa-trash-o fa-2x pull-right"></em>
    ```
 
    
-

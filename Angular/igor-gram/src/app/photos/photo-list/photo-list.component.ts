@@ -14,17 +14,20 @@ export class PhotoListComponent implements OnInit {
   filter: string = '';
   currentPage: number = 1;
   hasMore: boolean = true;
+  userName: string;
 
   constructor(private service: PhotoService, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.photos = this.route.snapshot.data.photos;
+    this.route.params.subscribe(params => {
+      this.userName = params.username;
+      this.photos = this.route.snapshot.data['photos'];
+    })
   }
 
   load() {
-    const username = this.route.snapshot.params.username;
     this.service
-      .listUserPage(username, ++this.currentPage)
+      .listUserPage(this.userName, ++this.currentPage)
       .subscribe((photos) => {
         this.filter = '';
         this.photos = this.photos.concat(photos);

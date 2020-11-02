@@ -33,11 +33,24 @@ export class PhotoService {
     return this.client.post(API + 'photos/upload', formData);
   }
 
-  findById(photoId:number) {
+  findById(photoId: number) {
     return this.client.get<iPhoto>(API + 'photos/' + photoId);
   }
 
-  getComments(photoId:number) {
-    return this.client.get<iPhotoComment[]>(API + 'photos/' + photoId + '/comments');
+  getComments(photoId: number) {
+    return this.client.get<iPhotoComment[]>(
+      API + 'photos/' + photoId + '/comments'
+    );
+  }
+
+  saveComment(photoId: number, commentText: string) {
+    console.log(photoId, commentText);
+    return this.client.post(API + 'photos/' + photoId + '/comments', {
+      commentText,
+    });
+  }
+
+  removePhoto(photoId: number) {
+    return this.client.delete(API + 'photos/' + photoId);
   }
 }
