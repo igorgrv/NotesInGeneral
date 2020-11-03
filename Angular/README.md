@@ -1286,12 +1286,15 @@ O WebPack dispensa a utilização de outros loaders, justamente porque ele cria 
 
 ## Anotações
 
-| Ação/Parâmetro | O que faz                                                    |
-| -------------- | ------------------------------------------------------------ |
-| `tap`          | O operador tap permite executar um efeito colateral, isto é, executar um código arbitrário em sua chamada, sem modificar o resultado do observable. Muito usado para logar informações, mas no exemplo ele é usado para resetar o formulário. |
-| `Renderer`     | É uma abstração para modificarmos propriedades do DOM. Muito útil quando estamos renderizando a aplicação no lado do server, por exemplo, através do Angular Universal. |
-| `of`           | Permite criar um Observable de um tipo qualquer.             |
-| `catchError`   | Permite tratar erros, evitando assim que se propague para quem realizou a inscrição no Observable |
+| Ação/Parâmetro                | O que faz                                                    |
+| ----------------------------- | ------------------------------------------------------------ |
+| `tap`                         | O operador tap permite executar um efeito colateral, isto é, executar um código arbitrário em sua chamada, sem modificar o resultado do observable. Muito usado para logar informações, mas no exemplo ele é usado para resetar o formulário. |
+| `Renderer`                    | É uma abstração para modificarmos propriedades do DOM. Muito útil quando estamos renderizando a aplicação no lado do server, por exemplo, através do Angular Universal. |
+| `of`                          | Permite criar um Observable de um tipo qualquer.             |
+| `catchError`                  | Permite tratar erros, evitando assim que se propague para quem realizou a inscrição no Observable; |
+| `readonly`                    | Propriedade de uma classe pública, porém somente leitura para que não tenhamos que escrever métodos acessadores caso fossem privadas; |
+| `Subject`                     | Possui o método `asObservable` que retorna um tipo Observable; Um Subject é um tipo genérico, isto é, o tipo que definirmos será o tipo de dado emitido. **FALTA INFO**; |
+| Comunicação entre pai e filho | Podem ser feitas por: Inbound property, Output property e através de variáveis de tempalte; |
 
 Preparando o ambiente, recursos necessários:
 
@@ -5451,7 +5454,7 @@ remove() {
 }
 ```
 
-### Removendo somente se for o Usuario
+### Diretiva para ocultar botão
 
 Esta implementação, possui um problema, pq estamos poderiamos remover a foto de outro usuário!
 
@@ -5496,4 +5499,202 @@ Iremos criar o componente `PhotoOwnerOnly`:
    <em photoOwnerOnly [ownedPhoto]="photo" (click)="remove()" class="fa fa-trash-o fa-2x pull-right"></em>
    ```
 
+## Mensagens globais
+
+A idéia é disparar uma mensagem quando o usuário remover, ou adicionar uma foto no topo do cabeçalho!
+
+Para isto iremos:
+
+1. Gerar o componente `Alert`, com `ng g c shared/components/alert`;
+
+2. Gerar o serviço `Alert`, com `ng g s shared/componentes/alert/alert`;
+
+3. Adicionar no `app.module` o `AlertModule`;
+
+4. Gerar uma **classe** chamada `alert.ts`:
+
+   1. Adicionar um `Enum` onde teremos os tipos de alerta pré definidos:
+      1. `readonly` está desta forma para que não seja possível `setar` nenhuma variável;	
+
+   ```typescript
+   export class Alert {
    
+       constructor(
+        public readonly alertType: AlertType,
+        public readonly message: string
+       ) {}
+   }
+   
+   export enum AlertType {
+       SUCCESS,
+       WARNING,
+       DANGER,
+       INFO
+   }    
+   ```
+
+### Service
+
+O Service que será responsável por interagir com o componente de alerta, onde **através de um Subject** será possível essa interação!
+
+1. Dentro do `AlertService` iremos criar um parâmetro do tipo `Subject<Alert>`;
+
+2. Criaremos um método privado `alert` que encapsulará os tipos de alerta (sucesso e etc);
+
+3. Disponibilizaremos um método que retorna um Observable;
+
+   ```typescript
+   export class AlertService {
+     alertSubect: Subject<Alert> = new Subject<Alert>();
+   
+     private alert(alertType: AlertType, message: string) {
+       this.alertSubect.next(new Alert(alertType, message));
+     }
+   
+     getAlert() {
+       this.alertSubect.asObservable();
+     }
+   
+     success(message: string) {
+       this.alert(AlertType.SUCCESS, message);
+     }
+   
+     warning(message: string) {
+       this.alert(AlertType.WARNING, message);
+     }
+   
+     danger(message: string) {
+       this.alert(AlertType.DANGER, message);
+     }
+   
+     info(message: string) {
+       this.alert(AlertType.INFO, message);
+     }
+   }
+   ```
+
+### Componente Alert
+
+A idéia é de que nosso componente possua:
+
+* Tipo de alerta (podendo ser mais de um, ou seja, um Array);
+
+  * A inclusão de um ou mais arrays, será feito dentro do `AlertService`;
+
+  ```typescript
+  constructor(private alertService: AlertService) {
+      this.alertService.getAlert().subscribe((alert) => {
+          if (!alert) {
+              this.alerts = [];
+          }
+          this.alerts.push(alert);
+      });
+  }
+  ```
+
+
+* Tempo (ms) que ficará aparecendo o alerta (default deixaremos 3segs);
+
+  ```typescript
+  @Input() timeout = 3000;
+  ```
+
+  * Para que o `timeout` funcione, iremos precisar utilizar a função `setTimeout` junto com um método `removeAlert`;
+
+    * O Método `removeAlert` irá fazer um `filter` que irá verificar se o alerta que está sendo removido
+
+    ```typescript
+    constructor(private alertService: AlertService) {
+        this.alertService.getAlert().subscribe((alert) => {
+            if (!alert) {
+                this.alerts = [];
+            }
+            this.alerts.push(alert);
+            setTimeout(() => {
+                this.removeAlert(alert);
+            }, this.timeout);
+        });
+    }
+    
+    removeAlert(alertToRemove: Alert) {
+        this.alerts = this.alerts.filter((alert) => alert != alertToRemove);
+    }
+    ```
+
+#### Template dinâmico
+
+Para exibir os alertas de início iremos iterar sobre nossa lista, a questão é só como iremos alterar o `class`?
+
+1. No `alert.html` iremos adicionar o template abaixo:
+
+   ```html
+   <div *ngFor="let alert of alerts">
+       {{ alert.message }}
+   </div>
+   ```
+
+2. Agora para o `class` iremos criar um método, que irá receber um `alert` que fará uma verificação do tipo que foi selecionado:
+
+   ```html
+   <div *ngFor="let alert of alerts" class="text-center {{ getAlertClass(alert) }}">
+       {{ alert.message }}
+   </div>
+   ```
+
+   ```typescript
+   getAlertClass(alert: Alert) {
+       if (!alert) return '';
+       switch (alert.alertType) {
+           case AlertType.DANGER:
+               return 'alert alert-danger';
+           case AlertType.INFO:
+               return 'alert alert-info';
+           case AlertType.SUCCESS:
+               return 'alert alert-success';
+           case AlertType.WARNING:
+               return 'alert alert-warning';
+       }
+   }
+   ```
+
+3. Agora basta adicionar dentro do `header` (fazer os devidos imports no `CoreModule`):
+
+   ```html
+       </nav>
+       <div class="fixed-top">
+           <app-alert></app-alert>
+       </div>
+   </header>
+   ```
+
+### Consumindo mensagem
+
+No `PhotoDetails`, dentro do método `remove()` iremos **antes** do redirect, fazer com que apareça a mensagem da remoção;
+
+1. Adicionar no construtor o `alertService`;
+
+2. Chamar o método respectivo de `sucess` ou `warning`:
+
+   ```typescript
+   constructor(
+       private route: ActivatedRoute,
+       private photoService: PhotoService,
+       private router: Router,
+       private alertService:AlertService
+     ) {}
+   
+     remove() {
+       this.photoService.removePhoto(this.photoId)
+       .subscribe(() => {
+         this.alertService.success("Photo Removed!")
+         this.router.navigate(['']);
+       },
+       err => {
+         console.log(err);
+         this.alertService.success('Could not delete the photo!');
+       });
+     }
+   ```
+
+Faremos o mesmo para o `PhotoForm`!
+

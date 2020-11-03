@@ -7,6 +7,7 @@ import { PhotosModule } from './photos/photos.module';
 import { CoreModule } from './core/core.module';
 import { VMessageModule } from './shared/components/vmessage/vmessage.module';
 import { HomeModule } from './home/home.module';
+import { AlertModule } from './shared/components/alert/alert.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -16,6 +17,7 @@ import { HomeModule } from './home/home.module';
     CoreModule,
     VMessageModule,
     AppRoutingModule,
+    AlertModule
   ],
   providers: [],
   bootstrap: [AppComponent],

@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { iPhoto } from '../photo/iPhoto';
 import { PhotoService } from '../photo/photo.service';
+import { AlertService } from '../../shared/components/alert/alert.service';
 
 @Component({
   selector: 'app-photo-details',
@@ -16,7 +17,8 @@ export class PhotoDetailsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private photoService: PhotoService,
-    private router:Router
+    private router: Router,
+    private alertService:AlertService
   ) {}
 
   ngOnInit(): void {
@@ -25,8 +27,14 @@ export class PhotoDetailsComponent implements OnInit {
   }
 
   remove() {
-    this.photoService
-      .removePhoto(this.photoId)
-      .subscribe(() => this.router.navigate(['']));
+    this.photoService.removePhoto(this.photoId)
+    .subscribe(() => {
+      this.alertService.success("Photo Removed!")
+      this.router.navigate(['']);
+    },
+    err => {
+      console.log(err);
+      this.alertService.success('Could not delete the photo!');
+    });
   }
 }
