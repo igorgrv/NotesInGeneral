@@ -5698,3 +5698,128 @@ No `PhotoDetails`, dentro do método `remove()` iremos **antes** do redirect, fa
 
 Faremos o mesmo para o `PhotoForm`!
 
+## Curtindo foto
+
+A idéia será de que disponibilizaremos um 'coração' para que o usuário curta a foto dentro dos comentários, porém faremos validações, como:
+
+* Usuário só deve curtir a foto caso ele esteja logado (sinal de uma diretiva)
+
+Para que apareça o coração na página de comentários, iremos adicionar o coração no `photoDetails.html`:
+
+```html
+<div class="text-left mb-4">
+  <em class="fa fa-heart-o fa-2x mr-2 pull-left"></em>{{ photo.likes }}
+  <em class="fa fa-comment-o fa-2x mr-2 ml-2"></em>{{ photo.comments }}
+  <em photoOwnerOnly [ownedPhoto]="photo" (click)="remove()" class="fa fa-trash-o fa-2x pull-right"></em>
+</div>
+```
+
+### Curtir apenas se logado [diretiva]
+
+Para que seja verificado se o usuário está logado, iremos encapsular o `UserService.islogged()`, de uma forma que poderemos aplicar uma diretiva diretamente no elemento!
+
+1. Crie o módulo com `ng g m shared/directive/show-if-logged-directive`
+
+2. Crie a diretiva na pasta → `shared/directive/show-if-logged-directive/show-if-logged`
+
+3. Importe o `ShowIfLoggedDirectiveModule` dentro do `PhotoDetailsModule`;
+
+4. Como iremos mexer com elementos do DOM, iremos importar no construtor o `Renderer2 & ElementRef`
+
+   ```typescript
+   @Directive({
+     selector: '[appShowIfLogged]',
+   })
+   export class ShowIfLoggedDirective implements OnInit {
+     constructor(
+      private element: ElementRef<any>,
+      private renderer: Renderer2,
+      private userService: UserService
+     ) {}
+     
+     ngOnInit(): void {
+       !this.userService.isLogged() &&
+         this.renderer.setStyle(this.element.nativeElement, 'display', 'none');
+     }
+   }
+   ```
+
+5. Basta adicionar o `selector` no `PhotoDetails.html`:
+
+   ```html
+   <em appShowIfLogged class="fa fa-heart-o fa-2x mr-2 pull-left">{{ photo.likes }}</em>
+   ```
+
+   
+
+### Curtindo a foto [service]
+
+Para curtir a foto, basta fazermos um `post` para a URL `API/photos/{id}/like`, sendo assim no `PhotoService` iremos criar o método `like()`:
+
+```typescript
+like(photoId: number) {
+  return this.client.post(API + 'photos/' + photoId + '/like', {});
+}
+```
+
+Agora criarmos um método no `PhotoDetails.ts` para realizar o 'like'
+
+```typescript
+like(photo: iPhoto) {
+  this.photoService
+    .like(photo.id)
+    .subscribe((liked) => {
+      if (liked) {
+        this.photo$ = this.photoService.findById(photo.id);
+      }
+  	});
+}
+```
+
+E então fazer com que no `click` do icone, seja disparado essa função
+
+```html
+<em (click)="like(photo)" appShowIfLogged class="fa fa-heart-o fa-2x mr-2 pull-left">{{ photo.likes }}</em>
+```
+
+### Tratando erros
+
+O backend não está preparado para o 'dislike', ou seja se clicarmos duas vezes na foto, o backend irá **retornar erro 304**, mas como fazer com que isso não seja disparado para o usuário?<br>
+
+Iremos fazer com que o método `like` do `PhotoService` retorne `true` se não tiver erro e `false` se tiver alguem erro;<br>
+
+Para que o `Observable` se torne um `Observable<boolean>` faremos uso do método `of`!
+
+1. Dentro do `PhotoService`, iremos primeiro disponibilizar o `response`
+
+   ```typescript
+   like(photoId: number) {
+       return this.client
+         .post(API + 'photos/' + photoId + '/like', {}, { observe: 'response' });
+   ```
+
+2. Agora iremos fazer com que retorne `true` caso tenha alguma resposta
+
+   ```typescript
+     like(photoId: number) {
+       return this.client
+         .post(API + 'photos/' + photoId + '/like', {}, { observe: 'response' })
+         .pipe(map((res) => true));
+   ```
+
+3. Porém, precisamos fazer com que venha `false` caso seja o erro `304` e para isto iremos utilizar o `catchError()` e o `of`:
+
+   ```typescript
+   like(photoId: number) {
+     return this.client
+       .post(API + 'photos/' + photoId + '/like', {}, { observe: 'response' })
+       .pipe(map((res) => true))
+       .pipe(
+       catchError((err) => {
+         return (err.status = '304' ? of(false) : throwError(err));
+       })
+     );
+   }
+   ```
+
+   

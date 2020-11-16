@@ -128,6 +128,11 @@
 * Spring Boot Extension Pack;
 * Lombok Annotation;
 * Snippets (HTML, Angular, css, javascript);
+* Typescript Hero;
+* Tslint;
+* Path Intellisense;
+* Typescript importer;
+* Prettier;
 
 ## JavaScript Check
 
