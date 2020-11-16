@@ -5822,4 +5822,28 @@ Para que o `Observable` se torne um `Observable<boolean>` faremos uso do método
    }
    ```
 
-   
+
+
+## Ambiente de Deploy [var ambiente]
+
+Quando realizamos o `ng build —prod` não queremos que a URL da API seja `localhost`, queremos que seja uma nova URL, e para fazer esse chaveamento, fazemos uso do `environment` e `enriomnent.prod`.
+
+1. Abra o `environment` e crie o parâmetro `apiUrl`
+
+   ```typescript
+   export const environment = {
+     production: false,
+     apiUrl: 'http://localhost:3000/',
+   };
+   ```
+
+2. Abre o `environment.prod` e crie da mesma forma:
+
+   ```typescript
+   export const environment = {
+     production: true,
+     apiUrl: 'http://localhost:3000/',
+   };
+   ```
+
+3. Agora onde estamos utilizando 'localhost', iremos alterar para `environment.ApiUrl` e testaremos novamente a aplicação, tudo deve funcionar normalmente!
