@@ -95,6 +95,7 @@ O Docker é um conjunto de tecnologias **OpenSource** cujo o intuito é facilita
 |      `docker run -e AUTHOR="" imagem`      |     **Roda** a imagem e habilita **variáve de ambiente**     |
 |       `docker run -v "var/www" img`        |            **Roda** a imagem e cria um **volume**            |
 | `docker run -v "user\desktop:var/www" img` | **Roda** a imagem e cria um **volume** espelhando no desktop |
+|     `docker run -w "/var/www" imagem`      |          **Roda** a imagem e inicia dentro da pasta          |
 |         `docker start idContainer`         |          **Starta** um container que estava parado           |
 |      `docker start -a -i idContainer`      |    **Starta** um container e abre o terminal do container    |
 |         `docker stop idContainer`          |                    **Para** um container                     |
@@ -105,6 +106,9 @@ O Docker é um conjunto de tecnologias **OpenSource** cujo o intuito é facilita
 |              `docker images`               |               **Exibe** todas imagens baixadas               |
 |           `docker rmi suaImagem`           |                     **Remove** a imagem                      |
 |              `docker inspect`              |                  **Inspeciona** o container                  |
+|               `docker build`               |                      **Cria** a imagem                       |
+|       `docker build -f NomeArquivo`        | **Cria** a imagem baseado no arquivo (precisa estar com o arquivo no diretório) |
+|    `docker build -t usuario/nomeImagem`    |                **Cria** a imagem com um nome                 |
 
 ## Comandos Linux
 
@@ -117,7 +121,7 @@ O Docker é um conjunto de tecnologias **OpenSource** cujo o intuito é facilita
 | `echo "oi" > arquivo.txt` |     **Preenche** o arquivo com um texto      |
 |     `apt-get update`      |           **Atualiza** os pacotes            |
 |     `mkdir nomePasta`     |              **Cria** uma pasta              |
-|                           |                                              |
+|           `pwd`           |          **Exibe** o caminho atual           |
 |                           |                                              |
 
 ## Layered File System
@@ -137,3 +141,51 @@ Os volumes nos permitem criar um local em específico que serão salvos os dados
 Para trabalhar com volumes, utiliamos do `docker run -v "/var/www"` onde o `-v` representa a criação de um volume, na pasta `var/www`, ou seja, tudo que salvarmos dentro de `var/www` estará sendo salvo no **Docker Host** da máquina!
 
 * `docker run -v "C:\Users\usuario\desktop:/var/www" ubuntu` -> irá informar que tudo que for salvo na pasta `var/www` será salvo na verdade no `desktop`!
+
+### Rodando uma aplicação no container
+
+Com o conceito de volume em mente, podemos fazer com que **transportemos uma aplicação para o container!**, para isto iremos utilizar do:
+
+* `-p` → para referenciar a porta;
+* `-d` → para não ficar travado o terminal;
+* `-v` → para mapear o volume
+* `-w` → para informar o docker onde iniciar
+
+* `pwd` → para referenciar o caminho
+
+Para rodar a aplicação no container, iremos ir até a aplicação pelo terminal, utilizando `cd` e então utilizaremos do `pwd` !
+
+```bash
+igorromero@MBP-de-Igor Docker % cd volume-exemplo 
+
+igorromero@MBP-de-Igor volume-exemplo % pwd
+/Users/igorromero/NotesInGeneral/Docker/volume-exemplo
+```
+
+Agora basta utilizarmos os comandos juntos:
+
+```dockerfile
+docker run -v "$(pwd):/var/www" -w "/var/www" -p 8080:3000 -d node npm run start
+```
+
+## Dockerfile
+
+O Dockerfile, vem para nos auxiliar a **criar nossas próprias imagens**, para que depois seja possível fazer um `publish` da imagem no **Docker Hub**.<br>
+
+Para escrever um arquivo `.dockerfile`, existem comandos básicos que espelham as ações que fazemos com comandos `docker`, porém é necessário **que o arquivo esteja dentro do projeto**!
+
+### Comandos Básicos Dockerfile
+
+|            Comando            |                          O que faz                           |
+| :---------------------------: | :----------------------------------------------------------: |
+|     `FROM imagem:version`     |      **Referencia** uma imagem base que será utilizada       |
+|     `MAINTAINER criador`      |                    **Criador** da imagem                     |
+| `COPY pathOrigem pathDestino` | **Copia** do caminho de origem → destino (`copy . /var/www` → `.` →indica todos arquivos da origem) |
+|        `WORKDIR path`         |     **Path** de inicio da aplicação (`WORKDIR /var/www`)     |
+|         `RUN comando`         |           **Roda** um comando (`RUN npm install`)            |
+|     `ENTRYPOINT comando`      |   **Roda** o comando, depois que o container for estartado   |
+|         `EXPOSE port`         | **Expõem** a porta (geralmente a porta q aplicação precisa)  |
+|       `ENV variavel=x`        | **Cria** variável de ambiente (`ENV PORT=3000`) → para utilizar rodamos `EXPOSE $PORT` |
+
+### Criando imagem
+
