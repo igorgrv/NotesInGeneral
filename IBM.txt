@@ -1,7 +1,0 @@
-Simple question: how is the world different because it exists?
-- IBM is the backbone of the world's most mission critical systems;
-- IBM is the forefront of some of the most exciting techonologies, that literally change the way the world works:
-	* Whether it's cloud; (1.2trillions, 20% came)
-	* AI; (15trillions, 4% came)
-	- Blockchain
-	- Quantum Computing
