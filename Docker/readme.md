@@ -78,37 +78,44 @@ O Docker é um conjunto de tecnologias **OpenSource** cujo o intuito é facilita
 * Docker Hub → repositório;
 * Docker Machine → gerencia o Docker em um host virtual;
 
-## Comandos Básicos
+## **Comandos Básicos
 
-|                  Comando                   |                          O que faz                           |
-| :----------------------------------------: | :----------------------------------------------------------: |
-|                `docker ps`                 |               **Exibe** containers em execução               |
-|               `docker ps -a`               |       **Exibe todos** containers (parados ou em exec.)       |
-|               `docker ps -q`               |              **Exibe todos** IDs dos containers              |
-|             `docker run image`             | **Roda** uma imagem (podendo ser ubunto, hello-word, node);  |
-|           `docker run -it image`           |          **Roda** a imagem e **entra** no container          |
-|                   `exit`                   |               **Sai** do terminal do container               |
-|           `docker run -d image`            |    **Roda** a imagem e **não permite** entrar no terminal    |
-|       `docker run -P 12345:80 image`       | **Roda** a imagem e **habilita porta** 12345 externa a 80 do container |
-|         `docker port idContainer`          |        **Exibe** a porta que esta rodando o container        |
-|     `docker run --name nomeCont image`     |          **Roda** a imagem e **nomeia** o container          |
-|      `docker run -e AUTHOR="" imagem`      |     **Roda** a imagem e habilita **variáve de ambiente**     |
-|       `docker run -v "var/www" img`        |            **Roda** a imagem e cria um **volume**            |
-| `docker run -v "user\desktop:var/www" img` | **Roda** a imagem e cria um **volume** espelhando no desktop |
-|     `docker run -w "/var/www" imagem`      |          **Roda** a imagem e inicia dentro da pasta          |
-|         `docker start idContainer`         |          **Starta** um container que estava parado           |
-|      `docker start -a -i idContainer`      |    **Starta** um container e abre o terminal do container    |
-|         `docker stop idContainer`          |                    **Para** um container                     |
-|       `docker stop $(docker ps -q)`        |             **Para** todos os container em exec.             |
-|       `docker stop -t 0 idContainer`       |                **Para** de forma mais rápida                 |
-|          `docker rm idContainer`           |                    **Remove** o container                    |
-|          `docker container prune`          |           **Remove** todos containers **inativos**           |
-|              `docker images`               |               **Exibe** todas imagens baixadas               |
-|           `docker rmi suaImagem`           |                     **Remove** a imagem                      |
-|              `docker inspect`              |                  **Inspeciona** o container                  |
-|               `docker build`               |                      **Cria** a imagem                       |
-|       `docker build -f NomeArquivo`        | **Cria** a imagem baseado no arquivo (precisa estar com o arquivo no diretório) |
-|    `docker build -t usuario/nomeImagem`    |                **Cria** a imagem com um nome                 |
+|                      Comando                      |                          O que faz                           |
+| :-----------------------------------------------: | :----------------------------------------------------------: |
+|                    `docker ps`                    |               **Exibe** containers em execução               |
+|                  `docker ps -a`                   |       **Exibe todos** containers (parados ou em exec.)       |
+|                  `docker ps -q`                   |              **Exibe todos** IDs dos containers              |
+|                `docker run image`                 | **Roda** uma imagem (podendo ser ubunto, hello-word, node);  |
+|              `docker run -it image`               |          **Roda** a imagem e **entra** no container          |
+|                      `exit`                       |               **Sai** do terminal do container               |
+|               `docker run -d image`               |    **Roda** a imagem e **não permite** entrar no terminal    |
+|          `docker run -P 12345:80 image`           | **Roda** a imagem e **habilita porta** 12345 externa a 80 do container |
+|             `docker port idContainer`             |        **Exibe** a porta que esta rodando o container        |
+|        `docker run --name nomeCont image`         |          **Roda** a imagem e **nomeia** o container          |
+|           `docker run -e XXX="" imagem`           |     **Roda** a imagem e habilita **variáve de ambiente**     |
+|           `docker run -v "var/www" img`           |            **Roda** a imagem e cria um **volume**            |
+|    `docker run -v "user\desktop:var/www" img`     | **Roda** a imagem e cria um **volume** espelhando no desktop |
+|         `docker run -w "/var/www" imagem`         |          **Roda** a imagem e inicia dentro da pasta          |
+|          `docker run —network nomeRede`           |              **Roda** a imagem em **uma rede**               |
+|            `docker start idContainer`             |          **Starta** um container que estava parado           |
+|         `docker start -a -i idContainer`          |    **Starta** um container e abre o terminal do container    |
+|         `docker start $(docker ps -a -q)`         |             **Starta** todos containers parados              |
+|             `docker stop idContainer`             |                    **Para** um container                     |
+|           `docker stop $(docker ps -q)`           |             **Para** todos os container em exec.             |
+|          `docker stop -t 0 idContainer`           |                **Para** de forma mais rápida                 |
+|              `docker rm idContainer`              |                    **Remove** o container                    |
+|             `docker container prune`              |           **Remove** todos containers **inativos**           |
+|                  `docker images`                  |               **Exibe** todas imagens baixadas               |
+|              `docker rmi suaImagem`               |                     **Remove** a imagem                      |
+|                 `docker inspect`                  |                  **Inspeciona** o container                  |
+|                  `docker build`                   |                      **Cria** a imagem                       |
+|           `docker build -f NomeArquivo`           | **Cria** a imagem baseado no arquivo (precisa estar com o arquivo no diretório) |
+|       `docker build -t usuario/nomeImagem`        |                **Cria** a imagem com um nome                 |
+|                  `docker login`                   |                   **Login** no Docker Hub                    |
+|             `docker push nomeImagem`              |                     **Publica** a imagem                     |
+|             `docker pull nomeImagem`              |                     **Consome** a imagem                     |
+| `docker network create —driver bridge nomeDaRede` |                    **Cria** uma **rede**                     |
+|             `docker logs idContainer`             |                **Exibe** um log da aplicação                 |
 
 ## Comandos Linux
 
@@ -168,7 +175,7 @@ Agora basta utilizarmos os comandos juntos:
 docker run -v "$(pwd):/var/www" -w "/var/www" -p 8080:3000 -d node npm run start
 ```
 
-## Dockerfile
+## Imagem - Dockerfile
 
 O Dockerfile, vem para nos auxiliar a **criar nossas próprias imagens**, para que depois seja possível fazer um `publish` da imagem no **Docker Hub**.<br>
 
@@ -187,5 +194,128 @@ Para escrever um arquivo `.dockerfile`, existem comandos básicos que espelham a
 |         `EXPOSE port`         | **Expõem** a porta (geralmente a porta q aplicação precisa)  |
 |       `ENV variavel=x`        | **Cria** variável de ambiente (`ENV PORT=3000`) → para utilizar rodamos `EXPOSE $PORT` |
 
-### Criando imagem
+### Criando Dockerfile
+
+Seguindo os comandos básicos, conseguimos criar uma imagem do docker.<br>
+
+Dentro da aplicação [volume-exemplo](https://s3.amazonaws.com/caelum-online-public/646-docker/03/projetos/volume-exemplo.zip), iremos criar um `Dockerfile`, para que seja possível executar o projeto no container, com a **imagem do Node**;
+
+1. Iremos chamar a imagem do Node;
+2. Depois declarar uma variável de ambiente `ENV PORT` referenciando a porta 3000;
+3. Copiar todos arquivos do projeto (`.`), para a pasta `var/www`;
+4. Informar para o container iniciar em `/var/www` (por conta do package.json);
+
+```dockerfile
+FROM node
+ENV PORT=3000
+COPY . /var/www
+WORKDIR /var/www
+RUN npm install
+ENTRYPOINT npm start
+EXPOSE $PORT
+```
+
+### Criando a imagem
+
+Com o `Dockerfile` criado, agora é possível rodar o `docker build`.<br>
+
+1. Acessaremos via terminal, o local onde esta o `Dockerfile`;
+
+2. Com o `-f` iremos informar o nome do arquivo;
+
+3. Com o `-t` iremos informar o `usuário/nomeImagem`
+
+4. Por fim, iremos por um `.` para informar que o arquivo `Dockerfile`esta ali
+
+   ```dockerfile
+   docker build -f Dockerfile -t igor/node .
+   ```
+
+5. Agora basta rodar a imagem
+
+   ```dockerfile
+   docker run -d -p 8080:3000 igor/node
+   ```
+
+   
+
+### Publicando imagem Docker Hub
+
+Para publicar uma imagem no [Docker Hub](https://hub.docker.com/) é necessário criar uma conta primeiro.
+
+1. Com a conta criada, executaremos `docker login` e colocaremos o `user id` e a senha;
+2. Agora faremos o `docker push nomeDaImagem` → `docker push igorromeronode` 
+3. Se abrirmos o **Docker Hub** iremos ver uma imagem publicada, que podemos consumi-la com o `docker pull nomeDaImagem`
+
+
+
+## Networking - Comunicando containers
+
+E se quisermos fazer com que os containers se comuniquem? Por padrão, o Docker possui uma **rede default** que permite que os containers se conversem!<br>
+
+Se rodarmos um `docker inspect`, poderemos ver em `NetworkingSettings` que o container esta rodando na **rede padrão, chamada BRIDGE**. Onde cada container **terá um IP próprio**:
+
+<img src="https://s3.amazonaws.com/caelum-online-public/646-docker/05/imagens/rede-docker.png" alt="rede" style="zoom: 50%;" />
+
+### Testando comunicação via IP
+
+1. Vamos criar 2 containers (1 e 2) para isto, abra 2 terminais:
+
+   ````
+   docker run -it —name container-1 ubuntu
+   ````
+
+2. Em cada container, iremos rodar um `hostname -i`, para pegarmos o IP;
+
+3. Com o comando `apt-get update && apt-get install iputils-ping` iremos habilitar o `ping`;
+
+4. Ping colocando `ping ipContainer`;
+
+### Comunicação via Nome
+
+Comunicar via IP não é algo muito bom, pq  teriamos que saber qual o IP toda as vezes para comunicar um APP com um BD por exemplo?<br>
+
+Para comunicação ocorrer entre aplicações, é necessário **criar uma network**, pois em uma rede interna, **é possível realizar a comunicação através do nome** da aplicação!
+
+1. Rode o comando para criação da rede, passando o **tipo de driver** e o nome da rede;
+
+   ```
+   docker network create --driver bridge nomeDaRede
+   ```
+
+2. Para consultar se foi criado:
+
+   ```
+   docker network ls
+   ```
+
+3. Para rodar o container na network criada
+
+   ```
+   docker run -it --name container-1 --network nomeDaRede
+   ```
+
+4. Desta forma é possível realizar o `ping` utilizando o nome da aplicação!
+
+### Comunicando APP + BD
+
+Para comunicar um aplicativo com o banco de dados, utilizaremos 2 imagens:
+
+```docker
+docker pull mongo
+docker pull igorgrv/books
+```
+
+Devemos nos atentar a algumas configurações padrão da aplicação, como:
+
+* Porta definida → neste caso `3000` → teremos que rodar nesta porta
+* Nome do host do BD → neste caso `meu-mongo` → o container terá que ter este nome
+
+Portanto, tendo essas infos. Podemos rodar:
+
+```
+docker run --network minhaNetwork -p 8080:3000 -d igorgrv/books
+
+docker run --network minhaNetwork --name meu-mongo -d mongo
+```
 
