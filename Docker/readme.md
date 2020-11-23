@@ -181,7 +181,7 @@ O Dockerfile, vem para nos auxiliar a **criar nossas próprias imagens**, para q
 
 Para escrever um arquivo `.dockerfile`, existem comandos básicos que espelham as ações que fazemos com comandos `docker`, porém é necessário **que o arquivo esteja dentro do projeto**!
 
-### Comandos Básicos Dockerfile
+### **Comandos Básicos
 
 |            Comando            |                          O que faz                           |
 | :---------------------------: | :----------------------------------------------------------: |
@@ -319,3 +319,161 @@ docker run --network minhaNetwork -p 8080:3000 -d igorgrv/books
 docker run --network minhaNetwork --name meu-mongo -d mongo
 ```
 
+
+
+## Docker Compose
+
+Imagine que queremos subir:
+
+* 3 containers idénticos;
+* Container com BD;
+* Container com um Load Balancer;
+
+<img src="https://s3.amazonaws.com/caelum-online-public/646-docker/06/imagens/funcionamento-aplicacoes.png" alt="compose" style="zoom: 50%;" />
+
+Teriamos que rodar pelo menos 5 containers! Imagine quanta configuração poderá ficar faltando…<br>
+
+O **Docker compose** se trata de uma configuração, que pode ser feita através de **arquivos `.yml`** que conterá toda configuração dos containers!
+
+### Entendendo APP
+
+Como utilizaremos 3 tipos de containers, sendo 2 deles (APP & Load Balancer), teremos que ter **2 tipos de `Dockerfile`**.<br>
+
+```dockerfile
+# NGINX.dockerfile
+FROM nginx:latest
+COPY /public /var/www/public			# /public contem os arq estaticos
+COPY /docker/config/nginx.conf /etc/nginx/nginx.conf			# config do nginx
+RUN chmod 755 -R /var/www/public
+EXPOSE 80 443
+ENTRYPOINT ["nginx"]
+# Parametros extras para o entrypoint
+CMD ["-g", "daemon off;"]
+
+
+# APP.dockerfile
+FROM node:latest
+ENV NODE_ENV=development
+COPY . /var/www
+WORKDIR /var/www
+RUN npm install 
+ENTRYPOINT ["npm", "start"]
+EXPOSE 3000
+```
+
+### **Comandos Básicos
+
+O `docker-compose.yml` lembra um `json`, onde é composto de arguns parâmetros, como:
+
+|      Comando      |                          O que faz                           |
+| :---------------: | :----------------------------------------------------------: |
+|  `version: '3'`   |                   Informa o tipo de versão                   |
+|   `services: `    |                  **Informa** os containers                   |
+|     `build:`      | **Informa** onde esta o dockerfile e a partir de qual contexto |
+|     `image: `     |             **Declara** a partir de qual imagem              |
+| `container_name:` |               **Informa** o nome do container                |
+|     `ports: `     |            **Declara** a porta que será utilizada            |
+|    `networks:`    |        **Declara** o nome da rede e o tipo de driver         |
+|   `depends_on:`   |       **Informa** que é necessário container X iniciar       |
+
+No `yaml` toda vez que um **parâmetro possui traço (`-`)** indica que pode haver +1 valor!<br>
+
+Exemplo de `docker-compose.yml`:
+
+```yaml
+version: '3'
+services:
+    nginx:
+        build:
+            dockerfile: ./docker/nginx.dockerfile
+            context: .
+        image: douglasq/nginx
+        container_name: nginx
+        ports:
+            - "80:80"
+        networks: 
+            - production-network
+        depends_on: 
+            - "node1"
+            - "node2"
+            - "node3"
+
+    mongodb:
+        image: mongo
+        container_name: meu-mongo
+        networks: 
+            - production-network
+
+    node1:
+        build:
+            dockerfile: ./docker/alura-books.dockerfile
+            context: .
+        image: igorgrv/books
+        container_name: alura-books-1
+        ports:
+            - "3000"
+        networks: 
+            - production-network
+        depends_on:
+            - "mongodb"
+
+    node2:
+        build:
+            dockerfile: ./docker/alura-books.dockerfile
+            context: .
+        image: igorgrv/books
+        container_name: alura-books-2
+        ports:
+            - "3000"
+        networks: 
+            - production-network
+        depends_on:
+            - "mongodb"
+
+    node3:
+        build:
+            dockerfile: ./docker/alura-books.dockerfile
+            context: .
+        image: igorgrv/books
+        container_name: alura-books-3
+        ports:
+            - "3000"
+        networks: 
+            - production-network
+        depends_on:
+            - "mongodb"
+
+networks: 
+    production-network:
+        driver: bridge
+```
+
+### Subindo serviços
+
+1. Para realizar o **build** do docker-compose, **dentro da aplicação**, executamos:
+
+   ```
+   docker-compose build
+   ```
+
+   1. Este comando irá baixar todas as imagens
+
+2. Para subir os serviços:
+
+   ```
+   docker-compose up
+   ```
+
+3. Para dar restart:
+
+   ```
+   docker-compose restart
+   ```
+
+4. Para parar todos os serviços:
+
+   ```
+   docker-compose down
+   ```
+
+   
