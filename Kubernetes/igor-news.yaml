@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: igor-news
+spec:
+  containers:
+    - name: igor-news-container
+      image: aluracursos/portal-noticias:1

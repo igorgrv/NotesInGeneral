@@ -119,11 +119,14 @@ Para compilar o código, será utilizado o **Prompt de comando**!
 - A JVM não "entende" códigos .java - ela entende códigos **_.class_** - sendo assim é necessário compilar o arquivo .java com o código `javac nomeArquivo.java`;
 - Após gerar o `nomeArquivo.class`, poderemos utilizar o comando `java nomeArquivo` para ver o resultado;
 
+**Na versão 11 do Java, não é necessario rodar o `javac`**
+
 # <a name="ides"></a>IDEs
 As três maiores IDEs são:
 * Eclipse - versão  [Eclipse EE](https://www.eclipse.org/downloads/packages/);
 * Netbeans;
 * Intellij;
+* VSCode;
 
 # <a name="tipos"></a>Tipos
 
@@ -135,7 +138,8 @@ int idade = 37 //Agora o Java entende o que é a 'idade'
 * **bity** -> para números muito pequeno (até 127);
 * **short** -> para números pequenos (até 32mil);
 * **int** -> para números inteiros (até 2 bilhões);
-* **long** -> para números GIGANTES, necessário declar um `l`no final;
+* **long** -> para números GIGANTES, necessário declar um `L` no final;
+	
 	```java
 	long numeroGrande = 33238929838L;
 	```
@@ -152,23 +156,102 @@ int idade = 37 //Agora o Java entende o que é a 'idade'
 	//irá dar 0.3000000000004 - para somas de decimais o ideal é utilizar um BigDecimal
 	```
 
-## <a name="casting"></a>Casting
-	O _casting_ é responsável por "forçar" a troca dos tipos, por exemplo:
-	```java
-	double salario = 1250.70;
-	int valor = salario; 
-	//para que ocorra a transformação do salario para valor é necessário realziar um casting
-	
-	int valor = (int) salario;
-	//resultado: 1250 -> irá perder a precisão
-	```
 * **char** -> guarda um caracter, para isto é necessário deixar entre asplas simples
-	```java
-	char letra = 'i';
-	```
+
+  ```java
+  char letra = 'i';
+  ```
+
+* **Final** -> Quando uma variável **não deve ter seu valor alterado**, declaramos-a como **`final`**:
+
+  ```java
+  final int valorInalterado = 12;
+  valorIntalterado = 13; // → irá gerar um erro de compilação
+  ```
+
+* **Enum** -> Define valores que podem ser escolhidos:
+
+  ```java
+  enum Tamanhos = { PEQUENO, MEDIO, GRANDE};
+  
+  Tamanhos p = Tamanhos.PEQUENO;
+  ```
+
+  
+
+## Operadores matemáticos
+
+Os básicos são `+ - * /` , quando queremos pegar o que __sobrou__ da divisão, utilizamos o `%`;<br>
+
+1. Em um terminal, execute `jshell` (irá permitir executar funções sem precisar compila-las);
+2. Execute `15 / 2` → o resultado será `7` 
+3. Execute `15 % 2` → o resultado será `1`, ou seja, o que sobrou!
+
+<br>
+
+No Java, existe a **Classe `Math`** que irá ter alguns métodos como:
+
+```java
+Math.sqrt(x) // fará a raiz quadrada;
+Math.floorMod(a, b) // funciona como o '%' porém para números negativos
+Math.round(x) // irá arredondar o valor
+```
+
+<br>
+
+## <a name="casting"></a>Casting
+
+O _casting_ é responsável por "forçar" a troca dos tipos, por exemplo:
+
+```java
+double salario = 1250.70;
+int valor = salario; 
+//para que ocorra a transformação do salario para valor é necessário realizar um casting
+
+int valor = (int) salario;
+//resultado: 1250 -> irá perder a precisão
+```
+
+
+## Strings
+
+String é uma **classe** do `java.lang` com uma gama gigante de métodos, por exemplo:
+
+* `substring(a, b)`  → retorna String
+
+  ```java
+  String palavra = "Olá";
+  String letras = palavra.substring(0, 2); // letras = Ol
+  ```
+
+* `equals(x)` | `equalsIgnoreCase(x)` → retorna boolean
+
+  ```java
+  String palavra = "Olá";
+  String palavra2 = "Olá";
+  
+  palavra.equals(palavra2); // irá retorna true
+  ```
+
+* `length()` → retorna int → o `length` conta os **caracteres Unicodes** , alguns caracteres possuem o valor maior que 1;
+
+* `trim()` → retira os espaços;
+
+* `toLowerCase()` | `toUpperCase()` → retorna String com valores minúsculos ou maiúsculos;
+
+* `indexOf` | `lastIndexOf` → retorna em qual posição esta o caracter;
+
+  ```java
+  String hello = "hello";
+  hello.indexOf(l); // irá retornar 2;
+  ```
+
+  
 
 # <a name="condicionais"></a>Condicionais
+
 ## if
+
 Será utilizado para fazer validações "ses" - Ex.:<br>
 ```java
 sysout("Testando o if");
@@ -2291,3 +2374,62 @@ DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyy");
 System.out.println(copa.format(formatador));
 //01/05/2020 -> data formatada
 ```
+
+
+
+
+
+# Java Fundaments Assessment
+
+```
+1.  In Java 8, R apply(T t) is a method of:
+	 B. Function<T,R>
+
+2.  Using the switch statement is more efficient than using a nested if or if-else statement in Java.
+	TRUE
+	
+3.  The finalize() method is called just prior to:
+	D. Garbage collection
+
+4.  Which statement is true?
+	A. StringBuffer is a final class; StringBuilder is not a final class.
+
+7.  Which snippet completes the code so that it counts the number of primes between 1 and max (where max is an integer)?
+private long countPrimes(int max) {
+  ............
+}
+private boolean isPrime(long n) {
+  return n > 1 && rangeClosed(2, (long) sqrt(n)).noneMatch(divisor -> n % divisor == 0);
+}
+
+	B. return range(1, max).parallel().filter(this::isPrime).count();
+
+8.  Which functional interface represents a function that accepts a long-valued argument and produces a double-valued result?
+	C. LongUnaryOperator
+
+9.  What does Class-Data Sharing ("CDS") feature introduced in Java 10 do?
+	C. A feature that allows persistence of class data in file system to be used later for application recovery
+
+10.  Streams may or may NOT have a defined encounter orde
+	TRUE
+
+11.  Developers must deal with concurrency issues when using date because java.util.Date is NOT thread safe.
+	TRUE
+
+12.  Which of the following features were introduced in Java 8?
+	 A. Interface static methods
+   B. Defender methods
+   C. Typesafe enums
+	 
+13.  What special features are provided by the StampedLock class?
+	B. A stamp that can be used to release the lock
+  C. Support for the Optimistic Locking mode
+
+14. Which statements concerning Streams in Java 8 are correct?
+   A. Stream represents a sequence of objects from a source, which supports aggregate operations.
+   B. Most of the stream operations return stream itself so that their result can be pipelined.
+
+15.  Private methods are allowed in interfaces from Java 9 onwards.
+	True
+```
+

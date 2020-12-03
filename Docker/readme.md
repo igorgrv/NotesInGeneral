@@ -477,3 +477,44 @@ networks:
    ```
 
    
+
+## Exemplos
+
+### Java on Liberty + Maven
+
+```dockerfile
+FROM maven:3-jdk-8 as BUILD
+COPY src /usr/src/app/src
+COPY WebContent /usr/src/app/WebContent
+COPY pom.xml /usr/src/app
+RUN mvn -f /usr/src/app/pom.xml compile package install
+
+FROM curlimages/curl:7.70.0 as DOWNLOAD
+ARG ARTIFACTORY_API_KEY=$ARTIFACTORY_API_KEY
+RUN curl -H 'X-JFrog-Art-Api:'$ARTIFACTORY_API_KEY -o /tmp/jvm.options "https://na.artifactory.swg-devops.com/artifactory/txo-cspbc-team-star-generic-local/jvm.options" \
+	&& curl -H 'X-JFrog-Art-Api:'$ARTIFACTORY_API_KEY -o /tmp/keystore.jks "https://na.artifactory.swg-devops.com/artifactory/txo-cspbc-team-star-generic-local/keystore.jks"
+	
+FROM websphere-liberty:latest
+COPY --chown=1001:0 --from=BUILD /usr/src/app/target/target.war /config/apps/
+COPY --chown=1001:0 --from=DOWNLOAD /tmp/jvm.options /config/
+COPY --chown=1001:0 --from=DOWNLOAD /tmp/keystore.jks /config/
+COPY --chown=1001:0 /artifacts/server.xml /config/
+```
+
+
+
+### Java Standalone
+
+```dockerfile
+# Using maven to create executable jar
+FROM maven:3-jdk-8 as BUILD
+COPY src /usr/app/src
+COPY WebContent /usr/app/WebContent
+COPY pom-jobs.xml /usr/app/pom.xml
+RUN mvn -f /usr/app/pom.xml -q clean
+RUN mvn -f /usr/app/pom.xml -q package
+
+FROM openjdk:16-jdk-alpine
+COPY --from=BUILD /usr/app/target/<app-name>-jar-with-dependencies.jar /usr/app/
+```
+

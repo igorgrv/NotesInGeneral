@@ -52,20 +52,21 @@
 
 [Shortcuts keybord.pdf](https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf)
 
-| Shortcuts          | What does the shortcut do?                                   |
-| ------------------ | ------------------------------------------------------------ |
-| `ctrl + shift + t` | **Abre** todos shortcuts                                     |
-| `ctrl + shift + p` | **Abre** pesquisa de configurações e classes<br />Ex.: `>java:` -> irá abrir várias opções de serviços no Java |
-| `ctrl + shift + k` | **Deleta** a linha                                           |
-| `shift + alt + f`  | **Identa** o código                                          |
-| `ctrl + e`         | **Abre** arquivo                                             |
-| `ctrl + .`         | **QuickFix**                                                 |
-| `F5`               | **Run**                                                      |
-| `ctrl + shift + e` | **Painel** explorer (onde ficam os códigos)                  |
-| `ctrl + shift + g` | **Painel** git                                               |
-| `ctrl + shift + f` | **Painel** pesquisa                                          |
-| `ctrl + '`         | **Painel** terminal                                          |
-| `shift + alt + o`  | Organiza **Imports**                                         |
+| Shortcuts                                | What does the shortcut do?                                   |
+| ---------------------------------------- | ------------------------------------------------------------ |
+| `ctrl + shift + t`                       | **Abre** todos shortcuts                                     |
+| `ctrl + shift + p`                       | **Abre** pesquisa de configurações e classes<br />Ex.: `>java:` -> irá abrir várias opções de serviços no Java |
+| `ctrl + shift + k ` | `comd + shift + k` | **Deleta** a linha                                           |
+| `shift + alt + f`                        | **Identa** o código                                          |
+| `ctrl + e`                               | **Abre** arquivo                                             |
+| `ctrl + .`                               | **QuickFix**                                                 |
+| `F5`                                     | **Run**                                                      |
+| `ctrl + shift + e`                       | **Painel** explorer (onde ficam os códigos)                  |
+| `ctrl + shift + g`                       | **Painel** git                                               |
+| `ctrl + shift + f`                       | **Painel** pesquisa                                          |
+| `ctrl + '`                               | **Painel** terminal                                          |
+| `shift + alt + o`                        | Organiza **Imports**                                         |
+| `command + b`                            | **toggle** painel                                            |
 
 ## settings.json
 
