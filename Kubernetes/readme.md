@@ -17,7 +17,9 @@ Um cluster com Kubernetes, pode ser criado:
 
 ## Aprofundando
 
-O Kubernetes NÃO é só um orquestrador de containers, ele possui diversos recursos/soluções que podem ser implementadas!![Screen Shot 2020-12-02 at 22.29.35](/Users/igorromero/Library/Application Support/typora-user-images/Screen Shot 2020-12-02 at 22.29.35.png)
+O Kubernetes NÃO é só um orquestrador de containers, ele possui diversos recursos/soluções que podem ser implementadas
+
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/kubernetes_1.png?raw=true" alt="recursos" style="zoom:67%;" />
 
 O Kubernetes, para gerenciar os cluster, utilizasse de 2 tipos de denominações:
 
@@ -28,7 +30,7 @@ O Kubernetes, para gerenciar os cluster, utilizasse de 2 tipos de denominações
 * **Node**
   * É onde irá **executar** as aplicações;
 
-<img src="/Users/igorromero/Library/Application Support/typora-user-images/Screen Shot 2020-12-02 at 22.32.10.png" alt="Screen Shot 2020-12-02 at 22.32.10" style="zoom:67%;" />
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/kubernetes_node.png?raw=true" alt="recursos" style="zoom:67%;" />
 
 ### Master
 
@@ -38,7 +40,7 @@ O Master possui o chamado **Control Planes**, onde ficam alguns serviços, como:
   * Este é o serviços **responsável por gerenciar os recursos**!
   * Utilizamos do **_Kubectl_** para se comunicar via request com a API, onde podemos criar um arquivo que poderá criar, ler, remover os recursos do cluster!
 
-<img src="/Users/igorromero/Library/Application Support/typora-user-images/Screen Shot 2020-12-02 at 22.41.13.png" alt="Screen Shot 2020-12-02 at 22.41.13" style="zoom: 50%;" />
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/kubernetes_master.png?raw=true" alt="recursos" style="zoom:67%;" />
 
 * C-M (Control Manager);
 * Sched (Schedule);
@@ -53,7 +55,7 @@ O Node, possui para cada VM um par de serviços:
 * Kubelet;
 * K-proxy (realiza a comunicação entre os nodes);
 
-<img src="/Users/igorromero/Library/Application Support/typora-user-images/Screen Shot 2020-12-02 at 22.38.44.png" alt="Screen Shot 2020-12-02 at 22.38.44" style="zoom:50%;" />
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/kubernetes_node_2.png?raw=true" alt="recursos" style="zoom:67%;" />
 
 
 
@@ -241,7 +243,7 @@ spec:
 
 Como vimos os **pods não possuem um IP fixo**, ou seja, como faremos para comunicar um POD com o outro?
 
-<img src="/Users/igorromero/Library/Application Support/typora-user-images/Screen Shot 2020-12-03 at 11.34.31.png" alt="Screen Shot 2020-12-03 at 11.34.31" style="zoom:90%;" />
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/kubernetes_svc.png?raw=true" alt="recursos" style="zoom:67%;" />
 
 O **SVC (Service)** é o recursos responsável por:
 
@@ -256,7 +258,7 @@ Ou seja, através de um **SVC**, podemos mapear um IP para acessa-lo e o SVC ir�
 
 Na prática, um POD irá se comuincar com o SVC e esse SVC irá se comuincar com o outro POD.
 
-![Screen Shot 2020-12-03 at 11.37.50](/Users/igorromero/Desktop/Screen Shot 2020-12-03 at 11.37.50.png)
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/kubernetes_service2.png?raw=true" alt="recursos"/>
 
 #### Configurando SVC
 
@@ -274,7 +276,7 @@ Tudo isto, é feito também através de um arquivo no formato `.json` ou `.yaml`
 
 O `ClusterIP` faz a **comunicação dos PODs dentro de um cluster**, porém não como uma via de mão dupla, ou seja, configuramos o `ClusterIP` para mandar a requisição para 1 POD! Onde **para a comunicação ser estável, utiizamos LABELS**!
 
-<img src="/Users/igorromero/Library/Application Support/typora-user-images/Screen Shot 2020-12-03 at 14.10.00.png" alt="Screen Shot 2020-12-03 at 14.10.00" style="zoom:67%;" />
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/kubernetes_clusterip.png?raw=true" alt="recursos" style="zoom:90%;" />
 
 * Neste exemplo, TODOS PODs, encaminham requisições para o IP `pod-2`, porem o POD final `pod-2` não pode mandar para o `pod-1`.
 
@@ -376,7 +378,7 @@ Podemos entender, que a comunicação entre Pods, **acontece pela Label**, ou se
 
 O `NodePort`, funciona **como um `ClusterIP`**, porém expõe para o mundo o acesso aos Pods também, ou seja, iremos acessar o SVC com o NodePort configurado, que então irá acessar o Pod!
 
-<img src="/Users/igorromero/Library/Application Support/typora-user-images/Screen Shot 2020-12-03 at 14.52.25.png" alt="Screen Shot 2020-12-03 at 14.52.25" style="zoom: 50%;" />
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/kubernetes_nodeport.png?raw=true" alt="recursos" style="zoom:67%;" />
 
 ##### Criando NodePort
 
