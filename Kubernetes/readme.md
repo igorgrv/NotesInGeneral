@@ -684,4 +684,163 @@ Como **`ConfigMap`** teremos que, criar as variáveis:
     MYSQL_PASSWORD: "igor123"
   ```
 
+
+<br>
+
+Configs:
+
+* BD
+
+  ```yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: igor-news-bd
+    labels:
+      app: igor-news-bd
+  spec:
+    containers:
+      - name: igor-news-bd-container
+        image: aluracursos/mysql-db:1
+        ports:
+          - containerPort: 3306
+        envFrom:
+          - configMapRef:
+              name: igor-news-bd-configmap
+  ```
+
+* BD-SVC
+
+  ```yaml
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: igor-news-bd-svc
+  spec:
+    type: ClusterIP
+    selector:
+      app: igor-news-bd
+    ports:
+      - port: 3306
+  ```
+
+* BD-CONFIGMAP
+
+  ```YAML
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: igor-news-bd-configmap
+  data:
+    MYSQL_ROOT_PASSWORD: "igor123"
+    MYSQL_DATABASE: "empresa"
+    MYSQL_PASSWORD: "igor123"
+  ```
+
+<br>
+
+<br>
+
+* SISTEMA
+
+  ```yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: igor-news-sistema
+    labels:
+      app: igor-news-sistema
+  spec:
+    containers:
+      - name: igor-news-sistema-container
+        image: aluracursos/sistema-noticias:1
+        ports:
+          - containerPort: 80
+        envFrom:
+          - configMapRef:
+              name: igor-news-sistema-configmap
+  ```
+
+* SISTEMA-SVC
+
+  ```yaml
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: igor-news-sistema-svc
+  spec:
+    type: NodePort
+    selector:
+      app: igor-news-sistema
+    ports:
+    - port: 80
+      nodePort: 30001
+  ```
+
+* SISTEMA-CONFIGMAP
+
+  ```YAML
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: igor-news-sistema-configmap
+  data:
+    HOST_DB: igor-news-bd-svc:3306 #será o name do SVC do BD + porta
+    USER_DB: root
+    PASS_DB: igor123
+    DATABASE_DB: empresa
+  ```
+
+<br>
+
+<br>
+
+* PORTAL
+
+  ```yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: igor-news-portal
+    labels:
+      app: igor-news-portal
+  spec:
+    containers:
+      - name: igor-news-portal-container
+        image: aluracursos/portal-noticias:1
+        ports:
+          - containerPort: 80
+        envFrom:
+          - configMapRef:
+              name: igor-news-portal-configmap
+  ```
+
+* PORTAL-SVC
+
+  ```yaml
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: igor-news-portal-svc
+  spec:
+    type: NodePort
+    selector:
+      app: igor-news-portal
+    ports:
+    - port: 80
+      nodePort: 30002
+  ```
+
+* PORTAL-CONFIGMAP
+
+  ```yaml
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: igor-news-portal-configmap
+  data:
+    IP_SISTEMA: http://localhost:30001
+  ```
+
   
+
