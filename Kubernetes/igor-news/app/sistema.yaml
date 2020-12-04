@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: igor-news-sistema
+  labels:
+    app: igor-news-sistema
+spec:
+  containers:
+    - name: igor-news-sistema-container
+      image: aluracursos/sistema-noticias:1
+      ports:
+        - containerPort: 80
+      envFrom:
+        - configMapRef:
+            name: igor-news-sistema-configmap

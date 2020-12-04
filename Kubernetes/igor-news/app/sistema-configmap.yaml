@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: igor-news-sistema-configmap
+data:
+  HOST_DB: igor-news-bd-svc:3306 #será o name do SVC do BD + porta
+  USER_DB: root
+  PASS_DB: igor123
+  DATABASE_DB: empresa

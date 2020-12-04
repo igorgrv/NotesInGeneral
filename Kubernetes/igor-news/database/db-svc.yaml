@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: igor-news-bd-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: igor-news-bd
+  ports:
+    - port: 3306

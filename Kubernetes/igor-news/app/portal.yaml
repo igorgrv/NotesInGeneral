@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: igor-news-portal
+  labels:
+    app: igor-news-portal
+spec:
+  containers:
+    - name: igor-news-portal-container
+      image: aluracursos/portal-noticias:1
+      ports:
+        - containerPort: 80
+      envFrom:
+        - configMapRef:
+            name: igor-news-portal-configmap
