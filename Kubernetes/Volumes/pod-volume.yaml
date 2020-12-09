@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-volume
+  labels:
+    app: pod-volume
+spec:
+  containers:
+    - name: pod-volume-nginx
+      image: nginx
+      volumeMounts:
+        - mountPath: /volume-dentro-do-container
+          name: primeiro-volume
+    - name: pod-volume-jenkins
+      image: jenkins
+      volumeMounts:
+        - mountPath: /volume-dentro-do-container
+          name: primeiro-volume
+      ports:
+        - containerPort: 80
+  volumes:
+    - name: primeiro-volume
+      hostPath:
+        path: /Users/igorromero/kubernetesVolume
+        type: Directory

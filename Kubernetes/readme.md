@@ -101,23 +101,23 @@ Para rodar o Kubernetes em uma plataforma na nuvem, existe uma [documentação](
 
 ## ***Comandos Kubectl
 
-| Kubectl                                  | O que faz                                                    |
-| ---------------------------------------- | ------------------------------------------------------------ |
-| `kubectl run nomePod --image=nomeImagem` | **Cria** um Pod com a imagem x                               |
-| `kubectl get pods`                       | **Exibe** todos os Pods                                      |
-| `kubectl get configmap`                  | **Exibe** todos os ConfigMaps                                |
-| `kubectl get pods -o wide`               | **Exibe** mais informações sobre o Pod                       |
-| `kubectl get pod nomePode --watch`       | **Exibe** em tempo de execução, todos os Pods ou Pod específico; |
-| `kubectl get svc`                        | **Exibe** todos os Services                                  |
-| `kubectl get node -o wide`               | **Exibe** todos os NodePorts (IP Externo atribuído)          |
-| `kubectl describe pod nomePod`           | **Exibe** a descrição do Pod                                 |
-| `kubectl edit pod nomePod`               | **Abre** um arquivo `yaml` que pode ser editado              |
-| `kubectl apply -f ./seuArquivo.yaml`     | **Executa** o script                                         |
-| `kubectl delete nomePod`                 | **Deleta** o pod de modo imperativo                          |
-| `kubectl delete -f ./arquivo.yaml`       | **Deleta** o pod de modo declarativo                         |
-| `kubectl delete pods/svc --all`          | **Deleta** todos os pods ou sic                              |
-| `kubectl exec -it nomePod -- bash`       | **Abre** o terminal do container                             |
-|                                          | ****                                                         |
+| Kubectl                                                      | O que faz                                                    |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `kubectl run nomePod --image=nomeImagem`                     | **Cria** um Pod com a imagem x                               |
+| `kubectl get pods`                                           | **Exibe** todos os Pods                                      |
+| `kubectl get configmap`                                      | **Exibe** todos os ConfigMaps                                |
+| `kubectl get pods -o wide`                                   | **Exibe** mais informações sobre o Pod                       |
+| `kubectl get pod nomePode --watch`                           | **Exibe** em tempo de execução, todos os Pods ou Pod específico; |
+| `kubectl get svc`                                            | **Exibe** todos os Services                                  |
+| `kubectl get node -o wide`                                   | **Exibe** todos os NodePorts (IP Externo atribuído)          |
+| `kubectl describe pod nomePod`                               | **Exibe** a descrição do Pod                                 |
+| `kubectl edit pod nomePod`                                   | **Abre** um arquivo `yaml` que pode ser editado              |
+| `kubectl apply -f ./seuArquivo.yaml`                         | **Executa** o script                                         |
+| `kubectl delete nomePod`                                     | **Deleta** o pod de modo imperativo                          |
+| `kubectl delete -f ./arquivo.yaml`                           | **Deleta** o pod de modo declarativo                         |
+| `kubectl delete pods/svc --all`                              | **Deleta** todos os pods ou sic                              |
+| `kubectl exec -it nomePod -- bash`                           | **Abre** o terminal do container                             |
+| `kubectl exec -it pod-volume --container="pod-volume-nginx" -- bash` | **Abre** o terminal de um container em específico            |
 
 
 
@@ -979,4 +979,282 @@ A diferença está nos novos comandos, que nos permitem trabalhar a versão dos 
 
 ## Projeto - Igor News II
 
-Aplicando o `deployment` no projeto `igor-news`, ou seja, iremos para cada `pod` criar um `deployment` e excluir o `pod` antigo!
+Aplicando o `deployment` no projeto `igor-news`, ou seja, iremos para cada `pod` criar um `deployment` e excluir o `pod` antigo!<br>
+
+* Sistema-deployment:
+
+  ```yaml
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: igor-news-sistema-deployment
+  spec:
+    template:
+      metadata:
+        name: igor-news-sistema
+        labels:
+          app: igor-news-sistema
+      spec:
+        containers:
+          - name: igor-news-sistema-container
+            image: aluracursos/sistema-noticias:1
+            ports:
+              - containerPort: 80
+            envFrom:
+              - configMapRef:
+                  name: igor-news-sistema-configmap
+    replicas: 3
+    selector:
+      matchLabels:
+        app: igor-news-sistema
+  ```
+
+* Portal-deployment:
+
+  ```yaml
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: igor-news-portal-deployment
+  spec:
+    template:
+      metadata:
+        name: igor-news-portal
+        labels:
+          app: igor-news-portal
+      spec:
+        containers:
+          - name: igor-news-portal-cotainer
+            image: aluracursos/portal-noticias:1
+            ports:
+              - containerPort: 80
+            envFrom:
+              - configMapRef:
+                  name: igor-news-portal-configmap
+    replicas: 3
+    selector:
+      matchLabels:
+        app: igor-news-portal
+  ```
+
+* db-deployment:
+
+  ```yaml
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: igor-news-db-deployment
+  spec:
+    template:
+      metadata:
+        name: igor-news-db
+        labels:
+          app: igor-news-db
+      spec:
+        containers:
+          - name: igor-news-bd-container
+            image: aluracursos/mysql-db:1
+            ports:
+              - containerPort: 3306
+            envFrom:
+              - configMapRef:
+                  name: igor-news-bd-configmap
+    replicas: 3
+    selector:
+      matchLabels:
+        app: igor-news-db
+  ```
+
+<br>
+
+
+
+## More Resources
+
+**PORÉM,** agora a aplicação possui um problema, **CADÊ OS DADOS DO BANCO?** <br>
+
+Como os pods são efêmeros, ou seja, eles podem morrer ou nascer a qualquer momento, eles **não guardar dados**, ou seja, quando o Pod é finalizado, os dados vão junto com eles. <br>
+
+### Volumes
+
+Para resolver este tipo de problema, existem os **Volumes!**, tais como:
+
+* PV → Persistent Volume (pode ser utilizado local ou Cloud);
+* PVC → Persistent Volume Claim (via Cloud);
+
+<img src="https://www.ibm.com/support/knowledgecenter/bluemix_stage/containers/images/cs_storage_pvc_pv.png" alt="IBM Knowledge Center" style="zoom:30%;" />
+
+Quando falamos da Cloud, normalmente temos um Disco onde este Disco para se comunicar com o Pod, precisa do `pv e pvc`.
+
+### Persistent Volume
+
+Quando um `PV` é criado, ele está **vinculado ao `POD`** e não ao container, portanto, caso um container deixe de existir, o volume ainda continuará lá!
+
+* Caso o pod deixe de existir, o volume também deixará, **porém os arquivos,** caso estejam vinculados a um diretório, ficaram lá e irá deixar de existir no pod;
+
+Existem diversos tipos de `PV`, que podem ser encontrados na [documentação do Kubernetes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/):
+
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/kubernetes_pv.png?raw=true" alt="recursos" style="zoom:67%;" />
+
+#### Criando PV
+
+Como exemplo de `PV` utilizaremos o `hostPath`.<br>
+
+Para checarmos como volumes interagem entre containers de um mesmo Pod, iremos criar **2 containers em um Pod**;
+
+1. A criação de um Pod ja é conhecida:
+
+   ````yaml
+   apiVersion: v1
+   kind: Pod
+   metadata:
+     name: pod-volume
+     labels:
+       app: pod-volume
+   spec:
+     containers:
+       - name: pod-volume-nginx
+         image: nginx
+       - name: pod-volume-jenkins
+         image: jenkins
+         ports:
+           - containerPort: 80
+   ````
+
+2. Para adicionar um `PV` iremos declarar a TAG `volumes` **fora** do container;
+
+   1. Declararemos um `name`;
+   2. E o tipo de volume, que neste caso será o `hostPath`
+      1. Que recebe um `path`. Este `path` será o caminho que o container ao salvar um arquivo irá fazer uma **cópia**.
+         1. E também um `type`, que neste caso será `directory`	
+
+   ```yaml
+     containers:
+       - name: pod-volume-nginx
+         image: nginx
+       - name: pod-volume-jenkins
+         image: jenkins
+         ports:
+           - containerPort: 80
+     volumes:
+       - name: primeiro-volume
+         hostPath:
+           path: /Users/igorromero/kubernetesVolume
+           type: Directory
+   ```
+
+3. Com o volume declarado, precisamos apenas **informar o path dentro do container**, através da tag `volumeMounts` → `mountPath`
+
+   ```yaml
+   spec:
+     containers:
+       - name: pod-volume-nginx
+         image: nginx
+         volumeMounts:
+           - mountPath: /volume-dentro-do-container
+             name: primeiro-volume
+       - name: pod-volume-jenkins
+         image: jenkins
+         volumeMounts:
+           - mountPath: /volume-dentro-do-container
+             name: primeiro-volume
+   ```
+
+4. Basta subirmos o arquivo e então então executarmos um `exec` no container:
+
+   ```bash
+   kubectl apply -f ./arquivo-volume.yaml
+   kubectl exec -it pod-volume --container="pod-volume-nginx" -- bash
+   
+   cd volume-dentro-do-container
+   touch arquivo-test-dentro-do-container.txt
+   
+   # Se formos para o container do Jenkins, veremos o mesmo arquivo
+   kubectl exec -it pod-volume --container="pod-volume-jenkins" -- bash
+   ```
+
+5. Note que foi criado o arquivos tanto no container, quanto dentro do `path` explicito!
+
+### Persistent Volume Claim
+
+O `PVC` veio para solucionar o problema de 'perder arquivos' após um Pod ser excluído.<br>
+
+Quando temos um `pvc` , o novo Pod que vir a 'nascer' irá ter os arquivos novamente, **PORÉM** o `pvc`deve estar **Lincado com um disco!**
+
+* No caso do uso do Google Cloud, o `pvc` deve estar vinculado com o serviço `Disk`, ou seja, o `name` do disk deve ser igual ao name do `pvc`;
+
+#### Criando PVC
+
+Para criar um PVC, **precisamos de um `PV`**. No caso do `PV` do Google Cloud, precisamos especificar:
+
+* Tipo de volume: `hostPath`, `gcePersistentDisk`...
+* Capacidade de armazenamento: `10Gi`
+* Tipo de acesso: `ReadWriteMany, ReadWriteOnce, ReadOnly`
+
+```yaml
+#pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-1
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  gcePersistentDisk:
+    pdName: pv-disk #mesmo nome do disk do Google Cloud
+  storageClassName: standard
+```
+
+<br>
+
+Com o `pv` declarado, podemos agora criar um `pvc`!
+
+1. Para que um `pv` se comunique com um `pvc` , ambos precisam:
+
+   1. Ter a mesma capacidade → `storage`
+   2. Ter o mesmo tipo de acesso → `accessModes`
+
+   ```yaml
+   apiVersion: v1
+   kind: PersistentVolumeClaim
+   metadata:
+     name: pvc-1
+   spec:
+     accessModes:
+       - ReadWriteOnce
+     resources:
+       requests:
+         storage: 10Gi
+   ```
+
+2. Agora basta subir o `pvc` e configurar um Pod
+
+<br>
+
+Já configuramos um Pod, com o `hostPath`, que referencia um `pv`, mas e quando estamos falando de **`pvc`?**<br>
+
+* Quando temos um `pvc` , iremos declarar que se trata de um `PersistentVolumeClaim` e passar o `ClaimName` que seria o `name` do `pvc`:
+
+  ```yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: pod-volume
+    labels:
+      app: pod-volume
+  spec:
+    containers:
+      - name: pod-volume-nginx
+        image: nginx
+        volumeMounts:
+          - mountPath: /volume-dentro-do-container
+            name: primeiro-volume
+    volumes:
+      - name: primeiro-volume
+        persistentVolumeClaim:
+            claimName: pvc-1
+  ```
+
+  
