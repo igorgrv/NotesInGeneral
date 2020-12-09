@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: igor-news-sistema-deployment
+spec:
+  template:
+    metadata:
+      name: igor-news-sistema
+      labels:
+        app: igor-news-sistema
+    spec:
+      containers:
+        - name: igor-news-sistema-container
+          image: aluracursos/sistema-noticias:1
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: igor-news-sistema-configmap
+  replicas: 3
+  selector:
+    matchLabels:
+      app: igor-news-sistema

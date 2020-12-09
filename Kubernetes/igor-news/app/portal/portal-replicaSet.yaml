@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: igor-news-portal-replicaset
+spec:
+  template:
+    metadata:
+      name: igor-news-portal
+      labels:
+        app: igor-news-portal
+    spec:
+      containers:
+        - name: igor-news-portal-cotainer
+          image: aluracursos/portal-noticias:1
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: igor-news-portal-configmap
+  replicas: 3
+  selector:
+    matchLabels:
+      app: igor-news-portal

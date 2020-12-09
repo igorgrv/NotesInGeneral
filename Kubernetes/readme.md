@@ -684,6 +684,7 @@ Como **`ConfigMap`** teremos que, criar as variáveis:
     MYSQL_PASSWORD: "igor123"
   ```
 
+<br>
 
 <br>
 
@@ -844,3 +845,138 @@ Configs:
 
   
 
+## More Resources
+
+### ReplicaSets - RS
+
+Quando falamos que o Kubernete tem o poder de **recriar um Pod**, é o `ReplicaSet` o responsável por isso!
+
+#### Criando RS
+
+Para criar um `ReplicaSet` é bem simples, pois basicamente criaremos um **`template`**, que terá as informações do `pod`:
+
+1. Crie um arquivo `yaml`;
+
+2. Diferente dos outros recursos (SVC ou Pod), o `replicaSet` utiliza outro tipo de `apiVersion`!
+
+3. No `spec` iremos criar um **`template`**, que terá as informações do Pod:
+
+   ```yaml
+   apiVersion: apps/v1
+   kind: ReplicaSet
+   metadata:
+     name: igor-news-portal-replicaset
+   spec:
+   	template:
+     	# informações do Pod
+   ```
+
+4. Adicione as informações do `metadata & spec` do template:
+
+   ```yaml
+   apiVersion: apps/v1
+   kind: ReplicaSet
+   metadata:
+     name: igor-news-portal-replicaset
+   spec:
+     template:
+     	#informações provenientes de um POD
+       metadata:
+         name: igor-news-portal
+         labels:
+           app: igor-news-portal
+       spec:
+         containers:
+           - name: igor-news-portal-cotainer
+             image: aluracursos/portal-noticias:1
+             ports:
+               - containerPort: 80
+             envFrom:
+               - configMapRef:
+                   name: igor-news-portal-configmap
+   ```
+
+5. Por fim, basta informarmos o número de **`replicas`** que queremos e um **`selector`** que referencie a `label` do Pod, com o **`matchLabels`**
+
+   ```yaml
+   apiVersion: apps/v1
+   kind: ReplicaSet
+   metadata:
+     name: igor-news-portal-replicaset
+   spec:
+     template:
+       metadata:
+         name: igor-news-portal
+         labels:
+           app: igor-news-portal
+       spec:
+         containers:
+           - name: igor-news-portal-cotainer
+             image: aluracursos/portal-noticias:1
+             ports:
+               - containerPort: 80
+             envFrom:
+               - configMapRef:
+                   name: igor-news-portal-configmap
+     replicas: 3
+     selector:
+       matchLabels:
+         app: igor-news-portal
+   ```
+
+6. Se rodarmos agora um `kubectl apply -f ./replicaSet.yaml`, automaticamente será criado 3 Pods, onde caso seja feito um `delete` de um deles, outro será instanciado no mesmo momento!
+
+   1. Podemos ver este comportamento com **`kubectl get replicaset --watch`**
+
+<br>
+
+### Deployment
+
+O `Deployment` é uma melhoria do `replicaSet`, como uma **camada acima, que PERMITE VERSIONAMENTO** dos `replicaSets`.<br>
+
+#### Criando Deployment
+
+A criação de um Deployment é bem parecida com a do `replicaSet`, apenas muda o `kind`:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: igor-news-portal-deployment
+spec:
+  template:
+    metadata:
+      name: igor-news-portal
+      labels:
+        app: igor-news-portal
+    spec:
+      containers:
+        - name: igor-news-portal-cotainer
+          image: aluracursos/portal-noticias:1
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: igor-news-portal-configmap
+  replicas: 3
+  selector:
+    matchLabels:
+      app: igor-news-portal
+```
+
+A diferença está nos novos comandos, que nos permitem trabalhar a versão dos códigos!
+
+#### ***Comandos Básicos
+
+|                           Kubectl                            |               O que faz               |
+| :----------------------------------------------------------: | :-----------------------------------: |
+|            `kubectl apply -f ./arquivo --record`             |  **Roda** o deploy com versionamento  |
+|         `kubectl rollout history deploy nameDeploy`          |    **Exibe** as versões do arquivo    |
+| `kubectl annotate deploy nameDeploy kubernetes.io/change-cause="suaMsg"` | **Altera** a descrição da atualização |
+|  `kubectl rollout undo deploy nameDeploy --to-revision="2"`  |       **Volta** para a versão X       |
+
+
+
+## Projeto - Igor News II
+
+Aplicando o `deployment` no projeto `igor-news`, ou seja, iremos para cada `pod` criar um `deployment` e excluir o `pod` antigo!
