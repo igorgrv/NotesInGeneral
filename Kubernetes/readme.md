@@ -1086,7 +1086,7 @@ Para resolver este tipo de problema, existem os **Volumes!**, tais como:
 
 Quando falamos da Cloud, normalmente temos um Disco onde este Disco para se comunicar com o Pod, precisa do `pv e pvc`.
 
-### Persistent Volume
+#### Persistent Volume - PV
 
 Quando um `PV` é criado, ele está **vinculado ao `POD`** e não ao container, portanto, caso um container deixe de existir, o volume ainda continuará lá!
 
@@ -1094,9 +1094,9 @@ Quando um `PV` é criado, ele está **vinculado ao `POD`** e não ao container, 
 
 Existem diversos tipos de `PV`, que podem ser encontrados na [documentação do Kubernetes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/):
 
-<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/kubernetes_pv.png?raw=true" alt="recursos" style="zoom:67%;" />
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/images/kubernetes_pv.png?raw=true" alt="recursos" style="zoom:37%;" />
 
-#### Criando PV
+##### Criando PV
 
 Como exemplo de `PV` utilizaremos o `hostPath`.<br>
 
@@ -1175,7 +1175,7 @@ Para checarmos como volumes interagem entre containers de um mesmo Pod, iremos c
 
 5. Note que foi criado o arquivos tanto no container, quanto dentro do `path` explicito!
 
-### Persistent Volume Claim
+#### Persistent Volume Claim - PVC
 
 O `PVC` veio para solucionar o problema de 'perder arquivos' após um Pod ser excluído.<br>
 
@@ -1183,7 +1183,7 @@ Quando temos um `pvc` , o novo Pod que vir a 'nascer' irá ter os arquivos novam
 
 * No caso do uso do Google Cloud, o `pvc` deve estar vinculado com o serviço `Disk`, ou seja, o `name` do disk deve ser igual ao name do `pvc`;
 
-#### Criando PVC
+##### Criando PVC
 
 Para criar um PVC, **precisamos de um `PV`**. No caso do `PV` do Google Cloud, precisamos especificar:
 
@@ -1258,3 +1258,52 @@ Já configuramos um Pod, com o `hostPath`, que referencia um `pv`, mas e quando 
   ```
 
   
+
+### Probes
+
+Os probes são utilizados para checar o status da aplicação. Por exemplo, o POD pode estar em um correto funcionamento, porém a aplicação pode ter tido algum problema e estar retornando um status 500 para as requisições.<br>
+
+Alguns tipos de probes, como:
+
+* Liveness;
+* Readiness;
+
+Checam o status da aplicação utilizando Scripts! Neste script especificamos que o **deveremos ter falha** caso o status seja **menor que 200 ou >= 400** 
+
+```yaml
+readinessProbe:
+  httpGet:
+    path: /
+    port: 80
+  periodSeconds: 10
+  initialDelaySeconds: 3
+```
+
+* Neste exemplo, será feito um teste, após 3 segs que a aplicação for startada, na porta 80;
+
+
+
+### Horizontal Pod AutoScaler
+
+```yaml
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: primeiro-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: primeiro-deployment
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 20
+```
+
+* Neste exemplo, será escalado um novo Pod, caso o consumo seja acima de 20%

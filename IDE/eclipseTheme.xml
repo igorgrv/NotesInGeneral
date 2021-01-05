@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<colorTheme id="61284" name="vscodeEclipse" modified="2020-12-29 14:12:22" author="Igor">
+    <searchResultIndication color="#272C35" />
+    <filteredSearchResultIndication color="#272C35" />
+    <occurrenceIndication color="#272C35" />
+    <writeOccurrenceIndication color="#272C35" /> 
+    <findScope color="#353C4B" />
+    <deletionIndication color="#D25252" />
+    <sourceHoverBackground color="#272C35" />
+    <singleLineComment color="#5B6371" italic="false" />
+    <multiLineComment color="#5B6371" italic="false" />
+    <commentTaskTag color="#5B6371" italic="false" />
+    <javadoc color="#5B6371" italic="false" />
+    <javadocLink color="#D9E577" italic="false" />
+    <javadocTag color="#D9E577" italic="false" />
+    <javadocKeyword color="#D9E577" italic="false" />
+    <class color="#ECBF6F" bold="false" underline="false" strikethrough="false" />
+    <interface color="#D371E3" />
+    <method color="#43B0F5" />
+    <methodDeclaration color="#43B0F5" />
+    <bracket color="#D8D8D8" />
+    <number color="#7FB347" />
+    <string color="#8BC56F" />
+    <operator color="#F06372" />
+    <keyword color="#D371E3" bold="false" />
+    <annotation color="#D371E3" />
+    <staticMethod color="#43B0F5" />
+    <localVariable color="#F06372" />
+    <localVariableDeclaration color="#F06372" />
+    <field color="#F06372" />
+    <staticField color="#EFC090" />
+    <staticFinalField color="#EFC090" />
+    <deprecatedMember color="#D25252" underline="false" strikethrough="true" />
+    <enum color="#7FB347" />
+    <inheritedMethod color="#ECBF6F" />
+    <abstractMethod color="#ECBF6F" />
+    <parameterVariable color="#AAB2C0" />
+    <typeArgument color="#BFA4A4" />
+    <typeParameter color="#BFA4A4" />
+    <constant color="#EFC090" />
+    <background color="#272C35" />
+    <currentLine color="#353C4B" />
+    <foreground color="#D8D8D8" />
+    <lineNumber color="#616D85" />
+    <selectionBackground color="#616D85" />
+    <selectionForeground color="#D0D0D0" />
+</colorTheme>
