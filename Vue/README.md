@@ -336,3 +336,94 @@ E adicionar na TAG `li` o `v-for` com o nome do array e o atributo `:key` que o 
   </div>
 </template>
 ```
+
+
+
+## Consumindo API
+
+1. Baixaremos o projeto [api.zip](https://s3.amazonaws.com/caelum-online-public/vue/api.zip);
+
+2. Descompactaremos e então:
+
+   ```bash
+   cd api
+   npm install
+   npm start
+   
+   API escutando na porta: 3000
+   ```
+
+3. Dentro do projeto Vue, iremos instalar o `vue-resource` → este recurso permite-nos usar o `$http` (métodos HTTP);
+
+   ```bash
+   cd igorgram
+   npm i vue-resource
+   npm run dev
+   ```
+
+4. Com o `vue-resource` instalado, precisamos importa-lo em nosso `main.js` e então **registra-lo** através do Global View
+
+   ```javascript
+   import Vue from 'vue';
+   import App from './App.vue';
+   import VueResource from 'vue-resource';
+   
+   Vue.use(VueResource);
+   ```
+
+5. No `App.vue` iremos utilizar do **_[Lifecycle Hooks](https://vuejs.org/v2/api/#Options-Lifecycle-Hooks)_** (gancho de ciclo de vida), para que seja feito a requisição **somente quando App tiver sido criado** → `created`;
+
+   ```vue
+   <script>
+   export default {
+     data() {
+       return {
+         titulo: "IgorGram",
+         fotos:[]
+       };
+     },
+   
+     created() {
+       alert("teste");
+     }
+   };
+   </script>
+   ```
+
+6. Dentro de `created`, já que 'ativamos' o módulo do **VueResource**, iremos através do objeto `$http` fazer o consumo da API, onde o objeto `$http` retorna uma **`promise`**, que podemos manipular, transformando em `json()`;
+
+   ```vue
+   <template>
+     <div>
+       <h1 v-text="titulo"></h1>
+       <ul>
+         <li v-for="foto of fotos" :key="foto._id">
+           <img :src="foto.url" :alt="foto.titulo" />
+         </li>
+       </ul>
+     </div>
+   </template>
+   
+   <script>
+   export default {
+     data() {
+       return {
+         titulo: "IgorGram",
+         fotos: []
+       };
+     },
+   
+     created() {
+       this.$http
+         .get("http://localhost:3000/v1/fotos")
+         .then(res => res.json())
+         .then(
+           fotos => (this.fotos = fotos),
+           err => console.log(err)
+         );
+     }
+   };
+   </script>
+   ```
+
+   
