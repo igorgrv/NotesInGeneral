@@ -1,33 +1,35 @@
 <template>
-  <div>
-    <h1 v-text="titulo"></h1>
-    <ul>
-      <li v-for="foto of fotos" :key="foto._id">
-        <img :src="foto.url" :alt="foto.titulo" />
-      </li>
-    </ul>
+  <div class="corpo">
+    <meu-menu></meu-menu>
+    <transition name="pagina">
+      <router-view></router-view>
+    </transition>
   </div>
 </template>
 
 <script>
-export default {
-  data() {
-    return {
-      titulo: "IgorGram",
-      fotos: []
-    };
-  },
+import Menu from "./components/shared/menu/Menu";
 
-  created() {
-    this.$http
-      .get("http://localhost:3000/v1/fotos")
-      .then(res => res.json())
-      .then(
-        fotos => (this.fotos = fotos),
-        err => console.log(err)
-      );
+export default {
+  components: {
+    "meu-menu": Menu
   }
 };
 </script>
 
-<style></style>
+<style>
+.corpo {
+  font-family: Helvetica, sans-serif;
+  margin: 0 auto;
+  width: 96%;
+}
+
+.pagina-enter-active,
+.pagina-leave-active {
+  transition: opacity 0.3s;
+}
+.pagina-enter,
+.pagina-leave-active {
+  opacity: 0;
+}
+</style>
