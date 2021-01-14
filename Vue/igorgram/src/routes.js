@@ -1,7 +1,8 @@
-import Home from './components/view/home/Home';
-import Cadastro from './components/view/cadastro/Cadastro';
+import Home from "./components/view/home/Home";
+import Cadastro from "./components/view/cadastro/Cadastro";
 
 export const routes = [
-  { path:'', component: Home, titulo:'home' },
-  { path:'/cadastro' , component: Cadastro, titulo:'cadastro'}
-]
+  { path: "", name: "home", component: Home, titulo:"Home", menu:true},
+  { path: "/cadastro", name: "cadastro", component: Cadastro, titulo:"Cadastro", menu:true},
+  { path: '*', component: Home, menu:false }
+];

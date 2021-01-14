@@ -2,7 +2,9 @@
   <nav>
     <ul>
       <li v-for="route of routes" :key="route.path">
-        <router-link :to="route.path? route.path : '/'">{{ route.titulo }}</router-link>
+        <router-link :to="route.path ? route.path : '/'">
+          {{route.titulo}}
+        </router-link>
       </li>
     </ul>
   </nav>
@@ -15,12 +17,10 @@ export default {
 
   data() {
     return {
-      routes
+      routes: routes.filter(rota => rota.menu)
     }
   }
 }
 </script>
 
-<style>
-
-</style>
+<style></style>

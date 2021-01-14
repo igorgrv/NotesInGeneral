@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1 class="centralizado">Home</h1>
-
+    <h2 class="centralizado">{{ mensagem }}</h2>
     <input
       type="search"
       @input="filtro = $event.target.value"
@@ -32,6 +32,7 @@
 import Painel from "../../../components/shared/painel/Painel";
 import ImagemResponsiva from "../../../components/shared/imagem-responsiva/ImagemResponsiva";
 import Botao from "../../shared/botao/Botao.vue";
+import FotoService from "../../../domain/service/foto/FotoService";
 
 export default {
   components: {
@@ -44,7 +45,8 @@ export default {
     return {
       titulo: "IgorGram",
       fotos: [],
-      filtro: ""
+      filtro: "",
+      mensagem: ""
     };
   },
 
@@ -63,18 +65,22 @@ export default {
 
   methods: {
     remove(foto) {
-      alert(foto.titulo + " removida!");
+      this.service
+        .remove(foto._id)
+        .then(
+          () => {
+            let indice = this.fotos.indexOf(foto)
+            this.fotos.splice(indice, 1);
+            this.mensagem = "Foto removida com sucesso";
+            },
+          err => this.mensagem = err.message
+        );
     }
   },
 
   created() {
-    this.$http
-      .get("http://localhost:3000/v1/fotos")
-      .then(res => res.json())
-      .then(
-        fotos => (this.fotos = fotos),
-        err => console.log(err)
-      );
+    this.service = new FotoService(this.$resource);
+    this.service.listaFotos().then(fotos => this.fotos = fotos);
   }
 };
 </script>

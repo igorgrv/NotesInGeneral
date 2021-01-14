@@ -1,28 +1,23 @@
 <template>
   <div>
     <h1 class="centralizado">Cadastro</h1>
-    <h2 class="centralizado"></h2>
+    <h2 class="centralizado">{{ mensagem }}</h2>
+    <h2 class="centralizado">{{ foto.titulo }}</h2>
 
     <form @submit.prevent="gravar()">
       <div class="controle">
         <label for="titulo">TÍTULO</label>
-        <input
-          id="titulo"
-          autocomplete="off"
-          @input="foto.titulo = $event.target.value"
-          :value="foto.titulo"
-        />
+        <input id="titulo" autocomplete="off" v-model.lazy="foto.titulo" />
       </div>
 
       <div class="controle">
         <label for="url">URL</label>
-        <input
-          id="url"
-          autocomplete="off"
-          @input="foto.url = $event.target.value"
-          :value="foto.url"
+        <input id="url" autocomplete="off" v-model.lazy="foto.url" />
+        <imagem-responsiva
+          v-show="foto.url"
+          :url="foto.url"
+          :descricao="foto.descricao"
         />
-        <imagem-responsiva />
       </div>
 
       <div class="controle">
@@ -30,14 +25,13 @@
         <textarea
           id="descricao"
           autocomplete="off"
-          @input="foto.descricao = $event.target.value"
-          :value="foto.descricao"
+          v-model="foto.descricao"
         ></textarea>
       </div>
 
       <div class="centralizado">
         <meu-botao descricao="GRAVAR" tipo="submit" />
-        <router-link to="/"
+        <router-link :to="{name: 'home'}"
           ><meu-botao descricao="VOLTAR" tipo="button"
         /></router-link>
       </div>
@@ -48,6 +42,8 @@
 <script>
 import ImagemResponsiva from "../../shared/imagem-responsiva/ImagemResponsiva";
 import Botao from "../../shared/botao/Botao";
+import Foto from "../../../domain/model/foto/Foto";
+import FotoService from "../../../domain/service/foto/FotoService";
 
 export default {
   components: {
@@ -57,19 +53,22 @@ export default {
 
   data() {
     return {
-      foto: {
-        titulo: "",
-        url: "",
-        descricao: ""
-      }
+      foto: new Foto(),
+      mensagem: ''
     };
   },
 
   methods: {
     gravar() {
-      console.log(this.foto.titulo);
-      this.foto = {}
+      this.service
+        .cadastra(this.foto)
+        .then(() => this.foto = new Foto(), err => this.mensagem = err.message);
+        //this.foto = new Foto() irá apagar os valores
     }
+  },
+
+  created() {
+    this.service = new FotoService(this.$resource);
   }
 };
 </script>

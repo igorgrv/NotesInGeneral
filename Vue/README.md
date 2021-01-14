@@ -976,15 +976,18 @@ Para declarar as rotas da aplicação:
 
 2. Importaremos o Componente
 
-3. Passaremos o `path` e o nome do `component`;
+3. Passaremos o `path` , um `name` para rota e o  nome do `component`;
 
+   1. A Rota `*` indica que caso nao seja localizado o path, irá abrir o component X;
+   
    ```javascript
    import Home from './components/view/home/Home';
    import Cadastro from './components/view/cadastro/Cadastro';
    
    export const routes = [
-     { path:'', component: Home },
-     { path:'/cadastro' , component: Cadastro}
+     { path:'', name: 'home', component: Home },
+     { path:'/cadastro', name: 'cadastro', component: Cadastro},
+     { path:*, component: Home}
    ]
    ```
 
@@ -1106,16 +1109,17 @@ O `routes.js` ja possui as informações abaixo, so faltaria o `titulo`
 </ul>
 ```
 
-1. No `routes.js` adicionaremos o título como um parâmetro
+1. No `routes.js` adicionaremos o `titulo` como um parâmetro e também um boolean `menu` que irá checar se será exibido ou não no menu!
 
    ```javascript
    export const routes = [
-     { path:'', component: Home, titulo:'home' },
-     { path:'/cadastro' , component: Cadastro, titulo:'cadastro'}
-   ]
+     { path: "", name: "home", component: Home, titulo:"Home", menu:true},
+     { path: "/cadastro", name: "cadastro", component: Cadastro, titulo:"Cadastro", menu:true},
+     { path: '*', component: Home, menu:false }
+   ];
    ```
 
-2. No `Menu.vue` iremos importar o `routes.js` e iterar sobre ele com o `v-for`
+2. No `Menu.vue` iremos importar o `routes.js` e filtraremos somente aquilo que o `menu=true` para que entao iteraremos sobre ele com o `v-for`;
 
    ```vue
    <template>
@@ -1135,7 +1139,7 @@ O `routes.js` ja possui as informações abaixo, so faltaria o `titulo`
    
      data() {
        return {
-         routes
+         routes: routes.filter(rota => rota.menu)
        }
      }
    }
@@ -1515,7 +1519,7 @@ export default {
 
 
 
-## Ca#pturando dados
+### Capturando dados
 
 Para capturar dados do formulário, usaremos do `$event.target.value`;
 
@@ -1579,4 +1583,316 @@ Para capturar dados do formulário, usaremos do `$event.target.value`;
    ```
 
    
+
+### v-model - Two-way data binding
+
+O `v-model` serve para fazer a comunicação do `template` para o `script` e vice-versa, ou seja, o que tinhamos:
+
+```vue
+<input @input="foto.titulo = $event.target.value" :value="foto.titulo"/>
+```
+
+Agora pode se tornar:
+
+```vue
+<input v-model="foto.titulo"/>
+```
+
+**PORÉM,** se percebemos o que acontece no `input v-model="foto.url"` iremos ter um problema...<br>
+
+Devemos utilizar o `.lazy` para que seja inserido o valor **após sairmos do input!**
+
+```vue
+<input v-model.lazy="foto.titulo"/>
+```
+
+
+
+### v-show - Exibindo imagem
+
+O `v-show` permite que o elemento fique como `hide` caso seu valor seja `null` ou vazio.
+
+1. Para o `<imagemResponsiva` atribua o `v-show`
+
+   ```vue
+   <imagem-responsiva v-show="foto.url" :url="foto.url" :descricao="foto.descricao"/>
+   ```
+
+
+
+## Model
+
+Dentro do Vue, podemos fazer uso de **Modelos**, desta forma não é necessário ficar declanado objetos na 'mão', como foi feito com o `foto: {}`;
+
+1. Criaremos o `Foto.js` → `src/domain/model/foto/Foto.js`;
+
+2. Entao declararemos a classe, com um `constructor`, passando os parâmetros que utilizamos:
+
+   ```javascript
+   export default class Foto {
+     constructor(url = "", titulo = "", descricao = "") {
+       this.url = url;
+       this.titulo = titulo;
+       this.descricao = descricao;
+     }
+   }
+   ```
+
+3. No `Cadastro.vue` iremos no lugar de `foto: {}` instaciaremos a classe `Foto`:
+
+   ```vue
+   <script>
+   import Foto from "../../../model/foto/Foto";
+   
+   export default {
+   
+     data() {
+       return {
+         foto: new Foto()
+       };
+     },
+   
+     methods: {
+       gravar() {
+         console.log(this.foto);
+         this.foto = new Foto();
+       }
+     }
+   };
+   </script>
+   ```
+
+
+
+
+## Centralizando URI
+
+Para não precisarmos ficar declarando o `http://localhost:3000/` , podemos  mapear no `main.js` a URI da aplicação!
+
+1. Dentro de `main.js` → através do `Vue` iremos utilizar o método `http`
+
+   ```javascript
+   Vue.use(VueResource);
+   Vue.use(VueRouter);
+   Vue.http.options.root = 'http://localhost:3000';
+   ```
+
+Agora basta que seja feito o CRUD no `FotoService` utilizando o `this._resource`!
+
+## Service - $resource
+
+Seguindo o padrão MVC, precisamos deixar em um só local aquilo que for referente a API, para isso existe a camada **Service**.<br>
+
+Um objeto especializado em trabalhar com **requisições HTTP é o `$resource`**, portanto iremos utiliza-lo em nosso `FotoService`.
+
+* O `$resource` irá possuir métodos como:
+  * `save(seuObjeto)` → funcionará como um POST;
+  * `query()` → funcionará como GET;
+  * `delete(id)` → funcionará como o DELETE;
+  * `update(seuObjeto)` → funcionará como o PUT;
+  * `get( { id } )` → funcionará como um GET específico para parâmetros;
+
+**PORÉM,** o `$resource` é um recurso do Vue e não do JS, então para ser utilizado no Service, deveremos recebe-lo no `constructor`;
+
+1. Criaremos o `FotoService.js` → `src/domain/service/foto/FotoService.js` que irá receber o `resource` como parâmetro;
+
+2. Como todos os endpoints da API seguem `v1/fotos{/id}` , iremos passar para o  `resource` esse path;
+
+   1. Quando utilizamos o `{/id}` informamos que é um parâmetro que **pode ou não** vir a aparecer e a barra `/` significa é utilizada pq o backend utiliza → `http://localhost:3000/v1/fotos/id`
+
+   ```javascript
+   export default class FotoService{
+   
+     constructor(resource) {
+       this._resource = resource('v1/fotos{id}');
+     }
+   
+   }
+   ```
+
+<br>
+
+### CRUD
+
+#### Read
+
+```javascript
+// FotoService.js
+export default class FotoService{
+
+  constructor(resource) {
+    this._resource = resource('v1/fotos{id}');
+  }
+  
+  lista() {
+    return this._resource
+    	.query()
+    	.then(
+      	res => res.json(),
+      	err => {
+          console.log(err);
+          throw new Exception("Erro ao carregar imagens");
+    		}
+    	);
+  }
+
+}
+```
+
+```vue
+<!-- Home.vue -->
+<script>
+export default {
+  
+  data() {
+    return {
+      fotos =[]
+    }
+  }
+  
+  created() {
+    this.service = new FotoService();
+    this.service
+    	.lista()
+    	.then(fotos => this.fotos = fotos)
+  }
+}
+</script>
+```
+
+
+
+#### Delete
+
+Para remover a foto, do lado do `Home.vue` teremos uma particularidade para a página ser 'atualizada'. Teremos que **remover do array, após executar o método!**
+
+1. Precisamos pegar pelo `indexOf` a posição que esta a foto;
+2. Com o `indice` , podemos utilizar do `splice` para remover o Array!
+
+```javascript
+// FotoService.js
+export default class FotoService{
+  
+  constructor(resource){
+    this._resource = resource("v1/foto{/id	}");
+  }
+  
+  remove(id) {
+    return 
+    	this._resource
+        	.delete({ id })
+        	.then(null, err => {
+            console.log(err);
+            throw new Error("Não foi possível excluir a imagem");
+          });
+  }
+}
+```
+
+```vue
+<!-- Home.vue -->
+<template>
+  <!-- omitido -->
+  <meu-button tipo="button" descricao="remover" @botaoAtivado="remove(foto)" />
+	
+	<!-- @botaoAtivado é devido o Button.vue estar esperando esse evento para acionar o botao -->
+    <!-- 
+			<button :class="estiloDoBotao" :type="tipo" @click="disparaAcao()">
+
+			methods: {
+        disparaAcao() {
+          this.$emit('botaoAtivado')
+        }
+      },
+    -->
+</template>
+
+<script>
+import FotoService from "../../../domain/service/foto/FotoService";
+  
+export default {
+  data() {
+    return {
+      fotos = [],
+      mensagem = ''
+    }
+  }
+  
+ methods: {
+    remove(foto) {
+      this.service
+        .remove(foto._id)
+        .then(
+          () => {
+            let indice = this.fotos.indexOf(foto)
+            this.fotos.splice(indice, 1);
+            this.mensagem = "Foto removida com sucesso";
+            },
+          err => this.mensagem = err.message
+        );
+    }
+  },
+  
+  created() {
+    this.service = new FotoService();
+    //omitido
+  }
+}
+</script>
+```
+
+
+
+#### Create
+
+```javascript
+export default class FotoService {
+  
+  constructor(resource) {
+    this._resource = resource("v1/foto{/id}");
+  }
+  
+  cadastra(foto) {
+    return this._resource.save(foto).then(null, err => {
+      console.log(err);
+      throw new Error("Não foi possível salvar a imagem");
+    });
+  }
+}
+```
+
+```vue
+<!-- Cadastro.vue -->
+<template>
+	<form @submit.prevent="gravar()">
+  	<input v-model.lazy="foto.titulo" />
+  </form>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      foto = {}
+    }
+  }
+  
+  
+  methods: {
+    gravar() {
+      this.service
+        .cadastra(this.foto)
+        .then(
+        	() => this.foto = new Foto(),	//this.foto = new Foto() irá apagar os valores        
+        	err => this.mensagem = err.message
+      	);
+    }
+  },
+  
+  created() { 
+  	this.service = new FotoService();
+  }
+}
+</script>
+```
 
