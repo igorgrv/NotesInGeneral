@@ -4,38 +4,58 @@
     <h2 class="centralizado">{{ mensagem }}</h2>
     <h2 class="centralizado">{{ foto.titulo }}</h2>
 
-    <form @submit.prevent="gravar()">
-      <div class="controle">
-        <label for="titulo">TÍTULO</label>
-        <input id="titulo" autocomplete="off" v-model.lazy="foto.titulo" />
-      </div>
+    <validationObserver v-slot="{ handleSubmit }">
+      <form @submit.prevent="handleSubmit(grava)">
+        <div class="controle">
+          <label for="titulo">TÍTULO</label>
+          <validation-provider
+            rules="required|minmax:3,20"
+            :bails="false"
+            v-slot="{ errors }"
+          >
+            <input
+              name="titulo"
+              id="titulo"
+              autocomplete="off"
+              v-model.lazy="foto.titulo"
+            />
+            <span class="erro">{{ errors[0] }}</span>
+          </validation-provider>
+        </div>
 
-      <div class="controle">
-        <label for="url">URL</label>
-        <input id="url" autocomplete="off" v-model.lazy="foto.url" />
-        <imagem-responsiva
-          v-show="foto.url"
-          :url="foto.url"
-          :descricao="foto.descricao"
-        />
-      </div>
+        <div class="controle">
+          <label for="url">URL</label>
+          <validation-provider
+            rules="required"
+            v-slot="{ errors }"
+          >
+            <input name="url" id="url" autocomplete="off" v-model.lazy="foto.url" />
+            <span class="erro">{{ errors[0] }}</span>
+          </validation-provider>
+          <imagem-responsiva
+            v-show="foto.url"
+            :url="foto.url"
+            :descricao="foto.descricao"
+          />
+        </div>
 
-      <div class="controle">
-        <label for="descricao">DESCRIÇÃO</label>
-        <textarea
-          id="descricao"
-          autocomplete="off"
-          v-model="foto.descricao"
-        ></textarea>
-      </div>
+        <div class="controle">
+          <label for="descricao">DESCRIÇÃO</label>
+          <textarea
+            id="descricao"
+            autocomplete="off"
+            v-model="foto.descricao"
+          />
+        </div>
 
-      <div class="centralizado">
-        <meu-botao descricao="GRAVAR" tipo="submit" />
-        <router-link :to="{name: 'home'}"
-          ><meu-botao descricao="VOLTAR" tipo="button"
-        /></router-link>
-      </div>
-    </form>
+        <div class="centralizado">
+          <meu-botao descricao="GRAVAR" tipo="submit" />
+          <router-link :to="{ name: 'home' }">
+            <meu-botao descricao="VOLTAR" tipo="button" />
+          </router-link>
+        </div>
+      </form>
+    </validationObserver>
   </div>
 </template>
 
@@ -54,21 +74,38 @@ export default {
   data() {
     return {
       foto: new Foto(),
-      mensagem: ''
+      mensagem: "",
+      id: this.$route.params.id
     };
   },
 
   methods: {
     gravar() {
-      this.service
-        .cadastra(this.foto)
-        .then(() => this.foto = new Foto(), err => this.mensagem = err.message);
-        //this.foto = new Foto() irá apagar os valores
+      this.$validator
+        .validateAll()
+        .then(sucess => {
+          if (sucess) {
+            this.service.cadastra(this.foto).then(
+              () => {
+                if(this.id)
+                  this.$router.push({name:'home'});
+                  this.foto = new Foto();
+              },
+              err => (this.mensagem = err.message)
+            );
+          }
+        }
+      );
+      //this.foto = new Foto() irá apagar os valores
     }
   },
 
   created() {
     this.service = new FotoService(this.$resource);
+    if (this.id) {
+      this.mensagem = "Alterando a foto";
+      this.service.getFotoById(this.id).then(foto => (this.foto = foto));
+    }
   }
 };
 </script>
@@ -94,5 +131,9 @@ export default {
 
 .centralizado {
   text-align: center;
+}
+
+.erro {
+  color: red;
 }
 </style>

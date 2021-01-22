@@ -397,6 +397,8 @@ No template, teriamos que:
   </template>
   ```
 
+<br>
+
 
 
 ### v-for - Binding array
@@ -679,6 +681,10 @@ E no template utilizamos o nome dado ao componente, nesse caso `painel`, passand
   <!-- <imagem-responsiva />
 </painel>
 ```
+
+<br>
+
+Podemos acessar a `prop` de um componente **sem** o `:`, porém o Vue irá entender **como uma String!** - útil em casos que tratamos a String do lado do componente filho!
 
 #### Slot
 
@@ -1121,12 +1127,14 @@ O `routes.js` ja possui as informações abaixo, so faltaria o `titulo`
 
 2. No `Menu.vue` iremos importar o `routes.js` e filtraremos somente aquilo que o `menu=true` para que entao iteraremos sobre ele com o `v-for`;
 
+   1. Faremos apenas um pequeno ajuste ao `to: route.path` , pq o path de `Home` é uma string vazia (`''`);
+
    ```vue
    <template>
      <nav>
        <ul>
          <li v-for="route of routes" :key="route.path">
-           <router-link :to="route.path">{{ route.titulo }}</router-link>
+           <router-link :to="route.path? route.path : '/'">{{ route.titulo }}</router-link>
          </li>
        </ul>
      </nav>
@@ -1146,11 +1154,6 @@ O `routes.js` ja possui as informações abaixo, so faltaria o `titulo`
    </script>
    ```
 
-   * Faremos apenas um pequeno ajuste ao `to: route.path` , pq o path de `Home` é uma string vazia (`''`);
-
-     ```vue
-     <router-link :to="route.path? route.path : '/'">{{ route.titulo }}</router-link>
-     ```
 
 ## Eventos Customizados
 
@@ -1490,7 +1493,7 @@ Dado um formulário simples, utlizando componentes:
 
       <div class="centralizado">
         <meu-botao rotulo="GRAVAR" tipo="submit"/>
-        <router-link to="/"><meu-botao rotulo="VOLTAR" tipo="button"/></router-link>
+        <router-link :to="{ name: 'home'}"><meu-botao rotulo="VOLTAR" tipo="button"/></router-link>
       </div>
 
     </form>
@@ -1618,6 +1621,52 @@ O `v-show` permite que o elemento fique como `hide` caso seu valor seja `null` o
    <imagem-responsiva v-show="foto.url" :url="foto.url" :descricao="foto.descricao"/>
    ```
 
+### Validando formulário
+
+Para utilizar a validação do formulário utilizamos **Vee-Validate**:
+
+```bash
+npm install vee-validate
+```
+
+Então devemos importa-lo no `main.js`:
+
+```javascript
+import { ValidationProvider, extend, ValidationObserver } from 'vee-validate';
+
+//Disponibiliza globalmente ambos
+Vue.component('ValidationProvider', ValidationProvider);
+Vue.component('ValidationObserver', ValidationObserver);
+```
+
+Com o `ValidationProvider` e `Observer` sendo disponibilizado globalmente, podemos utilizar no `<template> `
+
+```vue
+<validationObserver v-slot="{ handleSubmit }">
+  <form @submit.prevent="handleSubmit(grava)">
+    <div class="controle">
+      <label for="titulo">TÍTULO</label>
+      <validation-provider rules="required|minmax:3,20" :bails="false"v-slot="{errors}">
+        <input name="titulo" id="titulo" autocomplete="off" v-model.lazy="foto.titulo"/>
+        <span class="erro">{{ errors[0] }}</span>
+      </validation-provider>
+      
+      <validation-provider rules="required" :bails="false"v-slot="{errors}">
+        <input name="url" id="url" autocomplete="off" v-model.lazy="foto.url"/>
+        <span class="erro">{{ errors[0] }}</span>
+      </validation-provider>
+      
+    </div>
+  </form>
+</validationObserver>
+```
+
+Agora para impedir que seja feito o `submit`:
+
+```javascript
+
+```
+
 
 
 ## Model
@@ -1689,7 +1738,7 @@ Um objeto especializado em trabalhar com **requisições HTTP é o `$resource`**
   * `save(seuObjeto)` → funcionará como um POST;
   * `query()` → funcionará como GET;
   * `delete(id)` → funcionará como o DELETE;
-  * `update(seuObjeto)` → funcionará como o PUT;
+  * `update({ id: foto_id }, seuObjeto)` → funcionará como o PUT;
   * `get( { id } )` → funcionará como um GET específico para parâmetros;
 
 **PORÉM,** o `$resource` é um recurso do Vue e não do JS, então para ser utilizado no Service, deveremos recebe-lo no `constructor`;
@@ -1896,3 +1945,113 @@ export default {
 </script>
 ```
 
+
+
+#### Update
+
+O `update`/alteração precisamos manipular:
+
+* `routes.js` → criaremos uma rota para a mesma tela de cadastro, passando o `:id`;
+
+* `FotoService.js` → criaremos o método para alterar a foto. 1º precisaremos encontrar a `Foto` pelo `id` com o `get` e depois utilizar do `
+
+* `Home.vue` → criaremos um botão, com o `router-link` para a rota mapeada acima, com o objeto `params` contendo o `foto._id`, dessa foto `Cadastro` poderá consumir o `id`;
+
+*  `Cadastro.vue` → Precisará através do `$route` (objeto do **global view object** VueRouter) capturar o `id` da rota; Com o `id` mapeado iremos fazer uso do `getFotoById` do `FotoService`;
+
+  
+
+```javascript
+// routes.js
+import Cadastro from "./components/view/cadastro/Cadastro";
+
+export const Routes = [ 
+	{ path: "/cadastro", name: "cadastro", component: Cadastro, titulo:"Cadastro", menu:true},
+  { path: "/cadastro/:id", name: "alteracao", component: Cadastro, titulo:"Cadastro", menu:false},
+]
+```
+
+```javascript
+// FotoService.js
+export default class FotoService {
+  
+  constructor(resource) {
+    this._resource = resource("v1/fotosq{/id}");
+  }
+  
+  //codigo omitido
+  getFotoById(id) { 
+  	return _resource
+    	.get({ id })	// get irá devolver uma promise
+    	.then(res => res.json());
+  }
+  
+  cadastra(foto) {
+    if(foto._id) {
+      return this._resource
+        .update( {id: foto._id } , foto)
+        .then(null, err => {
+          console.log(err);
+          throw new Error('Não foi possível alterar a imagem')
+        });
+    } else {
+      return this._resource
+        .save(foto)
+        .then(null, err => {
+          console.log(err);
+          throw new Error('Não foi possível salvar a imagem')
+        });
+    }
+  }
+}
+```
+
+
+
+```vue
+<!-- Home.vue -->
+<template>
+
+	<!-- codigo omitido -->
+  <router-link :to="{name: 'alteracao', params: { id: foto._id}}">
+    <botao-customizado descricao="ALTERAR" tipo="button" />
+  </router-link>
+
+</template>
+```
+
+```vue
+<!-- Cadastro.vue -->
+
+<script>
+  
+  data() {
+    return {
+      id: this.$route.params.id
+    };
+  },
+    
+  created() {
+    this.service = new FotoService(this.$resource);
+    if (this.id) {
+      this.mensagem = "Alterando a foto";
+      this.service.getFotoById(this.id).then(foto => (this.foto = foto));
+    }
+  }
+</script>
+```
+
+
+
+## Lazy loading
+
+O lazy loading no Vue é bem simples, basta que seja feita a alteração no `routes.js`!
+
+1. Invés de utilizarmos do `import XX from 'x'` utilizaremos do `System.import('./pathClasse')`;
+
+   ```javascript
+   //import Cadastro from "./components/view/cadastro/Cadastro";
+   const Cadastro = () => System.import('./components/view/cadastro/Cadastro.vue')
+   ```
+
+   

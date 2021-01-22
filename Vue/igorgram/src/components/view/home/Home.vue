@@ -16,10 +16,21 @@
         :key="foto._id"
       >
         <painel :titulo="foto.titulo">
-          <imagem-responsiva :url="foto.url" :titulo="foto.titulo" v-rotacao-diretiva="{incremento:15, animate:true}"/>
+          <imagem-responsiva
+            :url="foto.url"
+            :titulo="foto.titulo"
+            v-rotacao-diretiva="{ incremento: 15, animate: true }"
+          />
+          <router-link :to="{ name: 'alteracao', params: { id: foto._id } }">
+            <botao-customizado
+              descricao="ALTERAR"
+              tipo="button"
+            ></botao-customizado>
+          </router-link>
           <botao-customizado
             descricao="REMOVER"
             tipo="button"
+            estilo="danger"
             @botaoAtivado="remove(foto)"
           ></botao-customizado>
         </painel>
@@ -65,22 +76,20 @@ export default {
 
   methods: {
     remove(foto) {
-      this.service
-        .remove(foto._id)
-        .then(
-          () => {
-            let indice = this.fotos.indexOf(foto)
-            this.fotos.splice(indice, 1);
-            this.mensagem = "Foto removida com sucesso";
-            },
-          err => this.mensagem = err.message
-        );
+      this.service.remove(foto._id).then(
+        () => {
+          let indice = this.fotos.indexOf(foto);
+          this.fotos.splice(indice, 1);
+          this.mensagem = "Foto removida com sucesso";
+        },
+        err => (this.mensagem = err.message)
+      );
     }
   },
 
   created() {
     this.service = new FotoService(this.$resource);
-    this.service.listaFotos().then(fotos => this.fotos = fotos);
+    this.service.listaFotos().then(fotos => (this.fotos = fotos));
   }
 };
 </script>

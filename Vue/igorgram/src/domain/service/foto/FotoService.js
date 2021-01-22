@@ -4,12 +4,21 @@ export default class FotoService {
   }
 
   cadastra(foto) {
-    return this._resource
-      .save(foto)
-      .then(null, err => {
-        console.log(err);
-        throw new Error('Não foi possível salvar a imagem')
-      });
+    if(foto._id) {
+      return this._resource
+        .update( {id: foto._id } , foto)
+        .then(null, err => {
+          console.log(err);
+          throw new Error('Não foi possível alterar a imagem')
+        });
+    } else {
+      return this._resource
+        .save(foto)
+        .then(null, err => {
+          console.log(err);
+          throw new Error('Não foi possível salvar a imagem')
+        });
+    }
   }
 
   listaFotos() {
@@ -21,7 +30,8 @@ export default class FotoService {
 
   getFotoById(id){
     return this._resource
-      .get({id});
+      .get({id})
+      .then(res => res.json());
   }
 
   remove(id){
