@@ -11,7 +11,8 @@ Dentro do bloco `script` teremos algumas parâmetros, que dirão como **o compon
 ### Methods - objeto
 
 * O objeto `methods` irão ficar todos os métodos `void` do componente.
-* Funções neste objeto **permitem que seja feita comunicação com outro componente!**
+* Funções neste objeto **permitem que seja feita comunicação com outro componente!**;
+* Não devemos utilizar a função feita `methods` dentro do template com interpolação! O Vue verifica cada função do methods procurando se há alguma alteração!
 
 ```vue
 <button class="botao botao-perigo" :type="tipo" @click="disparaAcao()">
@@ -309,7 +310,7 @@ No Vue.js, tudo dentro do `template` que for ter +1 elemento HTML, **PRECISA EST
 
 
 
-## Data binding
+## Data binding - Interpolação
 
 No Angular, tinhamos a **interpolação** `{{ nomeSeletor }}` e no Vue, teremos o mesmo modo!<br>
 
@@ -333,7 +334,9 @@ export default {
 
 * Através do `data()` retornamos o objeto `msg` com o a frase que será **interpolada** quando o template chamar `{{ msg }}`;
 
-### v-text - Binding texto
+### ![vue1](/Users/igorromero/NotesInGeneral/Vue/imagesReadme/vue1.png)
+
+#### v-text - Binding texto
 
 Um outro modo de fazer a interpolação é utilizar a tag `v-text` em tags html:
 
@@ -397,9 +400,33 @@ No template, teriamos que:
   </template>
   ```
 
+### Methods:
+
+Através do `methods` é possível acessarmos os valores do `data()` com o `this` . Desta forma é possível manipular dinâmica mente o `template`:
+
+```javascript
+data() {
+  return {
+    courseGoalA: 'courseGoalA',
+    courseGoalB: 'courseGoalB'
+  }
+}
+
+methods: {
+  const randomNumber = Math.random();
+  if(randomNumber < 0.5) {
+    return this.courseGoalA;
+  } else {
+    return this.courseGoalB;
+  }
+}
+```
+
+![vue2](/Users/igorromero/NotesInGeneral/Vue/imagesReadme/vue2.png)
+
+
+
 <br>
-
-
 
 ### v-for - Binding array
 
@@ -804,7 +831,269 @@ O `v-on` ou o shortcut `@` é utilizado quando temos actions (`dblclick(), click
 
 * `v-on` ou `@` → `@click="suaFuncao()` realiza um data binding unidirecional da view para a fonte de dados, que pode ou não modificá-lo.
 
-### Filtro reativo
+### Exemplo Simples
+
+Caso queiramos criar um contador com o Vue utilizando dois botões, como fariamos?
+
+<img src="/Users/igorromero/NotesInGeneral/Vue/imagesReadme/vue3.png" alt="vue3" style="zoom:67%;" />
+
+Utilizariamos do `v-on:click` para que a cada clique um `counter` fosse acrescentado ou removido!
+
+<img src="/Users/igorromero/NotesInGeneral/Vue/imagesReadme/vue4.png" alt="vue4" style="zoom:50%;" />
+
+Porém sabemos que o ideal é não deixar o código explicito no `<template>` e sim dentro de `methods`!
+
+* Com o uso do `methods` podemos passar parâmetros!
+
+```javascript
+Vue.createApp({
+  data(){
+    return {
+      counter: 0;
+    }
+  },
+  methods: {
+    add(num){
+      return this.counter = this.counter + num;
+    },
+    reduce(num){
+      return this.counter = this.counter - num;
+    }
+  }
+}).mount("#div");
+```
+
+```html
+<div id="div">
+  <h2> Events in action</h2>
+  <button v-on:click="add(5)">Add + 5</button>
+  <button v-on:click="rediuce(5)">Add + 5</button>
+  <p>
+    resulce {{ counter }}
+  </p>
+</div>
+```
+
+### $event - Evento nativo
+
+<img src="/Users/igorromero/NotesInGeneral/Vue/imagesReadme/vue5.png" alt="vue5" style="zoom:70%;" />
+
+E se quisermos capturar o valor digitado? O JavaScript disponibiliza o objeto **`$event`** por padrão nas funções e através do `$event` podemos pegar o `value`!
+
+* Se formos passar um parâmetro na função, preciso deixar explícito o `$event`
+
+```vue
+<template>
+	<input type="text" @input="getValue($event, 'Romero')" />
+	<p>
+   Seu nome: {{ nome }}
+  </p>
+</template>
+
+<script>
+	data() {
+    return {
+      nome: ''
+    }
+  }
+  
+  methods: {
+    getValue(e, sobrenome) {
+      this.nome = e.target.value + ' ' + sobrenome;
+    }
+  }
+</script>
+```
+
+### Events Modifiers
+
+Os eventos da diretiva `v-on` possuem modificadores como o `prevent` do evento `submit` que faz com que a página não seja carregada!
+
+<img src="/Users/igorromero/NotesInGeneral/Vue/imagesReadme/vue6.png" alt="vue6" style="zoom:70%;" />
+
+E se quisessemos exibir o nome **somente se apertassemos o ENTER** ? Temos o modificador do `keyup` chamado `enter`!
+
+```vue
+<template>
+	<button @click="addCounter($event, 10)">Add 10</button>
+  <!-- irá ter que clicar com o botão direito -->	
+	<button @click.right="removeCounter($event, 5)">Subctract 5</button> 
+	
+	<p>result: {{counter}}</p>
+
+	<!-- aqui vem o enter -->
+	<input type="text" @input="getName" @keyup.enter="getConfirmedName"/> 
+	<p>Your name: {{confirmedName}}</p>
+
+	<form @submit.prevent> <!-- essa ação irá prever de atualizar o formulário -->
+    <button>Sign Up</button>
+  </form>
+</template>
+```
+
+```javascript
+export default {
+  data() {
+    return {
+      name: '',
+      confirmedName: '',
+      sobrenome: 'sobrenome',
+      counter: 0
+    }
+  },
+  methods: {
+    getName(e){
+      this.name = e.target.value + ' ' + sobrenome;
+    },
+    getConfirmedName() {
+      this.confirmedName = this.name
+    }
+  }
+}
+```
+
+## v-once
+
+O `v-once` é utilizado quando não queremos que o elemento seja alterado!
+
+1. Se criarmos outra variável para o `counter` queremos que ela não seja modificada ao clicar no botão!
+
+   ```vue
+   <template>
+   	<button @click="addCounter($event, 10)">Add 10</button>
+   	<button @click.right="removeCounter($event, 5)">Subctract 5</button> 
+   	
+   	<p>result: {{counter}}</p>
+   
+   	<!-- aqui implementamos o v-once-->
+   	<p v-once>result not modified: {{counter}}</p>
+   </template>
+   ```
+
+## v-model - two-way binding
+
+O `v-model` substitui → `v-bind:value + v-on:input` <br>
+
+Reset o valor do input
+
+<img src="/Users/igorromero/NotesInGeneral/Vue/imagesReadme/vue7.png" alt="vue7" style="zoom:50%;" />
+
+1. Sem o `v-model`:
+
+   ```vue
+   <template>
+   	<input type="text" value="name" @input="getName"/>
+   	<button @click="resetValue">Reset Input</button>
+   	<p>YourName: {{ name }}</p>
+   </template>
+   ```
+
+2. Com o `v-model`:
+
+   ````vue
+   <template>
+   	<input type="text" v-model:"name"/>
+   	<button @click="resetValue">Reset Input</button>
+   	<p>YourName: {{ name }}</p>
+   </template>
+   ````
+
+Para ambos o script não muda:
+
+```javascript
+const app = Vue.createApp({
+  data() {
+    return {
+      name="",
+    }
+  },
+  methods: {
+    resetValue() {
+      this.name = ''
+    }
+  }
+});
+
+app.mount("#seuId");
+```
+
+## Computed Property - manipulando o data()
+
+A `computedProperty` ou `computed:` é utilizada como `output` para o `template`, ou seja, invés de utilizarmos `methods` que irá ser executado toda vez que algum elemento do `data` alterar, utilizamos a `computed` para ser mais performático!
+
+* Quando queremos manipular um dado que esta em `data()` utilizamos do objeto `computed`, onde cada propriedade desse objeto é **obrigatoriamente uma função**;
+
+### Exemplo Simples
+
+Queremos exibir o sobrenome somente se o `name` for digitado no `input`!
+
+```vue
+<template>
+	<input type="text" v-model:"name"/>
+	<button @click="resetValue">Reset Input</button>
+	<p>YourName: {{ minhaComputedFunction }}</p>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      name: ""
+    }
+  },
+  
+  computed: {
+	  minhaComputedFunction() {
+      if(this.name === "") {
+      	return this.name = "";
+      }
+      return this.name + ' ' + 'Romero'; 
+    }
+  }
+}
+</script>
+```
+
+* Funcionaria com o `methods`  porém, teriamos um problema de performance, pois outros methods iriam ficar sendo executados em conjunto com esse!
+
+## Watch - Verificando data()
+
+O elemento `watch` permite que seja verificado um objeto do `data()` , basta que seja utilizado o **nome da função** com o mesmo **nome do `data()`**!
+
+Dentro da função do `watch` será disponibilizado o `value` que é como o `this`
+
+1. Zere o `counter` após chegar em 50!
+
+   ```vue
+   <template>
+   	<button @click="addCounter($event, 10)">Add 10</button>
+   	<button @click.right="removeCounter($event, 5)">Subctract 5</button> 
+   	
+   	<p>result: {{counter}}</p>
+   </template>
+   
+   <script>
+   export default {
+     data() {
+       return {
+         counter: 0
+       }
+     },
+     
+     watch: {
+       counter(value) { //mesmo nome da propriedade do data
+         if( value > 50 ) { //o value = é igual o this
+           value = 0;
+         }
+       }
+     }
+   }
+   </script>
+   ```
+
+   
+
+## Filtro reativo
 
 Usaremos do `v-on` para criar um filtro reativo, onde **conforme digitamos aparecerá a imagem**!
 
@@ -834,9 +1123,7 @@ Usaremos do `v-on` para criar um filtro reativo, onde **conforme digitamos apare
 
 4. E agora para filtrar a iterar no array  `fotos`?
 
-#### Computed Property - manipulando o data()
-
-Quando queremos manipular um dado que esta em `data()` utilizamos do objeto `computed`, onde cada propriedade desse objeto é **obrigatoriamente uma função**;
+Com a computed Property manipularemos o `data()`
 
 ```javascript
 data() {
@@ -1587,7 +1874,7 @@ Para capturar dados do formulário, usaremos do `$event.target.value`;
 
    
 
-### v-model - Two-way data binding
+### v-model - na pratica
 
 O `v-model` serve para fazer a comunicação do `template` para o `script` e vice-versa, ou seja, o que tinhamos:
 
@@ -1608,8 +1895,6 @@ Devemos utilizar o `.lazy` para que seja inserido o valor **após sairmos do inp
 ```vue
 <input v-model.lazy="foto.titulo"/>
 ```
-
-
 
 ### v-show - Exibindo imagem
 
