@@ -85,7 +85,6 @@
     "editor.fontLigatures": true,
     "editor.formatOnPaste": true,
     "editor.formatOnType": false,
-    "editor.lineHeight": 25,
     "editor.minimap.enabled": false,
     "editor.multiCursorModifier": "ctrlCmd",
     "editor.suggestSelection": "first",
@@ -120,6 +119,22 @@
     "unwantedRecommendations": []
 }
 ```
+
+## jsconfig.json
+
+Utiilzado para informar o projeto o autocomplete para javascript!
+
+```json
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6"
+  },
+  "exclude": ["node_modules"]
+}
+```
+
+
 
 ### Plugins
 

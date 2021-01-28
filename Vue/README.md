@@ -111,22 +111,19 @@ data() {
 
 Assim como no Angular, o Vue.js necessita do [Node.js](https://nodejs.org/en/) instalado e do [VSCode](https://code.visualstudio.com/download)!
 
-1. Em um terminal, execute → `npm i -g vue-cli`;
+1. Em um terminal, execute → `npm i -g @vue/cli`;
    1. Este comando fará com que seja possível utilizar o Vue.js de **forma global**;
 2. Cheque com → `vue --version`;
 
 Com o **Vue-cli** instalado, para criar um projeto:
 
 ```bash
- vue init webpack-simple nomeDoProjeto
-```
-
-Para rodar o projeto:
-
-```bash
-cd igorgram
-npm install
-npm run dev
+ vue create nomeDoProjeto
+ 
+ --selectDefaultVue2
+ --yarn
+ 
+ yarn run serve
 ```
 
 * O comando `npm run dev` basicamente executa o que esta no `package.json`:
@@ -135,6 +132,16 @@ npm run dev
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
+  },
+  ```
+  
+* ou com Yarn
+
+  ```javascript
+  "scripts": {
+    "serve": "vue-cli-service serve",
+      "build": "vue-cli-service build",
+        "lint": "vue-cli-service lint"
   },
   ```
 
@@ -992,7 +999,7 @@ Reset o valor do input
 
    ````vue
    <template>
-   	<input type="text" v-model:"name"/>
+   	<input type="text" v-model="name"/>
    	<button @click="resetValue">Reset Input</button>
    	<p>YourName: {{ name }}</p>
    </template>
@@ -1004,7 +1011,7 @@ Para ambos o script não muda:
 const app = Vue.createApp({
   data() {
     return {
-      name="",
+      name:"",
     }
   },
   methods: {
@@ -1029,7 +1036,7 @@ Queremos exibir o sobrenome somente se o `name` for digitado no `input`!
 
 ```vue
 <template>
-	<input type="text" v-model:"name"/>
+	<input type="text" v-model="name"/>
 	<button @click="resetValue">Reset Input</button>
 	<p>YourName: {{ minhaComputedFunction }}</p>
 </template>
@@ -1056,44 +1063,7 @@ export default {
 
 * Funcionaria com o `methods`  porém, teriamos um problema de performance, pois outros methods iriam ficar sendo executados em conjunto com esse!
 
-## Watch - Verificando data()
-
-O elemento `watch` permite que seja verificado um objeto do `data()` , basta que seja utilizado o **nome da função** com o mesmo **nome do `data()`**!
-
-Dentro da função do `watch` será disponibilizado o `value` que é como o `this`
-
-1. Zere o `counter` após chegar em 50!
-
-   ```vue
-   <template>
-   	<button @click="addCounter($event, 10)">Add 10</button>
-   	<button @click.right="removeCounter($event, 5)">Subctract 5</button> 
-   	
-   	<p>result: {{counter}}</p>
-   </template>
-   
-   <script>
-   export default {
-     data() {
-       return {
-         counter: 0
-       }
-     },
-     
-     watch: {
-       counter(value) { //mesmo nome da propriedade do data
-         if( value > 50 ) { //o value = é igual o this
-           value = 0;
-         }
-       }
-     }
-   }
-   </script>
-   ```
-
-   
-
-## Filtro reativo
+### Filtro reativo
 
 Usaremos do `v-on` para criar um filtro reativo, onde **conforme digitamos aparecerá a imagem**!
 
@@ -1168,7 +1138,143 @@ computed: {
 
 
 
-## v-show - manipulando display
+## Watch
+
+O elemento `watch` permite que seja um `data` quanto um `computed` , basta que seja utilizado o **nome da função** com o mesmo **nome do `data/computed`**!
+
+Dentro da função do `watch` será disponibilizado o `value` que é como o `this`
+
+1. Zere o `counter` após chegar em 50!
+
+   ```vue
+   <template>
+   	<button @click="addCounter($event, 10)">Add 10</button>
+   	<button @click.right="removeCounter($event, 5)">Subctract 5</button> 
+   	
+   	<p>result: {{counter}}</p>
+   </template>
+   
+   <script>
+   export default {
+     data() {
+       return {
+         counter: 0
+       }
+     },
+     
+     watch: {
+       counter(value) { //mesmo nome da propriedade do data
+         if( value > 50 ) { //o value = é igual o this
+           value = 0;
+         }
+       }
+     }
+   }
+   </script>
+   ```
+
+   Ou vendo uma **Computed Property**:
+
+   ```javascript
+   computed: {
+     result() {
+       if (this.counter < 37) {
+         return "Not there yet!";
+       } else if (this.counter > 37) {
+         return "Too much!";
+       } else {
+         return this.counter;
+       }
+     },
+   },
+     watch: {
+       result() {
+         console.log("Executing the watch");
+         const that = this;
+         setTimeout(() => {
+           that.counter = 0;
+         }, 2000);
+       },
+     },
+   ```
+
+   
+
+## Manipulando CSS
+
+### Inline Style
+
+O Vue nos permite fazer o `v-bind` do atributo `style` e desta forma, podemos passar uma `computed` property através do style!
+
+* O `:style` recebe um objeto com os valores do CSS!
+
+<img src="/Users/igorromero/NotesInGeneral/Vue/imagesReadme/vue8.png" alt="vue8" style="zoom:50%;" />
+
+Ao clicar o pontilhado do **quadrado fica vermelho**:
+
+```vue
+<template>
+  <div class="demo" @click="selectBox('A')" :style="makeRedA"></div>
+  <div class="demo" @click="selectBox('B')" :style="makeRedB"></div>
+</template>
+
+<script>
+export default {
+ data() {
+    return {
+      selectedBoxA: false,
+      selectedBoxB: false,
+    };
+  },
+  methods: {
+    selectBox(value) {
+      if (value === "A") {
+        this.selectedBoxA = true;
+      } else if (value === "B") {
+        this.selectedBoxB = true;
+      }
+    },
+  },
+  computed: {
+    makeRedA() {
+      return { borderColor: this.selectedBoxA ? "red" : "#ccc" };
+    },
+    makeRedB() {
+      return { borderColor: this.selectedBoxB ? "red" : "#ccc" };
+    },
+  },
+}
+</script>
+```
+
+É possível fazer diretamente no HTML também!
+
+```vue
+<input type="text" v-model="colorInput"/>
+<p :style="{'background-color': colorInput}">Style me inline!</p>
+```
+
+O mesmo é possível para o atributo `class`! É possível fazer um `v-bind:class` ;
+
+```vue
+<template>
+  <div class="demo" :class="{active: selectedBoxA}" @click="selectBox('A')" :style="makeRedA"></div>
+  <div class="demo" :class="{active: selectedBoxB}" @click="selectBox('B')" :style="makeRedB"></div>
+</template>
+```
+
+Ou podemos passar como um **Array**!
+
+```vue
+<template>
+  <div :class="['demo', {active: selectedBoxA}]" @click="selectBox('A')" :style="makeRedA"></div>
+  <div :class="['demo', {active: selectedBoxB}]"@click="selectBox('B')" :style="makeRedB"></div>
+</template>
+```
+
+
+
+### v-show - manipulando display
 
 Ainda utilizando actions, queremos que ao dar `dblclick` em título a imagem seja ocultada!
 
@@ -1210,7 +1316,7 @@ Ainda utilizando actions, queremos que ao dar `dblclick` em título a imagem sej
 
    
 
-## Transition - ajudando CSS
+### transition - ajudando CSS
 
 `<transition />` é um elemento do Vue, que automaticamente nos habilita 3 novos estilos!<br>
 
@@ -1245,6 +1351,10 @@ Portanto, se quisermos criar um `fade` :
 }
 </style>
 ```
+
+## Condicionais
+
+## if - else if - else
 
 
 

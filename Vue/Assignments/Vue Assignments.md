@@ -179,22 +179,54 @@ app.mount("#assignment");
 
 ```
 
+## 4. Dynamic Styling
 
+<img src="/Users/igorromero/NotesInGeneral/Vue/imagesReadme/assignment4.png" alt="assignment3" style="zoom:50%;" />
 
+* Mudar o `Style me` se o valor digitado for `user1` ou `user2`;
+* O `toggle paragraph` irá exibir ou não exibir o `style me`;
+* O segundo input deverá setar a cor do `style me inline`;
 
+```vue
+<section id="assignment">
+  <!-- 1) Fetch the user input and use it as a CSS class -->
+  <!-- The entered class should be added to the below paragraph -->
+  <input type="text" v-model="userInput"/>
+  <!-- (available classes: "user1", "user2") -->
+  <p :class="userInput">
+    Style me!
+  </p>
+  <button @click="toggleVisibility">Toggle Paragraph</button>
+  <!-- 2) Use the "visible" and "hidden" classes to show/ hide the above paragraph -->
+  <!-- Clicking the button should toggle between the two options -->
+
+  <!-- 3) Add dynamic inline styling to the below paragraph and let the user enter a background-color -->
+  <input type="text" v-model="colorInput"/>
+  <p :style="{'background-color': colorInput}">Style me inline!</p>
+</section>
+```
 
 ```javascript
-//app.js
 const app = Vue.createApp({
   data() {
     return {
-      counter = 0;
+      userInput: "",
+      visibility: true,
+      colorInput:""
     };
   },
-  methods:{
-    
-  }
+  computed: {
+    toggleParagraph() {
+      if (this.visibility) return "visible";
+      return "hidden";
+    },
+  },
+  methods: {
+    toggleVisibility() {
+      this.visibility = !this.visibility;
+    },
+  },
 });
-app.mount('#assignment');
-```
 
+app.mount("#assignment");
+```
