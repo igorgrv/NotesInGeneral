@@ -8,6 +8,10 @@ Uma das **diferenças em relação ao Angular**, será em como o código é dist
 
 Dentro do bloco `script` teremos algumas parâmetros, que dirão como **o componente irá funcionar!**;
 
+## VueLifeCycle
+
+<img src="/Users/igorromero/NotesInGeneral/Vue/imagesReadme/vue10.png" alt="vue10" style="zoom:30%;" />
+
 ### Methods - objeto
 
 * O objeto `methods` irão ficar todos os métodos `void` do componente.
@@ -407,7 +411,7 @@ No template, teriamos que:
   </template>
   ```
 
-### Methods:
+### Methods
 
 Através do `methods` é possível acessarmos os valores do `data()` com o `this` . Desta forma é possível manipular dinâmica mente o `template`:
 
@@ -430,52 +434,6 @@ methods: {
 ```
 
 ![vue2](/Users/igorromero/NotesInGeneral/Vue/imagesReadme/vue2.png)
-
-
-
-<br>
-
-### v-for - Binding array
-
-Com o `v-for` podemos passar o **array** de fotos:
-
-```vue
-<script>
-export default {
-  data() {
-    return {
-      fotos:[
-        {
-          src: "https://assets.codepen.io/t-1003/internal/avatars/teams/default.png?fit=crop&format=auto&height=256&version=1513627136&width=256",
-          description: "Vue"
-        },
-        {
-          src: "https://1.bp.blogspot.com/-CpOVQnk_nE0/WDbFz6J2JfI/AAAAAAAAGZk/SZKGIqr1TZgNZiMBoHKnh--r9xDV5RMkACLcB/s1600/angularjs-development-services.png",
-          description: "Angular"
-        }
-      ]
-    }
-  }
-}
-</script>
-```
-
-E adicionar na TAG `li` o `v-for` com o nome do array e o atributo `:key` que o Vue pede para ser **uma chave única**, que como não temos passaremos somente o nome
-
-```vue
-<template>
-  <div>
-    <h1 v-text="titulo"></h1>
-    
-    <ul>
-      <li v-for="foto of fotos" :key="foto">
-        <img :src="foto.src" :alt="foto.description" />
-      </li>
-    </ul>
-    
-  </div>
-</template>
-```
 
 
 
@@ -1354,9 +1312,160 @@ Portanto, se quisermos criar um `fade` :
 
 ## Condicionais
 
-## if - else if - else
+<img src="/Users/igorromero/NotesInGeneral/Vue/imagesReadme/vue9.png" alt="vue9" style="zoom:50%;" />
 
+Vue disponibiliza condicionais para podermos **exibir ou não** um componente por exemplo!
 
+Dado o exemplo da imagem:
+
+```vue
+<body>
+  <header>
+    <h1>Vue Course Goals</h1>
+  </header>
+  <section id="user-goals">
+    <h2>My course goals</h2>
+    <input type="text" />
+    <button>Add Goal</button>
+    <p>No goals have been added yet - please start adding some!</p>
+    <ul>
+      <li>Goal</li>
+    </ul>
+  </section>
+</body>
+
+const app = Vue.createApp({
+  data() {
+    return { goals: [] };
+  },
+});
+
+app.mount('#user-goals');
+```
+
+### if - else if - else
+
+Exiba a frase `No goals have been added yet - please start adding some!` caso não exista nenhum componente `<li>` e caso exista, exiba-o dentro do card `goal`
+
+1. Usaremos o `if` na tag `p` para verificar se o Array `Goals` possui algo:
+
+   ```vue
+   <p v-if="goals.length === 0">
+     No goals have been added yet - please start adding some!
+   </p>
+   ```
+
+2. E `v-else` para indicar caso o array possua algo, é para exibir:
+
+   ```vue
+   <ul v-else>
+     <li>Goal</li>
+   </ul>
+   ```
+
+   * O `v-else-if` pode ser utilizado logo após o `v-if` onde será necessário passar uma fórmula!
+
+### v-for
+
+Para exibirmos os valores que foram adicionados no array `goals`  usamos o `v-for`!<br>
+
+Como boa prática, devemos tambem passar o `:key` para que a tag tenha um **identificador único**!
+
+```vue
+<ul v-else>
+  <li v-for="goal in goals" :key="goal">{{ goal}}</li>
+</ul>
+```
+
+* O `v-for` disponibiliza o `index` do array, que pode ser útil para caso queiramos remover o elemento!
+
+  ```vue
+  <ul v-else>
+    <li v-for="(goal, index) in goals" :key="goal">{{ goal}} - {{ index }}</li>
+  </ul>
+  
+  <!-- ira exibir 'goal - 0' para o 1º elemento-->
+  ```
+
+* Para remover, podemos utilizar do index e fazer um `splice` do array!
+
+  ```vue
+  <ul v-else>
+    <li v-for="(goal, index) in goals" :key="goal" @click="remove(index)">
+      {{ goal}} - {{ index }}
+    </li>
+  </ul>
+  
+  remove(value) {
+  	this.goals.splice(value, 1);
+  },
+  ```
+
+  
+
+#### iterando array de fotos
+
+Com o `v-for` podemos passar o **array** de fotos:
+
+```vue
+<script>
+export default {
+  data() {
+    return {
+      fotos:[
+        {
+          src: "https://assets.codepen.io/t-1003/internal/avatars/teams/default.png?fit=crop&format=auto&height=256&version=1513627136&width=256",
+          description: "Vue"
+        },
+        {
+          src: "https://1.bp.blogspot.com/-CpOVQnk_nE0/WDbFz6J2JfI/AAAAAAAAGZk/SZKGIqr1TZgNZiMBoHKnh--r9xDV5RMkACLcB/s1600/angularjs-development-services.png",
+          description: "Angular"
+        }
+      ]
+    }
+  }
+}
+</script>
+```
+
+E adicionar na TAG `li` o `v-for` com o nome do array e o atributo `:key` que o Vue pede para ser **uma chave única**, que como não temos passaremos somente o nome
+
+```vue
+<template>
+  <div>
+    <h1 v-text="titulo"></h1>
+    
+    <ul>
+      <li v-for="foto of fotos" :key="foto">
+        <img :src="foto.src" :alt="foto.description" />
+      </li>
+    </ul>
+    
+  </div>
+</template>
+```
+
+## $refs
+
+O Vue possui um elemento chamado `ref` que pode ser utilizado no html, funcionando de forma parecida com o v-model, porém com o `ref` é possível pegar todo elemento do DOM;
+
+Se quisermos pegar a mensagem de um input:
+
+```vue
+<input type="text" ref="refText">
+<button @click="setValue">Set value</button>
+{{ message }}
+```
+
+No javascript, acessamos com o `$refs`:
+
+```javascript
+methods: {
+  setValue() {
+    this.message = this.$refs.refText.value;
+  }
+}
+```
 
 ## Rotas
 

@@ -230,3 +230,291 @@ const app = Vue.createApp({
 
 app.mount("#assignment");
 ```
+
+
+
+## 5. Conditionals
+
+<img src="/Users/igorromero/NotesInGeneral/Vue/imagesReadme/assignment5.png" alt="assignment5" style="zoom:50%;" />
+
+* Exibir a lista somente se houver valores;
+* Botão deve mudar o nome, caso tenha valores na lista ou não;
+* Botão deve escnoder ou mostrar a lista;
+
+```vue
+<section id="assignment">
+  <h2>Assignment</h2>
+  <!-- 1) Add code to manage a list of tasks in a Vue app -->
+  <!-- When clicking "Add Task" a new task with the entered text should be added -->
+  <input type="text" v-model="inputTask" />
+  <button @click="addTask">Add Task</button>
+  <ul v-if="isNotHide">
+    <!-- 2) Output the list of tasks here -->
+    <li v-for="task in tasks">{{task}}</li>
+  </ul>
+  <!-- 3) When the below button is pressed, the list should be shown or hidden -->
+  <!-- BONUS: Also update the button caption -->
+  <button @click="toggleHide" >{{ textButton }}</button>
+</section>
+```
+
+```javascript
+const app = Vue.createApp({
+  data() {
+    return { inputTask: '', tasks: [], isNotHide: true };
+  },
+  computed: {
+    textButton() {
+      return this.isNotHide ? 'Hide' : 'Show';
+    },
+  },
+  methods: {
+    addTask() {
+      this.tasks.push(this.inputTask);
+    },
+    toggleHide() {
+      this.isNotHide = !this.isNotHide;
+    },
+  },
+});
+
+app.mount('#assignment');
+```
+
+
+
+# Project
+
+## 1. Monster Slayer
+
+<img src="/Users/igorromero/Library/Application Support/typora-user-images/Screen Shot 2021-01-29 at 22.07.18.png" alt="Screen Shot 2021-01-29 at 22.07.18" style="zoom:30%;" />
+
+### To do
+
+* Botão ataque, deve retirar de X - Y do monstro e de X - Y do jogador com um `Attack`;
+* Botão `special Attack` irá tirar mais dano do que o normal, jogador tbm receberá um ataque;
+* Heal irá curar o jogador e receber um taque;
+* Surrender o jogo acaba;
+* Battle log deve registrar cada dano e habilidade usada;
+
+### Base do projeto
+
+```vue
+<body>
+  <header>
+    <h1>Monster Slayer</h1>
+  </header>
+  <div id="game">
+    <section id="monster" class="container">
+      <h2>Monster Health</h2>
+      <div class="healthbar">
+        <div class="healthbar__value"></div>
+      </div>
+    </section>
+    <section id="player" class="container">
+      <h2>Your Health</h2>
+      <div class="healthbar">
+        <div class="healthbar__value"></div>
+      </div>
+    </section>
+    <section id="controls">
+      <button>ATTACK</button>
+      <button>SPECIAL ATTACK</button>
+      <button>HEAL</button>
+      <button>SURRENDER</button>
+    </section>
+    <section id="log" class="container">
+      <h2>Battle Log</h2>
+      <ul></ul>
+    </section>
+  </div>
+</body>
+```
+
+### Botão de Ataque
+
+Antes de realizar o ataque, precisamos passar os valores da barra de saúde (`health`)!
+
+```javascript
+const app = Vue.createApp({
+  data() {
+    return {
+      playersHealth: 100,
+      monstersHealth: 100,
+    };
+  }
+});
+
+app.mount('#game');
+```
+
+Com `health` criado, podemos criar uma função que irá receber o attaque minimo e máximo para retirar da vida do player e do monster
+
+```javascript
+function getRandomNumber(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
+}
+
+const app = Vue.createApp({
+  methods: {
+    attackMonster() {
+      this.monstersHealth -= getRandomNumber(5, 12);
+      this.attackPlayer();
+    },
+    attackPlayer() {
+      this.playersHealth -= getRandomNumber(8, 15);
+    },
+  },
+});
+
+app.mount('#game');
+```
+
+Para alterar a vida no html, iremos criar uma `computed` que retorna um `style` ou seja, um objeto que irá alterar o `width`
+
+```javascript
+  computed: {
+    monsterHealthBar() {
+      if(this.monsterHealth < 0) {
+        return { width: '0%' };
+      }
+      return { width: this.monsterHealth + '%' };
+    },
+    playerHealthBar() {
+      if(this.playerHealth < 0) {
+        return { width: '0%' };
+      }
+      return { width: this.playerHealth + '%'};
+    }
+  }
+```
+
+No html
+
+```vue
+<div class="healthbar">
+  <div class="healthbar__value" :style="monsterHealthBar"></div>
+</div>
+
+<div class="healthbar">
+  <div class="healthbar__value" :style="playerHealthBar"></div>
+</div>
+```
+
+### Botão Special Ataque
+
+Bem parecido com o botão de ataque, so aumentaremos o dano, e através do `countRounds` iremos checar se podemos apertar o botao novamente
+
+```javascript
+methods: {
+  specialAttack() {
+    this.countRounds++;
+    this.monsterHealth -= getRandomNumber(10,25);
+    this.attackPlayer();
+  }
+},
+computed: {
+  mayUseSpecial() {
+      return this.countRounds % 3 !== 0;
+  }
+}
+```
+
+No html:
+
+```vue
+<button :disabled="mayUseSpecial" @click="specialAttack">
+  SPECIAL ATTACK
+</button>
+```
+
+### Botão de cura
+
+Para a cura, basta que a gente utilize a função que pega um valor e acrescentar a vida do player:
+
+```javascript
+methods: {
+  health() {
+    this.countRounds++;
+    const healthValue = getRandomNumber(8,20)
+    if(this.playerHealth + healthValue < 100){    
+      this.playerHealth += healthValue;
+    }
+    this.attackPlayer();
+  }
+}
+```
+
+```vue
+<button @click="health">HEAL</button>
+```
+
+### Exibir vencedor
+
+Para exibir o vencedor, iremos utilizar do `watch` para checar a cada mudança do `playerHealth` e `monsterHealth`
+
+```javascript
+data() {
+  return {
+    playerHealth: 100,
+    monsterHealth: 100,
+    countRounds: 0,
+    winner: null
+  };
+},
+watch: {
+  playerHealth(value) {
+    if(value <= 0 && this.monsterHealth <= 0)
+      this.winner = 'draw'
+    else if (value <= 0) 
+      this.winner = 'monster'
+  },
+    monsterHealth(value){
+      if(value <= 0 && this.playerHealth <= 0)
+        this.winner = 'draw'
+      else if (value <= 0) 
+        this.winner = 'player'     
+    }
+}
+```
+
+No html, caso termine o jogo iremos retirar os botões e exibir um botão de restart!
+
+```vue
+<section class="container" v-if="winner">
+  <h2>Game Over!</h2>
+  <h2 v-if="winner === 'player'">You Win!</h2>
+  <h2 v-else-if="winner === 'monster'">You Lose!</h2>
+  <h2 v-else>It's a Draw</h2>
+  <button @click="restartGame">Restart the Game</button>
+</section>
+<section id="controls" v-else>
+  <button @click="attackMonster">ATTACK</button>
+```
+
+Botão de restart:
+
+```javascript
+restartGame() {
+  this.monsterHealth = 100;
+  this.playerHealth = 100;
+  this.countRounds = 0;
+  this.winner = null;
+}
+```
+
+### Botão surrender
+
+O botão de Surrender, irá fazer cmo que a gente perca e o jogue acabe
+
+```javascript
+surrender() {
+  this.winner = 'monster';
+}
+```
+
+```vue
+<button @click="surrender">SURRENDER</button>
+```
+
+### 
