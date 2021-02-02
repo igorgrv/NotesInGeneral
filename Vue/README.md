@@ -1762,7 +1762,185 @@ Ex.: Queremos clicar no botão, estando na tela Home, e apareça uma confirmaç�
    </script>
    ```
 
+### Custom event + parameter
 
+Quando trabalhamos com banco de dados, usualmente precisamos fazer uso do ID para que seja X alteração e através de um **eventos customizado** é possível passar parâmetros tbm!
+
+<img src="/Users/igorromero/NotesInGeneral/Vue/imagesReadme/vue11.png" alt="vue11" style="zoom:50%;" />
+
+Dado o componente `FriendList.vue` que recebe os valores do `App.vue` (onde possui o banco de dados). Como faremos para que ao clique do `Toggle Favorite` (`FriendList`) seja alterado o status no BD (`App.vue`)?
+
+```vue
+<template>
+  <li>
+    <h2>{{ friend.name }}</h2>
+    <button>Toggle Favorite</button>
+    <button @click="toggleDetails">Show Details</button>
+    <ul v-if="detailsAreVisible">
+      <li>
+        <strong>Phone:</strong>
+        {{ friend.phone }}
+      </li>
+      <li>
+        <strong>Email:</strong>
+        {{ friend.email }}
+      </li>
+    </ul>
+  </li>
+</template>
+```
+
+Utilizamos dos eventos customizados + passando um parâmetro (`id`)!
+
+1. No Click do button em `FriendList` iremos utilizar do `this.$emit` para que o `App.vue` escute e altere no BD:
+
+   ```vue
+   <button @click="toggleFavorite">Toggle Favorite</button>
+   
+   <script>
+     props: {
+       id: {
+         type: Number,
+         required: true
+       }
+     }
+   	methods: {
+       toggleFavorite() {
+         this.$emit('toggle-favorite', this.id)
+       }
+     }
+   </script>
+   ```
+
+2. No `App.vue` iremos escutar o `toggle-favorite` ;
+
+3. Procurar no Array, com o `find` e alterar o status!
+
+   ```vue
+   <!-- App.vue -->
+   <template>
+   	<FriendList @toggle-favorite="changeFavorite"></FriendList>
+   </template>
+   <script>
+   	import FriendList from './FriendList.vue';
+     
+     components: { FriendList },
+     data() {
+       return {
+         friend = [
+         	{
+         		isFavorite = true;
+       		}
+         ]
+       }
+     }
+     methods: {
+       changeFavorite(numberId){
+         const friend = this.friendsData.find(friend => this.id === numberId);
+         friend.isFavorite = !friend.isFavorite
+       }
+     }
+   </script>
+   ```
+
+### Emits
+
+Temos uma outra propriedade do Vue, que serve para **validarmos o evento customizado**, chamada `emits`:
+
+```vue
+<script>
+	emits: ['nome-evento-customizado']
+</script>
+```
+
+Onde é possível serem feitas validações para os eventos customizado (usual quando trabalhado com times):
+
+```vue
+<script>
+	methods: {
+    toggleFavorite() {
+      this.$emit('toggle-favorite', this.id)
+    }
+  },
+    
+  emits: {
+    toggle-favorite: function(id) {
+      if(id) return true;
+      else {
+        console.warn('faltou enviar o ID');
+        return false;
+      }
+    }
+  }
+</script>
+```
+
+### Simples formulario
+
+<img src="/Users/igorromero/NotesInGeneral/Vue/imagesReadme/vue12.png" alt="vue12" style="zoom:50%;" />
+
+O evento customizado pode ser utilizado para comunicar dados de um formulario para o componente pai!
+
+1. Criar o `NewFriend.vue` com o template:
+
+   ```vue
+   <template>
+   	<form @submit.prevent="addFriend">
+   		<label>Name</label>
+   		<input type="text" v-model="friendName"/>
+     </form>
+   </template>
+   
+   <script>
+   	data() {
+       return {
+         friendName: ''
+       }
+     },
+   </script>
+   ```
+
+2. Com o uso do `this.$emit` iremos ao `submit` do formulario, emitir um `add-new-friend`, passando como parâmetro o `friendName`:
+
+   ```vue
+   <template>
+   	<form @submit.prevent="addFriend"/>
+   	<!-- omitido -->
+   </template>
+   <script>
+   	data() {
+       return {
+         friendName: ''
+       }
+     },
+     emits: ['add-new-friend'],
+   	methods: {
+       addFriend() {
+         this.$emit('add-new-friend', this.friendName);
+       }
+     }
+   </script>
+   ```
+
+3. Agora no `App.vue` iremos importar esse componente e então escutar o evento `add-new-friend`:
+
+   ```vue
+   <!-- App.vue -->
+   <template>
+   	<NewFriend @add-new-friend="addFriend" />
+   </template>
+   
+   <script>
+   	methods: {
+       addFriend(nameFromForm) {
+         const newFriend = { name: nameFromForm };
+         this.friend.push(newFriend);
+       }
+     }
+   </script>
+   ```
+
+   
 
 ## Estilos customizados
 
@@ -1832,7 +2010,9 @@ E se o botão também pudesse ser customizado? Alterando as classes?
 
    
 
-## Validando props
+## + sobre props
+
+### Validando Props
 
 Para **obrigar** que uma `props` seja utilizada, ou até mesmo, deixar um **default** caso não seja informado o padrão, podemos utilizar do **objeto `props`**!
 
@@ -1859,6 +2039,160 @@ Para **obrigar** que uma `props` seja utilizada, ou até mesmo, deixar um **defa
          required: false,
          default: "default"
        }
+   },
+   ```
+
+
+### Binding all props
+
+Dado um componente filho, `UserData`:
+
+```vue
+<template>
+  <h2>{{ firstname }} {{ lastname }}</h2>
+</template>
+ 
+<script>
+  export default {
+    props: ['firstname', 'lastname']
+  }
+</script>
+```
+
+Podemos fazer com que no `template` do Componente pai, seja carregado um objeto com todas as props do objeto filho!
+
+```vue
+<template>
+  <user-data v-bind="person"></user-data>
+</template>
+ 
+<script>
+  export default {
+    data() {
+      return {
+        person: { firstname: 'Max', lastname: 'Schwarz' }
+      };
+    }
+  }
+</script>
+```
+
+## Provide + Inject
+
+<img src="/Users/igorromero/NotesInGeneral/Vue/imagesReadme/vue13.png" alt="vue13" style="zoom:48%;" />
+
+No cenário acima, o componente `App` possui os dados (os `topics`) e o componente `KnowledgeGrid` precisa desses `topics` para preencher o `knowledgeElement`
+
+```vue
+<!-- knowledgeElement -->
+<template>
+  <li>
+    <h3>{{ topicName }}</h3>
+    <p>{{ description }}</p>
+    <button @click="$emit('select-topic', id)">Learn More</button>
+  </li>
+</template>
+
+<!-- knowledgeGrid -->
+<template>
+  <ul>
+    <knowledge-element
+      v-for="topic in topics"
+      :key="topic.id"
+      :id="topic.id"
+      :topic-name="topic.title"
+      :description="topic.description"
+      @select-topic="$emit('select-topic', $event)"
+    ></knowledge-element>
+  </ul>
+</template>
+
+<!-- KnowledgeBase -->
+<template>
+  <section>
+    <h2>Select a Topic</h2>
+    <knowledge-grid :topics="topics" @select-topic="$emit('select-topic', $event)" />
+  </section>
+</template>
+
+<!-- App -->
+<template>
+  <div>
+    <knowledge-base :topics="topics" @select-topic="activateTopic" />
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      topics: [
+        {
+          id: 'basics',
+          title: 'The Basics',
+          description: 'Core Vue basics you have to know',
+          fullText:
+            'Vue is a great framework and it has a couple of key concepts: Data binding, events, components and reactivity - that should tell you something!',
+        },
+      ]
+   }
+}
+</script>
+```
+
+**PORÉM**, existe o `knowledgeBase` entre o `App` e `knowledgeGrid`, então como fazer para passar o `topics` de `App` para o `knowledgeGrid` ? podiamos ir passando através das `props` , mas encheremos o componente com valores desnecessário :thinking:;<br>
+
+O Vue possui dois elementos cruciais para comunicação de componentes! O `provide()` e o `inject`!<br>
+
+* O `provide()` é utilizado no **componente pai**;
+* O `inject: []` é utilizado no **componente filho**, ou seja, o `provide` sempre tem que vir de um componente acima do componente a ser utilizado!
+
+### Utilizando Provide + Inject p/ Props
+
+1. Dentro de `App.vue` iremos colocar declarar o `provide` (parecido com o `data()`):
+
+   ```javascript
+   provide() {
+     return {
+   	  topics: this.topics //iremos devolver o que vem do data()
+     }
+   },
+   ```
+
+2. Dessa forma, no `knowledgeGrid` podemos remover o `props` e utilizar o `inject`;
+
+   1. O `inject` precisa receber o mesmo valor do `provide`
+
+   ```javascript
+   export default {
+     inject: ['topics'],
+   }
+   ```
+
+### Provide + inject p/ custom Events
+
+É possível também fazer o `provide` e `inject` para eventos customizados! evitando que eventos sejam passados de componente para componente sem necessidade!
+
+1. Remova `@select-topic` de todos os componentes;
+
+2. Em `KnowledgeElement` utilizaremos do `inject` no lugar do `emits` , pois ali estaremos esperando receber do `provide`:
+
+   ```javascript
+   // knowledgeElement
+   export default {
+     props: ['id', 'topicName', 'description'],
+     inject: ['selectTopic'],
+   };
+   ```
+
+3. Em `App.vue`:
+
+   ```javascript
+   provide() {
+     return {
+       topics: this.topics,
+       selectTopic: this.activateTopic
+     }
    },
    ```
 
@@ -2165,11 +2499,7 @@ Com o `ValidationProvider` e `Observer` sendo disponibilizado globalmente, podem
 </validationObserver>
 ```
 
-Agora para impedir que seja feito o `submit`:
-
-```javascript
-
-```
+Agora para impedir que seja feito o `submit`
 
 
 
