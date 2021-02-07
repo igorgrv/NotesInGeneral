@@ -1,6 +1,8 @@
 # the-learning-project
 
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/Vue/TheLearningProject/images/image1.png?raw=true" alt="1" style="zoom:40%;" />
 
+<img src="https://github.com/igorgrv/NotesInGeneral/blob/master/Vue/TheLearningProject/images/image2.png?raw=true" alt="1" style="zoom:40%;" />
 
 ## Project setup
 ```
