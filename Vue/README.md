@@ -1279,6 +1279,7 @@ methods: {
 ```
 
 * O `$ref.refText.` iria devolver o `<input type="text" ...` ou seja, com o `$ref` poderiamos acessar **todas propriedades do `input`**!
+* O `$ref.refText.value` irá **sempre** devolver uma String! 
 
 ## Computed Property - manipulando o data()
 
@@ -2670,7 +2671,7 @@ Para capturar dados do formulário, usaremos do `$event.target.value`;
    </script>
    ```
 
-2. Para capturar os valores, devemos usar do. `@submit.prevent="suaFuncao()"` 
+2. Para capturar os valores, devemos usar do. `@submit.prevent="suaFuncao()"`  irá previnir que a página recarregue
 
    ```vue
    <form @submit.prevent="gravar()">
@@ -2722,15 +2723,19 @@ Agora pode se tornar:
 
 **PORÉM,** se percebemos o que acontece no `input v-model="foto.url"` iremos ter um problema...<br>
 
-Devemos utilizar o `.lazy` para que seja inserido o valor **após sairmos do input!**
+Devemos utilizar o `.lazy` para que seja inserido o valor **após sairmos do input!** Se não iremos ficar mandando ao servidor cada letra!
 
 ```vue
 <input v-model.lazy="foto.titulo"/>
 ```
 
-### v-show - Exibindo imagem
+#### v-model - diferentes inputs
 
-O `v-show` permite que o elemento fique como `hide` caso seu valor seja `null` ou vazio.
+
+
+### v-show - na pratica
+
+O `v-show` permite que o elemento fique como `hide` caso seu valor seja `null` ou vazio (funciona como um `v-if`)
 
 1. Para o `<imagemResponsiva` atribua o `v-show`
 
@@ -3206,8 +3211,3 @@ app.component('meu-component', MeuComponent);
 ```
 
 * Estará disponível a tag `meu-component` para todos outros componentes utilizarem!
-
-
-
-# Aplicando conhecimento
-
