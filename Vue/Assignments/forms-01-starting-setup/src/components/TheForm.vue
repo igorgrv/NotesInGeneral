@@ -1,16 +1,16 @@
 <template>
-  <form>
+  <form @submit.prevent="submitData">
     <div class="form-control">
       <label for="user-name">Your Name</label>
-      <input id="user-name" name="user-name" type="text" />
+      <input id="user-name" name="user-name" type="text" v-model="inputText"/>
     </div>
     <div class="form-control">
       <label for="age">Your Age (Years)</label>
-      <input id="age" name="age" type="number" />
+      <input id="age" name="age" type="number" v-model="inputNumber"/>
     </div>
     <div class="form-control">
       <label for="referrer">How did you hear about us?</label>
-      <select id="referrer" name="referrer">
+      <select id="referrer" name="referrer" v-model="selectType">
         <option value="google">Google</option>
         <option value="wom">Word of mouth</option>
         <option value="newspaper">Newspaper</option>
@@ -19,15 +19,15 @@
     <div class="form-control">
       <h2>What are you interested in?</h2>
       <div>
-        <input id="interest-news" name="interest" type="checkbox" />
+        <input id="interest-news" name="interest" type="checkbox" value="news" v-model="interested"/>
         <label for="interest-news">News</label>
       </div>
       <div>
-        <input id="interest-tutorials" name="interest" type="checkbox" />
+        <input id="interest-tutorials" name="interest" type="checkbox" value="tutorials" v-model="interested"/>
         <label for="interest-tutorials">Tutorials</label>
       </div>
       <div>
-        <input id="interest-nothing" name="interest" type="checkbox" />
+        <input id="interest-nothing" name="interest" type="checkbox" value="nothing" v-model="interested"/>
         <label for="interest-nothing">Nothing</label>
       </div>
     </div>
@@ -51,6 +51,31 @@
     </div>
   </form>
 </template>
+
+<script>
+export default {
+  data() {
+    return {
+      inputText: '',
+      inputNumber: null,
+      selectType: 'google',
+      interested: []
+    }
+  },
+  methods: {
+    submitData() {
+      console.log('inputText: ' + this.inputText)
+      this.inputText = ''
+      console.log('inputNumber: ' + this.inputNumber + ' - typeof: ' + typeof(this.inputNumber))
+      this.inputNumber = null
+      console.log('selectType: ' + this.selectType)
+      this.selectType = 'google'
+      console.log('interested: ' + this.interested)
+      this.interested = []
+    }
+  }
+}
+</script>
 
 <style scoped>
 form {

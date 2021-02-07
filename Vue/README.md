@@ -2731,6 +2731,160 @@ Devemos utilizar o `.lazy` para que seja inserido o valor **após sairmos do inp
 
 #### v-model - diferentes inputs
 
+<img src="/Users/igorromero/NotesInGeneral/Vue/imagesReadme/vue16.png" alt="vue16" style="zoom:50%;" />
+
+Dado diferente tipos de input, como funcionaria o `v-model` ?
+
+#### text
+
+O `v-model` irá interpretar como `String` devido o `input type="text"`
+
+```vue
+<form @submit.prevent="submitData">
+    <input type="text" v-model="inputText"/>
+</form>
+
+<script>
+export default {
+  data() {
+    return {
+      inputText: ''
+    }
+  },
+  methods: {
+    submitData() {
+      console.log('inputText: ' + this.inputText)
+      // IRÁ RETORNAR O QUE FOI DIGITADO
+      inputText: ''
+      // IRÁ RETORNAR AO ESTADO ORIGINAL
+    }
+  }
+}
+</script>
+```
+
+
+
+#### number
+
+O `v-model` irá interpretar como `Number` devido o `input type="number"`
+
+* Na declaração do `data() ` devemos deixa como `null` para que o `typeOf` continue como `number`
+
+```vue
+<form @submit.prevent="submitData">
+    <input type="number" v-model="inputNumber"/>
+</form>
+
+<script>
+export default {
+  data() {
+    return {
+      inputNumber: null
+    }
+  },
+  methods: {
+    submitData() {
+      console.log('inputNumber: ' + this.inputNumber + ' - typeof: ' + typeof(this.inputNumber))
+      // IRÁ RETORNAR "inputNumber: 0 - typeof: number"
+      inputNumber: null
+      // IRÁ RETORNAR AO ESTADO ORIGINAL
+    }
+  }
+}
+</script>
+```
+
+
+
+#### select
+
+Todo `select` irá ter `option` que consequentemente exige um `value`. Quando utilizamos `v-model` no `select` , o Vue irá procurar pelo `value` do `option` ! Dessa forma, podemos iniciar o `select` passando um dos `value`
+
+```vue
+<form @submit.prevent="submitData">      
+  <select name="referrer" v-model="selectType">
+    <option value="google">Google</option>
+    <option value="wom">Word of mouth</option>
+    <option value="newspaper">Newspaper</option>
+  </select>
+</form>
+
+<script>
+export default {
+  data() {
+    return {
+       selectType: 'google'
+    }
+  },
+  methods: {
+    submitData() {
+      console.log('selectType: ' + this.selectType)
+      // IRÁ RETORNAR O QUE SELECIONADO
+      selectType: 'google'
+      // IRÁ RETORNAR AO ESTADO ORIGINAL
+    }
+  }
+}
+</script>
+```
+
+
+
+#### checkbox
+
+Os `checkbox` funcionam de forma parecida ao  `select`, para:
+
+* agrupa-los utilizamos do `name`;
+* ter um valor único, utilizamos do `value`;
+* utilizar do memso  `v-model` em todos `checkbox`;
+* no `data` devemos declarar um como `array` pois o Vue quem irá popular e remover do array:
+
+```vue
+<form @submit.prevent="submitData">      
+	<div>
+    <input name="interest" type="checkbox" value="news" v-model="interested"/>
+    <label>News</label>
+  </div>
+  <div>
+    <input name="interest" type="checkbox" value="tutorials" v-model="interested"/>
+    <label>Tutorials</label>
+  </div>
+  <div>
+    <input name="interest" type="checkbox" value="nothing" v-model="interested"/>
+    <label>Nothing</label>
+  </div>
+</form>
+
+<script>
+export default {
+  data() {
+    return {
+       interested: []
+    }
+  },
+  methods: {
+    submitData() {
+      console.log('interested: ' + this.interested)
+      // IRÁ RETORNAR O QUE SELECIONADO
+      this.interested = []
+      // IRÁ RETORNAR AO ESTADO ORIGINAL
+    }
+  }
+}
+</script>
+```
+
+
+
+#### radio
+
+
+
+#### component
+
+
+
 
 
 ### v-show - na pratica
