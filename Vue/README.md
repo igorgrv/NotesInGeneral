@@ -109,6 +109,34 @@ data() {
 
 
 
+## Vue Style Guide
+
+O Vue disponibiliza **sugestões** para estrutura de pastas e nome dos arquivos, através do [style-guide](https://vuejs.org/v2/style-guide/)!
+
+Alguns exemplos de nome de componentes:
+
+* **The**Component.vue → `the` é utilizado para informar que o componente é utilizado **uma vez** (geralmente dentro do `App`)
+* MeuComponente.vue → no HTML deveremos utilizar com `-` →  `<meu-componente>`  ;
+
+Para props:
+
+```javascript
+props: {
+  status: {
+    type: String,
+    required: true,
+    validator: function (value) {
+      return [
+        'syncing',
+        'synced',
+        'version-conflict',
+        'error'
+      ].indexOf(value) !== -1
+    }
+  }
+}
+```
+
 
 
 ## Getting Started
@@ -122,12 +150,12 @@ Assim como no Angular, o Vue.js necessita do [Node.js](https://nodejs.org/en/) i
 Com o **Vue-cli** instalado, para criar um projeto:
 
 ```bash
- vue create nomeDoProjeto
+@vue create nomeDoProjeto
  
  --selectDefaultVue2
  --yarn
  
- yarn run serve
+ @yarn run serve
 ```
 
 * O comando `npm run dev` basicamente executa o que esta no `package.json`:
@@ -678,7 +706,166 @@ E no template utilizamos o nome dado ao componente, nesse caso `painel`, passand
 
 Podemos acessar a `prop` de um componente **sem** o `:`, porém o Vue irá entender **como uma String!** - útil em casos que tratamos a String do lado do componente filho!
 
-#### Slot
+#### Componente ImagemResponsiva
+
+Para reforçar o uso da comunicação entre pai e filho, iremos mover a tag `img` para um componente!
+
+```vue
+<!-- ImagemResponsiva -->
+<template>
+	<img :src="url" :alt="titulo"/> 
+	<!-- url e titulos serao obrigatorios para quem quiser usar o componente-->
+</template>
+```
+
+No componente pai:
+
+```vue
+<!-- App.vue -->
+<template>
+	<painel :titulo="foto.titulo">
+    <imagem-responsiva :url="foto.url" :titulo="foto.titulo" />
+  </painel>
+</template>
+
+<script>
+import Painel from "./components/shared/painel/Painel";
+import ImagemResponsiva from './components/shared/imagem-responsiva/ImagemResponsiva' 
+  
+export default {
+  
+  components: {
+    "painel": Painel,
+    "imagem-responsiva": ImagemResponsiva
+  },
+}
+</script>
+```
+
+
+
+### <component .>
+
+A tag `component` possibilita menos repetição de código, para componentes **iguais**!
+
+```vue
+<!-- MeuComponentH2 -->
+<template>
+	<h2>
+    Meu template 1
+  </h2>
+</template>
+
+<!-- MeuComponentH3 -->
+<template>
+	<h2>
+    Meu template 2
+  </h2>
+</template>
+```
+
+Se criarmos dois botoes que ficam hora exibindo um componente, hora o outro, com `props` e `methods` teriamos:
+
+```vue
+<!-- App.vue -->
+<template>
+	<button @click="toggleComponent('h2')">Component H2</button>
+	<button @click="toggleComponent('h3')">Component H3</button>
+	
+	<MeuComponentH2 v-if="selectedComponent === 'MeuComponentH2'"></MeuComponentH2>
+	<MeuComponentH2 v-if="selectedComponent === 'MeuComponentH3'"></MeuComponentH2>
+</template>
+
+<script>
+import MeuComponentH2 from './MeuComponentH2';
+import MeuComponentH3 from './MeuComponentH3';
+
+export default {
+	  components: {MeuComponentH2,MeuComponentH3},
+  	props: { selectedComponent: 'MeuComponentH2' }
+  	methods: {
+      toggleComponent(componentName) {
+        if (componentName === 'h2') 
+          this.selectedComponent = 'MeuComponentH2';
+        else 
+          this.selectedComponent = 'MeuComponentH3';
+      }
+    }
+ }
+</script>
+```
+
+Com o uso de `<components>`:
+
+```vue
+<!-- App.vue -->
+<template>
+	<button @click="toggleComponent('h2')">Component H2</button>
+	<button @click="toggleComponent('h3')">Component H3</button>
+	
+	<component :is="selectedComponent"></component>
+</template>
+
+<script>
+import MeuComponentH2 from './MeuComponentH2';
+import MeuComponentH3 from './MeuComponentH3';
+
+export default {
+	  components: {MeuComponentH2,MeuComponentH3},
+  	props: { selectedComponent: 'MeuComponentH2' }
+  	methods: {
+      toggleComponent(componentName) {
+        if (componentName === 'h2') 
+          this.selectedComponent = 'MeuComponentH2';
+        else 
+          this.selectedComponent = 'MeuComponentH3';
+      }
+    }
+ }
+</script>
+```
+
+#### keep-alive
+
+O `<keep-alive>` é utilizado em conjunto quando queremos manter o dado de um componente!
+
+* Sem o `keep-alive`:
+
+  * Quando digitarmos em um input e fazer o switch com a tag `<component />` o conteúdo **irá sumir** 
+
+  ```vue
+  <!-- MeuComponentH2 -->
+  <template>
+  	<h2>Meu template 1</h2>
+  	<input type="text">
+  </template>
+  
+  <!-- MeuComponentH3 -->
+  <template>
+  	<h2>Meu template 2</h2>
+  	<input type="text">
+  </template>
+  
+  <!-- App -->
+  <template>
+  	<component :is="selectedComponent"></component>
+  </template>
+  ```
+
+* Com o `keep-alive`:
+
+  ```vue
+  <!-- App -->
+  <template>
+  	<keep-alive>
+  		<component :is="selectedComponent"></component>
+    </keep-alive>
+  </template>
+  ```
+
+  
+
+## Slot
 
 Quando queremos que **parte** do conteúdo do pai esteja **dentro** do componente filho, utilizamos do **`<slot>`**. Desta forma o Vue irá entender que aquele é um espaço que pode ficar entre as tags do componente, neste caso `<painel> conteúdo aqui </painel>`
 
@@ -721,43 +908,130 @@ E se quisermos que dentro do componente tenham **mais slots?** Utilizamos do **n
 </componente-qualquer>
 ```
 
+### Named Slot (#)
 
+Named slot é utilizado quando temos mais de um `slot` dentro de um componente, para indicar ao Vue, onde irá tais partes do componente!
 
-### Componente ImagemResponsiva
+<img src="/Users/igorromero/NotesInGeneral/Vue/imagesReadme/vue14.png" alt="vue14" style="zoom:33%;" />
 
-Para reforçar o uso da comunicação entre pai e filho, iremos mover a tag `img` para um componente!
+O `card` (borda com sombra) pode ter dois `slots`, um:
+
+* Para o `header` ;
+* Para o `badge` (admin / author);
+
+Quando temos +1 utilizamos o **`<slot name="">`**
 
 ```vue
-<!-- ImagemResponsiva -->
+<!-- card.vue -->
 <template>
-	<img :src="url" :alt="titulo"/> 
-	<!-- url e titulos serao obrigatorios para quem quiser usar o componente-->
+  <div>
+    <header>
+      <slot name="header"></slot>
+    </header>
+    <slot></slot>
+  </div>
+</template>
+
+<!-- Badge -->
+<template>
+  <section>
+    <BadgeCard>
+      <template v-slot:header>
+        <h3>{{ fullName }}</h3>
+        <base-badge :type="role" :caption="role.toUpperCase()"></base-badge>
+      </template>
+    <p>{{ infoText }}</p>
+    </BadgeCard>
+  </section>
 </template>
 ```
 
-No componente pai:
+* `v-slot:` pode ser abreviado para `#`
+
+  ```vue
+  <!--
+  <template v-slot:header></template>
+  -->
+  <template #header></template>
+  ```
+
+### $slots
+
+O Vue disponibiliza a propriedade global `$slots` para caso a gente queira checar se a **named slot** esta sendo usada:
 
 ```vue
-<!-- App.vue -->
+<!-- card.vue -->
 <template>
-	<painel :titulo="foto.titulo">
-    <imagem-responsiva :url="foto.url" :titulo="foto.titulo" />
-  </painel>
+  <div>
+    <header v-if="$slots.header">
+      <slot name="header"></slot>
+    </header>
+    <slot></slot>
+  </div>
+</template>
+
+```
+
+* Neste exemplo, o componente que **não implementar** o `<template #header>`  terá a formatação do componente `<header>`!
+
+
+### teleport
+
+A tag `<teleport to="someWhere">` é utilizada para quando queremos mover um componente para uma região do projeto!
+
+* com o uso do `to` podemos selecionar o elemento `html` que queremos que o componente vá! 
+
+```vue
+<teleport to="body">
+	<meu-componente></meu-componente>
+</teleport>
+```
+
+* Neste exemplo, ao mandar para o `body` iremos mandar para o final do html! para uma semantica melhor!
+
+### Cmpt reutilizável + slot + teleport
+
+<img src="/Users/igorromero/NotesInGeneral/Vue/imagesReadme/vue15.png" alt="vue15" style="zoom:50%;" />
+
+Queremos criar o componente `error-alert` que irá variar a mensagem de erro ao usuário!
+
+```vue
+<!-- error-alert -->
+<template>
+  <dialog open>
+    <slot></slot>
+    <button @click="this.$emit('close-error');">Okay</button>
+  </dialog>
+</template>
+```
+
+Ou seja, quem implementar o component `error-alert` irá poder colocarr um conteúdo dentro!
+
+```vue
+<!-- ManageGoals.vue -->
+<template>
+	<teleport to="body">
+    <error-alert v-if="inputIsInvalid" @CloseError="confirmError">
+      <h2>Input is invalid</h2>
+      <p>Please enter at least a fwa characters</p>
+    </error-alert>
+  </teleport>
 </template>
 
 <script>
-import Painel from "./components/shared/painel/Painel";
-import ImagemResponsiva from './components/shared/imagem-responsiva/ImagemResponsiva' 
-  
+import ErrorAlert from './ErrorAlert.vue';
+
 export default {
-  
-  components: {
-    "painel": Painel,
-    "imagem-responsiva": ImagemResponsiva
-  },
-}
+  components: { ErrorAlert },
+  methods: {
+    confirmError() {
+      this.inputIsInvalid = false;
+    }
+  }
 </script>
 ```
+
+
 
 
 
@@ -981,6 +1255,30 @@ const app = Vue.createApp({
 
 app.mount("#seuId");
 ```
+
+## $refs
+
+O Vue possui um elemento chamado `ref` que pode ser utilizado no html, funcionando de forma parecida com o v-model, porém com o `ref` é possível pegar todo elemento do DOM;
+
+Se quisermos pegar a mensagem de um input:
+
+```vue
+<input type="text" ref="refText">
+<button @click="setValue">Set value</button>
+{{ message }}
+```
+
+No javascript, acessamos com o `$refs`:
+
+```javascript
+methods: {
+  setValue() {
+    this.message = this.$refs.refText.value;
+  }
+}
+```
+
+* O `$ref.refText.` iria devolver o `<input type="text" ...` ou seja, com o `$ref` poderiamos acessar **todas propriedades do `input`**!
 
 ## Computed Property - manipulando o data()
 
@@ -1443,28 +1741,6 @@ E adicionar na TAG `li` o `v-for` com o nome do array e o atributo `:key` que o 
     
   </div>
 </template>
-```
-
-## $refs
-
-O Vue possui um elemento chamado `ref` que pode ser utilizado no html, funcionando de forma parecida com o v-model, porém com o `ref` é possível pegar todo elemento do DOM;
-
-Se quisermos pegar a mensagem de um input:
-
-```vue
-<input type="text" ref="refText">
-<button @click="setValue">Set value</button>
-{{ message }}
-```
-
-No javascript, acessamos com o `$refs`:
-
-```javascript
-methods: {
-  setValue() {
-    this.message = this.$refs.refText.value;
-  }
-}
 ```
 
 ## Rotas
@@ -2196,7 +2472,10 @@ O Vue possui dois elementos cruciais para comunicação de componentes! O `provi
    },
    ```
 
-   
+
+
+
+
 
 # Vue parte II
 
@@ -2500,8 +2779,6 @@ Com o `ValidationProvider` e `Observer` sendo disponibilizado globalmente, podem
 ```
 
 Agora para impedir que seja feito o `submit`
-
-
 
 ## Model
 
@@ -2888,4 +3165,49 @@ O lazy loading no Vue é bem simples, basta que seja feita a alteração no `rou
    const Cadastro = () => System.import('./components/view/cadastro/Cadastro.vue')
    ```
 
-   
+
+
+
+## Componente Global vs Local
+
+Componente simples:
+
+```vue
+<!-- meuComponent.vue -->
+<template>
+	<input type="text" placeholder="faço algo">
+</template>
+```
+
+### Import local
+
+```vue
+<!-- outroComponent -->
+<template>
+	<meu-component></meu-component>
+</template>
+
+<script>
+import MeuComponent from './meuComponent.vue'
+export default {
+  components: [MeuComponent]
+}
+</script>
+```
+
+### Import Global
+
+```javascript
+// main.js
+import MeuComponent from './components/meuComponent.vue'
+
+const app = createApp(App);
+app.component('meu-component', MeuComponent);
+```
+
+* Estará disponível a tag `meu-component` para todos outros componentes utilizarem!
+
+
+
+# Aplicando conhecimento
+
