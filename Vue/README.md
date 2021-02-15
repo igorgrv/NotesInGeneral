@@ -2879,11 +2879,125 @@ export default {
 
 #### radio
 
+Radio funciona da mesma maneira que funciona o checkbox, precisamos:
+
+* Dar um `value` para cada  `input`;
+* `v-model` com o mesmo valor;
+
+```vue
+<form @submit.prevent="submitData">      
+  <h2>How do you learn?</h2>
+  <div>
+    <input id="how-video" name="how" type="radio" value="video" v-model="how"/>
+    <label for="how-video">Video Courses</label>
+  </div>
+  <div>
+    <input id="how-blogs" name="how" type="radio" value="blog" v-model="how"/>
+    <label for="how-blogs">Blogs</label>
+  </div>
+  <div>
+    <input id="how-other" name="how" type="radio" value="other" v-model="how"/>
+    <label for="how-other">Other</label>
+  </div>
+</form>
+
+<script>
+export default {
+  data() {
+    return {
+       how: null
+    }
+  },
+  methods: {
+    submitData() {
+      console.log('how they learn: ' + this.how)
+      // IRÁ RETORNAR O QUE SELECIONADO
+      this.how = null
+      // IRÁ RETORNAR AO ESTADO ORIGINAL
+    }
+  }
+}
+</script>
+```
 
 
-#### component
 
+#### *component
 
+E se quisermos capturar o valor de outro componente? Podemos usar o `v-model` no componente?
+
+Para utilizarmos o `v-model` em um componente customizado, teremos que:
+
+* Utilizar de `props`;
+
+* Utilizar do `this.$emit` passando **obrigatoriamente** o nome da `props` junto com `update`
+
+  ```javascript
+  export default {
+    props: ['modelValue'],
+    methods: {
+      setActived(value) {
+        this.$emit('update:modelValue', value)
+      }
+    }
+  };
+  ```
+
+Seguindo com o template, teriamos os botões customizados:
+
+```vue
+<!-- RaitingControl.vue -->
+<template>
+  <ul>
+     <li :class="{active: modelValue === 'poor'}">
+      <button type="button" @click="setActived('poor')">Poor</button>
+    </li>
+     <li :class="{active: modelValue === 'average'}">
+      <button type="button" @click="setActived('average')">Average</button>
+    </li>
+    <li :class="{active: modelValue === 'great'}">
+      <button type="button" @click="setActived('great')">Great</button>
+    </li>
+  </ul>
+</template>
+
+<script>
+export default {
+  props: ['modelValue'],
+  methods: {
+    setActived(value) {
+      this.$emit('update:modelValue', value)
+    }
+  }
+};
+</script>
+```
+
+No componente Pai, teriamos que somente utilizar o `v-model` passando o parâmetro que quiséssemos (imbutido no `v-model` estariamos recebendo o `value` que foi passado pelo `$emit`)
+
+```vue
+<!-- TheForm -->
+<form @submit.prevent="submitData">
+  <div class="form-control">
+    <rating-control v-model="raiting"></rating-control>
+  </div>
+</form>
+
+<script>
+import RatingControl from './RatingControl'
+
+components: {
+    RatingControl
+},
+methods: {
+  submitData() {
+    console.log('component value: ' + this.raiting)
+    // IRÁ RETORNAR O QUE value
+    this.raiting = null
+  }
+}
+</script>
+```
 
 
 
@@ -2984,7 +3098,9 @@ Dentro do Vue, podemos fazer uso de **Modelos**, desta forma não é necessário
 
 
 
-## Centralizando URI
+## HTTP - VueResource 
+
+### Centralizar URL
 
 Para não precisarmos ficar declarando o `http://localhost:3000/` , podemos  mapear no `main.js` a URI da aplicação!
 
@@ -3312,6 +3428,159 @@ export default class FotoService {
 ```
 
 
+
+## Firebase
+
+[Firebase](https://console.firebase.google.com/u/0/?pli=1) nos permite a criação de um backend, ou neste caso, de um simples banco de dados na nuvem que irá receber um `.json`;
+
+1. No Firebase → Go to Console;
+2. Crie um projeto, coloque um nome;
+3. Vá em `Realtime Database` → Criar Banco de Dados → Teste Mode;
+
+O FireBase irá disponibilizar uma URL para ser utilizada, que deverá ser sempre adicionado um `.json` no final de cada requisição!
+
+* Ex.: `https://vue-http-demo-igorgrv-default-rtdb.firebaseio.com/requisicao.json`
+
+## HTTP - Outras formas
+
+### fetch
+
+O `fetch` é outro meio de se realizar requisições http, **nativo do Vue** , ao contrário de como é feito com o `VueResource` que de ser instalado...
+
+Com o `fetch` seguimos o padrão:
+
+1. URL
+2. Objeto Javascript:
+   1. Método com `method` (`GET POST DELETE`)
+   2. Headers (objeto javascript)
+   3. Body (com o formato `json` → `JSON.stringify`)
+
+#### POST
+
+```javascript
+fetch('https://vue-http-demo-igorgrv-default-rtdb.firebaseio.com/surverys.json',
+  {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      userName: this.enteredName,
+      rating: this.chosenRating
+    })
+  }
+)).then((res) => {
+  if(res.ok) console.log('fetched')
+  else throw new Error('Falha ao fazer o fetch')
+}).catch((error) => {
+  console.error(error);
+  this.error = error.message;
+});
+```
+
+#### GET
+
+Como o `fetch` devolve uma `Promise` podemos utilizar do `then` para iterar nas respostas, bem como o `catch`:
+
+* No caso do FireBase, iremos receber um `json` que precisa ser formatado para um objeto Javascript, com o `json()`, onde para cada Id iremos atribuir a um array;
+
+```javascript
+loadExperiences() {
+  fetch('https://vue-http-demo-igorgrv-default-rtdb.firebaseio.com/surverys.json')
+    .then(res => {
+    	if(res.ok) return res.json()
+  	})
+    .then(data => {
+      const results = []
+      for(const id in data) {
+        results.push({
+          id: id,
+          rating: data[id].rating,
+          name: data[id].userName
+        })
+      }
+      this.results = results
+  	})
+  	.catch((error) => {
+      console.error(error);
+      this.isLoading = false;
+      this.error = 'Falha ao fazer o fetch'
+  	});
+}
+```
+
+##### Carregar dados antes de exibir a tela
+
+Com o uso do life cycle do Vue, podemos carregar os dados recuperados do backend/banco de dados, com o uso do `mounted`
+
+```javascript
+mounted() {
+  this.loadExperiences();
+}
+```
+
+##### Loading message
+
+Um modo simples de exibir uma mensagem enquanto está sendo feito o `fetch` é atribuir uma mensagem de loading:
+
+1. No template, adicionaremos um `loading` simples;
+2. Faremos um binding com a propriedade `isLoading`;
+3. Setaremos com true para quando estiver prestes a fazer o fetch e como false quando terminar
+
+```vue
+<template>
+      <p v-if="isLoading">Loading...</p>
+      <ul v-else>
+        <survey-result
+          v-for="result in results"
+          :key="result.id"
+          :name="result.name"
+          :rating="result.rating"
+        ></survey-result>
+      </ul>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      results: [],
+      isLoading: false
+    };
+  },
+  methods: {
+    loadExperiences() {
+      this.isLoading = true
+      fetch('https://vue-http-demo-igorgrv-default-rtdb.firebaseio.com/surverys.json')
+      .then(res => {
+        if(res.ok) return res.json()
+      })
+      .then(data => {
+        this.isLoading = false
+</script>
+```
+
+
+
+### axios
+
+Assim como `VueResource` e `fetch` existe o [axios](https://github.com/axios/axios)!
+
+1. Instalar o `axios` no projeto → `npm i axios`
+2. No componente que for utilizar o `axios` :
+   1. Importar o `axios` 
+   2. Utilizar dos métodos http
+
+```javascript
+import axios from 'axios';
+
+axios.post('https://vue-http-demo-85e9e.firebaseio.com/surveys.json', {
+  name: this.enteredName,
+  rating: this.chosenRating,
+});
+```
+
+Com o `axios` escrevemos menos código se comparado ao `fetch`
 
 ## Lazy loading
 

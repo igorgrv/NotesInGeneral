@@ -34,18 +34,21 @@
     <div class="form-control">
       <h2>How do you learn?</h2>
       <div>
-        <input id="how-video" name="how" type="radio" />
+        <input id="how-video" name="how" type="radio" value="video" v-model="how"/>
         <label for="how-video">Video Courses</label>
       </div>
       <div>
-        <input id="how-blogs" name="how" type="radio" />
+        <input id="how-blogs" name="how" type="radio" value="blog" v-model="how"/>
         <label for="how-blogs">Blogs</label>
       </div>
       <div>
-        <input id="how-other" name="how" type="radio" />
+        <input id="how-other" name="how" type="radio" value="other" v-model="how"/>
         <label for="how-other">Other</label>
       </div>
     </div>
+     <div class="form-control">
+       <rating-control v-model="raiting"></rating-control>
+     </div>
     <div>
       <button>Save Data</button>
     </div>
@@ -53,14 +56,20 @@
 </template>
 
 <script>
+import RatingControl from './RatingControl'
+  
 export default {
   data() {
     return {
       inputText: '',
       inputNumber: null,
       selectType: 'google',
-      interested: []
+      interested: [],
+      how: null
     }
+  },
+  components: {
+    RatingControl
   },
   methods: {
     submitData() {
@@ -72,6 +81,10 @@ export default {
       this.selectType = 'google'
       console.log('interested: ' + this.interested)
       this.interested = []
+      console.log('how they learn: ' + this.how)
+      this.how = null
+      console.log('component value: ' + this.raiting)
+      this.raiting = null
     }
   }
 }
