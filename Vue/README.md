@@ -158,16 +158,7 @@ Com o **Vue-cli** instalado, para criar um projeto:
  @yarn run serve
 ```
 
-* O comando `npm run dev` basicamente executa o que esta no `package.json`:
-
-  ```json
-  "scripts": {
-    "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
-  },
-  ```
-  
-* ou com Yarn
+* O comando `npm run dev` basicamente executa o que esta no `package.json`:ou com Yarn
 
   ```javascript
   "scripts": {
@@ -176,6 +167,7 @@ Com o **Vue-cli** instalado, para criar um projeto:
         "lint": "vue-cli-service lint"
   },
   ```
+  
 
 Será aberto automaticamente o navegador em `http://localhost:8080/` !
 
@@ -946,7 +938,7 @@ Quando temos +1 utilizamos o **`<slot name="">`**
 </template>
 ```
 
-* `v-slot:` pode ser abreviado para `#`
+* `v-slot:` pode ser abreviado para `#`	
 
   ```vue
   <!--
@@ -1221,7 +1213,7 @@ Reset o valor do input
 
    ```vue
    <template>
-   	<input type="text" value="name" @input="getName"/>
+   	<input type="text" :value="name" @input="getName"/>
    	<button @click="resetValue">Reset Input</button>
    	<p>YourName: {{ name }}</p>
    </template>
@@ -1744,7 +1736,7 @@ E adicionar na TAG `li` o `v-for` com o nome do array e o atributo `:key` que o 
 </template>
 ```
 
-## Rotas
+## VueRouter - rotas
 
 Para utilizar rotas, precisamos **instalar o `VueRouter`**:
 
@@ -1936,6 +1928,331 @@ O `routes.js` ja possui as informações abaixo, so faltaria o `titulo`
    }
    </script>
    ```
+
+## VueRouter - Vue3
+
+Para o Vue3 é necessário instalar a última versão do `vue-router` ;
+
+```
+npm install vue-router@next --save
+```
+
+<img src="/Users/igorromero/NotesInGeneral/Vue/imagesReadme/vue17.png" alt="vue17" style="zoom:25%;" />
+
+Há diversas maneiras de criar rota, outra através do Vue-router é com o `createRouter`, que recebe dois parâmetros:
+
+* 1º parâmetro: `history` (createWebHistory) → irá permitir fazer um handler do histórico
+* 2º parâmetro: `routes` (array);
+  * `routes`: irá receber o `path` e o `component`
+
+```javascript
+import { createRouter, createWebHistory } from 'vue-router';
+import App from './App.vue';
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    {
+      path: '/teams',
+      component: () => import('./components/teams/TeamsList.vue')
+    },
+    {
+      path: '/users',
+      component: () => import('./components/users/UsersList.vue')
+    },
+  ]
+});
+
+const app = createApp(App);
+app.mount('#app');
+
+app.use(router);
+```
+
+### router-view
+
+Para que os elementos apareçam pelas rotas, se faz necessário o uso do `router-view` dentro do `App.vue`
+
+```vue
+<template>
+	<router-view></router-view>
+</template>
+```
+
+### router-link
+
+Para que não seja realizado uma requisição ao servidor toda vez que for trocado de rota, se é utilizado o `router-link` junto do `to` com a rota:
+
+```vue
+<ul>
+  <li>
+    <!-- <button @click="setActivePage('teams-list')">Teams</button> -->
+    <router-link to="/teams">Teams</router-link>
+  </li>
+  <li>
+   <!-- <button @click="setActivePage('users-list')">Users</button> -->
+    <router-link to="/users">Users</router-link>
+  </li>
+</ul>
+```
+
+* Por baixo dos panos o Vue renderiza como um `<a href="" />`
+
+#### router-link estilo
+
+O `router-link` tem como padrão uma classe para identificar quando ativo, o `router-link-active`
+
+```css
+a.router-link-active {
+  color: #f1a80a;
+  border-color: #f1a80a;
+  background-color: #1a037e;
+}
+```
+
+### $router - redirecionando
+
+O `vue-router` habilita métodos globais, como o:
+
+* `$router.push` que nos permite direcionar para outra página;
+* `$router.forward()` avança a página;
+* `$router.back()` volta a página;
+
+```vue
+<template>
+	<button @click="redirect">Confirm</button>
+</template>
+
+<script>
+  methods: {
+    redirect () {
+      this.$router.push('/teams');
+    }
+  }
+</script>
+```
+
+### $route - params
+
+O `vue-router` também deixa disponível o:
+
+* `$route.path` → irá exibir o path da URL;
+* `$route.params.nameParam` → irá recuperar o parâmetro passado na URL (precisa coincidir com o parâmetro passado no `routes`);
+
+```javascript
+// main.js
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    {
+      path:'/teams/:teamId',
+      component: () => import('./components/teams/TeamMembers.vue')
+    }
+  ]
+});
+```
+
+Acessando a rota `/teams/1` podemos acessa-la e carregar determinado componente:
+
+```vue
+<template>
+  <section>
+    <h2>{{ teamName }}</h2>
+    <ul>
+      <user-item
+        v-for="member in members"
+        :key="member.id"
+        :name="member.fullName"
+        :role="member.role"
+      ></user-item>
+    </ul>
+  </section>
+</template>
+
+<script>
+import UserItem from '../users/UserItem.vue';
+
+export default {
+  inject: [ 'teams', 'users' ],
+  components: { UserItem },
+  data() {
+    return {
+      teamName: '',
+      members: []
+    }
+  },
+  created () {
+    console.log(this.$route.path) // retorna /teams/1
+    const id = this.$route.params.teamId;
+    const selectedTeam = this.teams.find(team => team.id === id);
+    const members = selectedTeam.members;
+    const selectedMembers = [];
+    for (const member of members) {
+      const selectedUser = this.users.find(user => user.id === member);
+      selectedMembers.push(selectedUser);
+    }
+    this.members = selectedMembers;
+    this.teamName = selectedTeam.name;
+  }
+};
+</script>
+```
+
+#### router-link + id
+
+Dado os itens, queremos que ao clicar sermos redirecionado para a rota em específico. A rota para `teams/:id` já existe, portanto a lógica ficaria no `router-link`.
+
+```vue
+<!-- TeamList -->
+<template>
+  <ul>
+    <teams-item
+      v-for="team in teams"
+      :key="team.id"
+      :id="team.id"
+      :name="team.name"
+      :member-count="team.members.length"
+    ></teams-item>
+  </ul>
+</template>
+
+<!-- TeamItem -->
+<template>
+    <router-link :to="'/teams/' + id">View Members</router-link>
+</template>
+
+<script>
+export default {
+  props: ['id'],
+};
+</script>
+```
+
+### $route + watch
+
+Pode existir cenários onde de uma rota (de um `param`) é necessário ir para outra rota, por exemplo:
+
+* `/teams/1` → `/teams/2`
+
+E o Vue **não irá carregar** a página novamente :thinking:
+
+Para corrigir este tipo de problema, devemos utilizar do **watch + `route`** para que escutemos a rota caso ela seja alterada!
+
+```vue
+<script>
+  methods: {
+    loadData(newRoute) {
+      const id = newRoute.params.teamId;
+      const selectedTeam = this.teams.find(team => team.id === id);
+      const members = selectedTeam.members;
+      const selectedMembers = [];
+      for (const member of members) {
+        const selectedUser = this.users.find(user => user.id === member);
+        selectedMembers.push(selectedUser);
+      }
+      this.members = selectedMembers;
+      this.teamName = selectedTeam.name;
+    }
+  },
+  created () {
+   this.loadData(this.$route);
+  },
+  watch: {
+    $route(newRoute) {
+      this.loadData(newRoute)
+    }
+  }
+</script>
+```
+
+### route + props
+
+Invés de utilizarmos do `$route` podemos habilitar a rota para passar como uma `props`, basta setarmos como `props:true` a rota:
+
+```javascript
+{
+  path:'/teams/:teamId',
+  component: () => import('./components/teams/TeamMembers.vue'),
+  props: true
+}
+```
+
+E no componente que quiser utilizar esse `param:` `teamId` basta declarar a `prop` com o mesmo nome do `param`:
+
+```vue
+<!-- TeamMember.vue -->
+<script>
+  props: [ 'teamId' ],
+  created () {
+   this.loadData(this.teamId);
+  },
+  watch: {
+    teamId(newId) {
+      this.loadData(newId)
+    }
+  },
+  methods: {
+    loadData(id) {
+      const selectedTeam = this.teams.find(team => team.id === id);
+      const members = selectedTeam.members;
+      const selectedMembers = [];
+      for (const member of members) {
+        const selectedUser = this.users.find(user => user.id === member);
+        selectedMembers.push(selectedUser);
+      }
+      this.members = selectedMembers;
+      this.teamName = selectedTeam.name;
+    }
+  }
+</script>
+```
+
+### redirect / alias
+
+É possível realizar um redirecionamento com o `redirect` quando acessamos uma rota:
+
+```javascript
+{ path: '/', redirect: '/teams' }
+```
+
+* Quando acessaar `localhost:8080/` irá ser redirecionado para `teams`
+
+Um outro modo caso queiramos manter a rota `localhost:8080` exibindo o `teams` é o uso do **`alias`**:
+
+```javascript
+{
+  path: '/teams',
+  component: () => import('./components/teams/TeamsList.vue'),
+  alias: '/'
+},
+```
+
+* Quando acessaar `localhost:8080/` irá ser exibir o conteúdo do component  `teamsList`
+
+### rota 404
+
+Para rotas que não existem, podemos fazer com que seja exibido um componente:
+
+```javascript
+{ path: '/:notFound(.*)', component: () => import('./components/nav/NotFound.vue') }
+```
+
+```vue
+<template>
+  <div>
+    <h2>Page not found, try to come back to the 
+      <router-link to="/teams"> Teams</router-link>
+  	</h2>
+  </div>
+</template>
+```
+
+### Rota Filha - nested route
+
+
+
+![vue18](/Users/igorromero/NotesInGeneral/Vue/imagesReadme/vue18.png)
+
 
 
 ## Eventos Customizados
@@ -3634,3 +3951,8 @@ app.component('meu-component', MeuComponent);
 ```
 
 * Estará disponível a tag `meu-component` para todos outros componentes utilizarem!
+
+
+
+## Animações
+
