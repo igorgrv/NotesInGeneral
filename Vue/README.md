@@ -3954,5 +3954,22 @@ app.component('meu-component', MeuComponent);
 
 
 
-## Animações
+## Debug
+
+```json
+"configurations": [
+  {
+    "type": "chrome",
+    "request": "launch",
+    "name": "vuejs: chrome",
+    "url": "http://localhost:8080",
+    "webRoot": "${workspaceFolder}/src",
+    "breakOnLoad": true,
+    "sourceMapPathOverrides": {
+      "webpack:///src/*": "${webRoot}/*"
+    }
+  },
+```
+
+
 
