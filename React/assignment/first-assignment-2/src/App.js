@@ -5,35 +5,25 @@ import UserInput from './UserInput/UserInput';
 import UserOutput from './UserOutput/UserOutput';
 
 const App = () => {
-  const [userNameState, setUserName] = useState({
-    userName: 'IgorState',
-  });
+  const [userName, setUserName] = useState('IgorState');
 
-  const [ageState, setAge] = useState({
-    age: '24',
-  });
+  const [age, setAge] = useState('24');
 
   const changeName = (event) => {
-    setUserName({
-      userName: event.target.value,
-    });
+    setUserName(event.target.value);
   };
 
   const switchValue = (age) => {
-    setUserName({
-      userName: 'switchNameCalled',
-    });
-    setAge({
-      age: '25',
-    });
+    setUserName('switchNameCalled');
+    setAge('25');
   };
 
   return (
     <div className="App">
       <button onClick={switchValue.bind(this, '25')}>SwitchName</button>
-      <UserInput chagingName={changeName} userName={userNameState.userName} />
-      <UserOutput userName={userNameState.userName} />
-      <UserOutput userName={userNameState.userName}>{ageState.age} test</UserOutput>
+      <UserInput chagingName={changeName} userName={userName} />
+      <UserOutput userName={userName} />
+      <UserOutput userName={userName}>{age} test</UserOutput>
     </div>
   );
 };

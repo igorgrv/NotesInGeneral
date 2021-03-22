@@ -1,5 +1,3 @@
-
-
 # React
 
 ## Conceito
@@ -800,7 +798,7 @@ export default app;
 
 **Stateful** components → Componentes containers, que irão utiizar do `setState/useState` (não é ideal ter muitos componentes desse modelo, pois pode afetar a aplicação)
 
-## Style
+### Style
 
 O React nos permite criar um arquivo `css` apartado do arquivo `js` para que seja simplesmente importado!
 
@@ -830,7 +828,7 @@ const person = (props) => {
 }
 ```
 
-### Inline Style
+#### Inline Style
 
 React permite que os estilos sejam passados através de funções, diretamente no `js`:
 
@@ -849,6 +847,102 @@ render() {
     </button>
   )
 }
+```
+
+## 1º Assignment
+
+```
+TO DO
+
+* Create TWO new components: UserInput and UserOutput
+* UserInput should hold an input element, UserOutput two paragraphs
+* Output multiple UserOutput components in the App component (any paragraph texts of your choice)
+* Pass a username (of your choice) to UserOutput via props and display it there
+* Add state to the App component (=> the username) and pass the username to the UserOutput component
+* Add a method to manipulate the state (=> an event-handler method)
+* Pass the event-handler method reference to the UserInput component and bind it to the input-change event
+* Ensure that the new input entered by the user overwrites the old username passed to UserOutput
+* Add two-way-binding to your input (in UserInput) to also display the starting username
+* Add styling of your choice to your components/ elements in the components - both with inline styles and stylesheets
+```
+
+```react
+// UserInput.js
+
+import React from 'react';
+
+const UserInput = (props) => {
+  return (
+    <input type="text" onChange={props.chagingName} value={props.userName}/>
+  )
+}
+
+export default UserInput;
+```
+
+```react
+// UserOutput.js
+
+import React from 'react'
+import './UserOutput.css';
+
+const UserOutput = (props) => {
+  return (
+    <div>
+      <p>Username: {props.userName}</p>
+      <p>Another text</p>
+      <p>{props.children}</p>
+    </div>
+  )
+}
+
+export default UserOutput;
+```
+
+```css
+/* UserOutput.css */
+
+.UserOutput {
+  box-shadow: 7px 5px 12px 1px #262626;
+  margin: 2rem auto;
+  padding: 1rem;
+  width: 60%;
+}
+```
+
+
+
+```react
+// App.js
+
+import React, { useState } from 'react';
+
+import './App.css';
+import UserInput from './UserInput/UserInput';
+import UserOutput from './UserOutput/UserOutput';
+
+const App = () => {
+  const [userName, setUserName] = useState('IgorState');
+  const [age, setAge] = useState('24');
+  const changeName = (event) => { setUserName(event.target.value) };
+
+  const switchValue = (age) => {
+    setUserName('switchNameCalled');
+    setAge('25');
+  };
+
+  return (
+    <div className="App">
+      <button onClick={switchValue.bind(this, '25')}>SwitchName</button>
+      <UserInput chagingName={changeName} userName={userName} />
+      <UserOutput userName={userName} />
+      <UserOutput userName={userName}>{age} test</UserOutput>
+    </div>
+  );
+};
+
+export default App;
+
 ```
 
 
@@ -911,4 +1005,272 @@ render() {
 ```
 
 ## For
+
+Dado um array:
+
+```react
+state = {
+  persons: [
+    { id: 1, name: 'Igor', age: 25 },
+    { id: 2, name: 'Igor2', age: 26 },
+    { id:3, name: 'Igor3', age: 27 },
+  ],
+  showPerson: false,
+};
+```
+
+Invés de exibirmos dessa forma (chamando cada elemento do array)
+
+```react
+showPerson = (
+  <div>
+    <Person
+      name={this.state.persons[0].name}
+      age={this.state.persons[0].age}
+      click={this.switchingName.bind(this, 'IgorzinhoChildren')}
+      change={this.changeNameHandler}
+      >
+      Testing child elemenet
+    </Person>
+    <Person name={this.state.persons[1].name} age={this.state.persons[1].age} />
+    <Person name={this.state.persons[2].name} age={this.state.persons[2].age} />
+  </div>
+);
+```
+
+Podemos utilizar do `map` e reduzir nosso código
+
+* Dentro dos `{ }` iremos acrescentar o `map` onde no map iremos `return` o elemento JSX
+  * Temos que adicionar o `key` como uma chave única:
+
+```react
+<div>
+  {
+    this.state.persons.map(person => {
+      return (
+        <Person 
+          name={person.name}
+          age={person.age}
+          change={this.changeNameHandler}
+          key={person.id}
+          />
+      )
+    })
+  }
+</div>
+```
+
+### Event - Array way to change
+
+#### Array
+
+Como exemplo, iremos deletar um elemento que foi gerado pelo  `for` , e a melhor prática é:
+
+* Passar o `index` para a função;
+* Como iremos **alterar o array**, a boa prática é:
+  * Criar um **array novo** com os dados do array antigo;
+  * Alterar o array novo;
+  * Igualar o array novo alterado, com o antigo;
+
+```react
+deletePerson = (index) => {
+  const persons = [...this.state.persons]
+  persons.splice(index, 1)
+  this.setState({ persons: persons })
+}
+```
+
+#### Object
+
+Dado o array:
+
+```react
+state = {
+  persons: [
+    { id: 1, name: 'Igor', age: 25 },
+    { id: 2, name: 'Igor2', age: 26 },
+    { id:3, name: 'Igor3', age: 27 },
+  ],
+  showPerson: false,
+};
+```
+
+Como exemplo, iremos alterar o `name` do array `persons`, para isso precisaremos do `event` e do `index`
+
+```react
+<div>
+  {this.state.persons.map((person, index) => {
+    return (
+      <Person
+        change={(event) => this.changeNameHandler (event, person.id)}
+        key={person.id}
+       />
+    );
+  })}
+</div>
+```
+
+ Na função `changeNameHandler` iremos aplicar a **boa prática de se alterar um objeto**:
+
+1. Precisamos encontrar o index do objeto (poderiamos ter passado para a função o index diretamente) e para isso podemos usar do `findIndex`
+
+   ```react
+   changeNameHandler = (event, id) => {
+     const personIndex = this.state.persons.findIndex(person => {
+         return person.id = id
+     })
+   }
+   ```
+
+2. Com o index em mãos, iremos fazer um **cópia** do objeto que queremos alterar:
+
+   ```react
+   const person = this.state.persons[personIndex];
+   ```
+
+3. Com o objeto copiado, iremos alterar o `name` desse objeto ao valor digitado:
+
+   ```react
+   person.name = event.target.value;
+   ```
+
+4. Com o objeto alterado, iremos fazer uma cópia do array inteiro, para que alteremos a cópia do array e não o array do State diretamente:
+
+   ```react
+   const persons = [...this.state.persons];
+   persons[personIndex] = person;
+   
+   this.setState( {persons: persons} )
+   ```
+
+Alteração completa:
+
+```react
+changeNameHandler = (event, id) => {
+  const personIndex = this.state.persons.findIndex((person) => {
+    return (person.id = id);
+  });
+
+  const person = this.state.persons[personIndex];
+  person.name = event.target.value;
+
+  const persons = [...this.state.persons];
+  persons[personIndex] = person;
+
+  this.setState({ persons: persons });
+};
+
+
+/* MODO ANTIGO = ERRADO
+
+  changeNameHandler = (event) => {
+    this.setState({
+      persons: [
+        { name: event.target.value, age: 25 },
+        { name: 'Igor5', age: 26 },
+        { name: 'Igor6', age: 27 },
+      ],
+    });
+  };
+  
+*/
+```
+
+
+
+## 2º Assignment
+
+```
+TO DO
+
+* Create an input field (in App component) with a change listener which outputs the length of the entered text below it (e.g. in a paragraph).
+* Create a new component (=> ValidationComponent) which receives the text length as a prop
+* Inside the ValidationComponent, either output "Text too short" or "Text long enough" depending on the text length (e.g. take 5 as a minimum length)
+* Create another component (=> CharComponent) and style it as an inline box (=> display: inline-block, padding: 16px, text-align: center, margin: 16px, border: 1px solid black).
+* Render a list of CharComponents where each CharComponent receives a different letter of the entered text (in the initial input field) as a prop.
+* When you click a CharComponent, it should be removed from the entered text.
+```
+
+```react
+ // Validation.js
+
+import React from 'react';
+
+const Validation = (props) => {
+  let lengthMessage = 'Text too short'
+  if (props.length > 5) {
+    lengthMessage = 'Text long enough'
+  } 
+
+  return <p>{lengthMessage}</p>
+}
+
+export default Validation;
+```
+
+```react
+// Char.js
+
+import React from 'react';
+import './Char.css';
+
+const Char = (props) => {
+  return (
+    <div className="Char" onClick={props.click}>
+      <p>{props.character}</p>
+    </div>
+  );
+};
+
+export default Char;
+```
+
+```css
+/* char.css */
+.Char {
+  display: inline-block;
+  padding: 16px;
+  text-align: center;
+  margin: 16px;
+  border: 1px solid black;
+}
+```
+
+```react
+// LandingPage
+import React, { useState } from 'react';
+import Validation from '../Validation/Validation';
+import Char from '../Char/Char';
+
+const LandingPage = () => {
+  const [textEntered, setTextEntered] = useState('');
+
+  const listenForChanges = (event) => {
+    setTextEntered(event.target.value);
+  };
+
+  const removeCharacter = (index) => {
+    const text = [...textEntered];
+    text.splice(index, 1);
+    const updatedText = text.join('')
+    setTextEntered(updatedText)
+  };
+
+  let character = textEntered.split('').map((character, index) => {
+    return <Char character={character} key={index} click={() => removeCharacter(index)} />;
+  });
+
+  return (
+    <>
+      <input type="text" onChange={(event) => listenForChanges(event)} value={textEntered}/>
+      <p>{textEntered.length}</p>
+      <Validation length={textEntered.length} />
+      {character}
+    </>
+  );
+};
+
+export default LandingPage;
+
+```
 

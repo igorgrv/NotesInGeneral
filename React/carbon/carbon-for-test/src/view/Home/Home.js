@@ -4,8 +4,10 @@ import HomeForm from './components/form/HomeForm';
 
 const Home = () => {
   const [userNameState, setUserName] = useState({
-    userName: 'IgorUseState',
+    userName: 'Igor',
   });
+
+  const [showUser, setShowUser] = useState(true);
 
   const switchName = (event) => {
     setUserName({
@@ -13,11 +15,20 @@ const Home = () => {
     });
   };
 
+  const toggleUser = () => {
+    setShowUser(!showUser)
+  }
+
   return (
     <>
       <h1>Home</h1>
       <br />
-      <HomeForm userName={userNameState.userName} change={switchName}>
+      <HomeForm 
+        userName={userNameState.userName} 
+        change={switchName}
+        showUser={showUser}
+        toggleUser={toggleUser}
+      >
         My content inside props.children
       </HomeForm>
     </>

@@ -5,11 +5,25 @@ import Person from './Person/Person';
 class App extends Component {
   state = {
     persons: [
-      { name: 'Igor', age: 25 },
-      { name: 'Igor2', age: 26 },
-      { name: 'Igor3', age: 27 },
+      { id: 1, name: 'Igor', age: 25 },
+      { id: 2, name: 'Igor2', age: 26 },
+      { id: 3, name: 'Igor3', age: 27 },
     ],
     showPerson: false,
+  };
+
+  changeNameHandler = (event, id) => {
+    const personIndex = this.state.persons.findIndex((person) => {
+      return (person.id = id);
+    });
+
+    const person = this.state.persons[personIndex];
+    person.name = event.target.value;
+
+    const persons = [...this.state.persons];
+    persons[personIndex] = person;
+
+    this.setState({ persons: persons });
   };
 
   switchingName = (newName) => {
@@ -22,14 +36,10 @@ class App extends Component {
     });
   };
 
-  changeNameHandler = (event) => {
-    this.setState({
-      persons: [
-        { name: event.target.value, age: 25 },
-        { name: 'Igor5', age: 26 },
-        { name: 'Igor6', age: 27 },
-      ],
-    });
+  deletePerson = (index) => {
+    const persons = [...this.state.persons];
+    persons.splice(index, 1);
+    this.setState({ persons: persons });
   };
 
   togglePerson = () => {
@@ -52,16 +62,17 @@ class App extends Component {
     if (this.state.showPerson) {
       showPerson = (
         <div>
-          <Person
-            name={this.state.persons[0].name}
-            age={this.state.persons[0].age}
-            click={this.switchingName.bind(this, 'IgorzinhoChildren')}
-            change={this.changeNameHandler}
-          >
-            Testing child elemenet
-          </Person>
-          <Person name={this.state.persons[1].name} age={this.state.persons[1].age} />
-          <Person name={this.state.persons[2].name} age={this.state.persons[2].age} />
+          {this.state.persons.map((person, index) => {
+            return (
+              <Person
+                name={person.name}
+                age={person.age}
+                change={(event) => this.changeNameHandler(event, person.id)}
+                key={person.id}
+                click={() => this.deletePerson(index)}
+              />
+            );
+          })}
         </div>
       );
     }
@@ -75,7 +86,7 @@ class App extends Component {
         <button style={inlineStyle} onClick={this.switchingName.bind(this, 'Igorzinho')}>
           Switch names
         </button>
-        
+
         {showPerson}
       </div>
     );
