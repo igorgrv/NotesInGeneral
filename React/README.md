@@ -377,7 +377,7 @@ yarn start
   export default App;
   ```
 
-### Componente Dinâmico - props
+### Props
 
 Todo componente irá precisar **importar o `React`** para que seja possível retornar um HTML/JSX.
 
@@ -413,7 +413,7 @@ class App extends Component {
 }
 ```
 
-### Children component
+#### Children component
 
 E se quisessemos inserir alguma informação no componente filho?
 
@@ -447,7 +447,47 @@ const person = (props) => {
 }
 ```
 
-### Manipulando props - State
+#### Prop-types
+
+É possível validar o tipo de `props` que está sendo passado através do pacote `prop-types`:
+
+```bash
+npm i prop-types
+yarn add prop-types
+```
+
+Depois basta importar e no final da class/função utilizar os tipos de validações!
+
+```react
+import React from 'react';
+import './Person.css'
+import PropTypes from 'prop-types';
+
+const person = (props) => {
+  return (
+    <div className="Person">
+      <h1 onClick={props.click}>
+        I'm {props.name} and I'm {props.age} years old
+      </h1>
+      <p>{props.children}</p>
+      <input type="text" onChange={props.change} value={props.name}/>
+    </div>
+  )
+}
+
+person.propTypes = {
+  click: PropTypes.func,
+  name: PropTypes.string,
+  change: PropTypes.func,
+  age: PropTypes.number
+}
+
+export default person;
+```
+
+Caso a propriedade seja passada incorretamente, no console irá mostrar o erro
+
+### State
 
 Em alguns cenários iremos querer manipular os valores que passamos para o componente filho.
 
@@ -697,7 +737,17 @@ Quando utilizamos do `setState` , é disponibilizado 2 parâmetros:
 O `prevState` é útil quando queremos fazer um `counter` por exemplo!
 
 ```react
+state = {
+  changeCounter: 0
+};
 
+myFunction = () => {
+  this.setState((prevState, props) => {
+    return { 
+      changeCounter: prevState.changeCounter + 1
+    }
+	});
+}
 ```
 
 
@@ -1792,4 +1842,170 @@ const Cockpit = (props) => {
   );
 };
 ```
+
+
+
+## Refs
+
+### Class component
+
+`refs` é como um `document.querySelector` que onde for aplicado, poderá manipular o elemento HTML.
+
+* Quero que o último input seja tenha um `focus`!
+
+  * 1º modo seria através da variável `ref`:
+
+    ```react
+    // componentDidMount irá pegar o último elemento
+    componentDidMount() {
+      this.inputElement.focus();
+    }
+    
+    render() {
+      return (
+        <input
+        type="text"
+        onChange={props.change}
+        value={props.name}
+        ref={(inputEl) => this.inputElement = inputEl}
+        />
+      )
+    }
+    ```
+
+  * 2º modo através do `constructor` e do `React.createRef()`:
+
+    ```react
+    class Person extends Component {
+      constructor(props) {
+        super(props)
+        this.inputRef = React.createRef()
+      }
+      
+      componentDidMount() {
+        this.inputRef.current.focus();
+      }
+      
+      render() {
+        return (
+          <input
+          type="text"
+          onChange={props.change}
+          value={props.name}
+          ref={this.inputRef}
+          />
+        )
+      }
+    }
+    ```
+
+### Functional component - useRef
+
+Para `consts` o `React.createRef()` não existe, porém temos o `useRef()` que irá fazer exatamente o mesmo papel!
+
+* Além do `focus` quero que o botão seja clicado assim que iniciar!
+  * Devemos lembrar de utilizar do `useEffect` para que não haja **problemas do template não ter sido carregado antes do clique!**
+
+```react
+// Cockpit.js → para o click automático
+const cockpit = (props) => {
+  const toggleButton = useRef(null)
+  
+  useEffect( () => {
+    toggleButton.current.click()
+  }, [])
+  
+  return (
+  	<button ref={toggleButton} />
+  )
+}
+```
+
+```react
+// Person.js → para o focus
+const Person = (props) => {
+  const focusInput = useRef(null)
+  
+  // irá selecionar o último input
+  useEffect( () => {
+    focusInput.current.focus()
+  }, [])
+  
+  return (
+  	<input ref={focusInput} type="text" />
+  )
+}
+```
+
+
+
+## Prop Chain - Comunicação entre múltiplos componentes
+
+<img src="/Users/igorromero/NotesInGeneral/React/images/reactPropChain.png" alt="reactPropChain" style="zoom:48%;" />
+
+App.js importa:
+
+* Cockipit
+* Persons
+
+Persons importa:
+
+* Person
+
+Considerando o cenário onde queremos que ao clicar em um botão **do `Cockpit.js`** seja manipulado um valor de `Person` como fariamos?
+
+* Poderiamos ir passando as `props` de um componente para outro → Cockpit p/ App → App p/ Persons → Persons p/ Person!
+
+  ```react
+  // Cockpit.js
+  const Cockpit = (props) => {
+    return <button onClick={props.login}>Log in</button>
+  }
+  ```
+
+  ```react
+  // App.js
+  class App extends Component {
+    state = {
+      authenticated: false
+    };
+  
+    toggleLogin = () => {
+      this.setState({authenticated: true})
+    }
+    
+    render() {
+      return (
+        <div className="App">
+          <Cockpit login={this.toggleLogin} />
+          
+          <!-- teremos que passar para Persons -->
+          <Persons isAuthenticated={this.state.authenticated} />
+        </div>
+      );
+    }
+  }
+  ```
+
+  ```react
+  // Persons.js
+  const Persons = (props) => {
+    return <Person isAuth={props.isAuthenticated} />
+  }
+  ```
+
+  ```react
+  // Person.js
+  const Persons = (props) => {
+    return
+    	{ 
+        props.isAuth ?
+        <p>Authenticated</p> : <p>Please Log in</p>
+      }
+  }
+  ```
+
+  
+
+Trabalhoso! Componentes tendo responsabilidades demais, sem ter necessidade!
 

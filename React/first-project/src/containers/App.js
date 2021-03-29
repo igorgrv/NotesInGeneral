@@ -17,7 +17,8 @@ class App extends Component {
       { id: 3, name: 'Igor3', age: 27 },
     ],
     showPerson: false,
-    changeCounter: 0
+    changeCounter: 0,
+    authenticated: false
   };
 
   static getDerivedStateFromProps(props, state) {
@@ -79,6 +80,10 @@ class App extends Component {
     });
   };
 
+  toggleLogin = () => {
+    this.setState({authenticated: true})
+  }
+
   render() {
     console.log('render called')
 
@@ -97,6 +102,7 @@ class App extends Component {
           persons={this.state.persons}
           changed={this.changeNameHandler}
           clicked={this.deletePerson}
+          isAuthenticated={this.state.authenticated}
         />
     }
 
@@ -107,6 +113,7 @@ class App extends Component {
           switchingName={this.switchingName}
           togglePerson={this.togglePerson}
           inlineStyle={inlineStyle}
+          login={this.toggleLogin}
         />
         {showPerson}
       </div>
