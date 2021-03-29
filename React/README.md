@@ -4,6 +4,10 @@
 
 React é uma biblioteca javascript para construção de interfaces, que roda no browser (não precisa esperar o servidor)
 
+### Como React atualiza o DOM?
+
+Através de comparação entre o **Antigo virtual Dom** vs **Re-rendered virtual Dom** <img src="/Users/igorromero/NotesInGeneral/React/images/reactUpdateDom.png" alt="reactUpdateDom" style="zoom:50%;" />
+
 ## Getting started
 
 Sem utilizar diretamente a IDE, podemos importar as bibliotecas:
@@ -683,6 +687,19 @@ render() {
 }
 ```
 
+#### PrevState
+
+Quando utilizamos do `setState` , é disponibilizado 2 parâmetros:
+
+1. `prevState` → que irá conter o valor antes da alteração;
+2. `props` → irá conter todas as props da classe;
+
+O `prevState` é útil quando queremos fazer um `counter` por exemplo!
+
+```react
+
+```
+
 
 
 ### React Hooks - useState
@@ -1272,5 +1289,507 @@ const LandingPage = () => {
 
 export default LandingPage;
 
+```
+
+## Debugging
+
+### Chrome DevTools
+
+Através do chrome → Dev Tools → Source → conseguimos colocar break points na aplicação (linha 10)
+
+<img src="/Users/igorromero/NotesInGeneral/React/images/reactChrome1.png" alt="reactChrome1" style="zoom:50%;" />
+
+
+
+Another way is to use the `debugger` 
+
+```react
+const person = (props) => {
+ 
+  debugger
+  
+  return (
+    <div className="Person">
+      <h1 onClick={props.click}>
+        I'm {props.name} and I'm {props.age} years old
+      </h1>
+      <p>{props.children}</p>
+      <input type="text" onChange={props.change} value={props.name}/>
+    </div>
+  )
+}
+```
+
+
+
+### React Developer Tools
+
+O Chrome possui outra extensão chamada [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi/related) que nos permite ter mais informações do componente, como:
+
+* Props;
+* Valor em tempo real;
+* State;
+
+
+
+<img src="/Users/igorromero/NotesInGeneral/React/images/reactDevTool1.png" alt="reactDevTool1" style="zoom:50%;" />
+
+<img src="/Users/igorromero/NotesInGeneral/React/images/reactDevTools2.png" alt="reactDevTools2" style="zoom:50%;" />
+
+## Ex. Refatorando
+
+Dado a estrutura
+
+```
+- src
+-	-	Person
+-	-	-	Person.js
+-	-	App.js
+-	-	Index.js
+```
+
+```react
+// App.js
+import React, { Component } from 'react';
+import './App.css';
+import Person from './Person/Person';
+
+class App extends Component {
+  state = {
+    persons: [
+      { id: 1, name: 'Igor', age: 25 },
+      { id: 2, name: 'Igor2', age: 26 },
+      { id: 3, name: 'Igor3', age: 27 },
+    ],
+    showPerson: false,
+  };
+
+  changeNameHandler = (event, id) => {
+    const personIndex = this.state.persons.findIndex((person) => {
+      return (person.id = id);
+    });
+
+    const person = this.state.persons[personIndex];
+    person.name = event.target.value;
+
+    const persons = [...this.state.persons];
+    persons[personIndex] = person;
+
+    this.setState({ persons: persons });
+  };
+
+  switchingName = (newName) => {
+    this.setState({
+      persons: [
+        { name: newName, age: 25 },
+        { name: 'Igor5', age: 26 },
+        { name: 'Igor6', age: 27 },
+      ],
+    });
+  };
+
+  deletePerson = (index) => {
+    const persons = [...this.state.persons];
+    persons.splice(index, 1);
+    this.setState({ persons: persons });
+  };
+
+  togglePerson = () => {
+    const doesShow = this.state.showPerson;
+    this.setState({
+      showPerson: !doesShow,
+    });
+  };
+
+  render() {
+    const inlineStyle = {
+      backgroundColor: 'white',
+      font: 'inherit',
+      border: '1px solid blue',
+      padding: '8px',
+    };
+
+    let showPerson = null;
+
+    if (this.state.showPerson) {
+      showPerson = (
+        <div>
+          {this.state.persons.map((person, index) => {
+            return (
+              <Person
+                name={person.name}
+                age={person.age}
+                change={(event) => this.changeNameHandler(event, person.id)}
+                key={person.id}
+                click={() => this.deletePerson(index)}
+              />
+            );
+          })}
+        </div>
+      );
+    }
+
+    return (
+      <div className="App">
+        <h1>Testing App.js</h1>
+        <button style={inlineStyle} onClick={this.togglePerson}>
+          Toggle Person
+        </button>
+        <button style={inlineStyle} onClick={this.switchingName.bind(this, 'Igorzinho')}>
+          Switch names
+        </button>
+
+        {showPerson}
+      </div>
+    );
+  }
+}
+
+export default App;
+```
+
+Podemos perceber que o `App.js` tem muita responsabilidade, o q significa q precisa ser componetizado!
+
+### Folder structure
+
+```
+- src
+-	-	Components
+-	-	-	Persons
+-	-	-	-	Persons.js		→→ Irá conter a lista de pessoas
+- - -	-	Person
+- - -	-	-	Person.js
+-	-	-	Cockpit
+-	-	-	-	Cockipit.js		→→ Irá encapsular os dados para o App
+-	-	Container
+- -	-	App.js
+-	- -	Index.js
+```
+
+### Start Refactoring
+
+Basicamente, tudo do `App.js` que utilizar o `this.` no novo componente, irá ficar `props`!
+
+```react
+// App.js
+
+/*
+showPerson = (
+  <div>
+    {this.state.persons.map((person, index) => {
+      return (
+        <Person
+          name={person.name}
+          age={person.age}
+          change={(event) => this.changeNameHandler(event, person.id)}
+          key={person.id}
+          click={() => this.deletePerson(index)}
+          />
+      );
+    })}
+  </div>
+);
+*/
+
+//Refatorando
+
+showPerson = 
+  <Persons 
+    persons={this.state.persons}
+    clicked={this.deletePerson}
+    changed={this.changeNameHandler}
+    />
+```
+
+```react
+// Persons.js
+import React from 'react'
+import Person from './Person/person'
+
+const Persons = (props) => 
+  props.persons.map((person, index) => {
+    return (
+      <Person
+        name={person.name}
+        age={person.age}
+        change={(event) => props.changed(event, person.id)}
+        key={person.id}
+        click={() => props.clicked(index)}
+      />
+    );
+  });
+
+export default Persons;
+```
+
+```react
+// App.js
+<div className="App">
+  <Cockpit 
+    switchingName={this.switchingName}
+    togglePerson={this.togglePerson}
+    inlineStyle={inlineStyle}
+    />
+  {showPerson}
+</div>
+```
+
+```react
+// Cockpit.js
+import React from 'react';
+
+const Cockpit = (props) => (
+  <div>
+    <h1>Testing App.js</h1>
+    <button style={props.inlineStyle} onClick={() => props.togglePerson()}>
+      Toggle Person
+    </button>
+    <button style={props.inlineStyle} onClick={() => props.switchingName('Igorzinho')}>
+      Switch names
+    </button>
+  </div>
+);
+
+export default Cockpit;s
+```
+
+
+
+## Class vs Functional (Hooks)
+
+Classes que extendem Component ou React Hooks?
+
+<img src="/Users/igorromero/NotesInGeneral/React/images/reactClassBasedvsFunct.png" alt="reactClassBasedvsFunct" style="zoom:50%;" />
+
+### this.props - Class
+
+Assim como temos `props` para functional (hooks):
+
+```react
+const functional = (props) => {
+  // ...
+}
+```
+
+As class também possuem! Caso seja adicionado no `index.js`  dentro do component `App`  uma propriedade `appTitle`, essa propriedade poderá ser acessada com o `this.props.propName`:
+
+```javascript
+// index.js
+
+ReactDOM.render(<App appTitlte="Person Manager" />, document.getElementById('root'));
+```
+
+```react
+// App.js
+<Cockpit
+  title={this.props.appTitlte}
+  />
+
+// Cockpit.js
+const Cockpit = (props) => (
+  <div>
+    <h3>{props.title}</h3>
+    <!-- someOtherComponents -->
+  </div>
+);
+```
+
+## LifeCycle Hooks - for Class
+
+O LifeCycle Hooks é utilizado para o tipo `class` , não exitindo para `functional (hooks)`, portanto os métodos abaixo não funcionaram em `const functional = () => {}`...
+
+### LifeCycle - creation
+
+<img src="/Users/igorromero/NotesInGeneral/React/images/reactLifecycle.png" alt="reactLifecycle" style="zoom:50%;" />
+
+#### constructor
+
+O `constructor(props)` obrigatoriamente, precisa passar o `super(props)`;
+
+* Antigamente era no `constructor` que se setava o `state`
+
+```react
+class App extends Components {
+  constructor(props) {
+    super(props)
+    // this.state = {}
+  }
+}
+```
+
+#### getDerivedStateFromProps
+
+O lifeCycle `getDerivedStateFromProps` precisa ser inicializado com o método `static`
+
+```react
+static getDerivedStateFromProps(props, state) {
+  return state
+}
+```
+
+#### render
+
+É onde irá renderizar o JSX
+
+#### componentDidMount
+
+```react
+componentDidMount() {
+  console.log('componentDidMount')
+}
+```
+
+### LifeCycle - update
+
+<img src="/Users/igorromero/NotesInGeneral/React/images/reactLifeCycleUpdate.png" alt="reactLifeCycleUpdate" style="zoom:50%;" />
+
+#### shouldComponentUpdate
+
+Espera receber um `true` ou `false` , para saber se pode prosseguir com o componente ou não!
+
+* Se retornar false o componente não será exibido, pois irá ser barrado a troca do `state`;
+
+```react
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log('shouldComponentUpdate called')
+    console.log('shouldComponentUpdate nextProps: ' + JSON.stringify(nextProps))
+    console.log('shouldComponentUpdate nextState: ' + JSON.stringify(nextState))
+    return true;
+  }
+```
+
+#### componentDidUpdate
+
+Utilizado para fazer o `fetch` de dados do servidor
+
+## LifeCycle - for Functional
+
+### useEffect
+
+Para funções (hooks), o React disponibiliza o método `useEffect` que recebe 2 parâmetros:
+
+* A ação que deverá ser executada para o LifeCycle;
+* Qual o lifeCycle que irá ser utilizado;
+  * Se for passado um `[]` irá ser **executado somente uma vez**!
+
+```react
+const Cockpit = (props) => {
+  useEffect(() => {
+    console.log('Executado para todo lifeCycle')
+  }, []);
+  
+};
+```
+
+#### useEffect Behavior
+
+O comportamento do `useEffect` é dado pelo 2º parâmetro, portanto:
+
+* Altere o comportamento caso `persons` seja atualizado:
+
+  ```react
+  const Cockpit = (props) => {
+    
+    useEffect(() => {
+      console.log('Executado quando persons for atualizado')
+    }, [props.persons]);
+    
+  };
+  ```
+
+  
+
+## HOC (High Order Component)
+
+O React exige que tenhamo JSX dentro root tags ( `divs, headers, sessions` ) mas e se não quisermos colocar nossos elementos dentro de `divs` ?<br>
+
+Através da criação de **HOC** podemos ajustar esse cenário!
+
+```react
+// src/HOC/aux.js
+const aux = (props) => props.children;
+
+export default aux;
+```
+
+Agora invés de utilizarmos de `divs` importamos o componente **auxiliar**:
+
+```react
+// Cockpit.js -- with div
+<div>
+  <div>
+    <h1>Testing App.js</h1>
+    <h3>{props.title}</h3>
+  </div>
+  <div>
+    <button style={props.inlineStyle} onClick={() => props.togglePerson()}>
+      Toggle Person
+    </button>
+    <button style={props.inlineStyle} onClick={() => props.switchingName('Igorzinho')}>
+      Switch names
+    </button>
+  </div>
+</div>
+
+// Cockpit.js -- with Aux
+import Aux from '../../HOC/Aux';
+
+const Cockpit = (props) => {
+  return (
+    <Aux>
+      <h1>Testing App.js</h1>
+      <h3>{props.title}</h3>
+      <button style={props.inlineStyle} onClick={() => props.togglePerson()}>
+        Toggle Person
+      </button>
+      <button style={props.inlineStyle} onClick={() => props.switchingName('Igorzinho')}>
+        Switch names
+      </button>
+    </Aux>
+  );
+};
+```
+
+Também é possível atribuir mais propriedades a classes HOC, como por exemplo a `classe`:
+
+```react
+/*
+	<div className="App">
+		<h1>Meu Componente</h1>
+	</div>
+*/
+
+<Aux classes={"App"}>
+	<h1>Meu Componente</h1>
+</Aux>
+
+
+// Aux.js
+const aux = (props) => {
+ <div className={props.classes}>
+   {props.children}
+ </div>
+};
+```
+
+
+
+### Fragment
+
+Outra maneira sem precisar criar uma nova functional, como `Aux`, seria usar da classe `Fragment`:
+
+```react
+import React, { useEffect, Fragment } from 'react';
+// import Aux from '../../HOC/Aux';
+
+const Cockpit = (props) => {
+
+  return (
+    <Fragment>
+      <h1>Testing App.js</h1>
+      <h3>{props.title}</h3>
+    </Fragment>
+  );
+};
 ```
 

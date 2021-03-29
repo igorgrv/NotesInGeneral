@@ -1,8 +1,15 @@
 import React, { Component } from 'react';
 import './App.css';
-import Person from './Person/Person';
+import Persons from '../components/Persons/Persons';
+import Cockpit from '../components/Cockipit/Cockpit';
 
 class App extends Component {
+  constructor(props) {
+    super(props)
+    console.log('constructor called')
+    console.log('constructor props: ' + JSON.stringify(props))
+  }
+
   state = {
     persons: [
       { id: 1, name: 'Igor', age: 25 },
@@ -10,7 +17,25 @@ class App extends Component {
       { id: 3, name: 'Igor3', age: 27 },
     ],
     showPerson: false,
+    changeCounter: 0
   };
+
+  static getDerivedStateFromProps(props, state) {
+    console.log('getDerivedStateFromProps called')
+    console.log('getDerivedStateFromProps state: ' + JSON.stringify(state))
+    return state;
+  }
+
+  componentDidMount() {
+    console.log('componentDidMount called')
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log('shouldComponentUpdate called')
+    console.log('shouldComponentUpdate nextProps: ' + JSON.stringify(nextProps))
+    console.log('shouldComponentUpdate nextState: ' + JSON.stringify(nextState))
+    return true;
+  }
 
   changeNameHandler = (event, id) => {
     const personIndex = this.state.persons.findIndex((person) => {
@@ -23,8 +48,13 @@ class App extends Component {
     const persons = [...this.state.persons];
     persons[personIndex] = person;
 
-    this.setState({ persons: persons });
-  };
+    this.setState((prevState, props) => {
+      return { 
+        persons: persons,
+        changeCounter: prevState.changeCounter + 1
+      }
+    });
+  }
 
   switchingName = (newName) => {
     this.setState({
@@ -50,6 +80,8 @@ class App extends Component {
   };
 
   render() {
+    console.log('render called')
+
     const inlineStyle = {
       backgroundColor: 'white',
       font: 'inherit',
@@ -60,33 +92,22 @@ class App extends Component {
     let showPerson = null;
 
     if (this.state.showPerson) {
-      showPerson = (
-        <div>
-          {this.state.persons.map((person, index) => {
-            return (
-              <Person
-                name={person.name}
-                age={person.age}
-                change={(event) => this.changeNameHandler(event, person.id)}
-                key={person.id}
-                click={() => this.deletePerson(index)}
-              />
-            );
-          })}
-        </div>
-      );
+      showPerson = 
+        <Persons 
+          persons={this.state.persons}
+          changed={this.changeNameHandler}
+          clicked={this.deletePerson}
+        />
     }
 
     return (
       <div className="App">
-        <h1>Testing App.js</h1>
-        <button style={inlineStyle} onClick={this.togglePerson}>
-          Toggle Person
-        </button>
-        <button style={inlineStyle} onClick={this.switchingName.bind(this, 'Igorzinho')}>
-          Switch names
-        </button>
-
+        <Cockpit
+          title={this.props.appTitlte}
+          switchingName={this.switchingName}
+          togglePerson={this.togglePerson}
+          inlineStyle={inlineStyle}
+        />
         {showPerson}
       </div>
     );
