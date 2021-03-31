@@ -1,8 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import './Person.css';
 import PropTypes from 'prop-types';
+import AuthContext from '../../../context/auth-context';
 
 const person = (props) => {
+  const authContext = useContext(AuthContext);
   const focusInput = useRef(null);
 
   useEffect(() => {
@@ -11,9 +13,8 @@ const person = (props) => {
 
   return (
     <div className="Person">
-      { props.isAuth ?
-        <p>Authenticated</p> : <p>Please Log in</p>
-      }
+      { authContext.authenticated ? <p>Authenticated</p> : <p>Please Log in</p> }
+
       <h1 onClick={props.click}>
         I'm {props.name} and I'm {props.age} years old
       </h1>

@@ -1,7 +1,9 @@
-import React, { useEffect, Fragment, useRef } from 'react';
+import React, { useEffect, Fragment, useRef, useContext } from 'react';
 // import Aux from '../../HOC/Aux';
+import AuthContext from '../../context/auth-context';
 
 const Cockpit = (props) => {
+  const authContext = useContext(AuthContext);
   const toogleButton = useRef(null);
 
   useEffect(() => {
@@ -18,7 +20,9 @@ const Cockpit = (props) => {
       <button style={props.inlineStyle} onClick={() => props.switchingName('Igorzinho')}>
         Switch names
       </button>
-      <button style={props.inlineStyle} onClick={props.login}>Log in</button>
+      <button style={props.inlineStyle} onClick={authContext.login}>
+        Log in
+      </button>
     </Fragment>
   );
 };

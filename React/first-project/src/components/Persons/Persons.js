@@ -10,7 +10,6 @@ const Persons = (props) =>
         change={(event) => props.changed(event, person.id)}
         key={person.id}
         click={() => props.clicked(index)}
-        isAuth={props.isAuthenticated}
       />
     );
   });

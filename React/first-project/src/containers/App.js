@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import './App.css';
 import Persons from '../components/Persons/Persons';
 import Cockpit from '../components/Cockipit/Cockpit';
+import AuthContext from '../context/auth-context';
 
 class App extends Component {
   constructor(props) {
-    super(props)
-    console.log('constructor called')
-    console.log('constructor props: ' + JSON.stringify(props))
+    super(props);
+    console.log('constructor called');
+    console.log('constructor props: ' + JSON.stringify(props));
   }
 
   state = {
@@ -18,23 +19,26 @@ class App extends Component {
     ],
     showPerson: false,
     changeCounter: 0,
-    authenticated: false
+    authenticated: false,
   };
 
   static getDerivedStateFromProps(props, state) {
-    console.log('getDerivedStateFromProps called')
-    console.log('getDerivedStateFromProps state: ' + JSON.stringify(state))
+    console.log('getDerivedStateFromProps called');
+    console.log('getDerivedStateFromProps state: ' + JSON.stringify(state));
     return state;
   }
 
+  static contextType = AuthContext;
+
   componentDidMount() {
-    console.log('componentDidMount called')
+    console.log('componentDidMount called');
+    console.log(this.context.authenticated)
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    console.log('shouldComponentUpdate called')
-    console.log('shouldComponentUpdate nextProps: ' + JSON.stringify(nextProps))
-    console.log('shouldComponentUpdate nextState: ' + JSON.stringify(nextState))
+    console.log('shouldComponentUpdate called');
+    console.log('shouldComponentUpdate nextProps: ' + JSON.stringify(nextProps));
+    console.log('shouldComponentUpdate nextState: ' + JSON.stringify(nextState));
     return true;
   }
 
@@ -50,12 +54,12 @@ class App extends Component {
     persons[personIndex] = person;
 
     this.setState((prevState, props) => {
-      return { 
+      return {
         persons: persons,
-        changeCounter: prevState.changeCounter + 1
-      }
+        changeCounter: prevState.changeCounter + 1,
+      };
     });
-  }
+  };
 
   switchingName = (newName) => {
     this.setState({
@@ -81,11 +85,11 @@ class App extends Component {
   };
 
   toggleLogin = () => {
-    this.setState({authenticated: true})
-  }
+    this.setState({ authenticated: true });
+  };
 
   render() {
-    console.log('render called')
+    console.log('render called');
 
     const inlineStyle = {
       backgroundColor: 'white',
@@ -97,25 +101,27 @@ class App extends Component {
     let showPerson = null;
 
     if (this.state.showPerson) {
-      showPerson = 
-        <Persons 
+      showPerson = (
+        <Persons
           persons={this.state.persons}
           changed={this.changeNameHandler}
           clicked={this.deletePerson}
           isAuthenticated={this.state.authenticated}
         />
+      );
     }
 
     return (
       <div className="App">
-        <Cockpit
-          title={this.props.appTitlte}
-          switchingName={this.switchingName}
-          togglePerson={this.togglePerson}
-          inlineStyle={inlineStyle}
-          login={this.toggleLogin}
-        />
-        {showPerson}
+        <AuthContext.Provider value={{ authenticated: this.state.authenticated, login: this.toggleLogin }}>
+          <Cockpit
+            title={this.props.appTitlte}
+            switchingName={this.switchingName}
+            togglePerson={this.togglePerson}
+            inlineStyle={inlineStyle}
+          />
+          {showPerson}
+        </AuthContext.Provider>
       </div>
     );
   }

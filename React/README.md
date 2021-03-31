@@ -2005,7 +2005,149 @@ Considerando o cenário onde queremos que ao clicar em um botão **do `Cockpit.j
   }
   ```
 
-  
-
 Trabalhoso! Componentes tendo responsabilidades demais, sem ter necessidade!
+
+### Context API
+
+O React possui um meio de **prover e consumir** objetos, funções, atributos através do método  `React.createContext()`, que irá disponibilizar globalmente os valores declarados dentro do método!
+
+* Os valores declarados dentro de `createContext` podem e devem modificados por outros componentes, portanto devemos deixar como valores `default` para quem não passar nenhum dado
+
+```react
+import React from 'react';
+
+const authContext = React.createContext({ myValue: '123'}) // não precisa ser um objeto!
+
+export default authContext;
+```
+
+#### Provider
+
+Através do `createContext` podemos declarar valores default, como:
+
+```react
+import React from 'react';
+
+const authContext = React.createContext({
+  authenticated: false,
+  login: () => {}
+})
+
+export default authContext;
+```
+
+* **!importante** é necessário importar a função `authContext` para todo componente que precisar utilizar do objeto global, bem como também deixar os componentes que irão utilizar do objeto global dentro do componente `<AuthContext.Provider />`!
+
+  ```react
+  import AuthContext from '../context/auth-context';
+  
+  class App extends Component {
+    render () {
+      return (
+      	<AuthContext.Provider>
+          <Cockpit
+            title={this.props.appTitlte}
+            switchingName={this.switchingName}
+            togglePerson={this.togglePerson}
+            inlineStyle={inlineStyle}
+            login={this.toggleLogin}
+            />
+          {showPerson}
+      	</AuthContext.Provider>
+      )
+    }
+  }
+  ```
+
+* Através do `Provider` podemos atribuir os valores ao objeto global
+
+  ```react
+  <AuthContext.Provider 
+    	value={{ authenticated: this.state.authenticated, login: this.toggleLogin }}>
+  ```
+
+
+
+#### Consumer
+
+O `Consumer` deixa entre a tag uma função com **todo objeto global** declaro pelo `Provider`
+
+Relembrando que temos um botão em `Cockpit` que irá alterar um valor de `Person`, portanto:
+
+* Cockpit → irá receber a função `login`;
+* Person → irá receber a variável `authenticated`;
+
+Em `Person.js`:
+
+```react
+import AuthContext from '../../../context/auth-context'
+
+const person = (props) => {
+  return (
+    		<!-- Antes { props.isAuth ? <p>Authenticated</p> : <p>Please Log in</p> } -->
+      <AuthContext.Consumer>
+        {(context) => context.authenticated ? <p>Authenticated</p> : <p>Please Log in</p> }
+      </AuthContext.Consumer>
+    )
+}
+```
+
+Para o Cockpit:
+
+```react
+import AuthContext from '../../context/auth-context';
+
+const Cockpit = (props) => {
+  <AuthContext.Consumer>
+    {(context) => <button style={props.inlineStyle} onClick={context.login}>Log in</button> }
+  </AuthContext.Consumer>
+}
+```
+
+
+
+#### Class - contextType
+
+Para `class` → É se quisessemos utilizar em outros métodos o valor proveniente pelo `Provider`? 
+
+* É possível utilizar o método `static contextType` que irá receber a própria functional `auth-context`, permitindo que seja possível acessar os objetos com `this.context.yourObject`:
+
+  ```react
+  import AuthContext from '../context/auth-context';
+  
+  class App extends Component {  
+    
+    static contextType = AuthContext;
+  
+    componentDidMount() {
+      console.log('componentDidMount called');
+      console.log(this.context.authenticated)
+    }
+  }
+  ```
+
+#### Functional - useContext
+
+Para `consts` → utilizamos do `useContext` :
+
+```react
+import React, { useContext, useEffect, useRef } from 'react';
+import AuthContext from '../../../context/auth-context';
+
+const person = (props) => {
+  const authContext = useContext(AuthContext);
+}
+```
+
+Também podemos melhorar o código no template:
+
+```react
+<!-- ANTES -->
+<AuthContext.Consumer>
+  {(context) => context.authenticated ? <p>Authenticated</p> : <p>Please Log in</p> }
+</AuthContext.Consumer>
+
+<!-- com useContext -->
+{ authContext.authenticated ? <p>Authenticated</p> : <p>Please Log in</p> }
+```
 
