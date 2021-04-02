@@ -340,6 +340,86 @@ const doubleNumArray = numbers.map( (num) => {
 
 
 
+### Object
+
+#### Object.keys
+
+As vezes iremos precisar extrair as `keys` de um objeto e para isso o `Object.keys(yourObject)` recebe seu objeto e o extrai para um array
+
+```react
+const ingredientsState = useState({
+  salad: 1,
+  bacon: 1,
+  cheese: 2,
+  meat: 2
+})
+
+let transformedIngredients = Object.keys(props.ingredients);
+
+/*
+ transformedIngredients = ["salad", "bacon", "cheese", "meat"]
+*/
+```
+
+#### Object values → Array
+
+Considerando o exemplo acima, dado um objeto:
+
+```react
+const ingredientsState = useState({
+  salad: 1,
+  bacon: 1,
+  cheese: 2,
+  meat: 2
+})
+```
+
+Queremos exibir um array como:
+
+```json
+[
+  [salad],
+  [bacon],
+  [cheese, cheese]
+  [meat, meat]
+]
+```
+
+Para isso fazemos uma combinação de `Object.array` com `map`:
+
+```react
+const transformedObject = Object.keys(props.ingredientes)
+	.map( ingredientKey => {
+    return [...props.ingredientes(ingredientKey)].map( (_,i) => {
+      return <p key={ingredientKey+i}>
+      	{ingredientKey}
+      </p>
+    })
+  })
+```
+
+### Array
+
+#### Reduce → Initial value
+
+Em alguns cenários, vamos querer que o Array tenha um valor inicial caso nenhum dado seja passado, para isso podemos usar o método `reduce`, que recebe 2 parâmetros:
+
+* 1º parâmetro recebe o `previousValue` e o `currentValue`;
+* 2º parâmetro recebe o valor default caso não exista nada.
+
+```react
+const burger = (props) => {
+  let transformedIngredients = Object.keys(props.ingredients).map((igKey) => {
+    return [...Array(props.ingredients[igKey])].map((_, i) => {
+      return <BurgerIngredient key={igKey + i} type={igKey} />;
+    });
+  }).reduce((previousVal, currentVal) => {
+    return previousVal.concat(currentVal)
+  }, []);
+```
+
+
+
 ## 1º Project - create-react-app
 
 Para iniciar um projeto React, utilizaremos do pacote `create-react-app`:
@@ -458,7 +538,12 @@ npm i prop-types
 yarn add prop-types
 ```
 
-Depois basta importar e no final da class/função utilizar os tipos de validações!
+Para isso, no final da class/function iremos pegar o `nome.PropTypes` e como um objeto, iremos fazer as validações, como:
+
+* `PropType.string`
+* `PropType.isRequired`
+* `PropTypes.func`
+* `PropTypes.number` 
 
 ```react
 import React from 'react';
