@@ -651,7 +651,7 @@ class App extends Component {
 }
 ```
 
-####  setState - alterando State
+####  Class - setState - alterando State
 
 Se quisermos alterar o `state` precisamos utilizar função `setState()` (proveniente do `Component`). 
 
@@ -821,7 +821,7 @@ Quando utilizamos do `setState` , é disponibilizado 2 parâmetros:
 1. `prevState` → que irá conter o valor antes da alteração;
 2. `props` → irá conter todas as props da classe;
 
-O `prevState` é útil quando queremos fazer um `counter` por exemplo!
+O `prevState` é útil por boa prática, para quando queremos fazer um `counter` por exemplo, sem precisar alterar o `state` atual!
 
 ```react
 state = {
@@ -1002,6 +1002,50 @@ render() {
   )
 }
 ```
+
+#### More than 1 class
+
+* Ex.:
+
+  ```react
+  <button className="myClass mySecondClass"></button>
+  ```
+
+Para que o cenário acima seja possível, podemos fazer através de Arrays!
+
+```react
+import classes from './Button.css'
+
+const myFnc = () => {
+  return <button className={[classes.myClass, classes.mySecondClass].join(' ')}></button>
+}
+```
+
+Caso a segunda classe venha de uma `props`:
+
+```react
+import classes from './Button.css'
+
+const myFncFromProps = (props) => {
+  return <button 
+           className={[classes.myClass, classes[props.type]].join(' ')}>
+  </button>
+}
+```
+
+#### Assets
+
+A pasta `assets` deve estar dentro de `src` e todo arquivo a ser importado do `assets` deve ser importado como um arquivo `css`!
+
+```react
+import png from '../assets/my-logo.png';
+
+const logo = () => {
+  <img src={png} />
+}
+```
+
+
 
 ## 1º Assignment
 
