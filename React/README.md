@@ -2337,3 +2337,226 @@ Também podemos melhorar o código no template:
 { authContext.authenticated ? <p>Authenticated</p> : <p>Please Log in</p> }
 ```
 
+
+
+# HTTP / axios
+
+Para realizar requisições HTTP, a biblioteca `axios` é muito simples de ser implementada:
+
+```bash
+npm install axios
+```
+
+Como exemplo, iremos utilizar API publica → `https://jsonplaceholder.typicode.com/posts`
+
+## GET
+
+Realizando um GET
+
+```react
+import React, { useEffect } from 'react';
+import axios from 'axios';
+
+
+const blog = () => {
+  useEffect(() => {
+    axios.get('https://jsonplaceholder.typicode.com/posts')
+      .then(post => {
+        console.log(post) // irá retornar todos os dados
+      })
+  })
+  
+}
+```
+
+Renderizando valores de um GET:
+
+```react
+const blog = () => {
+  const [postState, setPostState] = useState([]);
+  
+  useEffect(() => {
+    axios.get('')
+    	.then(post => {
+      	setPostState(post.data)
+    })
+  })
+  
+  const posts = postState.map(post => {
+    return <Post title={post.title} />
+  })
+  
+  return {posts} // irá exibir todos os dados da URL
+}
+```
+
+### Transformando value
+
+Vamos falar que queremos adicionar outra `key` dentro de cada objeto do array proveniente da API:
+
+```react
+const blog = () => {
+  const[postState, setPostState] = useState([]);
+  
+  useEffect(() => {
+    axios.get('myUrl').then(response => {
+      const limitedPost = response.data.slice(0,4); // [post1, post2, post3, post4]
+      const postWithAuthor = limitedPost.map(post => {
+        return {
+          ...post,
+          author: "Igor"
+        }
+      });
+    })
+  })
+  
+  const posts = postState.map(post => {
+    return <Post title={post.title} author={post.author}/>
+  })
+  
+  return {posts};
+}
+```
+
+
+
+## POST
+
+Recuperando os valores do input, se torna fácil fazer o post:
+
+1. Pegar os valores do input através do `useState`
+
+   ```react
+   const newPost = () => {
+     const[post, setPost] = useState({
+       title: '',
+       content: '',
+       author: 'max'
+     });
+     
+     return (
+     	<input type="text" onChange={e => setPost({...post, title: event.target.value})}/>
+       <input type="text" onChange={e => setPost({...post, content: event.target.value})}/>
+       <input type="text" onChange={e => setPost({...post, author: event.target.value})}/>
+       <button type="submit">Register</button>
+     )
+   }
+   ```
+
+2. no `onClick` do botão fazer o send:
+
+   ```react
+   const newPost = () => {
+     const[post, setPost] = useState({
+       title: '',
+       content: '',
+       author: 'max'
+     });
+     
+     const postHandler = () => {
+       axios.post('https://jsonplaceholder.typicode.com/posts', post)
+         .then(response => {
+           console.log(response.data)
+         })
+     }
+     
+     return (
+     	<input type="text" onChange={e => setPost({...post, title: event.target.value})}/>
+       <input type="text" onChange={e => setPost({...post, content: event.target.value})}/>
+       <input type="text" onChange={e => setPost({...post, author: event.target.value})}/>
+       <button type="submit">Register</button>
+     )
+   }
+   ```
+
+
+
+## Handling error localy
+
+O famoso `catch` é disponível para o `axios`, desta forma podemos exibir um texto caso aconteça algum erro:
+
+```react
+const blog = () => {
+  const [postState, setPostState] = useState([]);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    axios.get('https://jsonplaceholder.typicode.com/posts').then((response) => {
+      setPostState(response.data);
+    }).catch(error => {
+      console.log(error)
+      setHasError(true);
+    });
+  }, []);
+
+  let posts = <p>Something went wrong</p>
+  if (!hasError) {
+    posts = <p>everthing went good</p>
+  }
+
+  return  {posts}
+
+}
+```
+
+
+
+## Interceptors
+
+Os `interceptors` servem para **lidar com requests & response de forma global** e também muito **util para headers**!
+
+* Os interceptors devem ir no `index.js` da aplicação!
+* Se não tiver um `return` irá ficar bloqueado;
+* 2º parâmetro é responsável **pelos erros**;
+
+```react
+import axios from 'axios';
+
+axios.interceptors.request.use(
+  (request) => {
+   	// para todo request, irá passar por aqui primeiro
+    return request;
+  },
+  (error) => {
+    console.log(error);
+    return Promise.reject(error);
+  }
+);
+
+axios.interceptors.response.use(
+  (response) => {
+    // para todo request, irá passar por aqui primeiro
+    return response;
+  },
+  (error) => {
+    console.log(error);
+    return Promise.reject(error);
+  }
+);
+
+ReactDOM.render(<App />, document.getElementById('root'));
+registerServiceWorker();
+```
+
+
+
+## Default
+
+### URL
+
+Se todas suas URLs são iguais, o `axios` provê algo chamado `baseURL` que pode ser utilizada global!
+
+```react
+// Url base: https://jsonplaceholder.typicode.com
+import axios from 'axios';
+
+axios.defaults.baseURL = 'https://jsonplaceholder.typicode.com';
+```
+
+### Header
+
+```react
+axios.defaults.headers.common['Authorization'] = 'seu token'; // para todo tipo de request
+axios.defaults.headers.post['Content-Type'] = 'application/json';
+```
+
