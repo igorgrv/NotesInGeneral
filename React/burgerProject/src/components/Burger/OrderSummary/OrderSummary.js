@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Aux from '../../../HOC/Aux';
 import classes from './OrderSummary.css';
 import Button from '../../UI/Button/Button';
 
 const orderSummary = (props) => {
+  useEffect( () => {
+    console.log('[ORDER] called')
+  })
+  
   const ingredientSummary = Object.keys(props.ingredients)
     .map(ingredient => {
       return <li key={ingredient}>

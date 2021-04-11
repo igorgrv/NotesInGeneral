@@ -1841,7 +1841,22 @@ Espera receber um `true` ou `false` , para saber se pode prosseguir com o compon
 
 #### componentDidUpdate
 
-Utilizado para fazer o `fetch` de dados do servidor
+Utilizado para fazer o `fetch` de dados do servidor:
+
+```react
+import axios from 'axios';
+
+class httpRequest extends Components {
+  componentDidUpdate () {
+    axios.get('minhaUrl')
+    	.then(response => {
+      	console.log(response)
+    })
+  }
+}
+```
+
+
 
 ## LifeCycle - for Functional
 
@@ -1854,9 +1869,32 @@ Para funções (hooks), o React disponibiliza o método `useEffect` que recebe 2
   * Se for passado um `[]` irá ser **executado somente uma vez**!
 
 ```react
+import React, { useState, useEffect } from 'react';
+
+function Exemplo() {
+  const [count, setCount] = useState(0);
+
+  // Similar ao componentDidMount e componentDidUpdate:
+  useEffect(() => {
+    // Atualiza o titulo do documento usando a API do browser
+    document.title = `Você clicou ${count} vezes`;
+  });
+
+  return (
+    <div>
+      <p>Você clicou {count} vezes</p>
+      <button onClick={() => setCount(count + 1)}>
+        Clique aqui
+      </button>
+    </div>
+  );
+}
+```
+
+```react
 const Cockpit = (props) => {
   useEffect(() => {
-    console.log('Executado para todo lifeCycle')
+    console.log('Executado UMA vez para todo lifecycle')
   }, []);
   
 };
@@ -1878,7 +1916,24 @@ O comportamento do `useEffect` é dado pelo 2º parâmetro, portanto:
   };
   ```
 
-  
+
+#### memo - ShouldComponentUpdate for Hooks
+
+Para ter o lifeCycle `shouldComponentUpdate` para function class, temos o `React.memo`! Para implementa-lo, devemos fazer o assign a uma `const` onde iremos checar se a `props` anterior é igual a corrente:
+
+```react
+// dada a props.show
+// irá atualizar somente se o antes e o depois forem igual
+const showIsEqual = (prevModal, nextModal) => prevModal.show === nextModal.show;
+
+const modal = (props) => {
+  return <Backdrop show={props.show} clicked={props.modalClosed} />
+};
+
+export default React.memo(modal, showIsEqual);
+```
+
+
 
 ## HOC (High Order Component)
 

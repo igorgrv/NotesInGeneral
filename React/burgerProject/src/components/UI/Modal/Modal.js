@@ -1,12 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import classes from './Modal.css';
 import Backdrop from '../Backdrop/Backdrop';
 import Aux from '../../../HOC/Aux';
 
+const showIsEqual = (prevModal, nextModal) => prevModal.show === nextModal.show;
+
 const modal = (props) => {
+  useEffect(() => {
+    console.log('[modal called');
+  }, [props.show]);
+
   return (
     <Aux>
-      <Backdrop show={props.show} clicked={props.modalClosed}/>
+      <Backdrop show={props.show} clicked={props.modalClosed} />
       <div
         className={classes.Modal}
         style={{
@@ -20,4 +26,4 @@ const modal = (props) => {
   );
 };
 
-export default modal;
+export default React.memo(modal, showIsEqual);
