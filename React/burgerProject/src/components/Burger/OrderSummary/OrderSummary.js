@@ -1,12 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Aux from '../../../HOC/Aux';
 import classes from './OrderSummary.css';
 import Button from '../../UI/Button/Button';
 
 const orderSummary = (props) => {
-  useEffect( () => {
-    console.log('[ORDER] called')
-  })
   
   const ingredientSummary = Object.keys(props.ingredients)
     .map(ingredient => {
@@ -27,7 +24,7 @@ const orderSummary = (props) => {
       </ul>
       <p>Continue to checkout</p>
       <Button clicked={props.modalClosed} type="Danger">CANCEL</Button>
-      <Button type="Success">ORDER</Button>
+      <Button clicked={props.orderNow} type="Success">ORDER</Button>
     </Aux>
    ); 
 }

@@ -2469,7 +2469,49 @@ Recuperando os valores do input, se torna fácil fazer o post:
    }
    ```
 
+### Post from State
 
+Em geral, todo `post` deveremos:
+
+1. Criar uma `const` e dentro dessa const declarar todos os `states` que iremos fazer o `POST`;
+
+   ```react
+   const burgerBuilder = () => {
+     const [ingredients, setIngredient] = useState({
+       salad: 0,
+       bacon: 0,
+       cheese: 0,
+       meat: 0,
+     });
+   
+     const [totalPrice, setTotalPrice] = useState(4);  
+   
+     const orderNowHandler = () => {
+       const order = {
+         ingredients: ingredients,
+         price: totalPrice,
+         customer: {
+           name: 'Igor',
+           address: {
+             street: 'Teststreet 1',
+             zipCode: '32131',
+             country: 'Brazil',
+           },
+           email: 'igorgrv@hotmail.com',
+         },
+         deliveryMethod: 'fastest',
+       };
+   
+       axios
+         .post('/orders.json', order)
+         .then((response) => console.log(response))
+         .catch((error) => console.log(error));
+     };
+   
+   }
+   ```
+
+   
 
 ## Handling error localy
 
