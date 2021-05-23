@@ -29,10 +29,6 @@ const HomeForm = (props) => {
       <br />
       <Button onClick={props.toggleUser}>Toggle User</Button>
       <InlineNotification {...notificationProps(props.children)} />
-      {
-        props.showUser &&
-        <InlineNotification {...notificationProps(props.userName)} />
-      }
     </Form>
   );
 };

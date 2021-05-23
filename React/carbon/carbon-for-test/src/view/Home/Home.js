@@ -3,16 +3,11 @@ import React, { useState } from 'react';
 import HomeForm from './components/form/HomeForm';
 
 const Home = () => {
-  const [userNameState, setUserName] = useState({
-    userName: 'Igor',
-  });
-
+  const [userNameState, setUserName] = useState('Igor');
   const [showUser, setShowUser] = useState(true);
 
   const switchName = (event) => {
-    setUserName({
-      userName: event.target.value,
-    });
+    setUserName(event.target.value);
   };
 
   const toggleUser = () => {

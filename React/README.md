@@ -942,6 +942,81 @@ const app = () => {
 export default app;
 ```
 
+#### PrevStates - boas praticas
+
+Existem alguns modos de se alterar o **estado** de um atributo.
+
+1. Exemplo - declarando valor a valor
+
+   ```react
+   const test = () => {
+     const [title, setTitle] = useState('');
+     const [name, setName] = useState('');
+     const [age, setAge] = useState(0);
+     
+     const titleChangeHandler = (event) => {
+       setTitle(event.target.value)
+     }
+     const nameChangeHandler = (event) => {
+       setName(event.target.value)
+     }
+     const ageChangeHandler = (event) => {
+       setAge(event.target.value)
+     }
+   }
+   ```
+
+2. Exemplo - através objeto
+
+   ```react
+   const test = () => {
+     const [userInfo, setUserInfo] = useState({
+       title: '',
+       name: '',
+       age: 0
+     });
+     
+     const titleChangeHandler = (event) => {
+       setUserInfo({
+         ...userInfo,
+         title: event.target.value
+       })
+     }
+     const nameChangeHandler = (event) => {
+       setUserInfo({
+         ...userInfo,
+         name: event.target.value
+       })
+     }
+     const ageChangeHandler = (event) => {
+       setUserInfo({
+         ...userInfo,
+         age: event.target.value
+       })
+     }
+   }
+   ```
+
+3. Exemplo - **PrevState** melhor prática
+
+   ```react
+   const test = () => {
+     const [userInfo, setUserInfo] = useState({
+       title: '',
+       name: '',
+       age: 0
+     });
+     
+     const ageChangeHandler = (event) => {
+       setUserInfo((prevState) => {
+         return { ...prevState, age: event.target.value}
+       })
+     }
+   }
+   ```
+
+   
+
 
 
 ### Stateless vs Stateful components
@@ -1042,6 +1117,36 @@ import png from '../assets/my-logo.png';
 
 const logo = () => {
   <img src={png} />
+}
+```
+
+#### Style convencional
+
+Por padrão, o CSS é importado como um componente
+
+```react
+import classes from './header.module.css';
+```
+
+```css
+.header {
+  background-color: red;
+}
+
+.h1-com-traco {
+  background-color: red;
+}
+```
+
+E então através do `className` é chamado a class:
+
+```react
+import classes from './header.module.css';
+
+const header = () => {
+  return <header className={classes.header}>
+  	<h1 className={classes['h1-com-traco']}>myHeader</h1>
+  </header>
 }
 ```
 
@@ -1858,9 +1963,7 @@ class httpRequest extends Components {
 
 
 
-## LifeCycle - for Functional
-
-### useEffect
+## UseEffect
 
 Para funções (hooks), o React disponibiliza o método `useEffect` que recebe 2 parâmetros:
 
@@ -1900,7 +2003,7 @@ const Cockpit = (props) => {
 };
 ```
 
-#### useEffect Behavior
+### useEffect Behavior
 
 O comportamento do `useEffect` é dado pelo 2º parâmetro, portanto:
 
@@ -1916,8 +2019,7 @@ O comportamento do `useEffect` é dado pelo 2º parâmetro, portanto:
   };
   ```
 
-
-#### memo - ShouldComponentUpdate for Hooks
+### memo - ShouldComponentUpdate for Hooks
 
 Para ter o lifeCycle `shouldComponentUpdate` para function class, temos o `React.memo`! Para implementa-lo, devemos fazer o assign a uma `const` onde iremos checar se a `props` anterior é igual a corrente:
 
@@ -1934,6 +2036,262 @@ export default React.memo(modal, showIsEqual);
 ```
 
 
+
+### Debounce
+
+Invés de realizar o **validações** de um form através do `onChange` (pq a cada letra digitada irá fazer com que seja verificado), é possível utilizar de `useEffects` + `setTimeout()` para fazermos o famoso **debounce** !
+
+Ex. com `onChange`:
+
+```react
+const login = () => {
+  const [enteredEmail, setEnteredEmail] = useState('');
+  const [formIsValid, setFormIsValid] = useState(false);
+  
+  const emailChangeHandler = (event) => {
+		console.log('with OnChange'); //irá ser disparado para cada letra
+    setEnteredEmail(event.target.value);
+    setFormIsValid(
+      event.target.value.includes('@') && enteredPassword.trim().length > 6
+    );
+  };
+
+  return {
+    <form>
+      <input
+        type="email"
+        id="email"
+        value={enteredEmail}
+        onChange={emailChangeHandler}
+        />
+      <Button type="submit" className={classes.btn} disabled={!formIsValid}>
+        Login
+      </Button>
+    </form>
+
+  }
+}
+```
+
+
+
+Ex. com `useEffect`:
+
+* Tudo que for dentro do `return` irá ser executado ANTES do que está fora, ou seja, podemos fazer um `clearTimeout` para impedir de cada letra ficar sendo executada
+
+```react
+const login = () => {
+  const [enteredEmail, setEnteredEmail] = useEffect('');
+  const [isFormValid, setIsFormValid] = useEffect(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      console.log('irá rodar a cada vez que for pausado');
+      setFormIsValid(enteredEmail.includes('@');
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+      console.log('Irá rodar a todo momento');
+    };
+  }, [enteredEmail]);
+}
+```
+
+
+
+## UseReducer
+
+### Quando usar
+
+Precisa validar um valor e também lidar com o valor digitado?
+
+Ex.:
+
+```react
+const [enteredEmail, setEnteredEmail] = useEffect('');
+const [isEmailValid, setIsEmailValid] = useEffec(false);
+
+const validateEmailHandler = () => {
+  setEmailIsValid(enteredEmail.includes('@'));
+};
+
+const emailChangeHandler = (event) => {
+  setEnteredEmail(event.target.value);
+};
+```
+
+Está gerenciando outros `useEffects` em um mesmo `state`?
+
+Ex.:
+
+```react
+const [enteredEmail, setEnteredEmail] = useEffect('');
+const [isEmailValid, setIsEmailValid] = useEffec(false);
+const [validForm, setValidForm] = useEffect(false);
+
+const validateEmailHandler = () => {
+  // enteredEmail pode não ter sido inicializado ainda, oq pode dar problema
+  setEmailIsValid(enteredEmail.includes('@'));
+};
+
+const emailChangeHandler = (event) => {
+  setEnteredEmail(event.target.value);
+  
+  // formIsValid depende de valores dos states enteredEmail && enteredPassword
+  setFormIsValid(enteredEmail.includes('@') && enteredPassword.trim().length > 6);
+};
+```
+
+
+
+### Como usar
+
+O `useReducer` serve principalmente para os casos acima, onde um state depende de outro, ou com um state está relacionado com o outro!
+
+<img src="/Users/igorromero/NotesInGeneral/React/images/reactUseReducer.png" alt="reactUseReducer" style="zoom: 25%;" />
+
+* `state` → é o nome do state comum;
+* `dispatchFn` → funciona como um `setState`, será utilizado para despachar o valor do `state`;
+* `reducerFn` → é onde ficará a lógica que irá alterar o `state` , essa function recebe o `prevState` e uma `action`
+* `initialState` → geralmente um objeto, onde no ex. acima irá ter o `enteredEmail` e `emailIsValid`;
+
+### Exemplo
+
+Dado o modelo sem reducer:
+
+```react
+const Login = (props) => {
+  const [enteredEmail, setEnteredEmail] = useState('');
+  const [emailIsValid, setEmailIsValid] = useState();
+  
+  const emailChangeHandler = (event) => {
+    setEnteredEmail(event.target.value);
+    setFormIsValid(enteredEmail.includes('@'));
+  };
+  
+  const validateEmailHandler = () => {
+    setEmailIsValid(enteredEmail.includes('@'));
+  };
+  
+}
+```
+
+
+
+Aplicando o reducer, parte 1 (aplicando o `state`):
+
+*   todo lugar q espera o `enteredEmail`, irá receber `emailState.value`;
+*   todo lugar q faz validações do `enteredEmail` (como `.includes(@)`) irá receber `emailState.isValid`;
+
+```react
+// emailReducer é uma função q não depende do component function (login)
+// irá retornar o valor default declaro no useReducer
+const emailReducer = (prevState, action) => {
+  return {value: '', isValid: false}
+}
+
+const login = (props) => {
+  const [emailState, dispatchEmail] = useReducer(emailReducer, {value: '', isValid: false})
+  
+  const emailChangeHandler = (event) => {
+    setEnteredEmail(event.target.value);
+    // setFormIsValid(enteredEmail.includes('@'));
+    setFormIsValid(emailReducer.isValid);
+  };
+  
+  const validateEmailHandler = () => {
+    // setFormIsValid(enteredEmail.includes('@'));
+    setEmailIsValid(emailReducer.isValid);
+  };
+  
+  const submitHandler = (event) => {
+    event.preventDefault();
+		// props.onLogin(enteredEmail, enteredPassword);
+    props.onLogin(emailReducer.value, enteredPassword);
+  };
+}
+```
+
+
+
+Aplicando o `dispatchFn` e `reducerFn`:
+
+* Todo lugar que utilizava do `setEnteredEmail` irá utilizar do `dispatchEmail` que por sua vez normalmente é declaro como um objeto, que irá passar:
+  * um `type`, como um identificador para o `emailReducer`;
+  * um `val`, para o `emailReducer` fazer a lógica;
+
+```react
+dispatchEmail({type: 'USER_INPUT', val: event.target.value});
+```
+
+* O `dispatchFn` aciona o `reducerFn` toda vez q é utilizado
+
+```react
+const emailReducer = (prevState, action) => {
+  if(action.type === 'USER_INPUT')
+    return {value: action.val, isValid: action.val.includes('@')};
+  return {value: '', isValid: false};
+}
+
+const Login = (props) => {
+  const [emailState, dispatchEmail] = useReducer(emailReducer, {value: '', isValid: false})
+  
+  const emailChangeHandler = (event) => {
+    dispatchEmail({type: 'USER_INPUT', val: event.target.value});
+
+    setFormIsValid(emailReducer.isValid && enteredPassword.trim().length > 6);
+  };
+
+}
+```
+
+Aplicando o `prevState`:
+
+* Em alguns cenários, será necessário utilizar o valor antigo (valor sem ter sido alterado), como no caso do `onBlur`
+
+```react
+const emailReducer = (prevState, action) => {
+  // codigo omitido
+  
+  if(action.type === 'INPUT_BLUR')
+    	return {value: prevState.value, isValid: prevState.value.includes('@')}
+  return {value: '', isValid: false}
+}
+
+const login = (props) => {
+  
+  //codigo omitido
+  const validateEmailHandler = () => {
+    dispatchEmail({ type: 'INPUT_BLUR', val: emailReducer.isValid });
+  };
+}
+```
+
+
+
+### Melhor debounce
+
+Uma vez que o form está com os campos validados, podemos fazer um melhor uso do `debounce` e executar somente quando o status `isValid` é alterado!
+
+1. Usaremos do ES8 e capturar o objeto `isValid` do `emailState`, passando um `alias` para diferenciar o email do password
+
+   ```react
+   const { isValid: emailIsValid} = emailState;
+   const { isValid: passwordIsValid} = passwordState;
+   
+   useEffect( () => {
+     const timer = setTimeout(() => {
+       setFormIsValid(emailIsValid && passwordIsValid)
+     }, 500);
+     
+     return () => {
+       clearTimeOut(timer)
+     }
+   }, [emailIsValid, passwordIsValid])
+   ```
+
+   
 
 ## HOC (High Order Component)
 
@@ -2029,7 +2387,44 @@ const Cockpit = (props) => {
 };
 ```
 
+### Portals
 
+Geralmente quando criamos um `modal` queremos q o mesmo esteja no início do HTML (para nível de organização), para que seja feito isso, é utilizado **Portals** !
+
+1. No `index.html` crie uma `div` que irá representar onde ficará o conteúdo;
+
+   ```html
+     <body>
+       <noscript>You need to enable JavaScript to run this app.</noscript>
+       <div id="overlays"></div> <!-- nova Div -->
+       <div id="root"></div>
+   ```
+
+2. Com a `div` criada, no componente `Modal`, precisaremos importar `ReactDOM`
+
+   ```react
+   import ReactDOM from 'react-dom';
+   ```
+
+3. Utilizar da função `ReactDOM.createPortal`, que recebe dois parâmetros:
+
+   1.  Componente;
+   2. Onde irá ser renderizado
+
+   ```react
+   const portalElement = document.getElementById('overlays');
+   
+   const Modal = (props) => {
+     return <Fragment>
+     	{ReactDOM.createPortal(<Backdrop />, portalElement)}
+       {ReactDOM.createPortal(<ModalOverlay >{props.children}</ModalOverlay>, portalElement)}
+     </Fragment>
+   }
+   
+   export default Modal;
+   ```
+
+   
 
 ## Refs
 
@@ -2123,7 +2518,78 @@ const Person = (props) => {
 }
 ```
 
+### Ref p/ forms
 
+Como uma boa prática, invés do uso do `onChange` de um input, é uma boa prática utilizar do `useRef` de uma forma que não seja criado `states` 'atoa':
+
+* Capture o valor dado um form!
+
+  ```react
+  const myForm = () => {
+    const nameRef = useRef();
+    
+    const addValueHandler = () => {
+      const name = nameRef.current.value;
+    }
+    
+    <form onSubmit="addValueHandler">
+      <input type="text" ref={nameRef} />
+    	<button type="submit" />
+    </form>
+  }
+  ```
+
+
+
+
+### Forward Refs - Componentes customizados
+
+Quando queremos acessar o `value` de um componente customizado (componente criado), não temos como passar diretamente o `ref` , like:
+
+```react
+const ParentComponent = () => {
+  const amountInputRef = useRef();
+  
+  const getting
+  return <form onSubmit={submitHandler}>
+    <!-- ref no MyCustomComponent NÃO IRÁ FUNCIONAR, pq React não tem como saber a qual input/componente irá utilizar Ref-->
+    <MyCustomComponent ref={amountInputRef} />
+  </form>
+}
+```
+
+
+
+Nesse caso, devemos utilizar `Forward Refs`!
+
+1. No `MyCustomComponent` iremos chamar `React.forwardRef` e então, como **segundo parâmetro** iremos chamar a `ref` que ficará disponível para quem utilizar o componente!
+
+   ```react
+   const MyCustomComponent = React.forwardRef((props, ref)) => {
+     return <div>
+     	<label>Test</label>
+       <input ref={ref} />
+     </div>
+   }
+   ```
+
+2. No `ParentComponent` então poderemos utilizar do `useRef` e pegar o valor do input!
+
+   ```react
+   const ParentComponent = () => {
+     const amountInputRef = useRef();
+     
+     const submitHandler = () => {
+     	const enteredAmount = amountInputRef.current.value;
+     }
+     
+     return <form onSubmit={submitHandler}>
+       <MyCustomComponent ref={amountInputRef} />
+     </form>
+   }
+   ```
+
+   
 
 ## Prop Chain - Comunicação entre múltiplos componentes
 
@@ -2197,7 +2663,7 @@ Trabalhoso! Componentes tendo responsabilidades demais, sem ter necessidade!
 
 O React possui um meio de **prover e consumir** objetos, funções, atributos através do método  `React.createContext()`, que irá disponibilizar globalmente os valores declarados dentro do método!
 
-* Os valores declarados dentro de `createContext` podem e devem modificados por outros componentes, portanto devemos deixar como valores `default` para quem não passar nenhum dado
+* Os valores declarados dentro de `createContext` podem e devem ser modificados por outros componentes, portanto devemos deixar como valores `default` para quem não passar nenhum dado
 
 ```react
 import React from 'react';
@@ -2215,8 +2681,8 @@ Através do `createContext` podemos declarar valores default, como:
 import React from 'react';
 
 const authContext = React.createContext({
-  authenticated: false,
-  login: () => {}
+  authenticated: false, // boolean
+  login: () => {}	// function
 })
 
 export default authContext;
@@ -2290,9 +2756,7 @@ const Cockpit = (props) => {
 }
 ```
 
-
-
-#### Class - contextType
+### Class - contextType
 
 Para `class` → É se quisessemos utilizar em outros métodos o valor proveniente pelo `Provider`? 
 
@@ -2312,7 +2776,7 @@ Para `class` → É se quisessemos utilizar em outros métodos o valor provenien
   }
   ```
 
-#### Functional - useContext
+### Functional - useContext
 
 Para `consts` → utilizamos do `useContext` :
 
@@ -2336,6 +2800,122 @@ Também podemos melhorar o código no template:
 <!-- com useContext -->
 { authContext.authenticated ? <p>Authenticated</p> : <p>Please Log in</p> }
 ```
+
+
+
+### useContext p/ Log-in
+
+Geralmente as informações de login, ficam disponível em diversos componentes e nada melhor do que utilizar do **Context Api + useContext** !
+
+* Invés de gerenciarmos diretamente o login no `App` podemos criar uma função que irá importar o `Provider` e já passar os valores `pré-definidos`
+
+Sem o Provider na classe Context API:
+
+```react
+// auth-context.js
+import React from 'react';
+
+const AuthContext = React.createContext({
+  isLoggedIn: false,
+  onLogout: () => {},
+  onLogin: () => {}
+});
+
+export default AuthContext;
+
+
+// App.js
+import React from 'react';
+import AuthContext from './auth-context'
+
+const app = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  
+  const loginInHandler = () => {
+    setIsLoggedIn(true)
+  }
+  
+  const loginOutHandler = () => {
+    setIsLoggedIn(false)
+  }
+  
+  return <AuthContext.Provider value={{
+      isLoggedIn: isLoggedIn,
+      onLogout: loginInHandler,
+      onLogin: loginOutHandler
+    }}>
+
+  </AuthContext.Provider>
+}
+```
+
+
+
+Com Provider no Context API (não precisa adicionar o `Provider` nos outros componentes):
+
+```react
+// auth-context.js with Provider
+import React from 'react';
+
+const AuthContext = React.createContext({
+  isLoggedIn: false,
+  onLogout: () => {},
+  onLogin: () => {}
+});
+
+const AuthContextProvider = (props) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  
+  const loginInHandler = () => {
+    setIsLoggedIn(true)
+  }
+  
+  const loginOutHandler = () => {
+    setIsLoggedIn(false)
+  }
+  
+  return <AuthContext.Provider value={{
+      isLoggedIn: isLoggedIn,
+      onLogout: loginInHandler,
+      onLogin: loginOutHandler
+    }}>
+
+  </AuthContext.Provider>
+}
+
+export default AuthContext;
+
+
+// index.js
+ReactDOM.render(
+  <AuthContextProvider>
+    <App />
+  </AuthContextProvider>,
+  document.getElementById('root')
+);
+
+
+
+// app.js
+function App() {
+
+  const ctx = useContext(AuthContext);
+
+  return (
+    <React.Fragment>
+      <MainHeader />
+      <main>
+        {!ctx.isLoggedIn && <Login />}
+        {ctx.isLoggedIn && <Home />}
+      </main>
+    </React.Fragment>
+  );
+}
+
+export default App;
+```
+
+
 
 
 
@@ -2392,6 +2972,8 @@ const blog = () => {
 
 ### Transformando value
 
+#### Adicionando outra key
+
 Vamos falar que queremos adicionar outra `key` dentro de cada objeto do array proveniente da API:
 
 ```react
@@ -2416,6 +2998,52 @@ const blog = () => {
   
   return {posts};
 }
+```
+
+
+
+#### Manipulando o retorno
+
+Pode ocorrer um cenário onde as `keys` da API não são as `keys` que queremos utilizar.
+
+Exemplo - JSON retornado da api:
+
+```json
+{
+  "episode_id": 1,
+ 	"film_description": "Film description" 
+}
+```
+
+Exemplo que queremos:
+
+```json
+{
+  "id": 1,
+ 	"description": "Film description" 
+}
+```
+
+
+
+Para transformar o `episode_id` em `id` iremos precisar manipular o retorno no `then`
+
+```react
+function App() {
+  const [movie, setMovie] = useState([]);
+
+  axios.get('https://swapi.dev/api/films/').then((res) => {
+    const transformedMovie = res.data.results.map((movie) => {
+      // manipulando o retorno para o JSON desejado
+      return {
+        id: movie.episode_id,
+        title: movie.title,
+        openingText: movie.opening_crawlm,
+        releaseDate: movie.release_date,
+      };
+    });
+    setMovie(transformedMovie);
+  });
 ```
 
 
@@ -2600,5 +3228,208 @@ axios.defaults.baseURL = 'https://jsonplaceholder.typicode.com';
 ```react
 axios.defaults.headers.common['Authorization'] = 'seu token'; // para todo tipo de request
 axios.defaults.headers.post['Content-Type'] = 'application/json';
+```
+
+## Modal - Displaying error
+
+Um modo comum em toda aplicação é ter um meio de fazer um handler global, neste exemplo **será com um modal**:
+
+1. Criaremos o componente HOC, chamado `withErrorHandling.js`
+
+2. Será uma function que irá receber como parâmetro o Componente que irá ser feito o wrap;
+
+   1. Este componente irá receber as próprias `props` disponíveis
+
+   ```react
+   import React from 'react';
+   import Modal from '../../components/UI/Modal/Modal';
+   import Aux from '../Aux';
+   
+   const withErrorHandling = (WrappedComponent) => {
+     return (props) => {
+       return <Aux>
+         <Modal show>
+           Something went wrong
+         </Modal>
+         <WrappedComponent {...props} />
+       </Aux>
+     };
+   }
+    
+   export default withErrorHandling;
+   ```
+
+3. Como a idéia é fazer um handling dos erros do `axios` iremos receber o `axios` e utilizar do `interceptor` 
+
+```react
+import React, { useEffect, useState } from 'react';
+import Modal from '../../components/UI/Modal/Modal';
+import Aux from '../Aux';
+
+const withErrorHandling = (WrappedComponent, axios) => {
+  return (props) => {
+    const [response, setResponse] = useState(null);
+
+    useEffect(() => {
+      axios.interceptors.request.use(null, (error) => {
+        setResponse(null);
+      });
+      axios.interceptors.response.use(null, (error) => {
+        setResponse(error);
+      });
+    });
+
+    const errorHandling = () => {
+      setResponse(null);
+    };
+
+    return (
+      <Aux>
+        <Modal show={response} modalClosed={errorHandling}>
+          {response ? response.message : null}
+        </Modal>
+        <WrappedComponent {...props} />
+      </Aux>
+    );
+  };
+};
+
+export default withErrorHandling;
+```
+
+### Using the modal
+
+Basta importar a function e no `export` passar os argumentos
+
+```react
+import withErrorHandling from '../../HOC/withErrorHandling/withErrorHandling';
+
+...
+
+export default withErrorHandling(burgerBuilder, axios);
+```
+
+## Spinner
+
+Enquanto a página carrega, ou enquanto uma requisição é enviada, podemos criar um `spinner`, como exemplo, o CSS:
+
+```css
+.Loader,
+.Loader:before,
+.Loader:after {
+  border-radius: 50%;
+}
+.Loader {
+  color: #521751;
+  font-size: 11px;
+  text-indent: -99999em;
+  margin: 55px auto;
+  position: relative;
+  width: 10em;
+  height: 10em;
+  box-shadow: inset 0 0 0 1em;
+  -webkit-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
+}
+.Loader:before,
+.Loader:after {
+  position: absolute;
+  content: '';
+}
+.Loader:before {
+  width: 5.2em;
+  height: 10.2em;
+  background: #fff;
+  border-radius: 10.2em 0 0 10.2em;
+  top: -0.1em;
+  left: -0.1em;
+  -webkit-transform-origin: 5.2em 5.1em;
+  transform-origin: 5.2em 5.1em;
+  -webkit-animation: load2 2s infinite ease 1.5s;
+  animation: load2 2s infinite ease 1.5s;
+}
+.Loader:after {
+  width: 5.2em;
+  height: 10.2em;
+  background: #fff;
+  border-radius: 0 10.2em 10.2em 0;
+  top: -0.1em;
+  left: 5.1em;
+  -webkit-transform-origin: 0px 5.1em;
+  transform-origin: 0px 5.1em;
+  -webkit-animation: load2 2s infinite ease;
+  animation: load2 2s infinite ease;
+}
+@-webkit-keyframes load2 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@keyframes load2 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+```
+
+Functional class:
+
+```react
+import React from 'react';
+import classes from './Spinner.css';
+
+const spinner = () => {
+  return <div className={classes.Loader}>Loading...</div>;
+};
+
+export default spinner;
+```
+
+### Using the Spinner
+
+O Spinner deve estar atrelado a uma variável que chega se esta `loading=true` ou `false`, portanto iremos criar uma variável no `state` que irá fazer esse check e quando o `axios` for chamado irá ser `true`:
+
+```react
+const [loading, setLoading] = useState(false);
+
+...
+
+const orderNowHandler = () => {
+  setLoading(true);
+  axios
+    .post('/orders', order)
+    .then((response) => {
+    setLoading(false); // terminou de carregar
+  })
+    .catch((error) => {
+    setLoading(false); // terminou de carregar
+  });
+};
+
+// iremos trocar o valor da variável orderSummary conforme seja true/false
+let orderSummary = (
+  <OrderSummary
+    ingredients={ingredients}
+    totalPrice={totalPrice}
+    modalClosed={cancelPurchaseHandler}
+    orderNow={orderNowHandler}
+    />
+);
+if (loading) {
+  orderSummary = <Spinner />;
+}
+
+return <Modal>{orderSummary}</Modal>
 ```
 

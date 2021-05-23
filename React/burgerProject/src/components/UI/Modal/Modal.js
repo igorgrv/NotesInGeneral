@@ -4,7 +4,7 @@ import Backdrop from '../Backdrop/Backdrop';
 import Aux from '../../../HOC/Aux';
 
 const modal = (props) => {
-  useEffect(() => {console.log('[modal]')});
+  useEffect(() => {});
 
   return (
     <Aux>
