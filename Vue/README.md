@@ -167,7 +167,6 @@ Com o **Vue-cli** instalado, para criar um projeto:
         "lint": "vue-cli-service lint"
   },
   ```
-  
 
 Será aberto automaticamente o navegador em `http://localhost:8080/` !
 
@@ -3967,7 +3966,15 @@ app.component('meu-component', MeuComponent);
     "breakOnLoad": true,
     "sourceMapPathOverrides": {
       "webpack:///src/*": "${webRoot}/*"
-    }
+    },
+    {
+      "type": "firefox",
+      "request": "launch",
+      "name": "vuejs: firefox",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}/src",
+      "pathMappings": [{ "url": "webpack:///src/", "path": "${webRoot}/" }]
+    },
   },
 ```
 

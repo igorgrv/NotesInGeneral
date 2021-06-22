@@ -1,0 +1,19 @@
+.headerPanel {
+  height: fit-content;
+
+  .bx--switcher {
+    margin-bottom: 1.5rem;
+  }
+}
+
+.bx--side-nav--ux {
+  background-color: #161616;
+}
+
+a.bx--side-nav__link > .bx--side-nav__link-text{
+  color: white;
+}
+
+.bx--side-nav__icon > svg {
+  fill: white;
+}

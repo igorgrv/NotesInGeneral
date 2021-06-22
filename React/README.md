@@ -3433,3 +3433,97 @@ if (loading) {
 return <Modal>{orderSummary}</Modal>
 ```
 
+# Custom Hooks
+
+O React nos permite criar nosso próprio componente **Hooks** , seguindo a regra:
+
+* TODO HOOKS **DEVE COMEÇAR COM `use`** → como `useCounter`, `useMeuComponente`
+
+A maior vantagem de usar um `custom hooks` é de poder **REFATORAR O CÓDIGO**, retirando duplicidades!
+
+* O exemplo abaixo, mostra um contador, onde foi dividido em dois componentes que possuem o mesmo código, **exceto** que um irá **somar** e o outro **subtrair** :
+
+  ```react
+  // Somador.js
+  const Somador = () => {
+    const [counter, setCounter] = useState(0);
+  
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setCounter((prevCounter) => prevCounter + 1); // CÓDIGO MUDA AQUI
+      }, 1000);
+  
+      return () => clearInterval(interval);
+    }, []);
+  
+    return <Card>{counter}</Card>;
+  };
+  
+  export default Somador;
+  
+  
+  // Subtrator.js
+  const Subtrator = () => {
+    const [counter, setCounter] = useState(0);
+  
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setCounter((prevCounter) => prevCounter - 1); // CÓDIGO MUDA AQUI
+      }, 1000);
+  
+      return () => clearInterval(interval);
+    }, []);
+  
+    return <Card>{counter}</Card>;
+  };
+  
+  export default Subtrator;
+  ```
+
+Com o uso de um `customHooks` é possível criar um componente que irá ter a lógica que está igual!
+
+1. Crie a pasta `src/hooks` ;
+
+2. Crie o arquivo `use-counter.js`
+
+3. Crie o functional componente → `UseCounter` e coloque toda a lógica repetida, esperando um parâmetro para saber se será subtração ou soma
+
+   ```react
+   // src/hooks/use-counter.js
+   const useCounter = (forward = true) => {
+     const [counter, setCounter] = useState(0);
+   
+     useEffect(() => {
+       const interval = setInterval(() => {
+         forward && setCounter((prevCounter) => prevCounter + 1);
+         !forward && setCounter((prevCounter) => prevCounter - 1);
+       }, 1000);
+   
+       return () => clearInterval(interval);
+     }, [forward]);
+   
+     return counter;
+   }
+   
+   export default useCounter;
+   ```
+
+4. Para utiliza-lo, faça igual um hooks qualquer:
+
+   ```react
+   // Somador.js
+   const Somador = () => {
+     const counter = useCounter();
+     return <Card>{counter}</Card>;
+   };
+   export default Somador;
+   
+   // Subtrator.js
+   const Subtrator = () => {
+     const counter = useCounter(false);
+     return <Card>{counter}</Card>;
+   };
+   export default Subtrator;
+   ```
+
+   
