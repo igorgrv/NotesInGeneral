@@ -3526,4 +3526,220 @@ Com o uso de um `customHooks` é possível criar um componente que irá ter a l�
    export default Subtrator;
    ```
 
+
+
+
+# Route
+
+Para trabalhar com rotas, é utilizado o **`react-router-dom`** :
+
+```bash
+npm install react-router-dom
+```
+
+1. Altere o `index.js` / `main.js` fazendo Wrapper do componente `App`, utilizando o **`BrowserRouter`**
+
+   ```react
+   import ReactDOM from 'react-dom';
+   import { BrowserRouter } from 'react-router-dom';
    
+   // codigo omitido
+   
+   ReactDOM.render(
+     <BrowserRouter>
+       <App />
+     </BrowserRouter>,
+   document.getElementById('root'));
+   ```
+
+2. No componente `App`, através do objeto `Route` é possível **informar ao react qual componente** irá ser carregado quando o **`path`** fizer o match com a rota!
+
+   1. Parâmetros para o `Route`:
+      1. `path="/rota"` → recebe a rota
+      2. `path="rota/:param"` → recebe a rota + parâmetro
+      3. `exact` → deixa explícito que a rota tem que bater por completo
+
+   ```react
+   import { Route } from 'react-router-dom';
+   import WelcomeComponent from './WelcomeComponent';
+   import ProductComponent from './ProductComponent';
+   
+   const App = () => {
+     return <div>
+     	<Route path="/welcome">
+       	<WelcomeComponent />
+       </Route>
+       <Route path="/product">
+       	<ProductComponent />
+       </Route>
+     </div>
+   }
+   ```
+
+   
+
+## Link
+
+O `<a href />` comum, não funciona bem com páginas SPA, para que não ocorra o reload, utilizamos o `Link` do `react-router-dom`
+
+```react
+import { Link } from 'react-router-dom';
+
+const Header = () => {
+  return <header>
+  	<nav>
+    	<ul>
+      	<li>
+        	<Link to="/welcome">Welcome</Link>
+        </li>
+      </ul>
+    </nav>
+  </header>
+}
+
+export default Header;
+```
+
+
+
+## NavLink
+
+`NavLink` funciona igual ao `Link`, a diferença está no parâmetro `activeClassName`, que fica disponível para rota selecionada!
+
+* Com `activeClassName` é possível passar o estilo que a tag `a` irá receber!
+
+```react
+// Header.module.css
+.header a.active {
+  color: #95bcf0;
+  padding-bottom: 0.25rem;
+  border-bottom: 4px solid #95bcf0;
+}
+
+// Header.js
+import { NavLink } from 'react-router-dom';
+import classes from './Header.module.css';
+
+const Header = () => {
+  return <header>
+  	<nav>
+    	<ul>
+      	<li>
+          <NavLink to="/welcome" activeClassName={classes.active}>
+            Welcome
+          </NavLink>
+        </li>
+      </ul>
+    </nav>
+  </header>
+}
+
+export default Header;
+```
+
+
+
+## Route w/ Param & Exact
+
+Rota com parâmetro → `product/1` → se trata de um detalhe de um produto, ou seja, o `1` é um **parâmetro dinâmico**!
+
+Para tornar a rota dinâmica, utilizamos o `:`, como `/products/:productId`
+
+* Como o início de `products` ja pertence a outra rota, é necessário utilizar o **`exact`** para que o componente não seja carregado dentro do componente `products`
+
+```react
+function App() {
+  return (
+    <div>
+      <Header />
+      <main>
+        <Route path="/welcome">
+          <Welcome />
+        </Route>
+        <Route path="/products" exact>
+          <Products />
+        </Route>
+        <Route path="/products/:productId">
+          <ProductDetails />
+        </Route>
+      </main>
+    </div>
+  );
+}
+
+export default App;
+```
+
+Para extrair o componente, agora precisamos utilizar do **`useParams`** também do `react-router-dom`!
+
+```react
+// ProductDetails.js → products/1
+import { useParams } from 'react-router-dom';
+
+const ProductDetails = () => {
+  const params = useParams();
+
+  return <h1>ProductDetails {params.productId} </h1> // irá retornar ProductDetails 1
+}
+
+export default ProductDetails;
+```
+
+
+
+## Switch 
+
+O `switch` do `react-router-dom` faz com que somente uma rota seja ativada por vez
+
+```react
+<Switch>
+  <Route path="/welcome">
+    <Welcome />
+  </Route>
+  <Route path="/products" exact>
+    <Products />
+  </Route>
+  <Route path="/products/:productId">
+    <ProductDetails />
+  </Route>
+</Switch>
+```
+
+
+
+## Nested Route
+
+Nested Route, é utilizado quando dentro de uma rota temos um 'complemento', e.g, dentro da rota:
+
+* `welcome` temos `welcome/admin` que irá exibir outro conteúdo
+
+```react
+import { Route } from 'react-router-dom';
+
+const Welcome = () => {
+  return <div>
+    <h1>Welcome page</h1>
+    <Route path="/welcome/admin">
+      <p>Welcome admin</p>
+    </Route>
+  </div>
+}
+
+export default Welcome;
+```
+
+
+
+## Redirect
+
+Para redirecionar o usuário, temos o componente `Redirect`:
+
+```react
+<Route path="/" exact>
+  <Redirect to="/welcome" />
+</Route>
+<Route path="/welcome">
+  <Welcome />
+</Route>
+```
+
