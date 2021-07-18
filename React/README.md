@@ -3230,6 +3230,24 @@ axios.defaults.headers.common['Authorization'] = 'seu token'; // para todo tipo 
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 ```
 
+```react
+axios.post('yourUrl', {
+  withCredentials: true,
+  auth: {
+    username: 'usuario',
+    password: 'password'
+  },
+  headers: {                  
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Authorization", 
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT, PATCH, DELETE" ,
+    "Content-Type": "application/json;charset=UTF-8"                   
+  },
+})
+```
+
+
+
 ## Modal - Displaying error
 
 Um modo comum em toda aplicação é ter um meio de fazer um handler global, neste exemplo **será com um modal**:
@@ -3685,6 +3703,39 @@ const ProductDetails = () => {
 export default ProductDetails;
 ```
 
+Para complementar, normalmente iremos extrair o objeto pelo ID passado na rota:
+
+```react
+const DUMMY_DATA = [
+  {
+    id: 1,
+    author: 'Igor',
+    text: 'My quote 1'
+  },
+  {
+    id: 2,
+    author: 'Igor',
+    text: 'My quote 2'
+  },
+  {
+    id: 3,
+    author: 'Igor',
+    text: 'My quote 3'
+  },
+  {
+    id: 4,
+    author: 'Igor',
+    text: 'My quote 4'
+  },
+]
+
+const QuoteDetail = () => {
+  const params = useParams();
+  const quote = DUMMY_DATA.find(quote => quote.id === parseInt(params.quoteId))
+  
+ }
+```
+
 
 
 ## Switch 
@@ -3743,3 +3794,824 @@ Para redirecionar o usuário, temos o componente `Redirect`:
 </Route>
 ```
 
+### 404
+
+Para rotas inexistentes, podemos fazer o uso do Redirect também! Apenas usamos o `path='*'`
+
+* Essa rota deve ser a última rota de todas!
+
+```react
+<Route path="/" exact>
+  <Redirect to="/welcome" />
+</Route>
+<Route path="/welcome">
+  <Welcome />
+</Route>
+<Route path="/*">
+  <Redirect to="/welcome" />
+</Route>
+```
+
+
+
+## useHistory - redirect no Comp.
+
+o `useHistory` funciona de forma parecida com o `Redirect`, a diferença é que invés de se utilizar dentro de um `Route` é utilizado no componente.
+
+* `useHistory` é muito útil quando se precisa direcionar o usuario logo após o submit de um form
+
+Métodos do `useHistory`:
+
+* `push(path)` → faz o redirect para o path selecionado, com a diferença q o usuário pode voltar para pagina atual
+*  `replace(path)` → faz o redirect mas n permite o usuario voltar para pagina
+
+
+
+```react
+// App.js
+<Route path="/quotes" >
+	<Quote />
+</Route>
+<Route path="/new-form" >
+	<NewForm />
+</Route>
+
+// NewForm.js
+import { useHistory } from 'react-router-dom';
+
+const NewForm = () => {
+  const history = useHistory();
+  
+  // quando o submit do QuoteForm for feito, irá direcionar para /quotes
+  const onSubmitHandler = (quote) => {
+    history.push('/quotes')
+  }
+  
+  return <QuoteForm onSubmit={onSubmitHandler} />
+}
+
+export default NewForm;
+```
+
+
+
+## Prompt
+
+Quer deixar uma mensagem para o usuário caso o form não tenha sido terminado de ser preenchido? Para isso existe o **`Prompt`** !
+
+* `Promp` recebe 2 parâmetros:
+  * `when` → informa quando ele deve ser ativado;
+  * `message` → mensagem que irá para o usuário;
+
+```react
+import { Prompt } from 'react-router-dom';
+
+const QuoteForm = () => {
+  const [isTextEntered, setIsTextEntered] = useState(false)
+  
+  const focusEnteredHandler = () => {
+    setIsTextEntered(false)
+  }
+  
+  return <Fragment>
+  	<Prompt when={isTextEntered} message={(location) => 'are you that you want to leave?'} />
+    <form onFocus={focusEnteredHandler} >
+    	<!-- código omitido -->
+    </form>
+  </Fragment>
+}
+```
+
+
+
+# Auth
+
+## FireBase - Base Config
+
+Para simular o backend com autenticação, será utilizado o [FireBase Auth API](https://firebase.google.com/docs/reference/rest/auth), que para ser utilizado, é necessário `API_KEY`
+
+* `API_KEY` → Acesse o Projeto → Authentication → Sign-in method → Email/Senha → Enable → Visão geral do projeto (settings) → Configurações do projeto → Chave de API Web (copy value)
+
+![Screen Shot 2021-06-28 at 09.01.23](/Users/igorromero/NotesInGeneral/React/README.assets/Screen Shot 2021-06-28 at 09.01.23.png)
+
+<img src="/Users/igorromero/NotesInGeneral/React/README.assets/Screen Shot 2021-06-28 at 09.03.00.png" alt="Screen Shot 2021-06-28 at 09.03.00" style="zoom:50%;" />
+
+## SignUp
+
+Para fazer o signUp, a partir do form iremos fazer uma requisição para o FireBase, passando:
+
+* `email` (string);
+* `password` (string - 6 min length);
+* `returnSecureToken`(boolean - retornar ou não o token)
+
+```REACT
+// AuthForm.js
+import axios from 'axios';
+import { useRef, useState } from 'react';
+
+import classes from './AuthForm.module.css';
+
+const AuthForm = () => {
+  const emailEntered = useRef(null);
+  const passwordEntered = useRef(null);
+
+  const submitFormHandler = (event) => {
+    event.preventDefault();
+
+    const email = emailEntered.current.value;
+    const password = passwordEntered.current.value;
+
+    let url =
+      'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAXxEEL5PZ9fZnQHfcVqF61rzPxs5f3uR4';
+
+    axios
+      .post(url, { email, password, returnSecureToken: true })
+      .then((res) => {
+        console.log(JSON.stringify(res.data));
+      })
+      .catch((err) => {
+        console.log(JSON.stringify(err.response.data));
+      });
+  };
+
+  return (
+    <section className={classes.auth}>
+      <h1>Sign Up</h1>
+      <form onSubmit={submitFormHandler}>
+        <div className={classes.control}>
+          <label htmlFor="email">Your Email</label>
+          <input type="email" id="email" required ref={emailEntered} />
+        </div>
+        <div className={classes.control}>
+          <label htmlFor="password">Your Password</label>
+          <input type="password" id="password" required ref={passwordEntered} />
+        </div>
+        <div className={classes.actions}>
+          <button>Create Account</button>
+        </div>
+      </form>
+    </section>
+  );
+};
+
+export default AuthForm;
+```
+
+Como retorno iremos ter o `response` com o `idToken` que será utilizado para as próximas validações!
+
+### Simples Feedback
+
+Em caso de erro, o FireBase também retorna uma mensagem que pode retornar uma msg ao usuário:
+
+* Response e.g.: 
+
+```json
+{
+    "error": {
+        "code": 400,
+        "message": "WEAK_PASSWORD : Password should be at least 6 characters",
+        "errors": [
+            {
+                "message": "WEAK_PASSWORD : Password should be at least 6 characters",
+                "domain": "global",
+                "reason": "invalid"
+            }
+        ]
+    }
+}
+```
+
+`````react
+// AuthForm.js
+import axios from 'axios';
+import { useRef, useState } from 'react';
+
+import classes from './AuthForm.module.css';
+
+const AuthForm = () => {
+  const [isLoading, setIsLoading] = useState(false); // checar se esta enviando request
+  
+  const emailEntered = useRef(null);
+  const passwordEntered = useRef(null);
+
+  const submitFormHandler = (event) => {
+    event.preventDefault();
+
+    const email = emailEntered.current.value;
+    const password = passwordEntered.current.value;
+
+    let url =
+      'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAXxEEL5PZ9fZnQHfcVqF61rzPxs5f3uR4';
+
+    axios
+      .post(url, { email, password, returnSecureToken: true })
+      .then((res) => {
+        console.log(JSON.stringify(res.data));
+      })
+      .catch((err) => {
+        console.log(JSON.stringify(err.response.data));
+      });
+  };
+
+  return (
+    <section className={classes.auth}>
+      <h1>Sign Up</h1>
+      <form onSubmit={submitFormHandler}>
+        <div className={classes.control}>
+          <label htmlFor="email">Your Email</label>
+          <input type="email" id="email" required ref={emailEntered} />
+        </div>
+        <div className={classes.control}>
+          <label htmlFor="password">Your Password</label>
+          <input type="password" id="password" required ref={passwordEntered} />
+        </div>
+        <div className={classes.actions}>
+          {!isLoading ? 'Create Account' : 'Sending Request...'}
+          <button type="button" className={classes.toggle}>
+           	Create new account
+          </button>
+        </div>
+      </form>
+    </section>
+  );
+};
+
+export default AuthForm;
+`````
+
+
+
+## SignIn
+
+Para fazer o Login, somente a URL é alterada, a lógica permanece, portanto, podemos criar um state para checar se é login ou create account:
+
+```react
+const AuthForm = () => {
+  const [isLogin, setIsLogin] = useState(true);
+
+  // codigo omitido
+
+  return (
+    <div className={classes.actions}>
+      {!isLoading ? <button>{isLogin ? 'Login' : 'Create Account'}</button> : 'Sending Request....'}
+      <button type="button" className={classes.toggle} onClick={switchAuthModeHandler}>
+        {isLogin ? 'Create new account' : 'Login with existing account'}
+      </button>
+    </div>)
+}
+```
+
+Caso dê certo o login, iremos mandar o usuário para rota `/`, que seria a tela de **Bem-vindo**! utilizando o `useHistory`
+
+```react
+const history = useHistory()
+
+const submitFormHandler = (event) => {
+  // codigo omitido
+
+  let url =
+      'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAXxEEL5PZ9fZnQHfcVqF61rzPxs5f3uR4';
+  if (isLogin)
+    url =
+      'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAXxEEL5PZ9fZnQHfcVqF61rzPxs5f3uR4';
+
+  axios
+    .post(url, { email, password, returnSecureToken: true })
+      .then((res) => {
+      history.replace("/") // direciona o usuário
+    });
+};
+```
+
+
+
+## AuthContext - User Global
+
+O Token gerado pelo login, normalmente será utilizado mais vezes na aplicação em diferentes componentes, sendo assim, **o ideal é criar um `context`** que será utilizado na aplicação como um todo!
+
+Para criar um `context`:
+
+1. Criar folder `store` dentro de `src`;
+
+2. Criar o `auth-context.js`;
+
+   1. Imp. React e utiliza `createContext()`
+
+      ```react
+      import React from 'react';
+      
+      const AuthContext = React.createContext();
+      ```
+
+   2. Inicializa o `createContext` passando um **objeto** contendo **as funções e parâmetros globais**!
+
+      ```react
+      import React from 'react';
+      
+      // default values
+      const AuthContext = React.createContext({
+        token: '',
+        isLoggedIn: false,
+        login: (token) => {},
+        logout: () => {}
+      });
+      
+      export default AuthContext;
+      ```
+
+   3. Cria o **`AuthContextProvider`**, que irá consumir o `AuthContext` 
+
+      ```react
+      export const AuthContextProvider = (props) => {
+        return <AuthContext.Provider>
+          {props.children}
+        </AuthContext.Provider>
+      }
+      ```
+
+   4. e irá implementar as funções/state em si, passando como dentro de `value`:
+
+      ```react
+      export const AuthContextProvider = (props) => {
+        const [token, setToken] = useState(null);
+        const userIsLoggedIn = !!token; // se não houver token, será false
+        const loginHandler = (token) => {
+          setToken(token);
+        };
+        const logoutHandler = () => {
+          setToken(null);
+        };
+      
+        const contextValue = {
+          token: token,
+          isLoggedIn: userIsLoggedIn,
+          login: loginHandler,
+          logout: logoutHandler,
+        };
+      
+        return <AuthContext.Provider value={contextValue}>{props.children}</AuthContext.Provider>;
+      };
+      ```
+
+   5. No `index.js`  importamos o `AuthContextProvider` e fazemos o wrap para toda aplicação
+
+      ```react
+      ReactDOM.render(
+        <AuthContextProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </AuthContextProvider>,
+        document.getElementById('root')
+      );
+      ```
+
+   6. Até este ponto, o `AuthContext` está disponível para toda aplicação, para utiliza-lo:
+
+      1. com o `useContext` passamos o `AuthContext` e fazemos o assign a uma variavel, que terá acesso a todos parâmetros/funções declarados globais:
+
+         ```react
+         // AuthForm
+         const AuthForm = () => {
+         	const authContext = useContext(AuthContext)
+         	
+           axios.post(url, { email, password, returnSecureToken: true })
+                 .then((res) => {
+                   authContext.login(res.data.idToken); // seta o valor do token
+                 });
+         }
+         ```
+
+         ```react
+         // MainNavigation.js
+         // iremos checar se está logado ou não, e alterar o header
+         const MainNavigation = () => {
+           const authContext = useContext(AuthContext);
+           const isLoggedIn = authContext.isLoggedIn;
+         
+           const logoutHandler = () => {
+             authContext.logout();
+           }
+           
+           return (
+             <header className={classes.header}>
+               <Link to="/">
+                 <div className={classes.logo}>React Auth</div>
+               </Link>
+               <nav>
+                 <ul>
+                   {!isLoggedIn && (
+                     <li>
+                       <Link to="/auth">Login</Link>
+                     </li>
+                   )}
+                   {isLoggedIn && (
+                     <li>
+                       <Link to="/profile">Profile</Link>
+                     </li>
+                   )}
+                   {isLoggedIn && (
+                     <li>
+                       <button onClick={logoutHandler}>Logout</button>
+                     </li>
+                   )}
+                 </ul>
+               </nav>
+             </header>
+           );
+         };
+         
+         export default MainNavigation;
+         ```
+
+
+
+## Protecting Routes
+
+Normalmente, a aplicação possui páginas que não podem ser acessadas se o usuário não tiver permissão/não estiver logado, e então, precisamos verificar quando o usuário tenta acessar uma rota!
+
+1. Dentro de `App.js` (onde temos as rotas), iremos checar se existe o token, caso contrário, iremos redirecionar o usuário!
+
+   ```react
+   function App() {
+     const authContext = useContext(AuthContext);
+   
+     return (
+       <Switch>
+         {!authContext.isLoggedIn && (
+           <Route path="/auth">
+             <AuthPage />
+           </Route>
+         )}
+         <Route path="/profile">
+           {authContext.isLoggedIn && <UserProfile />}
+           {!authContext.isLoggedIn && <Redirect to="/auth" />}
+         </Route>
+       </Switch>
+     )
+   }
+   ```
+
+   
+
+## LocalStorage
+
+Guardar as variáveis de login usandi `useContext` ou `redux` irá ficar somente armazenada em tempo de execução, **quando é feito o reload/refresh** da página **tudo é perdido**, e isso não é o que queremos.
+
+Um meio de não se perder os dados quando o usuário faz login, é armazenando os dados no `LocalStorage` da aplicação!
+
+```react
+//AuthContext.js
+const AuthContext = React.createContext({
+  token: '',
+  isLoggedIn: false,
+  login: (token) => {},
+  logout: () => {},
+});
+
+export const AuthContextProvider = (props) => {
+  const localStorageToken = localStorage.getItem('token');
+  const [token, setToken] = useState(localStorageToken);
+
+  const userIsLoggedIn = !!token; // se não houver token, será false
+
+  const loginHandler = (token) => {
+    setToken(token);
+    localStorage.setItem('token', token);
+  };
+
+  const logoutHandler = () => {
+    setToken(null);
+    localStorage.removeItem('token');
+  };
+
+  const contextValue = {
+    token: token,
+    isLoggedIn: userIsLoggedIn,
+    login: loginHandler,
+    logout: logoutHandler,
+  };
+
+  return <AuthContext.Provider value={contextValue}>{props.children}</AuthContext.Provider>;
+};
+
+export default AuthContext;
+```
+
+
+
+
+
+# Typescript React
+
+Para criar um projeto usando typescript:
+
+```
+yarn create react-app app-name --template typescript
+
+yarn start
+```
+
+## Functional Component
+
+Um componente geralmente possui props, com typescript podemos deixar implícito que precisaremos receber determinadas props!
+
+1. Passamos uma interface para o functional component:
+
+```react
+// Todos.tsx
+
+const Todo: React.FC<ITodoProps> = (props) =>{
+    return()
+}
+export default Todo;
+```
+
+2. A interface irá conter as props esperadas:
+
+```typescript
+// Todo.tsx
+interface ITodoProps {
+  items: string[]
+}
+
+const Todo: React.FC<ITodoProps> = (props) =>{
+  return()
+}
+export default Todo;
+```
+
+
+
+## Form
+
+Quando trabalhamos com `Forms` o Typescript pode nos ajudar ao utilizar o `event`.
+
+1. `OnSubmit` → `React.FormEvent`
+2. `OnClick` → `React.MouseEvent`
+
+```react
+const TodoForm: React.FC<{}> = () => {
+  const onSubmitHandler = (event: React.FormEvent) => {
+    event.preventDefault();
+  }
+
+  return <form onSubmit={onSubmitHandler}>
+    <label>To do text:</label>
+    <input type="text"/>
+    <button>Add Todo</button>
+  </form>;
+};
+
+export default TodoForm;
+```
+
+
+
+## useRef
+
+Quando utilizado typeScript, o `useRef` irá esperar uma tipagem e também **um valor inicial**
+
+* Para inputs →  `useRef<HTMLInputElement>`
+* Para parágrafos → `useRef<HTMLParagraphElement>`
+
+```react
+const TodoForm: React.FC<{}> = () => {
+  const todoTextInputRef = useRef<HTMLInputElement>(null);
+  
+  return <form onSubmit={onSubmitHandler}>
+    <label>To do text:</label>
+    <input type="text" ref={todoTextInputRef}/>
+    <button>Add Todo</button>
+  </form>;
+}
+
+export default TodoForm;
+```
+
+* Toda vez que um `useRef` é instanciado, será atribuido ao `current` o `?` pois o Typescript não sabe ainda se um valor foi inicializado. Para evitar problemas, utilize `!` deixando ao typescript implicito que será uma String (por exemplo)
+
+```react
+const todoTextInputRef = useRef<HTMLInputElement>(null);
+
+const onSubmitHandler = (event: React.FormEvent) => {
+  event.preventDefault();
+  
+  let enteredText = todoTextInputRef.current!.value; // !aqui
+}
+```
+
+
+
+## Functional Props
+
+Quando queremos comunicar o chield Component com o Parent component, utilizamos de funcional props, mas no typeScript precisamos informar que a **variável se trata de uma função** e caso a função contenha parâmetros, precisamos falar o **tipo do parâmetro**:
+
+```react
+// TodoForm.tsx
+
+// interface declara a functional prop
+interface ITodoFormProps {
+  addTodo: (text: string) => void
+}
+
+const TodoForm:  React.FC<ITodoFormProps> = (props) => {
+
+  const todoTextInputRef = useRef<HTMLInputElement>(null);
+  const onSubmitHandler = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    let enteredText = todoTextInputRef.current!.value;
+    if (enteredText.trim().length === 0) return;
+
+		props.addTodo(enteredText); //calls parent method
+  }
+}
+```
+
+
+
+## useState
+
+Assim como tudo no typescript, é necessário inferir o **tipo** para o `useState` através do `<>`
+
+```react
+function App() {
+  //aqui informamos que o setToDo irá precisar passar um array de strings
+  //e que o toDo inicia como um array vazio
+  const [toDo, setToDo] = useState<string[]>([]);
+  
+  //addToDoHandler irá adicionar novo valor ao array
+  const addToDoHandler = (textToDo:string) => {
+    setToDo((prevToDoArray) => {
+      //concat irá criar um novo array, adicionando o novo elemento
+      return prevToDoArray.concat(textToDo);
+    })
+  }
+}
+```
+
+## Assignment - remove item
+
+Dado o cenário onde:
+
+* App.tsx → Chama `ToDos.tsx` (possui uma lista de `ToDoItem.tsx`) 
+
+Queremos que ao clicar no `ToDoItem.tsx` seja removido!
+
+* Como no `app.tsx` é onde fica todo os states, será nele que deveremos remover os itens e para isso iremos ter que esperar to `ToDos.tsx` passar o index!
+
+  ```react
+  // app.tsx
+  function App() {
+    const [toDo, setTodo] = useState<string[]>([]);
+  
+    const removeToDoHandler = (toDoIndex: number) => {
+      setTodo((prevToDoArray) => {
+        return prevToDoArray
+          .filter((toDo, index) => index !== toDoIndex); // filter devolve novo array
+        
+        /* 
+        outra maneira, declarando novo array
+        
+        	const newToDoAray = [...toDo];
+      		newToDoAray.splice(toDoIndex, 1)
+      		setTodo(newToDoAray)	
+        */
+      });
+    };
+  
+    return <Todos items={toDo} removeToDo={removeToDoHandler}/>
+  }
+  
+  export default App;
+  ```
+
+* No `Todos.tsx` iremos passar o index, com o uso do `bind`, onde de início é null, mas depois ao clicar terá o `index`:
+
+  ```react
+  // Todos.tsx
+  interface ITodoProps {
+    items: string[];
+    removeToDo: (index: number) => void; //declara a função na interface, informando q espera um index
+  }
+  
+  const Todos: React.FC<ITodoProps> = (props) => {
+    return (
+      <ul className={classes.todos}>
+        {props.items.map((item, index) => (
+          <ToDoItem key={index} text={item} 
+            onClickToDo={props.removeToDo.bind(null, index)} /> //aqui usamos .bind
+        ))}
+      </ul>
+    );
+  };
+  
+  export default Todos;
+  ```
+
+* Agora resta pegar o `onClick` to `ToDoItem`
+
+  ```react
+  // ToDoItem
+  
+  interface IToDoItemProps {
+    text: string;
+    onClickToDo: () => void; // aqui não precisamos de valor, só iremos acionar o ToDos.tsx
+  }
+  
+  const ToDoItem: React.FunctionComponent<IToDoItemProps> = (props) => {
+    return (
+      <li className={classes.item} onClick={props.onClickToDo}>
+        {props.text}
+      </li>
+    );
+  };
+  
+  export default Todo;
+  
+  ```
+
+  
+
+## Context
+
+O Assigment acima, é um bom exemplo que devemos implementar o `useContext` para evitar tantos métodos conversando um com o outro sem necessidade! 
+
+* ` React.createContext(valoresDefault)` espera receber os objetos que serão usados, porém com Typescript, teremos que passar o tipo do `createContext` too!
+
+  * Para evitar duplicidade de código, iremos criar um `type` que irá trazer o `contextObject`
+
+  ```react
+  type contextObject = {
+    item: string[],
+    addTodo: (todoText:string) => void,
+    removeTodo: (todoIndex:number) => void
+  }
+    
+  export const TodoContext =  React.createContext<contextObject>({
+    items: [],
+    addTodo: (todoText:string) => {},
+    removeTodo: (todoIndex:number) => {},
+  })
+  ```
+
+* Como todo context, precisamos criar o `Provider` que como é um **Functional Component** iremos declarar o tipo como `React.FC`
+
+  ```react
+  export const TodoContext 
+  // codigo omitido
+  
+  const TodoContextProvider: React.FC = (props) => {
+    return <TodoContext.Provider>
+    	{props.children}
+    </TodoContext.Provider>
+  }
+  
+  export default TodoContextProvider;
+  ```
+
+* Dentro do provider, iremos remover tudo que o `App.tsx` gerencia e passar para o Provider:
+
+  ```react
+  const TodoContextProvider: React.FC = (props) => {
+     const [toDo, setTodo] = useState<string[]>([]);
+  
+    const addTodoHandler = (toDoText: string) => {
+      setTodo((prevToDo) => {
+        return prevToDo.concat(toDoText);
+      });
+    };
+  
+    const removeToDoHandler = (toDoIndex: number) => {
+      const newToDoAray = [...toDo];
+      newToDoAray.splice(toDoIndex, 1);
+      setTodo(newToDoAray);
+    };
+    
+    return <TodoContext.Provider>
+    	{props.children}
+    </TodoContext.Provider>
+  }
+  
+  export default TodoContextProvider;
+  ```
+
+* Então, agora basta passar o `value` do contextProvider que referenciará os métodos que estavam no App
+
+  ```react
+    const valueContext<contextObject> = {
+        items: toDo,
+        addTodo: addTodoHandler,
+        removeTodo: removeToDoHandler,
+    };
+  
+  	return <ToDoContext.Provider value={contextValue}>
+      {props.children}
+    </ToDoContext.Provider>;
+  };
+  
+  export default ToDoContextProvider;
+  ```
+
+  

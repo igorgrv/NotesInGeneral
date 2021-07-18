@@ -148,7 +148,7 @@ int idade = 37 //Agora o Java entende o que é a 'idade'
 	//Atenção ao uso do double
 	double divisao = 5 / 2 //ira retornar 2.0 pois o Java ira entender que é um inteiro
 	double divisaoCerta = 5.0 / 2 //um nº tendo o double, o resultado irá ser double
-
+	
 	//Somar decimais deve se ter atenção!
 	double valor1 = 0.1;
 	double valor2 = 0.2;
@@ -675,7 +675,7 @@ public class Gerente extends Funcionario{
 * **_Atributos e Métodos_** são herdados juntos, PORÉM o **_construtor_** não! Se faz necessário chamar o construtor manualmente - tem que se ter atenção ao extender uma classe que possua um construtor pré definido!
 	```java
 	public class Funcionario {
-
+	
 		private String nome, CPF;
 		private double salario;
 		
@@ -687,7 +687,7 @@ public class Gerente extends Funcionario{
 		}
 		//Getters e Setters
 	}
-
+	
 	public class Gerente extends Funcionario {
 		//IDE irá informar que será necessário criar o construtor de Gerente com os mesmo atributos
 		public Gerente(String nome, String CPF, double salario) {
@@ -1213,7 +1213,7 @@ A classe Object, é a **CLASSE MÃE**, todas as classes do Java provém dela!
 			return "A conta: " + this.numero + " tem dinheiro";
 		}
 	}
-
+	
 	public static void main(String[] args) {
 		Conta cc = new Conta();
 		cc.setNumero = 123;
@@ -1275,24 +1275,24 @@ sysout(contas[0].getNumero); //irá imprimir 22
 	public class GuardaContas {
 		private Conta[] referencias;
 		private int posicaoLivre = 0;
-
+	
 		public GuardaContas() {
 			this.referencias = new Conta [10]
 		}
-
+	
 		public void adiciona(Conta ref){
 			this.referencias[this.posicaoLivre] = ref;
 			this.posicaoLivre++;
 		}
 	}
-
+	
 	//------------------------------------------------------------
 	public static void main (String[] args){
 		GuardaContas guardador = new GuardaContas();
-
+	
 		Conta cc = new ContaCorrente(22,11);
 		guardador.adiciona(cc);
-
+	
 		Conta cc2 = new ContaCorrente(22,11);
 		guardador.adiciona(cc2);
 	}
@@ -1354,7 +1354,7 @@ O problema de se criar um ArrayList Genérico, é de que qualquer tipo poderá s
 			Conta cc2 = new Conta(2222, 22222);
 			contas.add(cc);
 			contas.add(cc2);
-
+		
 			for (Conta conta : contas) { //Conta sendo especificada
 				System.out.println(conta);
 			}
@@ -1512,7 +1512,7 @@ O uso do lambda, vem para simplificar métodos! Mas como? Utilizando `->`<br> <b
 	   
 	NumeroDaContaComparator comparator = new NumeroDaContaComparator();
 	lista.sort(comparator);
-
+	
 	for (Conta conta : lista) {
 	    System.out.println(conta);
 	}
@@ -1522,12 +1522,12 @@ O uso do lambda, vem para simplificar métodos! Mas como? Utilizando `->`<br> <b
 	lista.sort( (c1,c2)	-> {
 		Integer.compare(c1.getNumero(), c2.getNumero())
 	});
-
+	
 	lista.forEach(conta -> {
 		System.out.println(conta)
 	});
 	```
-<br>Adicionando total:<br> 
+	<br>Adicionando total:<br> 
 * Com **for**:
 	```java
 	//Classe curso
@@ -1587,7 +1587,7 @@ O `Set`é uma interface que herda de `Collection`, assim como o `List`!
 	A
 	B
 	```
-O que houve com a order do `add` ? Por que não foi exibido o segundo elemento `Teste C`? A **diferença** entre um `List` e um `Set`:
+	O que houve com a order do `add` ? Por que não foi exibido o segundo elemento `Teste C`? A **diferença** entre um `List` e um `Set`:
 * O Set não adiciona os elementos a uma lista, ele simplesmente os "joga em um saco" de elementos do mesmo tipo, ou seja, ele não se preocupa com ordenação;
 * O Set não permite que elementos **repetidos** sejam adicionados! 
 * O Set é **muito mais rápido para efetuar buscas** do que uma Lista;
@@ -1808,7 +1808,7 @@ Imagine uma situação, onde temos milhares de objetos dentro de uma lista e ent
 			throw new NoSuchElementException("Aluno nao encontrado");
 		}
 	}
-
+	
 	//------------------------------------------------
 	public static void main(String[] args) {
 		Curso java = new Curso("Java");
@@ -2008,16 +2008,15 @@ As classes Wrappers nos ajudam com o mundo orientado a objeto, como por exemplo,
 	```java
 	String stringIdadeForm = "23";
 	Integer numero = Integer.valueOf(stringIdadeForm); //autoboxing
-
+	
 	System.out.println(numero.intValue()); //unboxing com o intValue
 	//irá imprimir 23
-
+	
 	//ou
 	String stringIdadeForm = "23";
 	int numero = Integer.parseInt(stringIdadeForm )
 	```
 	<br>
-	
 
 Outro exemplo da utilização de classes Wrapper vs Primitivo:<br> 
 * Pense em um sistema de cadastro, onde **a idade não é necessária**, ou seja, caso não seja preenchida devemos **considera-la** `null`.
@@ -2070,7 +2069,7 @@ Os **default methods** foram adicioandas as Interfaces, de modo que quando fosse
 	* **Sem o método** sort da List, **ordenando pelo tamanho da String**, com **Comparator**:
 		```java
 		class ComparadorPorTamanho implements Comparator<String>{
-
+		
 			@Override
 			public int compare(String s1, String s2) {
 				return Integer.compare(s1.length(), s2.length());
@@ -2095,7 +2094,7 @@ Os **default methods** foram adicioandas as Interfaces, de modo que quando fosse
 		```java
 		Comparator<String> comparador = new ComparadorPorTamanho();
 		//Collections.sort(cursos, comparador);
-
+		
 		cursos.sort(comparador);
 		System.out.println(cursos);
 		```
@@ -2127,7 +2126,7 @@ Antes do Lambda (`->`) eram utilizadas **classes anônimas**.
 	* Exemplo **sem Classe Anônima**:
 		```java
 		class ComparadorPorTamanho implements Comparator<String>{
-
+		
 			@Override
 			public int compare(String s1, String s2) {
 				return Integer.compare(s1.length(), s2.length());
@@ -2192,14 +2191,14 @@ Um Método de Referência é utilizado para **simplificar** ainda mais um **lamb
 	```java
 	//	COM LAMBDA
 	cursos.sort(Comparator.comparing(s -> s.length()));
-
+	
 	//	COM MÉTODO DE REFERÊNCIA
 	cursos.sort(Comparator.comparing(String::length));
-
+	
 	//-------------------------------------------------------
 	//	COM LAMBDA
 	cursos.forEach(curso -> System.out.println(curso));
-
+	
 	//	COM MÉTODO DE REFERÊNCIA
 	cursos.forEach(System.out::println);
 	```
@@ -2209,7 +2208,7 @@ Um Método de Referência é utilizado para **simplificar** ainda mais um **lamb
 		List<Curso> cursos = new ArrayList<Curso>();
 		cursos.add(new Curso ("Java"));
 		cursos.add(new Curso ("Pyton"));
-
+		
 		cursos.forEach(System.out::println); //irá imprimir o objeto Curso
 		
 		//Como imprimir invés do objeto, imprimir o nome de cada Curso  ??
@@ -2268,6 +2267,7 @@ Quando utilizamos o `stream()`, ele não afeta a lista, ou seja, caso seja feito
 	 
 	 System.out.println(streamToList);
 	```
+	
 * Exemplo 5: retornar se existe a String “X” dentro da Lista
 
   ```java
@@ -2275,6 +2275,19 @@ Quando utilizamos o `stream()`, ele não afeta a lista, ou seja, caso seja feito
       return orcamento.getItens().stream()
           .anyMatch(item -> item.getNome().equals(nomeItem));
   }
+  ```
+
+* Exemplo 6: se true retorna o value:
+
+  ```java
+  boolean isAllowed = allAllowedDomains.stream().anyMatch(allowedDomain -> {
+    // pattern → E.g.: *ibm.com
+    Pattern pattern = Pattern.compile("." + allowedDomain.getEmailDomain(), Pattern.CASE_INSENSITIVE);
+    // matcher → E.g.: (domain entered by user) us.ibm.com
+    Matcher matcher = pattern.matcher(email);
+    // if matches, then is a valid domain
+    return matcher.matches();
+  });
   ```
 
   
@@ -2309,7 +2322,7 @@ Curso curso = cursoOptional.orElse(null);
 		.findAny()
 		.ifPresent(c -> sysout(c.getNome())); //caso não existe, irá imprimir nada
 	```
-O `Optional`  possui variações, como:
+	O `Optional`  possui variações, como:
 * `OptionalDouble`
 * `OptionalInt`
 
@@ -2353,7 +2366,7 @@ A API de Datas do Java, foi implementada após anos utiliznado JODA (**_Java Obj
 	```java
 	LocalDate hoje = LocalDate.now(); //2020-05-01
 	LocalDate copa = LocalDate.of(2022, Month.JULY, 2);
-
+	
 	int anosFaltantesParaCopa = copa.getYear() - hoje.getYear();
 	System.out.println(anosFaltantesParaCopa); //2
 	```

@@ -1,4 +1,4 @@
-# Carbon Design System - VUE
+# Carbon Design System
 
 1. Fork → https://github.com/igorgrv/carbon-tutorial-vue
 
@@ -26,13 +26,24 @@
 3. Instalar o `carbon`:
 
    ```bash
+   --vue 
    yarn add carbon-components @carbon/vue @carbon/icons-vue
+   
+   --react
+   yarn add carbon-components carbon-components-react @carbon/icons-react carbon-icons
+   
+   --reactTypescript
+   yarn add @types/carbon-components-react
    ```
 
 4. Instalar o preprocessador para o SASS
 
    ```bash
+   --vue
    yarn add node-sass sass-loader
+   
+   --react
+   yarn add sass@1.32.12
    ```
 
 <br>
