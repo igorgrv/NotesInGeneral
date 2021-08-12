@@ -4300,6 +4300,170 @@ export default AuthContext;
 
 
 
+# Redux
+
+Redux tem um conceito parecido com o `Context`:
+
+* Is a state management system for cross-components or app-wide state
+
+Em outras palavras, é uma ótima prática para quem precisa que dados fluam entre componentes!
+
+## Redux vs Context
+
+Context nos ajuda a evitar `props chain` ou seja, propriedade sendo passada entre componentes sem ter necessidade, mas Context possui algumas desvantagens...
+
+1. 1 context com muitos muitos states e códigos
+
+2. Quando utilizamos Context, precisamos fazer o wrap do componente `App` onde temos duas opções:
+
+   1. Criar um Context que encapsula demais context;
+
+      ```
+      -- src
+      ---- context
+      ------- parent-context.js →→→→ irá receber todos demais context/providers
+      ------- auth-context.js
+      ------- x-context.js
+      ------- y-context.js
+      ```
+
+      
+
+3. Fazer o wrapper do componente `app` diversas vezes:
+
+   ```react
+   ReactDOM.render(
+     <AuthContextProvider>
+       <XContextProvider>
+         <YContextProvider>
+           <App />
+         </YContextProvider>
+       </XContextProvider>
+     </AuthContextProvider>,
+     document.getElementById('root')
+   );
+   ```
+
+## How Redux works
+
+<img src="/Users/igorromero/NotesInGeneral/React/README.assets/Screen Shot 2021-07-23 at 15.52.17.png" alt="Screen Shot 2021-07-23 at 15.52.17" style="zoom:50%;" />
+
+* **`store`** → Redux possui um **único** `store`  chamado de `state` (armazenamos os dados no state)
+  * `state.user`
+  * `state.auth`
+* **`Components`** → PEGAM valores do `store` → fazem um `subscription` no `store`, então toda vez que houver uma alteração `store` irá saber que **X componentes estão esperando saber sobre essa mudança!**
+  * `Components` pode pegar um valor mas **JAMAIS altera um valor do `store` diretamente!**
+* **`Reducers`** são os responsáveis por ALTERAR um valor no `store` , ou seja, responsáveis por `mutations` no `store`
+* **`Actions`** → Como um componente irá chamar um reducer? através de **ações!** 
+  * Quando um componente clica em um botão e esse botão altera um `state`, é através de um `dispatch` do component que uma `action` será acionada!
+  * `Action` é um objeto que descreve o tipo de operação que o **reducer** deverá fazer!
+
+
+
+## Simple Redux Project
+
+```
+npm init -y
+npm i redux
+```
+
+Com as dependências instaladas crie um arquivo `main` → `redux-demo.js`;
+
+Para começar utilizar redux:
+
+1. Iniciamos pela **criação do store**!
+
+   ```react
+   const redux = require('redux');
+   
+   const store = redux.createStore();
+   ```
+
+2. Todo `store` precisa de um **`reducer`**! É o reducer` que conterá os valores defaults de um `state`, onde um `reducer` será uma **função** que conterá 2 parâmetros:
+
+   1. `state` → onde geralmente é um objeto;
+   2. `action` → se trata das ações que alteram um state;
+
+   ```react
+   const redux = require('redux');
+   
+   const counterReducer = (state,action) => {}
+   
+   const store = redux.createStore();
+   ```
+
+   * `reducers` devem sempre retornar um novo `state` contendo as mesmas `keys` do `state`, ou seja, se o `state` possui a key *counter* , deverá retornar um *counter* também!
+   * Com o `reducer` pronto, podemos passa-lo para o `createStore`;
+
+   ```react
+   const redux = require('redux');
+   
+   const counterReducer = (state = { counter: 0 }, action) => {
+     return {
+       counter: state.counter + 1,
+     };
+   };
+   
+   const store = redux.createStore(counterReducer);
+   ```
+
+   * Porém, quando a aplicação iniciar, o `state.counter` não existirá ainda, então precisamos passar um valor `default` para o `state`
+
+   ```react
+   const counterReducer = (state = { counter: 0 }, action) => {
+     // codigo omitido
+   };
+   ```
+
+3. Com `store` e `reducer` prontos, agora precisamos simular um `component` que irá fazer um **Subscribe** no `store`! E para isso, temos a função `store.subscribe` que espera receber uma função!
+
+   * O `subscribe` só é executado quando ocorre alguma mudança no `state`!
+   * Uma função `subscribe` irá querer o `state` e para isso utilizamos do `store.getState()`
+
+   ```react
+   // codigo omitido
+   const store = redux.createStore(counterReducer);
+   
+   const counterSubscribe = () => {
+     const state = store.getState();
+     console.log(state);
+   }
+   
+   store.subscribe(counterSubscribe);
+   ```
+
+   * Se o código acima for executado com `node redux-demo.js` nada será exibido, pois não houve uma mudança no `state` ainda - **toda mudança deve ser feita por uma ACTION**;
+
+4. Para criar uma **action** precisamos fazer um `dispatch`! onde o `dispatch` irá chamar o reducer, portanto, todo `dispatch` precisa de um `type` que será um **identificador da action no reducer** !
+
+   ```react
+   const counterReducer = (state = { counter: 0 }, action) => {
+     if (action.type === 'increment') {
+       return {
+         counter: state.counter + 1,
+       };
+     }
+     // caso não seja 'increment' irá retornar o state original
+     return state;
+   };
+   
+   // codigo omitido
+   
+   store.subscribe(counterSubscribe);
+   store.dispatch({ type: 'increment' });
+   ```
+
+   
+
+## React + Redux Project
+
+Para utilizar Redux com o React, é necessário instalar as dependências abaixo:
+
+```
+npm i redux react-redux
+yarn add redux react-redux
+```
+
 
 
 # Typescript React
