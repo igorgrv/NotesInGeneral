@@ -1285,6 +1285,24 @@ class App extends component {
 }
 ```
 
+#### By Using &&
+
+Javascript também possui um meio mais elegante, através `&&` que irá verificar se o parâmetro a esquerda é true, se for ele exibe, se não ele não faz nada:
+
+```react
+render() {
+    return (
+    	{ 
+        this.state.showPerson && <div>
+        		<h1>if true shows persons list</h1>
+        	</div>
+      }
+    )
+  }
+```
+
+
+
 #### Elegant way
 
 O modo mais elegante é através de uma função interna no `render()` que irá conter todo o elemento que será exibido ou não;
@@ -4464,7 +4482,530 @@ npm i redux react-redux
 yarn add redux react-redux
 ```
 
+Como todo projeto com redux, é necessário começar pela criação do **store**:
 
+1. Criar a pasta **store/index.js** → irá ficar lógica do redux;
+
+2. Importar `createStore` e criar o **reducer + store**:
+
+   ```react
+   import {createStore} from 'redux';
+   
+   const counterReducer = (state = {counter: 0}, action) => {
+     return {
+       counter: state.counter + 1
+     }
+   }
+   
+   const store = createStore(counterReducer);
+   ```
+
+3. Criar algumas actions:
+
+   ```react
+   import { createStore } from 'redux';
+   
+   const counterReducer = (state = { counter: 0 }, action) => {
+     if (action.type === 'increment') {
+       return {
+         counter: state.counter + 1,
+       };
+     }
+   
+     if (action.type === 'decrement') {
+       return {
+         counter: state.counter - 1,
+       };
+     }
+   
+     return state;
+   };
+   
+   const store = createStore(counterReducer);
+   ```
+
+4. Exportar o `store` para que possa ser utilizado pelo app:
+
+   ```react
+   const store = createStore(counterReducer);
+   
+   export default store;
+   ```
+
+
+5. Agora basta deixar disponível para o `App` todo!
+
+   ```react
+   import { Provider } from 'react-redux';
+   import store from './store/index';
+   
+   ReactDOM.render(
+     <Provider store={store}>
+       <App />
+     </Provider>,
+     document.getElementById('root')
+   );
+   ```
+
+   
+
+### Get state from comp.
+
+Com o `store` e `reducer` preparados, podemos começar a consumir os valores fornecidos pelo `reducer`, os chamados **state**!
+
+1. Dentro do componente, iremos utilizar **`useSelector`** , do `react-redux`
+
+   ```react
+   import { useSelector } from 'react-redux';
+   ```
+
+   1. `useSelector` nos dá acesso diretamente ao `state`
+
+2. Basta agora apenas 'selecionarmos' o `state` que queremos!
+
+   ```react
+   import { useSelector } from 'react-redux';
+   
+   const Counter = () => {
+     const counter = useSelector(state => state.counter)
+   
+     return (
+         <div>
+         	{counter}
+       	</div>
+     );
+   };
+   
+   export default Counter;
+   ```
+
+   1. Redux irá cuidar de toda vez que houver uma alteração no `counter` renderizar novamente o novo valor!
+
+
+
+### Dispathing actions
+
+Para alterar o `state` é necessário utilizar do **`useDispatch`** para criar um `dispatch` → que carregará então a ação no `reducer`:
+
+1. Dentro do component, importe `useDispatch` e crie um `dispatch`:
+
+   ```react
+   import {useDispatch} from 'redux-react';
+   
+   const Counter = () => {
+     const dispatch = useDispatch();
+    	// codigo omitido 
+   }
+   ```
+
+2. Com o `dispatch` criado, podemos passar os `types` de actions que temos no `reducer`!
+
+   ```react
+   import {useDispatch} from 'redux-react';
+   
+   const Counter = () => {
+     const dispatch = useDispatch();
+     
+     const incrementHandler = () => {
+       dispatch({ type: 'increment' })
+     }
+     
+     const decrementHandler = () => {
+       dispatch({ type: 'decrement' })
+     }
+     
+     return (
+     	<main className={classes.counter}>
+         <h1>Redux Counter</h1>
+         <div className={classes.value}>{counter}</div>
+         <div>
+           <button onClick={incrementHandler}>Increment</button>
+           <button onClick={decrementHandler}>Decrement</button>
+         </div>
+         <button onClick={toggleCounterHandler}>Toggle Counter</button>
+       </main>
+     )
+   }
+   ```
+
+
+
+#### Dispatching custom actions
+
+E se quisermos que o valor fique dinâmico? Podemos passar para o `actions` também valores para serem utilizados no `reducer`!
+
+1. No Component, passe um valor que irá aumentar o counter baseado neste valor!
+
+   ```react
+   import {useDispatch} from 'redux-react';
+   
+   const Counter = () => {
+     const dispatch = useDispatch();
+     
+     const increaseHandler = () => {
+       dispatch({ type: 'increase', amount: 10 }) // variável amount
+     }
+   }
+   ```
+
+2. Dentro do `state` → `counterReducer` iremos esperar que `actions` tenha também` amount`!
+
+   ```react
+   const counterReducer = (state = { counter: 0 }, action) => {
+     if (action.type === 'increase') {
+       return {
+         counter: state.counter + action.amount,
+       };
+     } 
+   }
+   ```
+
+### More than one State
+
+E se quisermos fazer com que o `counter` hora apareça e hora não? 
+
+1. Além do `counter` do `state` iremos ter outra key, a `showCounter` e para isso precisaremos alterar o `reducer`:
+
+   ```react
+   import { createStore } from 'redux';
+   
+   const counterReducer = (state = { counter: 0, showCounter: true }, action) => {}
+   ```
+
+   * Porém, como ficarão as `actions` que utilizam somente o `counter` ? Teremos que passar o `showCounter` mesmo para quem só precisaria do `counter`!
+
+     ```react
+     const counterReducer = (state = { counter: 0, showCounter: true }, action) => {
+       if (action.type === 'increment') {
+         return {
+           counter: state.counter + 1,
+           showCounter: state.showCounter // pega o valor atual
+         };
+       }
+     
+       if (action.type === 'increase') {
+         return {
+           counter: state.counter + action.amount,
+           showCounter: state.showCounter // pega o valor atual
+         };
+       }
+     
+       if (action.type === 'decrement') {
+         return {
+           counter: state.counter - 1,
+           showCounter: state.showCounter // pega o valor atual
+         };
+       }
+     
+       return state;
+     };
+     ```
+
+2. Então criariamos a `action.type === 'showCounter'` que irá alterar de fato o `showCounter`:
+
+   ```react
+   const counterReducer = (state = { counter: 0, showCounter: true }, action) => {
+     if (action.type === 'showCounter') {
+       return {
+         counter: state.counter,
+         showCounter: !state.showCounter
+       }
+     }
+   };
+   ```
+
+3. Com a action criada, basta agora recuperar o valor do `state.showCounter` e fazer o dispatch no clique!
+
+   ```react
+   const Counter = () => {
+     const dispatch = useDispatch();
+     const showCounter = useSelector((state) => state.showCounter); 
+     const toggleCounterHandler = () => {
+       dispatch({ type: 'showCounter' });
+     };
+   
+     return (
+       <main className={classes.counter}>
+         <h1>Redux Counter</h1>
+         {showCounter ? <div className={classes.value}>{counter}</div> : null}
+         <button onClick={toggleCounterHandler}>Toggle Counter</button>
+       </main>
+     );
+   };
+   ```
+
+   
+
+## Redux Toolkit
+
+### Redux problems
+
+Redux demonstrou ser ótimo, mas também se não tomarmos atenção em alguns casos, podemos acabar errando assim como utilizando `contexts`. Exemplo:
+
+* Errar o name da `action` → Caso passemos no dispatch o nome errado da `action` o `reducer` nao irá entender!
+
+* State **imutáveis** → Se no `reducer` nao passarmos um objeto novo poderemos ter problemas, ou seja, conforme as variaveis do `state` crescem, nós precisaremos estar sempre referenciando-as repetitivamente!
+
+  ```react
+  
+  const counterReducer = (state = { counter: 0, showCounter: true }, action) => {
+   	if (action.type === 'increment') {
+      return {
+        counter: state.counter + 1,
+        // showCounter: state.showCounter → Preciso passar mesmo que eu não use, pq devemos sempre retornar um state completo!
+      };
+    } 
+  }
+  ```
+
+### reducer vs createSlice
+
+Redux Toolkit possui intermante o pacote `redux` então não se faz necessário utiliza-lo!
+
+```
+npm i @reduxjs/toolkit react-redux
+yarn add @reduxjs/toolkit react-redux
+```
+
+Para começar a implementar `react-toolkit` iremos utilizar o `createSlice` que espera receber 1 objeto com 3 keys:
+
+1.  `name` → Nome do slicer;
+
+2. `initialState` → Variáveis que o state irá possuir
+
+   ```react
+   const initialState = { counter: 0, showCounter: true };
+   ```
+
+3. `reducers` → Serão as `actions.types` que o `reducer` possui, porém com um grande diferencial:
+
+   * Invés de utilizar `ifs` , todas as funções inseridas funcionaram como o `action.type`;
+   * Todas funções terão acesso ao `state & action`;
+   * O `state` poderá ser modificado diretamente, não precisando modificar o `state` inteiro!
+
+```react
+import { createSlice } from '@reduxjs/toolkit';
+import { createStore } from 'redux';
+
+const initialState = { counter: 0, showCounter: true };
+
+const counterSlice = createSlice({
+  name: 'counter',
+  initialState,
+  reducers: {
+    increment(state) {
+      state.counter++;
+    },
+    decrease(state) {
+      state.counter--;
+    },
+    increase(state, action) {
+      state.counter = state.counter + action.amount;
+    },
+    showCounter(state) {
+      state.showCounter = !state.showCounter;
+    },
+  },
+});
+```
+
+PORÉM, agora enfrentamos um problema que seria como passar para o `createStore` que espera um reducer?
+
+### createStore vs configureStore (toolkit)
+
+O `createStore` espera receber somente um `reducer` e com `react toolkit` trabalhamos com `slices`! Para resolver este problema, poderíamos:
+
+1. Passar o `counterSlice.reducers`
+
+   ```react
+   const store = redux.createStore(counterSlice.reducers);
+   ```
+
+   * Mas e se tivermos vários `slicers/reducers`? Não funcionará!
+
+Para resolver esse problema, o `react toolkit` possui o **`configureStore`**, que espera receber um objeto, com a key `reducer`!
+
+```react
+const counterSlice = createSlice({reducers: ....});
+
+const store = configureStore({
+  reducer: counterSlice.reducers;
+})
+```
+
+Dessa forma caso tenhamos mais de um slicer, é possível somente passar para o `reducer` um objeto com cada `slicer`:
+
+```react
+const counterSlice = createSlice({reducers: ....});
+const authSlice = createSlice({reducers: ....});
+
+const store = configureStore({
+  reducer: { auth: authSlice, counter: counterSlice }
+})
+```
+
+* PORÉEM, como `auth` e `counter` são as 'keys', no componente, na hora de utilizar o `useSelector` será necessário também informa qual `reducer`
+
+  ```react
+  // components/counter.js
+  const counter = () => {
+    const count = useSelector((state) => state.counter.counter)
+    const showCounter = useSelector((state) => state.counter.showCounter)
+  }
+  ```
+
+  
+
+### dispatch w/ Toolkit
+
+Com `createSlice` e `configureStore` prontos, precisamos deixar disponível as `actions` para os componentes!
+
+1. Crie uma `const` que irá **exportar** o `slice.actions`!
+
+   ```react
+   // store/index.js
+   
+   const counterSlicer = createSlice({...});
+   const store = configureStore({
+   	reducer: counterSlicer.reducer
+   })
+   
+   export const counterActions = counterSlice.actions
+   export default store;
+   ```
+
+2. Dessa forma, no componente, podemos importar `counterActions` e acessar as funções inseridas no `slicer`:
+
+   ```react
+   import { counterActions } from '../store/index'
+   
+   const counter = () => {
+     
+     const incrementHandler = () => {
+       dispatch(counterActions.increment());
+     };
+     
+     const decrementHandler = () => {
+       dispatch(counterActions.decrement());
+     };
+     
+     const toggleCounterHandler = () => {
+       dispatch(counterActions.showCounter());
+     };
+   }
+   ```
+
+#### Dispatch w/ variable
+
+Mas como fica quando passamos um `value` para `actions`? Antes podiamos acessar `actions.amount` diretamente no `reducer`, mas o **toolkit** disponibiliza uma propriedade específica para isso, chamada **`payload`**!
+
+1. No componente, passe um valor dinâmico para o `slicer`:
+
+   ```react
+   // counter.js
+   import { counterActions } from '../store/index'
+   
+   const counter = () => {
+     const increaseHandler = () => {
+       dispatch(counterActions.increase(10)); // 10 → irá ficar dentro de actions.payload
+     };
+   }
+   ```
+
+2. No `slicer` , receba o valor pelo `actions.payload`
+
+   ```react
+   // store/index.js
+   
+   const counterSlice = createSlice({
+     name: 'counter',
+     initialState,
+     reducer: {
+       increase(state, action) {
+         state.counter = state.counter + action.payload // 10
+       }
+     }
+   })
+   ```
+
+   
+
+### Splitting Slicers
+
+O bom de utilizar `redux` é que não precisamos nos limitar a criação de todos `reducers` dentro de um mesmo arquivo!
+
+1. Para o `counterSlicer` criaremos na pasta `store/counter.js`, contendo toda a lógica do `counterSlice`:
+
+   ```react
+   import { createSlice } from '@reduxjs/toolkit';
+   
+   const initialState = { counter: 0, showCounter: false };
+   
+   const counterSlicer = createSlice({
+     name: 'counter',
+     initialState,
+     reducers: {
+       increase(state, action) {
+         state.counter = state.counter + action.payload;
+       },
+       showCounter(state) {
+         state.showCounter = !state.showCounter;
+       },
+       increment(state) {
+         state.counter++;
+       },
+       decrement(state) {
+         state.counter--;
+       },
+     },
+   });
+   
+   export const counterActions = counterSlicer.actions;
+   
+   export default counterSlicer.reducer;
+   ```
+
+2. Para o `authSlicer` basta agora que a adicione o código respectivo:
+
+   ```react
+   import { createSlice } from '@reduxjs/toolkit';
+   
+   const initialStateAuth = { isLoggedIn: false }
+   
+   const authSlicer = createSlice({
+     name: 'auth',
+     initialState: initialStateAuth,
+     reducers: {
+       login(state) {
+         state.isLoggedIn = true;
+       },
+       logout(state) {
+         state.isLoggedIn = false;
+       }
+     }
+   })
+   
+   export const authActions = authSlicer.actions;
+   
+   export default authSlicer.reducer;
+   ```
+
+3. Agora basta importar no `store/index.js` o `counterSlicer`, que já irá conter o `counterSlicer.reducer`:
+
+   ```react
+   // store/index.js
+   import { configureStore } from '@reduxjs/toolkit';
+   import counterSlicer from './counter';
+   import authSlicer from './auth';
+   
+   const store = configureStore({
+     reducer: { counter: counterSlicer, auth: authSlicer },
+   });
+   
+   export default store;
+   ```
+
+   
 
 # Typescript React
 
