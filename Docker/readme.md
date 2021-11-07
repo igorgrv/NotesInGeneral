@@ -262,7 +262,7 @@ Se rodarmos um `docker inspect`, poderemos ver em `NetworkingSettings` que o con
 1. Vamos criar 2 containers (1 e 2) para isto, abra 2 terminais:
 
    ````
-   docker run -it —name container-1 ubuntu
+   docker run -u root -it —name container-1 ubuntu
    ````
 
 2. Em cada container, iremos rodar um `hostname -i`, para pegarmos o IP;
@@ -270,6 +270,11 @@ Se rodarmos um `docker inspect`, poderemos ver em `NetworkingSettings` que o con
 3. Com o comando `apt-get update && apt-get install iputils-ping` iremos habilitar o `ping`;
 
 4. Ping colocando `ping ipContainer`;
+
+Ou testando a porta
+
+1. Com o comando `apt-get update && apt-get install telnet` iremos habilitar o `ping`;
+2. ping com telnet `telnet <ip_address> <port_number>`
 
 ### Comunicação via Nome
 

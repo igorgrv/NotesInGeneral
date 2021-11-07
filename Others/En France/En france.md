@@ -1,6 +1,6 @@
 # En france :fr:
 
-## Remarques
+## Remarques (observações)
 
 * La plupart [maioria] des mots ne prononcent pas la cosonnne finale;
 * No francés, todo substantivo no plural precisa do **des**
@@ -40,7 +40,7 @@
 
 * Madame → Senhora
 * Mesdames → Senhoras
-* Monsier → Senhor
+* Monsieur → Senhor
 * Messieurs → Senhores
 * Mademoiselle → Senhorita
 * Mesdemoiselles → Senhoritas
@@ -55,6 +55,20 @@
 * Pardon → Desculpa
 * Je suis désolé (desole) → sinto muito
 * Excusez-moi  / excuse-moi (informal) → me desculpe
+
+
+
+### Les Nationalités
+
+| Les pays (pai → países) |       Masculin       |          Féminin           |
+| :---------------------: | :------------------: | :------------------------: |
+|         France          |  Français (France)   |    Française (francesa)    |
+|    Brésil (Brrrésil)    | Brésilien (bresiliã) | Brésilienne (Brrésilienna) |
+|   Portugal (Portugal)   |      Portugais       |         Portugaise         |
+|       Angleterre        |       Anglais        |         Anglaises          |
+|    Espagne (Espanha)    |       Espagnol       |         Espagnole          |
+|          Japon          |       Japonais       |         Japonaise          |
+|        Amérique         |      Américain       |         Américaine         |
 
 
 
@@ -126,6 +140,8 @@ les lettres de l'alphabet avec des sons différents du portugais sont:
 
 ## Les Sujets *(suge)*
 
+Les pronoms sujets sont utilisés avec des verbes
+
 * Je
 * Tu (você, com amigos, família, intimos)
   * Para usar o `tu` normalmente se pede:
@@ -136,18 +152,65 @@ les lettres de l'alphabet avec des sons différents du portugais sont:
 * Vous (vocês/você formal)
 * Ils/Elles
 
+## Les toniques
+
+Usado geralmente depois ou antes de uma preposição (avec, aussi); 
+
+Usado para fazer diferença entre um e outro; → *Moi, J'aime le Brésil. Toi, J'adore le Portugal* - *Lui, il parle très bien fraçais. Elle, elle parle très bien portugais et anglais*
+
+* Moi → Primeira pessoa
+  * Moi Aussi
+  * Vous aussi?
+* Toi → Segunda pessoa
+  * Je parle <u>avec</u> toi
+* Lui / Elle → terceira pessoa
+* Nous
+* Vous 
+* Eux ('o' com biquinho) / Elles
+
 # La conjugaison *(conjuguezon)* des verbes
 
-## Être (ser)
+## Régulier (1º grupo)
+
+Les verbes réguliers utilisent le même (mesmo) schéma (padrão):
+
+* Je → xx**E**
+* Tu → xx**ES**
+* Il/Elle/On → xx**E**
+* Nous →  xx**ONS**
+* Vous → xx**EZ**
+* Ils/Elles → xx**ENT**
+
+### Parler (Falar) / Aimer (amar) / Adorer (adora)
+
+* Je → Parl**e** / Aim**e** / Ador**e**
+* Tu → Parl**es** / Aim**es** / Ador**es** 
+* Il/Elle/On → Parl**e** / Aim**e** / Ador**e**
+* Nous → Parl**ons** / Aim**ons** / Ador**ons**
+* Vous → Parl**ez** / Aim**ez** / Ador**ez**
+* Ils/Elles → Parl**ent** / Aim**ent** / Ador**ent**
+
+### Aller (ir)
+
+* Je → Va**is**
+* Tu → Va**s**
+* Il/Elle/On → Va
+* Nous →  all**ons**
+* Vous → all**ez**
+* Ils/Elles → v**ont**
+
+## Irrégulier
+
+### Être (ser)
 
 * Je → Suis (sui)
-* Tu → est
-* Il/elle/on → es
-* Nous → Somme
-* Vous → estes
-* Ils/elles → est
+* Tu → es
+* Il/elle/on → est
+* Nous → Sommes
+* Vous → êtes
+* Ils/elles → sont
 
-## Mettre (colocar)
+### Mettre (colocar)
 
 * Je Mets *(mé)*
 * Tu Mets *(mé)*
@@ -156,7 +219,7 @@ les lettres de l'alphabet avec des sons différents du portugais sont:
 * Vous Mettez *(mete)*
 * ils/elles Mettent (met)
 
-## Avoir (ter)
+### Avoir (ter)
 
 * J'ai (jé)
 * Tu as (a)
@@ -326,3 +389,42 @@ les lettres de l'alphabet avec des sons différents du portugais sont:
 
   <img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/Screen Shot 2021-07-03 at 00.42.40.png" alt="Screen Shot 2021-07-03 at 00.42.40" style="zoom: 33%;" />
 
+## Classe 3.2
+
+Complétez avec les verbes conjugués au présent
+
+- Il **parle** français et portugais. (parler)
+- Nous **avons** un ami en France. (avoir)
+- J' **aime** beaucoup Paris. (aimer)
+- Tu **mets** un blouson pour aller en France ? (mettre)
+- Je **parle** très bien anglais, et j'**ai** des amis en Angleterre. (parler, avoir)
+- Lui, il **adore** la France. Elle, elle **aime** beaucoup le Brésil. (adorer, aimer)
+- Ils **parlent** portugais. (parler)
+- Vous **avez** un vol pour Paris... Vous **aimez** Paris ? (avoir, aimer)
+
+Insistez (ênfase) et marquez la différence avec un pronom tonique, comme dans l'exemple.
+
+* Je parle français. Tu parles portugais.
+  * Moi, je parle français. Toi, tu parles portugais.
+
+- Tu adores l'Italie. J'adore le Portugal.
+  - **Toi**, tu adores l'Italie. **Moi**, J'adore le Portugal;
+- Il parle très bien français. Nous parlons anglais.
+  - **Lui**, il parle très bien français. **Nous**, nous parlons anglais
+- Elle aime voyager. Il aime parler avec des amis.
+  - **Elle**, elle aime voyager. **Lui**, il aime parler avec des amis
+- Vous avez deux valises. Nous avons trois valises.
+  - **Vous**, vous avez deux valises. **Nous**, nous avons trois valises.
+- Ils ont un vol pour Madrid. Elles ont un vol pour la France.
+  - **Eux**, ils ont un vol pour Madrid. **Elles**, elles ont un vol pour la France.
+
+Mettenz (coloque) les mots dans l'ordre pour former une phrase
+
+* suis - Je - brésilien - vous - et
+  * Je suis brésilien, et vous?
+* portugaise - Vous - Madame - êtes
+  * Vous êtes portugaise, Madame?
+* quel - Monsieur - Bonsoir - votre - est - vol
+  * Bonsoir Monsieur, quel est votre vol?
+* aiment - Eux - ils - voyager - beaucoup
+  * Eux, ils aiment beaucoup voyager
