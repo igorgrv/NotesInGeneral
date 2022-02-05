@@ -106,7 +106,48 @@ Example:
 * 9 → neuf (nuf)
 * 10 → Dix (dis) 
 
-# Les voyelles
+## Les nombres
+
+"Les chiffres" deviant "Les nombres" après (depois) le nombre dix
+
+* 11 → Onze
+* 12 → Douze (duze)
+* 13 → Treize 
+* 14 → Quatorze
+* 15 → Quinze (canze)
+* 16 → Seize (séze)
+* 17 → dix-sept
+* 18 → dix-huit
+* 19 → dix-neuf
+* 20 → vingt (van)
+
+## Les nombres ordinaux
+
+Le nombres ordinaux utilise le 'nombre' + 'ième'
+*(Os números ordinários usam o 'número' + 'ième')*
+
+* 1ª - Premier (première) → Je vais (vé) dans le premier arrondissement (Eu vou para o 1ª distrito)
+* 2º - Deuxième (duziéme)
+* 3º - Troisième
+* 4º - Quatrième
+* 5ª - Cinquième
+* 6º - Sixième
+* 7º - Septième
+* 8º - Huitième → Nous habitons dans le huitième arrondissement.
+* 9º - Neu***<u>v</u>***ième
+* 10º - Dixième
+* 11º - Onzième
+* 12º - Douzième
+* 13º - Treizième
+* 14º - Quatorzième
+* 15º - Quinzième
+* 16º - Seizième
+* 17º - Dix-septième
+* 18º - Dix-huitième
+* 19º - Dix-nouvième
+* 20º - vingtième
+
+# Les voyelles :a: :b:
 
 * A (a)
 * E (boca de O e tentar falar É, oe)
@@ -168,6 +209,38 @@ Usado para fazer diferença entre um e outro; → *Moi, J'aime le Brésil. Toi, 
 * Vous 
 * Eux ('o' com biquinho) / Elles
 
+# L'adjectifs
+
+## Possessif
+
+| Pronoms   | Masculin (Meu/Seu/Dele)        | Féminin (Minha/Sua/Dela)     | Pluriel (minhas/meus - seus - Deles) |
+| --------- | ------------------------------ | ---------------------------- | ------------------------------------ |
+| Je        | Mon → Mon anglais / Mon voisin | Ma → Ma ceinture / Ma valise | Mes → Mes chaussettes                |
+| Tu        | Ton → Ton siège                | Ta → Ta ceinture / Ta valise | Tes → Tes tee-shirts                 |
+| Il / Elle | Son → Son ordinator            | Sa → Sa ceinture             | Ses → Ses voisins                    |
+
+Les pronoms féminin (Ma, Ta, Sa) devant (antes) les mots avec H, deviant (viram) masculin
+
+* Ma agence → Mon agence
+* Ta arrivée → Ton arrivée
+
+# Les interrogatifs :question:
+
+## Quel
+
+Le terme '*quel*' varie en '*quelle*' selon le genre du substantif, **mais la prononciation est la même!**
+*(O 'quel' varia para 'quelle' conforme o gênero do substantivo, **Porém, a pronuncia é a mesma!**)*
+
+Ex.: 
+
+* **Quel** est votre **vol** (le vol - masculin)?
+* **Quelle** est votre destination (la destination - féminin)?
+
+de même (mesmo) pour le pluriel:
+
+* **Quels** sont les horaires disponibles?
+* **Quelles** sont les musiques que vous écoutez?
+
 # La conjugaison *(conjuguezon)* des verbes
 
 ## Régulier (1º grupo)
@@ -189,15 +262,6 @@ Les verbes réguliers utilisent le même (mesmo) schéma (padrão):
 * Nous → Parl**ons** / Aim**ons** / Ador**ons**
 * Vous → Parl**ez** / Aim**ez** / Ador**ez**
 * Ils/Elles → Parl**ent** / Aim**ent** / Ador**ent**
-
-### Aller (ir)
-
-* Je → Va**is**
-* Tu → Va**s**
-* Il/Elle/On → Va
-* Nous →  all**ons**
-* Vous → all**ez**
-* Ils/Elles → v**ont**
 
 ## Irrégulier
 
@@ -227,6 +291,15 @@ Les verbes réguliers utilisent le même (mesmo) schéma (padrão):
 * Nous avons (nousavon)
 * Vous avez (vousave)
 * Ils/Elle ont (illson, ellason)
+
+### Aller (ir)
+
+* Je → Vais (v**é**)
+* Tu → Vas (v**á**)
+* Il / Elle / On → va
+* Nous → allons
+* Vous → allez
+* Ils / Elles → vont
 
 # Exercices
 
@@ -428,3 +501,232 @@ Mettenz (coloque) les mots dans l'ordre pour former une phrase
   * Bonsoir Monsieur, quel est votre vol?
 * aiment - Eux - ils - voyager - beaucoup
   * Eux, ils aiment beaucoup voyager
+
+## Classe 3.3
+
+Traduisez les phrases suivantes en portugais.
+
+Nous avons des amis en France et au Brésil.
+
+* `Nós temos amigos na França e no Brasil;`
+
+J'aime cuisiner, j'adore voyager ! Et toi ?
+
+* `Eu amo cozinhar, eu adoro viajar! e você?`
+
+Lui, il parle anglais et portugais. Elle, elle parle français.
+
+* `Ele, ele fala inglês e português. Ela, ela fala francês.`
+
+Vous avez quatre valises ? Vous aimez beaucoup voyager !
+
+* `Você tem 4 malas? Você gosta de viajar!`
+
+Ils adorent le sport. Et elles ? Elles aiment bien le sport ?
+
+* `Eles adoram esporte. E elas? Elas gostam esporte?`
+
+Lui aussi aime voyager. Plus que tout !
+
+* `Ele também ama viajar. Mais que tudo!`
+
+## Classe 4.1
+
+```
+```
+
+
+
+<img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/Screen Shot 2021-11-08 at 23.40.06-6425879.png" alt="Screen Shot 2021-11-08 at 23.40.06" style="zoom:50%;" />
+
+Compléte:
+
+Dans l'avion, mon siège est le 14B, à côté du ***couloir***.
+
+Mon ***voisin*** est brésilien, il parle ***portugais***.
+
+C'est l'heure du dîner : ***poulet*** ou poisson ?
+
+Je reste à ma place, j'aime écouter de la ***musique*** ou regarder un film.
+
+J'attache ma ***ceinture***. C'est parti!
+
+## Classe 4.2
+
+* Le Défi - Conjugaison des verbes
+  * Monter (Subir)
+    * Je → Mont**e**
+    * Tu → Mont**es**
+    * Il / Elle / On → Mont**e**
+    * Nous → Mont**ons**
+    * Vous → Mont**ez**
+    * Ils / Elles → Mont**ent**
+  * Attacher (apertar)
+    * Je → Attach**e**
+    * Tu → Attach**es**
+    * Il / Elle / On → Attach**e**
+    * Nous → Attach**ons**
+    * Vous → Attach**ez**
+    * Ils / Elles → Attach**ent**
+  * Décoller (Decolar)
+    * Je → Décolle
+    * Tu → Décolles
+    * Il → Décolle
+    * Nous → Décollons
+    * Vous → Décollez
+    * Ils → Décollent
+  * Rester (ficar)
+    * Je → Reste
+    * Tu → Restes
+    * Il → Reste
+    * Nous → Restons
+    * Vous → Restez
+    * Ils → Restent
+  * Regarder (assistir/olhar)
+    * Je → Regarde
+    * Tu → Regardes
+    * Il → Regarde
+    * Nous → Regardons
+    * Vous → Regardez
+    * Ils → Regardent
+  * Écouter (escutar)
+    * Je → écoute
+    * Tu → écoutes
+    * Il → écoute
+    * Nous → écoutons
+    * Vous → écoutez
+    * Ils → écoutent
+
+
+
+* Complétez avec les pronoms manquants (je, tu, il, nous, vous, ils) ou avec le verbe "Etrê" conjugué.
+  * Je **suis** dans l'avion.
+  * Marie **est** brésilienne. Paul, lui, est portugais. 
+  * Nous **sommes** américains et nous parlons anglais.
+  * **Vous** êtes espagnole Madame ?
+  * Elles **sont** à Paris.
+  * Roger ? **Il** est assis à côté du hublot.
+  * Tu **es** anglais Andrew ? 
+* Soulignez (sublinhe) la bonne réponse
+  * Je monte dans l'avion pour Paris : (ma/**<u>mes</u>**) amis sont français, ils sont à Paris. (Mon/**<u>Ma</u>**) place est à côté du couloir. (**<u>Mon</u>**/Ma) voisin est déjà assis, il regarde un film. L'hôtesse de l'air met (mes/**<u>mon</u>**) bagage à main et (ma/***mon***) ordinateur dans le compartiment à bagages. J'attache (**<u>ma</u>**/mon) ceinture. Mon voisin attache aussi (**<u>sa</u>**/son) ceinture. C'est parti!
+* Mettez les mots dans l'ordre pour former une phrase
+  * dîner - du - l'heure - C'est - déjà. 
+    * ***C'est déjà l'heure du dîner***
+  * Pendant - j'écoute - le vol - musique - de la.
+    * ***Pendant le vol j'écoute de la musique***
+  * voisin - Mon - brésilien - est - il parle - portugais.
+    * ***Mon voisin est brésilien, il parle portugais***.
+  * siège - est - Mon - à côté - du couloir.
+    * ***Mon siège est à côté du couloir***
+
+## Classe 4.3
+
+* Traduisez les phrases suavantes en portugais
+  * Elle attache sa ceinture et elle reste à sa place.
+    * Ela aperta o cinto dela e ela fica no lugar dela
+  * Dans l'avion, nous écoutons de la musique.
+    * No avião, nós escutamos música
+  * Un jus d'orange s'il vous plaît Madame.
+    * Um suco de laranja por favor senhora
+  * Je mets ma valise dans le compartiment à bagages, à côté du couloir.
+    * Eu pego minha mala no compartimento de bagagens, ao lado do corredor.
+  * L'équipage est dans l'avion. Le pilote aussi. C'est parti ! L'avion décolle.
+    * O equipamento esta no avião. O piloto também. Partimos, o avião decola;
+  * Vous aimez écouter de la musique ? Voici des écouteurs.
+    * Você ama escutar musica? Aqui está os fones de ouvido
+* Traduisez les phrases suivantes en Français
+  * Meu vizinho assiste a um filme.
+    * Mon voisin regarde un film
+  * A aeromoça está no corredor.
+    * L'hôtesse de l'air est dans le couloir
+  * Ele já está sentado.
+    * Il est déjà assis
+  * Tenho amigos em Paris.
+    * J'ai des amis à Paris.
+  * Um suco de laranja, por favor.
+    * Un jus d'orange, s'il vous plaît
+
+
+
+## Classe 5.1
+
+Le texte de la classe 5.1
+
+```
+Nous sommes, ma femme et moi dans la queue pour le taxi!
+Ah! Une taxi arrive...
+
+- Taxi, taxi!
+	- Bonjour monsieur, bonjour madame, quelle est votre destination?
+- Bonjour, nous allons à l'hôtel Metropol. Prés de la Gare du nord.
+	- D'accord, quelle est l'address exacte?
+- 19 rue Maubeuge. Dans le dixième arrondissement.
+	- Vous êtes étrangers? Vous habitez dans quel pays?
+- Moi, Je suis brésilien, et ma femme est allemande. Nous habitons à Londres. Je suis professeur dans une école et ella est directrice de l'école
+```
+
+
+
+<img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/Capture d’écran 2021-11-15 à 23.00.32.png" alt="Capture d’écran 2021-11-15 à 23.00.32" style="zoom:50%;" />
+
+<img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/Capture d’écran 2021-11-15 à 23.04.16.png" alt="Capture d’écran 2021-11-15 à 23.04.16" style="zoom: 33%;" />
+
+## Classe 5.2
+
+Complétez avec les pronoms sujets manquents ou avec le verbe aller conjugué.
+
+* Je ***vais*** en France en décembre, j'ai des amis à Paris. 
+* ***Nous*** allons à l'hôtel Paradis, dans le centre de Paris.
+* Vous ***allez*** à l'hôtel ou dans un appartement ?
+* ***Je*** vais à l'aéroport, j'ai un avion pour Londres.
+* Le professeur ***va*** à l'école.
+* Marc ? ***Il*** va en France avec sa femme.
+* Elles ***vont*** à l'hôtel, écouter de la musique ou regarder un film.
+* Nous ***allons*** en France, à Marseille, avec mes amis portugais.
+
+Complétez avec le, la, l', les
+
+* Je vais à ***l'***aéroport : j'ai un vol pour New York. 
+* J'aime les États-Unis, ***les*** américains sont sympathiques.
+* Mon vol est à 15 heures, c'est ***le*** vol A12. 
+* Moi je suis professeur dans une école. Ma femme, Lola, est secrétaire de ***l'***école. 
+* Dans ***l'***avion, nous écoutons de la musique. 
+* J'adore ***la*** musique brésilienne, mais ma femme préfère ***le*** jazz.
+* C'est déjà  ***l'*** heure du dîner : poulet ou poisson. Je déteste ***le*** poisson !
+
+Soulignez le bon article
+
+* Je suis professeur dans (***<u>une</u>***/la/l') école. C'est (***<u>l'</u>***/le/une) école américaine de Rio de Janeiro.
+* J'habite au Brésil... Le Brésil est (**<u>*un*</u>**/une/le) beau pays et (l'/**<u>*les*</u>**/des) brésiliens sont sympathiques.
+* J'adore (une/l'/**<u>*la*</u>**) musique brésilienne, la samba, le forró... Pour écouter de la musique, je vais dans (le, l', **<u>*un*</u>**) restaurant près de la gare : (un, **<u>*le*</u>**, l') restaurant *Nossa Cozinha*. 
+* J'adore (des/**<u>*les*</u>**/l') boissons et mes amis aussi !
+
+
+
+## Classe 5.3
+
+Écoutez l'audio et écrivez les phrases
+
+1. Bienvenue à Paris;
+2. Quelle est votre destination?
+3. Quel est votre hôtel?
+4. Nous allons dans un hôtel près de la gare;
+5. Quelle est l'address du restaurant?
+6. Nous sommes étrangers;
+7. Je suis professeur dans une écoule;
+8. Les français sont symphatiques;
+9. J habite à Paris, mais je suis portugaise
+10. Le taxi arrive...
+
+Phrases à traduire
+
+* Bonjour Madame. Vous allez dans le centre de Paris ?
+  * Bom dia Senhora. Você vai para o centro de Paris?
+* Taxi ! Bonsoir, je vais à l'hôtel Paradis, à côté de la gare.
+  * Taxi! Boa noite, eu vou ao hôtel Paradis, ao lado da estação de trem.
+* Nous habitons dans le septième arrondissement, près de la Tour Eiffel.
+  * Nos moramos no sétimo distrito, perto da torre Eiffel.
+* Quelle est l'adresse exacte ?
+  * Qual é o endereço exato?
+* Ils vont à Paris, le vol est à 14 heures.
+  * Eles vão a Paris, o vôo é às 14 houras;
