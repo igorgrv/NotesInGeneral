@@ -496,7 +496,7 @@ public class HelloWorldControllerTest {
 
 #### MockMvcResultMatchers
 
-Com o uso dos métodos táticos do `MockMvcResultMatcher`:
+Com o uso dos métodos státicos do `MockMvcResultMatcher`:
 
 ```java
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
