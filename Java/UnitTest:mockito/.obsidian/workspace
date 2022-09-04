@@ -1,0 +1,96 @@
+{
+  "main": {
+    "id": "fdda0dc3fc85574a",
+    "type": "split",
+    "children": [
+      {
+        "id": "13fb7ce6a188868d",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "Unit + Mockito + Spring.md",
+            "mode": "source",
+            "backlinks": true,
+            "source": true
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "cd9644af8536ab24",
+    "type": "split",
+    "children": [
+      {
+        "id": "231df5616d22e819",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "aaad978866a66673",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "c5bb8ca7e90f5ee3",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": true,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "right": {
+    "id": "2f9b0aaa32a1e7d3",
+    "type": "split",
+    "children": [
+      {
+        "id": "e8f5d9d00d0104b1",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "c13dcb6e6637c4a1",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Unit + Mockito + Spring.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": false
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "13fb7ce6a188868d",
+  "lastOpenFiles": [
+    "Unit + Mockito + Spring.md"
+  ]
+}

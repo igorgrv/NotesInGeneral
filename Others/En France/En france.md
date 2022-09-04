@@ -24,7 +24,7 @@
 * Les vases sont dans les boîtes → *Os vasos estão nas caixas*
 * Les fleurs sont dans le salon → *As flores estão na sala*
 
-### Climat *(Clima)*
+### Climat *(Clima)* :sunny:
 
 * Froid *(frrruá)* → Frio → Il fait *(fé)* froid; [faz/está frio]
 * Très *(trê)* froid → Mt frio → Il fait très froid; [faz muito frio]
@@ -58,7 +58,7 @@
 
 
 
-### Les Nationalités
+### Les Nationalités :brazil: :fr:
 
 | Les pays (pai → países) |       Masculin       |          Féminin           |
 | :---------------------: | :------------------: | :------------------------: |
@@ -110,16 +110,34 @@ Example:
 
 "Les chiffres" deviant "Les nombres" après (depois) le nombre dix
 
-* 11 → Onze
-* 12 → Douze (duze)
-* 13 → Treize 
-* 14 → Quatorze
-* 15 → Quinze (canze)
-* 16 → Seize (séze)
-* 17 → dix-sept
-* 18 → dix-huit
-* 19 → dix-neuf
-* 20 → vingt (van)
+| Chiffre I             | Chiffre II                     | Chiffre III                   |
+| --------------------- | ------------------------------ | ----------------------------- |
+| 11 -> onze            | **20 -> vingt (van)**          | **50 -> Cinquente (sancant)** |
+| 12 -> douze (duze)    | 21 -> vingt et un (vante un)   | 51 -> Cinquente et un         |
+| 13 -> Treize          | 22 -> vingt-deux (van du)      | 52 -> Cinquente-Deux          |
+| 14 -> Quatorze        | **30 -> Trente (trent)**       | **60 -> Soixante (suasante)** |
+| 15 -> Quinze (canz)   | 31 -> Trente et un             | 61 -> Soixante et un          |
+| **16 -> Seize (séz)** | 32 -> Trente-deux              | 62 -> Soixante-Deux           |
+| **17 -> Dix-sept**    | **40 -> Quarante (carrante)**  |                               |
+| 18 -> Dix-huit        | 41 -> Quarante et un           |                               |
+| 19 -> Dix-neuf        | 42 -> Quarante-Deux (carrandu) |                               |
+
+| Chiffre IV                                |
+| ----------------------------------------- |
+| **70 -> Soixante-Dix** (suasant dis)      |
+| 71 -> Soixante et Onze                    |
+| 72 -> Soixante-Douze                      |
+| 77 -> Soixante-dix-sept                   |
+| 78 -> Soixante-dix-huit                   |
+| **80 -> Quatre-vingts** (catrevan)        |
+| 81 -> Quatre-vingt-un (catrevan un)       |
+| **90 -> Quatre-vingt-dix (catrevan dis)** |
+| 91 -> Quatre-vingt-onze                   |
+| 92 -> Quatre-vingt-douze                  |
+| 97 -> Quatre-vingt-dix-sept               |
+| **100 -> cent** (sã)                      |
+
+
 
 ## Les nombres ordinaux
 
@@ -213,20 +231,31 @@ Usado para fazer diferença entre um e outro; → *Moi, J'aime le Brésil. Toi, 
 
 ## Possessif
 
-| Pronoms   | Masculin (Meu/Seu/Dele)        | Féminin (Minha/Sua/Dela)     | Pluriel (minhas/meus - seus - Deles) |
-| --------- | ------------------------------ | ---------------------------- | ------------------------------------ |
-| Je        | Mon → Mon anglais / Mon voisin | Ma → Ma ceinture / Ma valise | Mes → Mes chaussettes                |
-| Tu        | Ton → Ton siège                | Ta → Ta ceinture / Ta valise | Tes → Tes tee-shirts                 |
-| Il / Elle | Son → Son ordinator            | Sa → Sa ceinture             | Ses → Ses voisins                    |
+| Pronoms   | Masculin (Meu/Seu/Dele)                       | Féminin (Minha/Sua/Dela)                        | Pluriel (minhas/meus - seus - Deles)         |
+| --------- | --------------------------------------------- | ----------------------------------------------- | -------------------------------------------- |
+| Je        | ***Mon (meu)***<br />Mon anglais / Mon voisin | ***Ma (minha)***<br />Ma ceinture / Ma valise   | ***Mes (meus/minhas)***<br />Mes chaussettes |
+| Tu        | ***Ton (Teu/seu)***<br /> Ton siège           | ***Ta (tua/sua)***<br />Ta ceinture / Ta valise | ***Tes (seus/suas)***<br />Tes tee-shirts    |
+| Il / Elle | ***Son (o x Dele)***<br /> Son ordinator      | ***Sa (o X Dela)***<br />Sa ceinture            | ***Ses (o X Deles/Delas)***<br />Ses voisins |
 
 Les pronoms féminin (Ma, Ta, Sa) devant (antes) les mots avec H, deviant (viram) masculin
 
 * Ma agence → Mon agence
 * Ta arrivée → Ton arrivée
 
+*Les pronoms sont referentes ao substantivo! Mesmo que queiramos dizer:*
+
+* A camisa dele
+
+Temos que verificar se Camisa é feminino ou masculino
+
+* A camisa (*féminin*) dele = *Sa chemise*
+* O telefone (*masculin*) dela = *Son téléphone*
+
+
+
 # Les interrogatifs :question:
 
-## Quel
+## Quel / Quelle
 
 Le terme '*quel*' varie en '*quelle*' selon le genre du substantif, **mais la prononciation est la même!**
 *(O 'quel' varia para 'quelle' conforme o gênero do substantivo, **Porém, a pronuncia é a mesma!**)*
@@ -240,6 +269,8 @@ de même (mesmo) pour le pluriel:
 
 * **Quels** sont les horaires disponibles?
 * **Quelles** sont les musiques que vous écoutez?
+
+
 
 # La conjugaison *(conjuguezon)* des verbes
 

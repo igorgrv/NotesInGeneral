@@ -1,6 +1,4 @@
-## React
-
-
+# React
 
 ## Conceito
 

@@ -138,8 +138,6 @@ public class MyClass {
 
 Na classe de teste precisaremos instanciar a classe Service para **cada tipo de teste**, caso contrário irá retornar NPE (NullPointerException).
 
-
-
 Para retornar 6:
 
 ```java
@@ -207,15 +205,14 @@ MyClassService serviceMocked = mock(MyClassService.class);
 
 * A class que é mocada não recebe os **comportamentos** , ou seja, se mocarmos um `List` , adicoinar um elemento ao List, e chamar `list.size()` não será retornado 1, a não seja que seja explicitamente informado a classe mocada, com o uso do `when` (comando abaixo)
 
-  * ```java
-    @Test
-      public void testingListMock() {
-        List<String> listMocked = mock(List.class);
-        listMocked.add("test1");
-        assertEquals(1, listMocked.size()); // IRÁ FALHAR, retornará 0
-      }
-    ```
-
+```java
+@Test
+public void testingListMock() {
+    List<String> listMocked = mock(List.class);
+    listMocked.add("test1");
+    assertEquals(1, listMocked.size()); // IRÁ FALHAR, retornará 0
+}
+```
 ## when
 
 O Comando `when` funcionará para especificar o que fazer quando o método de dentro da classe mockada for chamado
@@ -261,7 +258,7 @@ public class MyClassTest {
 
 
 
-## @InjectMocks + @RunWith
+## @InjectMocks + @RunWith/@ExtendWith
 
 `@RunWith` + `@injectMocks`  irá instanciar o objeto que estiver sido anotada (como um autowired)
 
@@ -278,7 +275,7 @@ public class MyClassTestMock {
 }
 ```
 
-* @ExtendWith(MockitoExtension.class) é utilizado para JUnit 5
+* `@ExtendWith(MockitoExtension.class)` é utilizado para JUnit 5
 
 ## @Mock
 
@@ -430,11 +427,7 @@ public void testingArgumentCaptureList() {
 }
 ```
 
-
-
 # Spring
-
-
 
 ## Controller
 
@@ -541,6 +534,8 @@ public void returnDummyItem() throws Exception {
 
 ### MockBean
 
+`MockBean` é utilizado quando se usa o `WebMockMvc` na classe de teste!
+
 Dado o controller & service:
 
 ```java
@@ -610,3 +605,212 @@ public class HelloWorldControllerTest {
 }
 ```
 
+
+
+## H2 Database + JPA
+
+Para usar H2 - para acessar `http://localhost:8080/h2` -> JDBC URL:  `jdbc:h2:mem:testdb`
+
+```properties
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+ 
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.username=sa
+spring.datasource.password=
+ 
+spring.data.jpa.repositories.bootstrap-mode=default
+
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+
+spring.jpa.defer-datasource-initialization=true
+```
+
+POM:
+
+```xml
+<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+
+<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+</dependency>
+```
+
+Entity/repository/service:
+
+```java
+@Entity
+public class Item {
+
+  @GeneratedValue
+  @Id
+  private int id;
+  private int quantity;
+  private int price;
+  private String name;
+  
+}
+
+@Repository
+public interface ItemRepository extends JpaRepository<Item, Integer>{}
+
+@Service
+public class HelloWorldService {
+
+  @Autowired
+  private ItemRepository itemRepository;
+
+  public Item retrieveItem() {
+    return new Item(1, "Ball", 10, 100);
+  }
+
+  public Optional<Item> returnById(int id){
+    return itemRepository.findById(id);
+  }
+
+  public List<Item> returnAllItens(){
+    return itemRepository.findAll();
+  }
+  
+}
+
+@RestController
+public class HelloWorldController {
+
+  @Autowired
+  private HelloWorldService helloWorldService;
+
+  @GetMapping("/allitems")
+  public List<Item> allItems() {
+    return helloWorldService.returnAllItens();
+  }
+}
+```
+
+Create `data.sql` file (no mesmo caminho do application.properties):
+
+```sql
+insert into item(id,name,price,quantity) values(1, 'item1', 10, 100);
+insert into item(id,name,price,quantity) values(2, 'item2', 10, 200);
+insert into item(id,name,price,quantity) values(3, 'item3', 10, 300);
+```
+
+### Test for Each layer
+#### for Controller
+Quando fazemos o teste do controller, temos que garantir que o teste para o Service com o repository está funcionando também! (ainda sim não é o ideal, pois dessa forma precisamos mockar todos os valores)
+
+Exemplo para testar o controller que retorna todos os itens:
+```java
+// MyClassControllerTest.java
+@WebMvcTest(HelloWorldController.class)
+public class HelloWorldControllerTest {
+
+  @Autowired
+  private MockMvc mockMvc;
+
+  @MockBean
+  private HelloWorldService helloWorldService;
+    
+  @Test
+  public void makeSureAllItemsWereRetrived() throws Exception {
+      when(helloWorldService.returnAllItens())
+          .thenReturn(Arrays.asList(new Item(1, "item1", 10, 100), new Item(2, "item2", 20, 200)));
+
+      RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/allitems").accept(MediaType.APPLICATION_JSON);
+      mockMvc.perform(requestBuilder)
+          .andExpect(status().isOk())
+          .andExpect(content().json("[{quantity:100,price:10,name:item1,id:1}, {quantity:200,price:20,name:item2,id:2}]"))
+          .andReturn();
+  }
+}
+```
+
+#### for Service
+
+Como o Service não faz chamada REST, usamos o `@extendWith / runwith`
+```java
+// MyClassServiceTest.java
+@ExtendWith(MockitoExtension.class)
+public class HelloWorldServiceTest {
+
+  @InjectMocks
+  private HelloWorldService service;
+
+  @Mock
+  private ItemRepository repository;
+
+  @Test
+  public void returnMockedValues() {
+    when(repository.findAll()).thenReturn(Arrays.asList(new Item(1, "item1", 10, 100), new Item(2, "item2", 20, 200)));
+
+    List<Item> items = service.returnAllItens();
+    assertEquals(1000, items.get(0).getValue());
+  }
+}
+```
+
+#### for Repository
+
+JUnit 4 Code:
+* @RunWith(SpringRunner.class)
+* @DataJpaTest
+
+JUnit 5 Code:
+* @DataJpaTest
+
+```javascript
+@DataJpaTest
+public class ItemRepositoryTest {
+  
+  @Autowired
+  private ItemRepository repository;
+
+  @Test
+  public void returnSize3() {
+    List<Item> items = repository.findAll();
+
+    assertEquals(3, items.size());
+  }
+}
+```
+
+## SpringBootTest - Integration Test
+
+Para interagir com todas as layers (Controller + Service + Repository) foi criado o `@SpringBootTest`! Através deste método o Spring irá procurar a classe que contenha o `@SpringBootApplication` anotado e irá executa-lo, ou seja, irá executar banco de dados, services e tudo mais....
+
+For:
+* JUnit 4 Code
+```java
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment=WebEnvironment.RANDOM_PORT)
+public class yourTestClass{}
+```
+* JUnit 5 Code
+```java
+@SpringBootTest(webEnvironment=WebEnvironment.RANDOM_PORT)
+public class yourTestClass{}
+```
+
+E com o uso da classe `TestRestTemplate` é possível realizar chamadas HTTP:
+```java
+@SpringBootTest(webEnvironment=WebEnvironment.RANDOM_PORT)
+public class yourTestClass{
+  
+  @Autowired
+  private TestRestTemplate testRestTemplate;
+  
+  @Test
+  public void checkIfAllItemsReturned3Items() {
+    
+    // realiza um get no retrive-all-items e retorna uma String
+    String response = this.testRestTemplate.getForObject("/retrieve-all-items", String.class);
+    JSONAssert.equals("[{id:1},{id:2},{id:3}]", response, false);
+  }
+}
+```
