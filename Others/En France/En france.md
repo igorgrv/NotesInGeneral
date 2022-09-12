@@ -92,6 +92,87 @@ Example:
 * Ce sont Ellen et Tiago;
 * Ce sont Stéphanie et Victor;
 
+
+
+
+
+### L'adjectifs Possessif
+
+| Pronoms   | Masculin (Meu/Seu/Dele)                       | Féminin (Minha/Sua/Dela)                        | Pluriel (minhas/meus - seus - Deles)         |
+| --------- | --------------------------------------------- | ----------------------------------------------- | -------------------------------------------- |
+| Je        | ***Mon (meu)***<br />Mon anglais / Mon voisin | ***Ma (minha)***<br />Ma ceinture / Ma valise   | ***Mes (meus/minhas)***<br />Mes chaussettes |
+| Tu        | ***Ton (Teu/seu)***<br /> Ton siège           | ***Ta (tua/sua)***<br />Ta ceinture / Ta valise | ***Tes (seus/suas)***<br />Tes tee-shirts    |
+| Il / Elle | ***Son (o x Dele)***<br /> Son ordinator      | ***Sa (o X Dela)***<br />Sa ceinture            | ***Ses (o X Deles/Delas)***<br />Ses voisins |
+
+Les pronoms féminin (Ma, Ta, Sa) devant (antes) les mots avec H, deviant (viram) masculin
+
+* Ma agence → Mon agence
+* Ta arrivée → Ton arrivée
+
+*Les pronoms sont referentes ao substantivo! Mesmo que queiramos dizer:*
+
+* A camisa dele
+
+Temos que verificar se Camisa é feminino ou masculino
+
+* A camisa (*féminin*) dele = *Sa chemise*
+* O telefone (*masculin*) dela = *Son téléphone*
+
+
+
+### Les jeurs de la semaine
+
+* Segunda: Lundi
+* Terça: Mardi
+* Quarta: Mercredi
+* Quinta: Jeudi
+* Sexta: Vendredi
+* Sábado: Samedi
+* Domingo: Dimanche
+
+
+
+* Aujourd'hui -> Hoje
+* Demain -> Amanhã
+* Hier -> Ontem
+* Après-demain -> Depois de amanhã
+* Jeur -> Dia
+* Semaine -> Semana
+* Mois -> Mês
+* Année -> Ano
+
+
+
+### il y a
+
+Assim como no inglês temos o ***there is*** no francês temos o ***il y a*** (em português, seria o nosso ***têm***).
+
+* Dans la chambre, **Il y a** grande fenêtre. *(No quarto, tem uma grande janela)*
+* Dans l'hôtel, il y a 45 chambres. *(No hôtel, tem 45 quartos)*
+* Il y a un serveur dans le restaurant? *(tem um garçon no restaurante?)*
+
+
+
+### La négation en France
+
+Forma básica: <u>**ne** + verb + **pas**</u>
+
+* Je mets mes vêtements dans le placard
+  * Je **ne** mets **pas** mes vêtement dans le placard
+* Je vais en France en Decémbre
+  * Je **ne** vais **pas** en France en Decémbre
+
+
+
+Quand le verb **commence avec le voyelle**: <u>**n'** + verb + **pas**</u>
+
+* Je aime être près de la fenêtre
+  * Je **n'**aime **pas** être près de la fenêtre
+
+
+
+
+
 # Les chiffres :1234:
 
 * 0 → Zéro (zéro)
@@ -122,20 +203,22 @@ Example:
 | 18 -> Dix-huit        | 41 -> Quarante et un           |                               |
 | 19 -> Dix-neuf        | 42 -> Quarante-Deux (carrandu) |                               |
 
-| Chiffre IV                                |
-| ----------------------------------------- |
-| **70 -> Soixante-Dix** (suasant dis)      |
-| 71 -> Soixante et Onze                    |
-| 72 -> Soixante-Douze                      |
-| 77 -> Soixante-dix-sept                   |
-| 78 -> Soixante-dix-huit                   |
-| **80 -> Quatre-vingts** (catrevan)        |
-| 81 -> Quatre-vingt-un (catrevan un)       |
-| **90 -> Quatre-vingt-dix (catrevan dis)** |
-| 91 -> Quatre-vingt-onze                   |
-| 92 -> Quatre-vingt-douze                  |
-| 97 -> Quatre-vingt-dix-sept               |
-| **100 -> cent** (sã)                      |
+| Chiffre IV                                | Chiffre V                                          |
+| ----------------------------------------- | -------------------------------------------------- |
+| **70 -> Soixante-Dix** (suasant dis)      | **100 -> cent** (sã)                               |
+| 71 -> Soixante et Onze                    | 138 -> cent trente-huit                            |
+| 72 -> Soixante-Douze                      | 178 -> cent soixante-dix-huit                      |
+| 77 -> Soixante-dix-sept                   | 199 -> cent quatre-vingt-dix-neuf                  |
+| 78 -> Soixante-dix-huit                   | **200 -> deux cent** (du sã)                       |
+| **80 -> Quatre-vingts** (catrevan)        | 273 -> deux cent soixante-treize                   |
+| 81 -> Quatre-vingt-un (catrevan un)       | **1000 -> mille (mill)**                           |
+| **90 -> Quatre-vingt-dix (catrevan dis)** | 1445 -> mille quatre cent quarante-cinq            |
+| 91 -> Quatre-vingt-onze                   | 2022 -> deux mille vingt-deux                      |
+| 92 -> Quatre-vingt-douze                  | 9999 -> neuf mille neuf cent quatre-vingt-dix-neuf |
+| 97 -> Quatre-vingt-dix-sept               | **1.000.000 -> Un million**                        |
+| 99 -> Quatre-vingt-dix-neuf               | **1.000.000.000 -> Un milliard**                   |
+
+
 
 
 
@@ -227,35 +310,11 @@ Usado para fazer diferença entre um e outro; → *Moi, J'aime le Brésil. Toi, 
 * Vous 
 * Eux ('o' com biquinho) / Elles
 
-# L'adjectifs
-
-## Possessif
-
-| Pronoms   | Masculin (Meu/Seu/Dele)                       | Féminin (Minha/Sua/Dela)                        | Pluriel (minhas/meus - seus - Deles)         |
-| --------- | --------------------------------------------- | ----------------------------------------------- | -------------------------------------------- |
-| Je        | ***Mon (meu)***<br />Mon anglais / Mon voisin | ***Ma (minha)***<br />Ma ceinture / Ma valise   | ***Mes (meus/minhas)***<br />Mes chaussettes |
-| Tu        | ***Ton (Teu/seu)***<br /> Ton siège           | ***Ta (tua/sua)***<br />Ta ceinture / Ta valise | ***Tes (seus/suas)***<br />Tes tee-shirts    |
-| Il / Elle | ***Son (o x Dele)***<br /> Son ordinator      | ***Sa (o X Dela)***<br />Sa ceinture            | ***Ses (o X Deles/Delas)***<br />Ses voisins |
-
-Les pronoms féminin (Ma, Ta, Sa) devant (antes) les mots avec H, deviant (viram) masculin
-
-* Ma agence → Mon agence
-* Ta arrivée → Ton arrivée
-
-*Les pronoms sont referentes ao substantivo! Mesmo que queiramos dizer:*
-
-* A camisa dele
-
-Temos que verificar se Camisa é feminino ou masculino
-
-* A camisa (*féminin*) dele = *Sa chemise*
-* O telefone (*masculin*) dela = *Son téléphone*
-
 
 
 # Les interrogatifs :question:
 
-## Quel / Quelle
+## Quel / Quelle / Lesquelles
 
 Le terme '*quel*' varie en '*quelle*' selon le genre du substantif, **mais la prononciation est la même!**
 *(O 'quel' varia para 'quelle' conforme o gênero do substantivo, **Porém, a pronuncia é a mesma!**)*
@@ -269,6 +328,61 @@ de même (mesmo) pour le pluriel:
 
 * **Quels** sont les horaires disponibles?
 * **Quelles** sont les musiques que vous écoutez?
+* **Quelles** sont mes recettes?
+
+
+
+Contrairement (*contraremã*) à quel ou quelle qui nécessitent un nom, **lesquelles**/**lequel** peut être utilisé seul.
+
+(Contrário do 'quel' ou 'quelle' que necessita um substantivo, 'lesquelles/lequel' pode ser utilizado sozinho)
+
+* Quelle rose tu as? *(Quais rosas você tem?)*
+* Tu as roses, **lesquelles**? (*você tem rosas, quais?*)
+* Lequel? (*qual?*)
+* Lequel est votre chien? (*qual é seu cachorro?*)
+
+
+
+## Combien
+
+Le combien est utilisé pour interroger la quantité:
+
+* **Combien** (*combiã)*? (quanto)
+* **Combien** sont-ils (*combiã sont-il*) ? (quantos são?)
+* **Combien** ça coûte (*combiã sa cute*)? (quanto custa)
+
+
+
+## Qui
+
+Qui = Quem
+
+* Qui est riche?
+
+
+
+## Est-ce que
+
+**est-ce que** = em geral indica uma pergunta para **sim e não**
+
+* est-ce que tu manges? (*você come?*)
+* est-ce que nous allons à Paris? (Nós vamos para Paris?)
+
+Quando acompanhado por:
+
+*  **quel** se torna **qu'est-ce que**
+   * Qu'est-ce que veux? (*O que você quer?*)
+*  uma vogal, como no pronome **elle**, se torna **est-ce qu'elle**
+   *  est-ce qu'elle à invité? (ela é convidada?)
+
+*  **quand**:
+   * Quand est-ce que nous allons à Paris? (*Quando vamos para Paris?*)
+*  **qui:**
+   *  Qui est-ce qu'elle à invité? *(quem ela convidou?)*
+   *  est-ce qu'il mange? (*ele come?*)
+
+
+
 
 
 
@@ -331,6 +445,32 @@ Les verbes réguliers utilisent le même (mesmo) schéma (padrão):
 * Nous → allons
 * Vous → allez
 * Ils / Elles → vont
+
+
+
+### Vouloir (querer)
+
+* Je veux (vu)
+* Tu veux (vu)
+* Il / Elle / On veut (vu)
+* nous voulons (vulon)
+* Vous voulez (vule)
+* Ils / Elles veulent (vul)
+
+
+
+### Pouvoir (poder -> ser capaz)
+
+Cuidado com a pronúncia de **Peux** -> é Po com boca de O - **Tu pus (pu) (*você está fedido*)**
+
+* Je peux (po boca de O) -> eu posso
+* Tu peux
+* Il / Elle / On peut (po)
+* Nous pouvons (povon)
+* Vous pouvez (pove)
+* Ils / Elles peuvent (pov)
+
+
 
 # Exercices
 
@@ -563,9 +703,6 @@ Lui aussi aime voyager. Plus que tout !
 
 ## Classe 4.1
 
-```
-```
-
 
 
 <img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/Screen Shot 2021-11-08 at 23.40.06-6425879.png" alt="Screen Shot 2021-11-08 at 23.40.06" style="zoom:50%;" />
@@ -693,7 +830,7 @@ Ah! Une taxi arrive...
 	- D'accord, quelle est l'address exacte?
 - 19 rue Maubeuge. Dans le dixième arrondissement.
 	- Vous êtes étrangers? Vous habitez dans quel pays?
-- Moi, Je suis brésilien, et ma femme est allemande. Nous habitons à Londres. Je suis professeur dans une école et ella est directrice de l'école
+- Moi, Je suis brésilien, et ma femme est allemande. Nous habitons à Londres. Je suis professeur dans une école et elle est directrice de l'école
 ```
 
 
@@ -761,3 +898,174 @@ Phrases à traduire
   * Qual é o endereço exato?
 * Ils vont à Paris, le vol est à 14 heures.
   * Eles vão a Paris, o vôo é às 14 houras;
+
+
+
+## Classe 6.1
+
+<img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/6.1.png" alt="6.1" style="zoom:50%;" />
+
+<img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/6.1.2.png" alt="6.1.2" style="zoom:50%;" />
+
+
+
+## Classe 6.2
+
+Complétez avec les pronoms sujets manquants (je, tu, il, elle, nous, vous, ils, elles) ou avec le verbe “voir” conjugué. Complete com os pronomes sujeitos ou com o verbo “voir” conjugado.
+
+
+
+- De la fenêtre de l'hôtel, nous **voyons** la Tour Eiffel.
+- **vous** voyez le taxi ? 
+- **Je** vois que vous avez une réservation jusqu'à mercredi.
+- Il **voit** sa femme et sa fille à la réception de l'hôtel.
+- La salle du petit déjeuner ? Elle est à côté de la chambre, vous **voyez** ?
+- Dans le taxi, elles **voient** l'aéroport et les avions.
+- Mon passeport ? Où est mon passeport ? Tu **vois** mon passeport ?
+
+
+
+Écrivez les nombres. Escreva os números. 
+
+* six : **6** 
+
+* seize : **16**
+* vingt-cinq : **25**
+* onze : **11**
+* soixante-quinze : **75**
+* quatre-vingt-dix : **90** 
+* deux cent cinquante-trois : **253**
+* mille neuf cents : **1900**
+* C'est la chambre **82** (quatre-vingt-deux), à côté de la réception.
+* L'hôtel est au numéro **865** (huit cent soixante-cinq) de la rue Maubeuge.
+* La salle du petit déjeuner est au troisième étage : c'est la salle **71** (soixante et onze).
+* Mon numéro de téléphone ? C'est le **06** (zéro six) **41** (quarante et un) **36** (trente-six) **96** (quatre-vingt-dix-neuf) **76** (soixante-seize).
+
+
+
+Mes numéros:
+
+* 453.230.368-00 = quatre cinq trois - deux trois zero - trois six huit - zero zero
+
+* Je suis de mille neuf cent quatre-vingt-seize
+* Je suis né (ne) le huit mars mille neuf cent quatre-vingt-seize
+* Elle est né le quinze mars mille neuf cent quatre-vingt-dix-sept
+
+
+
+## Classe 6.3
+
+Écoute les 10 phrases ensuite (*então*) écrive-les:
+
+1. J'ai une réservation, voici mon passeport;
+2. Je reste à l'hôtel jusqu'à mardi;
+3. Ma chambre est au sixième étage;
+4. Je vois un homme avec sa fille dans la rue;
+5. Ma clé est à la récepction;
+6. Je vois la villa de la fenêtre;
+7. Je m'appelle Monique;
+8. Le petit-déjeuner commence à quelle heure?;
+9. Tu vois le taxi? Il arrive;
+10. Oú est la Tour Eifell?;
+
+
+
+Traduisez les phrases suivantes en portugais.
+
+* Bienvenue à Paris !
+  * Bem-vindo a Paris!
+* J'ai une réservation dans un hôtel du centre de la ville.
+  * Eu tenho uma reserva em um hotel no centro da cidade.
+* Je suis avec ma femme et mes quatre filles.
+  * Eu estou com minha mulher e minhas 4 filhas.
+* Où est l'hôtel ? Vous avez l'adresse exacte ?
+  * Onde fica o hotel? O Senhor/Senhora tem o endereço exato?
+* Je vois que la chambre est grande avec une petite fenêtre.
+  * Eu vejo que o quarto é grande com uma pequena janela.
+
+
+
+Traduisez les phrases suivantes en français
+
+* Aqui está a chave do quarto.
+  * Voici la clé de la chambre.
+* Meu quarto fica no terceiro andar.
+  * Ma chambre est au troisième étage.
+* Onde fica a sala do café da manhã?
+  * Où est la salle du petit déjeuner?
+* Tenho uma grande família, somos oito.
+  * J'ai une grande famille, nous sommes huit.
+* Vejo que o hotel é grande.
+  * Je vois que l'hôtel est grand.
+
+
+
+## Classe 7.1
+
+Écrivez le texte:
+
+* Waouh, Quelle belle chambre. Il y a deux petits lits, une grande télévision et de grands placards.
+  * Génial. Tu veux le lit à côté de la fenêtre?
+* Non, Je n'aime pas être près de la fenêtre.
+  * Pas de problème. Tu peux mettre les vêtements dans le placard?
+* D'accord. 
+  * Je vais prendre une duche.
+
+* Et moi, je vais regarder les informations à la télé.
+  * Ensuite, nous pouvons visiter le quartier.
+* Comment tu veux. Il fait chaud, on ne peut pas mettre le clim?
+  * Si, bien sûr
+
+
+
+Devinez les mots du vocabulaire.
+
+a - Elle ouvre la porte de ma chambre...
+
+*Ela abre a porta do meu quarto...*
+
+* **La clé**
+
+
+
+b - Je l'allume quand il fait chaud dans la chambre...
+
+*Eu o ligo quando está calor no quarto...*
+
+* **La clim**
+
+
+
+c - Je l'utilise pour regarder des films ou les informations...
+
+*Eu a uso para assistir a filmes ou às notícias...*
+
+* **La télé**
+
+
+
+d - Je l'utilise pour ranger mes vêtements.
+
+*Eu o uso para guardar minhas roupas...*
+
+* **Le placard**
+
+
+
+e - Je l'utilise pour dormir, j'aime quand il est grand.
+
+*Eu a uso para dormir, gosto quando é grande.*
+
+* **Le lit**
+
+
+
+
+
+Ajoutez les accents. *Acrescente os acentos.*
+
+* Je suis à l'h**ô**tel. J'ai la cl**é** de ma chambre, numéro 53... Whaou ! Quelle belle chambre ! Il y a un grand lit, à c**ô**t**è** de la fen**ê**tre. La chambre est lumineuse avec une t**é**lévision et la climatisation. Je mets mes v**ê**tements dans le placard, pr**è**s du lit.
+
+
+
+<img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/7.1.png" alt="7.1" style="zoom:50%;" />

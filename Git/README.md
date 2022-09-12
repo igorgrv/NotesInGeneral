@@ -10,6 +10,20 @@
 
 ## Comando Git
 
+| Descrição                                | Comando                                 |
+| ---------------------------------------- | --------------------------------------- |
+| Mostrar changes                          | `git show yourCommit`                   |
+| Procurar qual branch possui o commit     | `git branch -r --contains yourCommit`   |
+| Listar todas branchs (remotas ou locais) | `git branch -a`                         |
+| Remover branch                           | `git branch -d SuaBranch`               |
+| Remover branch já comitada               | `git push -d origin SuaBranch`          |
+| Criar a branch e selecionar              | `git checkout -b SuaBranch`             |
+| Criar chave ssh                          | `ssh-keygen -t rsa -C m232436@test.com` |
+|                                          |                                         |
+|                                          |                                         |
+
+
+
 ```
 $ git diff, mostra as alterações por linha
 
@@ -50,17 +64,6 @@ ou
 $ git checkout -b sessao
 ```
 
-## Branch
-
-| Descrição                                | Código Git                     |
-| ---------------------------------------- | ------------------------------ |
-| Listar todas branchs (remotas ou locais) | `git branch -a`                |
-| Remover branch                           | `git branch -d SuaBranch`      |
-| Remover branch já comitada               | `git push -d origin SuaBranch` |
-| Criar a branch e selecionar              | `git checkout -b SuaBranch`    |
-
-
-
 
 
 ### Merge da branch para Develop
@@ -84,16 +87,3 @@ git pull
 git merge alteracao-no-readme-igor //irá adicionar as atualizações para develop
 git push
 ```
-
-
-
-## Criando chave SSH
-
-O comando abaixo irá criar uma chave SSH para ser inserida
-
-```
-ssh-keygen -t rsa -C m232436@bradesco.com.br
-```
-
-
-
