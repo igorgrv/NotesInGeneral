@@ -111,6 +111,7 @@ O Docker é um conjunto de tecnologias **OpenSource** cujo o intuito é facilita
 |                  `docker build`                   |                      **Cria** a imagem                       |
 |           `docker build -f NomeArquivo`           | **Cria** a imagem baseado no arquivo (precisa estar com o arquivo no diretório) |
 |       `docker build -t usuario/nomeImagem`        |                **Cria** a imagem com um nome                 |
+|    `docker build --no-cache --progress=plain`     |    **Cria** a imagem exibindo full logs e removendo cache    |
 |                  `docker login`                   |                   **Login** no Docker Hub                    |
 |             `docker push nomeImagem`              |                     **Publica** a imagem                     |
 |             `docker pull nomeImagem`              |                     **Consome** a imagem                     |

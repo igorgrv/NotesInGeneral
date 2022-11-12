@@ -7,173 +7,7 @@
   * Vous avez des bagages? (você tem malas?)
   * Vous avez **(precisa do des)** bagages?
 
-### Localização Singular
-
-**noun** (*Substitantivo*) **singulier** (*singular [sangulie]*) + **est dans** + **emplacement** (*lugar*)
-
-* Le fleur est dans le salon → *A flor está na sala*
-* Le lettre est dans le tiroir → *A carta está na gaveta*
-
-### Localização Plural
-
-**pluriel noun** + **sont dans** + **emplacement**
-
-* Les valises sont dans la voiture; → *As malas estão na viatura*
-* Les blusons sont dans l'armoire → *As blusas estão no armário*
-* Les lettres sont dans le tiroir [tirrua] → *As cartas estão na gaveta*
-* Les vases sont dans les boîtes → *Os vasos estão nas caixas*
-* Les fleurs sont dans le salon → *As flores estão na sala*
-
-### Climat *(Clima)* :sunny:
-
-* Froid *(frrruá)* → Frio → Il fait *(fé)* froid; [faz/está frio]
-* Très *(trê)* froid → Mt frio → Il fait très froid; [faz muito frio]
-* Gèle → geando → Il gèle; [está geando]
-* Chaud (xo) → calor → Il fait chaud; [faz/está calor]
-* Très chaud → mt calor → Il fait très chaud;
-* Pleut *(plu)* → chove → Il pleut [está chovendo]
-* Neige *(nége)* → nevando → Il neige [está nevando]
-* Beau (bo) → clima agradavel → il fait beau [clima está bom]
-* mauvais (move) → clima ruim → il fait mauvais [clima está ruim]
-
-### Les titres de civilité
-
-* Madame → Senhora
-* Mesdames → Senhoras
-* Monsieur → Senhor
-* Messieurs → Senhores
-* Mademoiselle → Senhorita
-* Mesdemoiselles → Senhoritas
-
-### Les mots de politesse
-
-* s'il vous plâit / s'il te plâit (informal) → por favor
-* Merci → Obrigado
-* Merci beaucoup (bocu) → muito obrigado!
-* De rien (rian) → de nada
-* Je vous en prie / Je t'en (ton) prie → de nada
-* Pardon → Desculpa
-* Je suis désolé (desole) → sinto muito
-* Excusez-moi  / excuse-moi (informal) → me desculpe
-
-
-
-### Les Nationalités :brazil: :fr:
-
-| Les pays (pai → países) |       Masculin       |          Féminin           |
-| :---------------------: | :------------------: | :------------------------: |
-|         France          |  Français (France)   |    Française (francesa)    |
-|    Brésil (Brrrésil)    | Brésilien (bresiliã) | Brésilienne (Brrésilienna) |
-|   Portugal (Portugal)   |      Portugais       |         Portugaise         |
-|       Angleterre        |       Anglais        |         Anglaises          |
-|    Espagne (Espanha)    |       Espagnol       |         Espagnole          |
-|          Japon          |       Japonais       |         Japonaise          |
-|        Amérique         |      Américain       |         Américaine         |
-
-
-
-### Pessoa Singular C'est 
-
-`c'est`(c) é utilizado para identificar uma pessoa
-
-Example:
-
-* C'est Igor; → Ce igor
-* C'est Renata;
-* C'est Tiago;
-
-### Pessoas Plural Ce sont
-
-`ce sont` (su som) é utilizado para identificar **pessoas**;
-
-Example:
-
-* Ce sont Igor et Renata; → Su som Igor e Renata
-* Ce sont Ellen et Tiago;
-* Ce sont Stéphanie et Victor;
-
-
-
-
-
-### L'adjectifs Possessif
-
-| Pronoms   | Masculin (Meu/Seu/Dele)                       | Féminin (Minha/Sua/Dela)                        | Pluriel (minhas/meus - seus - Deles)         |
-| --------- | --------------------------------------------- | ----------------------------------------------- | -------------------------------------------- |
-| Je        | ***Mon (meu)***<br />Mon anglais / Mon voisin | ***Ma (minha)***<br />Ma ceinture / Ma valise   | ***Mes (meus/minhas)***<br />Mes chaussettes |
-| Tu        | ***Ton (Teu/seu)***<br /> Ton siège           | ***Ta (tua/sua)***<br />Ta ceinture / Ta valise | ***Tes (seus/suas)***<br />Tes tee-shirts    |
-| Il / Elle | ***Son (o x Dele)***<br /> Son ordinator      | ***Sa (o X Dela)***<br />Sa ceinture            | ***Ses (o X Deles/Delas)***<br />Ses voisins |
-
-Les pronoms féminin (Ma, Ta, Sa) devant (antes) les mots avec H, deviant (viram) masculin
-
-* Ma agence → Mon agence
-* Ta arrivée → Ton arrivée
-
-*Les pronoms sont referentes ao substantivo! Mesmo que queiramos dizer:*
-
-* A camisa dele
-
-Temos que verificar se Camisa é feminino ou masculino
-
-* A camisa (*féminin*) dele = *Sa chemise*
-* O telefone (*masculin*) dela = *Son téléphone*
-
-
-
-### Les jeurs de la semaine
-
-* Segunda: Lundi
-* Terça: Mardi
-* Quarta: Mercredi
-* Quinta: Jeudi
-* Sexta: Vendredi
-* Sábado: Samedi
-* Domingo: Dimanche
-
-
-
-* Aujourd'hui -> Hoje
-* Demain -> Amanhã
-* Hier -> Ontem
-* Après-demain -> Depois de amanhã
-* Jeur -> Dia
-* Semaine -> Semana
-* Mois -> Mês
-* Année -> Ano
-
-
-
-### il y a
-
-Assim como no inglês temos o ***there is*** no francês temos o ***il y a*** (em português, seria o nosso ***têm***).
-
-* Dans la chambre, **Il y a** grande fenêtre. *(No quarto, tem uma grande janela)*
-* Dans l'hôtel, il y a 45 chambres. *(No hôtel, tem 45 quartos)*
-* Il y a un serveur dans le restaurant? *(tem um garçon no restaurante?)*
-
-
-
-### La négation en France
-
-Forma básica: <u>**ne** + verb + **pas**</u>
-
-* Je mets mes vêtements dans le placard
-  * Je **ne** mets **pas** mes vêtement dans le placard
-* Je vais en France en Decémbre
-  * Je **ne** vais **pas** en France en Decémbre
-
-
-
-Quand le verb **commence avec le voyelle**: <u>**n'** + verb + **pas**</u>
-
-* Je aime être près de la fenêtre
-  * Je **n'**aime **pas** être près de la fenêtre
-
-
-
-
-
-# Les chiffres :1234:
+## Les chiffres :1234:
 
 * 0 → Zéro (zéro)
 * 1 → Un (hã) / Une
@@ -187,7 +21,7 @@ Quand le verb **commence avec le voyelle**: <u>**n'** + verb + **pas**</u>
 * 9 → neuf (nuf)
 * 10 → Dix (dis) 
 
-## Les nombres
+### Les nombres
 
 "Les chiffres" deviant "Les nombres" après (depois) le nombre dix
 
@@ -220,9 +54,7 @@ Quand le verb **commence avec le voyelle**: <u>**n'** + verb + **pas**</u>
 
 
 
-
-
-## Les nombres ordinaux
+### Les nombres ordinaux
 
 Le nombres ordinaux utilise le 'nombre' + 'ième'
 *(Os números ordinários usam o 'número' + 'ième')*
@@ -248,7 +80,16 @@ Le nombres ordinaux utilise le 'nombre' + 'ième'
 * 19º - Dix-nouvième
 * 20º - vingtième
 
-# Les voyelles :a: :b:
+
+
+### Localização Singular
+
+**noun** (*Substitantivo*) **singulier** (*singular [sangulie]*) + **est dans** + **emplacement** (*lugar*)
+
+* Le fleur est dans le salon → *A flor está na sala*
+* Le lettre est dans le tiroir → *A carta está na gaveta*
+
+## Les voyelles :a: :b:
 
 * A (a)
 * E (boca de O e tentar falar É, oe)
@@ -257,10 +98,7 @@ Le nombres ordinaux utilise le 'nombre' + 'ième'
 * U (boca de U e tentar falar I, com biquinho)
 * y (igrrrequi)
 
-
-
-
-## L'Alphabet (lalfabé)
+### L'Alphabet (lalfabé)
 
 les lettres de l'alphabet avec des sons différents du portugais sont:
 
@@ -278,9 +116,9 @@ les lettres de l'alphabet avec des sons différents du portugais sont:
 * Y (igrrequi)
 * Z (zeda)
 
-# Pronoms
+## Pronoms
 
-## Les Sujets *(suge)*
+### Les Sujets *(suge)*
 
 Les pronoms sujets sont utilisés avec des verbes
 
@@ -294,7 +132,7 @@ Les pronoms sujets sont utilisés avec des verbes
 * Vous (vocês/você formal)
 * Ils/Elles
 
-## Les toniques
+### Les toniques
 
 Usado geralmente depois ou antes de uma preposição (avec, aussi); 
 
@@ -312,9 +150,126 @@ Usado para fazer diferença entre um e outro; → *Moi, J'aime le Brésil. Toi, 
 
 
 
-# Les interrogatifs :question:
+## Localização Plural
 
-## Quel / Quelle / Lesquelles
+**pluriel noun** + **sont dans** + **emplacement**
+
+* Les valises sont dans la voiture; → *As malas estão na viatura*
+* Les blusons sont dans l'armoire → *As blusas estão no armário*
+* Les lettres sont dans le tiroir [tirrua] → *As cartas estão na gaveta*
+* Les vases sont dans les boîtes → *Os vasos estão nas caixas*
+* Les fleurs sont dans le salon → *As flores estão na sala*
+
+## Climat *(Clima)* :sunny:
+
+* Froid *(frrruá)* → Frio → Il fait *(fé)* froid; [faz/está frio]
+* Très *(trê)* froid → Mt frio → Il fait très froid; [faz muito frio]
+* Gèle → geando → Il gèle; [está geando]
+* Chaud (xo) → calor → Il fait chaud; [faz/está calor]
+* Très chaud → mt calor → Il fait très chaud;
+* Pleut *(plu)* → chove → Il pleut [está chovendo]
+* Neige *(nége)* → nevando → Il neige [está nevando]
+* Beau (bo) → clima agradavel → il fait beau [clima está bom]
+* mauvais (move) → clima ruim → il fait mauvais [clima está ruim]
+
+## Les titres de civilité
+
+* Madame → Senhora
+* Mesdames → Senhoras
+* Monsieur → Senhor
+* Messieurs → Senhores
+* Mademoiselle → Senhorita
+* Mesdemoiselles → Senhoritas
+
+## Les mots de politesse
+
+* s'il vous plâit / s'il te plâit (informal) → por favor
+* Merci → Obrigado
+* Merci beaucoup (bocu) → muito obrigado!
+* De rien (rian) → de nada
+* Je vous en prie / Je t'en (ton) prie → de nada
+* Pardon → Desculpa
+* Je suis désolé (desole) → sinto muito
+* Excusez-moi  / excuse-moi (informal) → me desculpe
+
+## Les Nationalités :brazil: :fr:
+
+| Les pays (pai → países) |       Masculin       |          Féminin           |
+| :---------------------: | :------------------: | :------------------------: |
+|         France          |  Français (France)   |    Française (francesa)    |
+|    Brésil (Brrrésil)    | Brésilien (bresiliã) | Brésilienne (Brrésilienna) |
+|   Portugal (Portugal)   |      Portugais       |         Portugaise         |
+|       Angleterre        |       Anglais        |         Anglaises          |
+|    Espagne (Espanha)    |       Espagnol       |         Espagnole          |
+|          Japon          |       Japonais       |         Japonaise          |
+|        Amérique         |      Américain       |         Américaine         |
+
+## Pessoa Singular C'est 
+
+`c'est`(c) é utilizado para identificar uma pessoa
+
+Example:
+
+* C'est Igor; → Ce igor
+* C'est Renata;
+* C'est Tiago;
+
+## Pessoas Plural Ce sont
+
+`ce sont` (su som) é utilizado para identificar **pessoas**;
+
+Example:
+
+* Ce sont Igor et Renata; → Su som Igor e Renata
+* Ce sont Ellen et Tiago;
+* Ce sont Stéphanie et Victor;
+
+## L'adjectifs Possessif
+
+| Pronoms   | Masculin (Meu/Seu/Dele)                       | Féminin (Minha/Sua/Dela)                        | Pluriel (minhas/meus - seus - Deles)         |
+| --------- | --------------------------------------------- | ----------------------------------------------- | -------------------------------------------- |
+| Je        | ***Mon (meu)***<br />Mon anglais / Mon voisin | ***Ma (minha)***<br />Ma ceinture / Ma valise   | ***Mes (meus/minhas)***<br />Mes chaussettes |
+| Tu        | ***Ton (Teu/seu)***<br /> Ton siège           | ***Ta (tua/sua)***<br />Ta ceinture / Ta valise | ***Tes (seus/suas)***<br />Tes tee-shirts    |
+| Il / Elle | ***Son (o x Dele)***<br /> Son ordinator      | ***Sa (o X Dela)***<br />Sa ceinture            | ***Ses (o X Deles/Delas)***<br />Ses voisins |
+
+Les pronoms féminin (Ma, Ta, Sa) devant (antes) les mots avec H, deviant (viram) masculin
+
+* Ma agence → Mon agence
+* Ta arrivée → Ton arrivée
+
+*Les pronoms sont referentes ao substantivo! Mesmo que queiramos dizer:*
+
+* A camisa dele
+
+Temos que verificar se Camisa é feminino ou masculino
+
+* A camisa (*féminin*) dele = *Sa chemise*
+* O telefone (*masculin*) dela = *Son téléphone*
+
+## Les jeurs de la semaine
+
+* Segunda: Lundi
+* Terça: Mardi
+* Quarta: Mercredi
+* Quinta: Jeudi
+* Sexta: Vendredi
+* Sábado: Samedi
+* Domingo: Dimanche
+
+
+
+* Aujourd'hui -> Hoje
+* Demain -> Amanhã
+* Hier -> Ontem
+* Après-demain -> Depois de amanhã
+* Jeur -> Dia
+* Semaine -> Semana
+* Mois -> Mês
+* Année -> Ano
+
+## Les interrogatifs :question:
+
+### Quel / Quelle / Lesquelles
 
 Le terme '*quel*' varie en '*quelle*' selon le genre du substantif, **mais la prononciation est la même!**
 *(O 'quel' varia para 'quelle' conforme o gênero do substantivo, **Porém, a pronuncia é a mesma!**)*
@@ -341,9 +296,7 @@ Contrairement (*contraremã*) à quel ou quelle qui nécessitent un nom, **lesqu
 * Lequel? (*qual?*)
 * Lequel est votre chien? (*qual é seu cachorro?*)
 
-
-
-## Combien
+### Combien
 
 Le combien est utilisé pour interroger la quantité:
 
@@ -351,17 +304,15 @@ Le combien est utilisé pour interroger la quantité:
 * **Combien** sont-ils (*combiã sont-il*) ? (quantos são?)
 * **Combien** ça coûte (*combiã sa cute*)? (quanto custa)
 
-
-
-## Qui
+### Qui
 
 Qui = Quem
 
 * Qui est riche?
 
+### Pourquoi & Parce que
 
-
-## Est-ce que
+### Est-ce que
 
 **est-ce que** = em geral indica uma pergunta para **sim e não**
 
@@ -383,8 +334,78 @@ Quando acompanhado por:
 
 
 
+## il y a / there is
+
+Assim como no inglês temos o ***there is*** no francês temos o ***il y a*** (em português, seria o nosso ***têm***).
+
+* Dans la chambre, **Il y a** grande fenêtre. *(No quarto, tem uma grande janela)*
+* Dans l'hôtel, il y a 45 chambres. *(No hôtel, tem 45 quartos)*
+* Il y a un serveur dans le restaurant? *(tem um garçon no restaurante?)*
+
+No plural: Il y a -> Il y a também
+
+Negação: Il y a -> Il n'y (ni) a pas
+
+## La négation en France
+
+Forma básica: <u>**ne** + verb + **pas**</u>
+
+* Je mets mes vêtements dans le placard
+  * Je **ne** mets **pas** mes vêtement dans le placard
+* Je vais en France en Decémbre
+  * Je **ne** vais **pas** en France en Decémbre
 
 
+
+Quand le verb **commence avec le voyelle**: <u>**n'** + verb + **pas**</u>
+
+* Je aime être près de la fenêtre
+  * Je **n'**aime **pas** être près de la fenêtre
+
+## Le Pluriel des noms et des adjectifs
+
+* Un/Une -> Des
+* Le/La -> Les
+* +s (regra geral)
+  * La chambre -> Les chambre**s**
+  * Un petit lit -> Deux petit**s** lit**s**
+  * Une information -> Des information**s**
+* -s,-x,-z (si terminé avec s,x,z rien (*nada*) change)
+  * Un françai**s** préci**s** -> Des françai**s** préci**s**
+  * Un couloir lumineux -> Des couloir**s** lumineu**x**
+  * Un nez pointu (nariz pontudo) -> Des ne**z** pointu**s**
+* -eu -> eu**x**
+  * Un lieu (lugar) -> Des lieux
+    * Exception -> Bleue , pneu ->  bleues, pneus
+* -ail (*ai*), -al, -au (*o*) -> **aux**
+  * Un journal -> Des journ**aux**
+  * Un drapeau (bandeira) -> Des drape**aux** 
+  * Un travail (trabalho) -> Des trav**aux**
+  * Un homme sentimental -> Des hommes sentiment**aux**
+* -ou -> **x**
+  * genou (joelho) -> des genou**x**
+  * bijou (joia) -> Des bijou**x**
+
+
+
+# Future proche :rocket:
+
+Le future proche, ou "Future Próximo", en France:
+
+```
+Sujet + Aller conjugué au présent + infinitif du verbe
+```
+
+
+
+Par example:
+
+* **Je** + **vais** (vé) + **prendre** + une douche
+* **Tu** + **vas** + **rester** + à l'hôtel?
+* Lundi, **il** + **va** + **voir** un filme avec ses amis.
+* **Nous** + **allons** + **monter** dans l'avion (*nós vamos subir no avião*)
+* Pendent le voyage, **vous** + **allez** + **parler** anglais ou français?
+* **Ils** + **vont** + **aller** au cinéma
 
 # La conjugaison *(conjuguezon)* des verbes
 
@@ -471,6 +492,25 @@ Cuidado com a pronúncia de **Peux** -> é Po com boca de O - **Tu pus (pu) (*vo
 * Ils / Elles peuvent (pov)
 
 
+
+### Prendre (tomar/pegar)
+
+* **Je prends** (prãn) un jus pour moi
+* **Tu prends** (prãn) le journal
+* **Il prend** (prãn) un café avec son amie
+* **Nous prenons** (prenon)
+* **Vous prenez** (prene)
+* **Ils prennent** (pren)
+
+
+
+Les verbs: **Apprendre, Comprendre et surprendre** suivent la même conjugaison
+
+* J'apprends ma leçon de français
+* Tu apprends l'anglais dans quelle école?
+* Il comprend l'espagnol mais il ne parle pas
+* Elles ne comprend pas la phrase
+* 
 
 # Exercices
 
@@ -1069,3 +1109,314 @@ Ajoutez les accents. *Acrescente os acentos.*
 
 
 <img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/7.1.png" alt="7.1" style="zoom:50%;" />
+
+
+
+## Classe 7.2
+
+* Je veux
+* Tu veux
+* Il veut
+* nous voulons
+* vous voulez
+* ils veulent 
+
+
+
+* Je peux
+* tu peux
+* il peut
+* nous pouvons
+* Vous pouvez
+* ils peuvent
+
+
+
+Complétez avec les pronoms sujets manquants ou avec le verbe conjugué.
+
+- Tu **veux** le lit près de la fenêtre ? (vouloir)
+- **Nous** pouvons prendre une douche. Ensuite, je **veux** (vouloir)
+visiter Paris, d'accord ?
+- Ils **veulent** réserver une chambre pour mercredi. (vouloir)
+- On **peut** (pouvoir) mettre la clim ? Il fait chaud...
+- Nous **pouvons** (pouvoir) aller à l'hôtel ou visiter le quartier, comme
+**tu** veux...
+- Vous **voulez** (vouloir) visiter la Tour Eiffel ? Elle est près de l'hôtel.
+- Pas de problème, **vous** pouvez mettre les vêtements dans le placard.
+- Carole et Anne ? **elles** veulent regarder les informations à la télé.
+
+
+
+## Classe 7.3
+
+Les dix phrases pour écoutez:
+
+1. Je veux le lit à côte de la porte
+2.  Il veut une reservation jusqu'à mardi
+3.  Nous voulons visiter Paris
+4.  Tu peut mettre la clim s'il te plait?
+5.  Je ne peux pas
+6.  La chambre n'est pas belle
+7.  Vous pouvez regarder les informations
+8.  Comme tu veux?
+9.  Comme vous voulez? 
+10.  Je n'aime pas être près de la fenêtre 
+
+<img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/Screen Shot 2022-10-11 at 21.53.29.png" alt="Screen Shot 2022-10-11 at 21.53.29" style="zoom:50%;" />
+
+
+
+Traduz les phrases suivantes en portugais 
+
+* Je n'aime pas être à côté de la fenêtre.
+  * Eu não gosto de estar ao lado da janela
+* Je veux visiter le quartier. Et toi ?
+  * Eu quero visitar o bairro, e voce?
+* Nous voulons une grande chambre et deux petits lits.
+  * Nós queremos um grande quarto e duas camas pequenas
+* On peut mettre la clim ?
+  * A gente pode ligar o ar condicionado?
+* Je ne peux pas aller en France en décembre.
+  * Eu não posso ir na França em Dezembro
+
+Mettez les phrases suivant au pluriel
+
+* Il y a un hôtel dans la rue.
+  * Il y a des hôtels dans les rues
+* L'homme veut une chambre.
+  * Les hommes veulent des chambres
+* Je suis une femme sentimentale.
+  * Nous sommes les femmes sentimentales
+* Quelle belle chambre !
+  * Quelles belles chambres
+* Il y a une grande fenêtre et un beau lit.
+  * Il y a des grandes fenêtres et de beaux lits
+
+
+
+## Classe 8.1
+
+Revision - Écoutez et écrivez
+
+*Vol pour Paris*
+
+*On ~~entre~~ **est** **dans** l'avion, mon ~~marrie~~ **mari** et moi, on va à Paris. J'adore la France, j'aime la musique, la culture, ~~lar~~ **l'art**, le ~~bouquartir.~~ **beux quartier**, la Tour Eiffel, les petits ~~true~~ **rues** et les restaurants!*	
+
+*Mon siége et le vingt-cinq B ~~a~~ **à** côte de le ~~courrier~~ **couloir**. Ma voisine est déjà assise. Elle parle français, ella ~~sa parle colorie~~ **s'appelle Coralie**. Elle est Belge, mais elle habite **à** Paris pour le travail. Ella est ~~enfermer~~ infirmière, son mari est anglais et il voyage beaucoup, ils ont trois filles, ~~quel~~ **quelle** belle famille!*
+
+*Il fait froid dans l'avion, Je mets mon blouson... C'est parti! lavion décolle! Je parle avec Coralie.* 
+
+* *~~Quelle~~ **Quel** filme vous regardez?*
+  * *On peut se tutoye... (pode usar o Tu)*
+* *D'accord. Quel filme tu regardes?*
+  * *Je regarde un filme dramatique, c'est trés bien! et toi?* 
+* *Moi, je regarde un documentaire....*
+
+
+
+Traduiz les phrases suivantes en français
+
+* Eu amo a França!
+  * J'aime la France!
+* Minha vizinha se chama Alexandra. Ela é americana, mas mora na França.
+  * Ma voisine s'appelle Alexandra. Elle est américaine, mais elle habite en France.
+* Eles têm um filho e duas filhas, que linda família!
+  * Ils ont un fils e deux filles, quelle beaux famille!
+* No avião, eu assisto a um filme e escuto música brasileira.
+  * Dans l'avion, je regarde une filme et j'écoute de la musique brésilienne
+* Eu fico no meu lugar durante todo o voo.
+  * Je reste à ma place pendant tout le vol
+* A gente fala francês. E vocês?
+  * On parle français. Et vous?
+
+
+
+Completez les phrases avec les mots suivants:
+
+**frère - femme - sœurs - enfants - famille - mari - père**
+
+* Je m'appelle Maxime. J'ai un **frère** , Paul, et deux **soeurs**, Claire et Patricia.
+* Paul habite à Marseille avec sa **femme** . Il est ingénieur.
+* Claire est infirmière. Son **mari** est américain. Ils ont deux **enfants** et ils habitent à Washington.
+* Patricia habite à Paris. Elle n'a pas d'enfants.
+* Mon **père** et ma mère aiment beaucoup voyager ! Ils aiment le cinéma, la musique... Ils adorent cuisiner pour toute la **famille** !
+
+
+
+## Classe 8.2
+
+Écoutez l'audio et écrivez ce que tu vous entendez
+
+* Dans la chambre ~~dans~~ **de** mon hôtel...
+  * Waouh! ma chambre est belle et lumineuse... il ~~est~~ **y** a un grand fenêtre, Je peux ~~vois~~ **voir** la basilique du sacré-coeur et le quartier Montmartre...
+  * Où est ma valise? Je range ma vêtements dans le placard. Mon blouson pour le froid, mes chaussettes, mon ~~pourblo~~ **pull bleu**.
+  * Où est mon parapluie? Il pleut à París en Décembre. Il ~~ne~~ **n'est** pas dans ma valise, il n'est pas dans mon bagage à main... Voila! il est à côté de la porte.
+  * Je vais regarde la télévision. Ensuite, je vais prendre un douche pour aller ~~à~~ **au** cinéma avec mes amis.
+  * J'appelle la réception de l'hôtel...
+    * Réception de l'hôtel Métropole j'écoute?
+      * ~~Excuise~~**Execusez**-moi, je ~~vais~~ **veux** réserver un taxi
+    * Bien sûre, à quelle heure?
+      * Vingt-~~trente~~ **heures**, non, dix-neuf heures trente pour arriver en avance
+    * Un Taxi a dix-neuf heures trente. Le numéro de votre chambre, s'il vous plaît 
+      * Chambre vingt-une, merci beaucoup...
+  * Pour aller au cinéma, je mets mon beau pantalon et ma grande écharpe, c'est parti!
+
+
+
+## Classe 8.3
+
+Écoutez le audio et écrivez suivant:
+
+* Dans la queue pour le cinéma...
+  * Je vais vois un filme brésilien avec mes amis.
+  * J'aime le cinéma étranger, mais mes amis préfèrent les films français.
+  * Je regarde les hommes et les femmes dans la queue.
+  * Il y a des familles, des enfants...
+  * Je vois une femme très belle, elle porte une roube blue, une grande écharpe et des lunettes.
+  * Je parle avec elle:
+    * Excusez-moi, vous allez voir quel film?
+      * Bonsoir, le film 'central do brasil', vous aussi?
+    * Oui, moi aussi, le film commence **à** vingt heures, nous sommes en avance... Vous voulez un café?
+      * D'accord, j'adore le café, ah, je m'appele Laura et vous?
+    * Je m'appele Rafael!
+  * Quelle femme sympathique! Nous regardons le film et ensuite nous allons au restaurante.
+  * **Nous restons assis** et nous parlons **pendant** trois heures, c'est l'heure de partir.
+    * Laura, quel est votre numéro de téléphone? 
+
+
+
+Conjugaison de les verbs:
+
+* Avoir
+  * J'ai
+  * Tu as
+  * Il a
+  * Nous avons
+  * Vous avez
+  * Ils ont
+* Être
+  * Je suis
+  * Tu es
+  * Il est
+  * Nous sommes
+  * Vous êtes
+  * Ils sont
+* Allors
+  * Je vais (vé)
+  * Tu vas (va)
+  * Il va
+  * Nous allons
+  * Vous allez
+  * Ils vont
+* Voir (vuar = ver)
+  * Je vois (je vua)
+  * Tu vois
+  * Il voit (vua)
+  * Nous voyons (vuaion)
+  * Vous voyez (vuaie)
+  * Ils voient (vua)
+* Vouloir
+  * Je veux (vã)
+  * Tu veux 
+  * Il veut
+  * Nous voulons
+  * Vous voulez
+  * Ils veulent
+* Pouvoir
+  * Je peux
+  * Tu peux
+  * Il peut
+  * Nous pouvons
+  * Vous pouvez
+  * Ils peuvent
+
+
+
+Mettez les mots dans l'ordre pour former une phrase.
+
+* ne - Je - dans ma - pas - vêtements - mets - mes - valise
+  * **Je ne mets pas mes vêtements dans ma valise**
+* Je - ton - de la porte - vois - à côté - bermuda vert
+  * **Je vois ton bermuda vert à côté de la porte**
+* son - ami - Ma fille - voir - va - un film - avec
+  * **Ma fille va voir un filme avec son ami**
+* Pendant - mon - ma petite fille - parler - avec - voyage - je vais - français
+  * **Pendant mon voyage, je vais parler français avec ma petite fille**
+* pas - en retard - Nous - ne - sommes - au restaurant - pour - aller
+  * **Nous ne sommes pas en retard pour aller au restaurant?**
+* Anna - Je - et - m'appelle - vous
+  * **Je m'appelle Anna et vous?**
+* Je - 7 heures - un - vais - réserver - taxi - pour
+  * **Je vais réserver un taxi pour 7 heures**
+
+
+
+Traduisez les phrases de l'exercice précédentdent en portugais
+
+* Eu não coloco minhas roupas na minha mala.
+  * **Je ne mets pas mes vêtements dans ma valise**
+* Estou vendo sua bermuda verde ao lado da porta.
+  * **Je vois ton bermuda vert à côté de la porte**
+* Minha filha vai ver um filme com o amigo dela.
+  * **Ma fille va voir un filme avec son ami**
+* Durante minha viagem, vou falar francês com minha neta.
+  * **Pendant ma voyage, je vais parles français avec ma petite fille**
+* Nós não estamos atrasados para ir ao restaurante?
+  * **Nous ne sommes pas en retard pour aller au restaurant**
+* Eu me chamo Anna, e você? (Eu me chamo Anna, e o senhor/a senhora).
+  * **Je m'appelle Anna, et vous?**
+* Vou reservar um táxi para as 7 horas.
+  * **Je vais réserver un taxi pour sept heures**
+
+
+
+## Classe 9.1
+
+Écoutez le audio et écrivez les phrases suivant:
+
+* Super le petite-déjeuner! Pauline! tu veux à café ou tu préfères un thé?
+  * Un thé c'est bien, et toi, tu prends quoi?
+* Moi, Je prends un café. Il y a du sucre?
+  * Oui, ici... hum, du pain, du ~~brae~~ **beurre** (manteiga), de la confiture (geleia), des croissants!
+* Je vais préparer une tartine (torrada) avec de la confiture de **framboise**. Pour toi mon amour
+  * Merci, je vais aussi prendre un jus de fruit (fruit)
+* Pauline appelle le ~~servante~~ **serveur** (garçon)...
+  * Monsieur, s'il vous plaît?
+* Oui Madame?
+  * Qu'est-ce que vous avez comme jus de fruit?
+* Nous avons du jus de pomme et du jus d'orange
+  * Un jus d'orange alors.
+* ~~Vous le vous~~ **Voulez-vous** un jus d'orange ~~prece~~ pressé (natural) ou en ~~boîte~~ **bouteille** (garrafa)?
+  * Pressé s'il vous plait. Et toi, Guillarme, qu'est-ce que tu veux?
+
+
+
+La conjugaison de le verb Prendre:
+
+* **Je prends** (prãn) un jus pour moi
+* **Tu prends** (prãn) le journal
+* **Il prend** (prãn) un café avec son amie
+* **Nous prenons** (prenon)
+* **Vous prenez** (prene)
+* **Ils prennent** (pren)
+
+
+
+<img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/Screen Shot 2022-10-30 at 20.48.01.png" alt="Screen Shot 2022-10-30 at 20.48.01" style="zoom:50%;" />
+
+
+
+Courrigez les erreurs de conjugaison.
+
+* Pour aller dans le centre, nous prennent le bus
+  * Pour aller dans le centre, **nous prenons** le bus
+* Mes amis prenons un café au restaurant.
+  * **Mes amis prennent** un café au restaurant
+* Je prépares une tartine avec du beurre et de la confiture.
+  * **Je prépare** une tartine avec du beurre et de la confiture
+* Et toi Laura ? Tu prend un thé ou tu préfère un café ?
+  * Et toi Laura? **Tu prends** un thé ou tu préfère un café?
+* Pour aller en France, vous prend l'avion ?
+  * Pour aller en France, vous **prenez** l'avion?
+* Je ne parles pas très bien anglais, mais j'apprend !
+  * Je ne **parle** pas très bien anglais, mais **j'apprends**!
