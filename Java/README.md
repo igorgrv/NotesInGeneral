@@ -2246,7 +2246,6 @@ cursos.add(new Curso("HTML", 30));
 	```
 	* O método `map(Curso::getDuracao)` transforma a `Stream<Curso>` em `Stream<Integer>`;
 
-;
 * Exemplo 3: quero a soma da duracação dos cursos com +100 minutos;
 	* Quando trabalhamos com soma, inves de utilizar `map`, podemos utilizar o `mapToInt`, que terá métodos como `sum()`:
 	```java
@@ -2388,61 +2387,4 @@ System.out.println(copa.format(formatador));
 //01/05/2020 -> data formatada
 ```
 
-
-
-
-
-# Java Fundaments Assessment
-
-```
-1.  In Java 8, R apply(T t) is a method of:
-	 B. Function<T,R>
-
-2.  Using the switch statement is more efficient than using a nested if or if-else statement in Java.
-	TRUE
-	
-3.  The finalize() method is called just prior to:
-	D. Garbage collection
-
-4.  Which statement is true?
-	A. StringBuffer is a final class; StringBuilder is not a final class.
-
-7.  Which snippet completes the code so that it counts the number of primes between 1 and max (where max is an integer)?
-private long countPrimes(int max) {
-  ............
-}
-private boolean isPrime(long n) {
-  return n > 1 && rangeClosed(2, (long) sqrt(n)).noneMatch(divisor -> n % divisor == 0);
-}
-
-	B. return range(1, max).parallel().filter(this::isPrime).count();
-
-8.  Which functional interface represents a function that accepts a long-valued argument and produces a double-valued result?
-	C. LongUnaryOperator
-
-9.  What does Class-Data Sharing ("CDS") feature introduced in Java 10 do?
-	C. A feature that allows persistence of class data in file system to be used later for application recovery
-
-10.  Streams may or may NOT have a defined encounter orde
-	TRUE
-
-11.  Developers must deal with concurrency issues when using date because java.util.Date is NOT thread safe.
-	TRUE
-
-12.  Which of the following features were introduced in Java 8?
-	 A. Interface static methods
-   B. Defender methods
-   C. Typesafe enums
-	 
-13.  What special features are provided by the StampedLock class?
-	B. A stamp that can be used to release the lock
-  C. Support for the Optimistic Locking mode
-
-14. Which statements concerning Streams in Java 8 are correct?
-   A. Stream represents a sequence of objects from a source, which supports aggregate operations.
-   B. Most of the stream operations return stream itself so that their result can be pipelined.
-
-15.  Private methods are allowed in interfaces from Java 9 onwards.
-	True
-```
 

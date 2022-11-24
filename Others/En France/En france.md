@@ -267,7 +267,24 @@ Temos que verificar se Camisa é feminino ou masculino
 * Mois -> Mês
 * Année -> Ano
 
-## Les interrogatifs :question:
+## Comment poser un question :question:
+
+En français, nous avons trois façons (*maneira*) de poser (*fazer*) une question:
+
+* En ajoutant (*adicionando*) un `?`
+  * Tu prends un thé
+  * Tu prends un thé?
+  * Où tu vas?
+  * Ils veulent quoi? -> *le 'quoi' va à la fin de la phrase*
+* En ajoutant `est-ce que`:
+  * Est-ce que tu prends un thé?
+  * Où est-ce que tu vas?
+  * Quoi -> **Qu'est-ce qu**'ils veulent? (*o que eles querem*)
+* En inversant (*invertendo*) le pronom - moins courant (*menos comum*) et plus formel:
+  * Prends-tu un thé?
+  * Où vas-tu?
+  * Comment voyage-vous?
+  * Que veulent-ils?
 
 ### Quel / Quelle / Lesquelles
 
@@ -388,7 +405,7 @@ Quand le verb **commence avec le voyelle**: <u>**n'** + verb + **pas**</u>
 
 
 
-# Future proche :rocket:
+## Future proche :rocket:
 
 Le future proche, ou "Future Próximo", en France:
 
@@ -406,6 +423,24 @@ Par example:
 * **Nous** + **allons** + **monter** dans l'avion (*nós vamos subir no avião*)
 * Pendent le voyage, **vous** + **allez** + **parler** anglais ou français?
 * **Ils** + **vont** + **aller** au cinéma
+
+## Les articles partitifs
+
+Les articles partitifs sont utilisés pour les mots que nes peuvent pas être comptés (contadas). 
+
+Pour example les:
+
+* Lait
+* Eau
+* Confiture
+
+| Français      | Quand utilisé      | Example                                                      |
+| ------------- | ------------------ | ------------------------------------------------------------ |
+| Du            | Masculin singulier | Je veux du lait                                              |
+| De la / De l' | Feminin singulier  | J'aime ~~de la~~ les confitures Française / il veut de l'eau |
+| Des           | Pluriel            | Nous pouvons manger des céréales?                            |
+
+***Aimer, Adorer, détester = article défini (les)**: J'aime les confitures
 
 # La conjugaison *(conjuguezon)* des verbes
 
@@ -1420,3 +1455,85 @@ Courrigez les erreurs de conjugaison.
   * Pour aller en France, vous **prenez** l'avion?
 * Je ne parles pas très bien anglais, mais j'apprend !
   * Je ne **parle** pas très bien anglais, mais **j'apprends**!
+
+## Classe 9.2
+
+Transformez la question en utilisant "est-ce que":
+
+* Tu prépares une tartine? (*você está fazendo um sanduíche?*)
+  * Est-ce que tu prépares une tartine?
+* Ils vont au cinéma?
+  * Est-ce qu'ils vont au cinéma?
+* Comment vous allez au restaurant?
+  * Comment est-ce que vous allez au restaurant?
+* Où je mets les vêtements?
+  * Où est-ce que je mets les vêtements?
+* Tu mets quoi dans ta valise?
+  * Qu'est-ce que tu mets dans ta valise?
+
+
+
+Trouvez les mots interrogatifs manquants (où, quoi, qui, comment):
+
+* Tu veux ***quoi*** pour ton petit déjeneur?
+  * Un café et un pain au chocolat, c'est bien
+* Marie! ***Où*** est la clé de la chambre?
+  * Elle est dans ma veste
+* Avec ***qui*** est-ce qu'elles parlent?
+  * Avec la voisine, elle est musicienne
+* Tu vas ***où***? Au Restaurant? ***Comment***? En bus ou en taxi? Et ***qui*** va avec toi? Ton frère? Vous allez prendre ***quoi***? Du poisson, du poulet?
+  * Tu est très curieux!
+* Je vais prendre un thé
+  * ***Qu'*** est-ce que tu veux avec ton thé?
+    * Du sucre... il y a du lait?
+  * Oui, bien sûr. ***Comment ***est-ce que tu veux ton lait?
+    * Froid, s'il te plaît
+
+## Classe 9.3
+
+Le défi (desafio) - écrire ~~les~~ du vocabulaire relatif ~~du~~ à mon petit-déjeuner:
+
+* J'aime boire **du** café tout les matins (todas as manhãs)
+* J'aime aussi manger **du** pain avec **du** beurre (manteiga)
+* Ma femme et moi, nous avons l'habitude (costumamos) de manger **des** toasts aussi
+* Excusez-moi, je voudrais (eu gostaria) un sandwich, s'il vous plaît 
+
+
+
+Les dix phrases à décorer:
+
+1. Bonjour, nous allons prendre un petit-déjeuner (nós vamos tomar café)
+2. Je vais prendre un croissant et un chocolat chaud
+3. Et toi Florence? Tu prends quoi?
+4. Qu'est-ce que tu prends, Florence?
+5. Je préfère un café
+6. Tu veux une tartine avec de la confiture?
+7. Où est-ce que tu veux prendre ton petit-déjeuner?
+8. Que voulez-vous comme boisson chaude Monsieur?
+9. Excusez-moi, vous avez du sucre, s'il vous plaît
+10. Nous prenons un thé avec du sucre
+
+
+
+Complétez avec les articles partitifs
+
+En France, au petit déjeuner, on prend **du** lait avec **des** céréales.Comme boisson chaude : **Du** café, **du** thé ou **du** chocolat. Comme boisson froide, les français prennent **du** jus de fruit ou **du** lait froid. Le petit déjeuner n'est pas salé ! Il y a des croissants et des pains au chocolat, **du** pain ou **de la** baguette. On met **du** sucre dans le café et **de la** confiture sur les tartines !
+
+
+
+Mets les phrases dans l'ordre
+
+* préfères - Quelle - tu - le - confiture - avec - pain
+  * Quelle confiture tu préfères avec le pain?
+* J' - tartines - adore - du - les - beurre - avec
+  * J'adore les tartines avec du beurre
+* ton - café - Est-ce que - du - tu - lait - mets - dans
+  * Est-ce que tu mets du lait dans ton café?
+* On - céréales - pour - prend - des - le - petit-déjeuner
+  * On prend des céréales pour le petit-déjeuner
+*  de la - d'abricot - confiture - Tu - peux - sur ta tartine - mettre
+  * Tu peux mettre de la confiture d'abricot sur ta tartine 
+
+
+
+<img src="/Users/igorgomesromerovilela/Desktop/Screenshot 2022-11-20 at 23.20.57.png" alt="Screenshot 2022-11-20 at 23.20.57" style="zoom:50%;" />
