@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.igorromero.webfluxdemo.dto.SlackChatRequestDto;
+import com.igorromero.webfluxdemo.dto.request.SlackChatRequestDto;
+import com.igorromero.webfluxdemo.dto.response.SlackChannelBotResponse;
+import com.igorromero.webfluxdemo.dto.response.SlackChatResponseDto;
 import com.igorromero.webfluxdemo.service.SlackService;
 
 import reactor.core.publisher.Mono;
@@ -22,13 +24,18 @@ public class SlackController {
     private SlackService slackService;
 
     @PostMapping("/chat")
-    public Mono<Object> postSlackMessage(@RequestHeader(required = true) String authorization,
-            @RequestBody SlackChatRequestDto slackChatDto) {
-        return slackService.getChannelList(slackChatDto, authorization);
+    public Mono<SlackChatResponseDto> postSlackMessage(@RequestHeader(required = true) String authorization,
+            @RequestBody SlackChatRequestDto requestDto) {
+        return slackService.postSlackMessage(requestDto, authorization);
     }
 
     @GetMapping("/channel")
-    public Mono<String> getChannelInfo(@RequestParam (required = true) String token, @RequestParam (required = true) String channel) {
+    public Mono<SlackChatResponseDto> getChannelInfo(@RequestParam (required = true) String token, @RequestParam (required = true) String channel) {
         return slackService.getChannelInfo(token, channel);
+    }
+
+    @PostMapping("/channel/update")
+    public String updateSlackChannels() {
+        return slackService.updateSlackChannels();
     }
 }

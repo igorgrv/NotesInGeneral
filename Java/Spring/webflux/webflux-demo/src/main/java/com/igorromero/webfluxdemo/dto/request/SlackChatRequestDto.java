@@ -1,4 +1,4 @@
-package com.igorromero.webfluxdemo.dto;
+package com.igorromero.webfluxdemo.dto.request;
 
 import lombok.Data;
 import lombok.ToString;

@@ -14,7 +14,7 @@ import lombok.ToString;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class SlackResponseDto {
+public class SlackChatResponseDto {
     
     private boolean ok;
     private String error;

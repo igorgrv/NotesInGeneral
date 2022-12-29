@@ -442,6 +442,13 @@ Pour example les:
 
 ***Aimer, Adorer, détester = article défini (les)**: J'aime les confitures
 
+## Les directions
+
+* Devant -> Em frente / na frente
+* À côté -> Ao lado
+* Sous -> Embaixo
+* Sur -> Em cima
+
 # La conjugaison *(conjuguezon)* des verbes
 
 ## Régulier (1º grupo)
@@ -1536,4 +1543,69 @@ Mets les phrases dans l'ordre
 
 
 
-<img src="/Users/igorgomesromerovilela/Desktop/Screenshot 2022-11-20 at 23.20.57.png" alt="Screenshot 2022-11-20 at 23.20.57" style="zoom:50%;" />
+## Classe 10.1
+
+Écrivez l'audio suivant:
+
+* On fait quoi ~~aujaurd'ui~~ **aujourd'hui**? On va visiter le ~~museu~~ **Musée** du Louvre?
+  * Je préfère voir la Tour Eiffel. On peut visiter le Louvre demain, non?
+* Bon, d'accord. On prend le bus?
+  * Je préfère prendre le metro. C'est à 100 mètres.
+* Comme tu veux. Le ticket de ~~mètre~~ métro est à 1 euro 90.
+
+Dans le métro devant le plan (*em frente ao mapa*).
+
+* ~~Allors~~ **Alors**. On est à la ~~estacion~~ **station** Vaugirard, ici. On ~~prends~~ **prend** la ~~line~~ **ligne** 12 en direction de Porte de La Chapelle. On change à la station montparnasse.
+  * Oui, je ~~voir~~ **vois**... Ensuite on prend la ligne 6 en direction de nation.
+* Non, ce n'est pas la bonne direction. C'est la ligne 6 vers Charles de Gaulle. On va à la station Trocadéro.
+  * D'accord, c'est parti. Il y a une exposition prè/s de la Tour Eiffel. Elle commence à 11 heures.
+* Une exposition. Qu'est ce que c'est?
+  * Une exposition Douvres modernes. Ce sont des sculptures et des peinture.
+* Bon, ~~c'est~~ **si** tu veux. C'est toujours toi qui décides.
+
+
+
+Mettez le dialogue en ordre.
+
+```
+f - Salut Nathalie, ça va ?
+h - Je vais très bien ! Et toi ?
+a - Moi aussi, super ! Tu prends le métro ?
+g - Oui. Je vais voir une exposition près de la station Trocadéro. Et toi, tu vas où ?
+c - Je vais voir des amis. Je prends la ligne 4 et je change à la station Odéon. C'est quoi l'exposition ?
+b - Ce sont des peintures.
+e - J'aime beaucoup la peinture, mais je préfère la sculpture...
+d - Moi j'aime l'Art moderne... Mon métro arrive. Au revoir !
+```
+
+
+
+Complétez. Complete.
+
+```
+exposition - prends - peinture - musée - aller - hôtel - sculptures - demain
+```
+
+Aujourd'hui, je **prends** le métro pour **aller** voir la Tour Eiffel. Ensuite, je vais visiter un **musée**... Non ! Je préfère voir une **exposition** . Il y a deux expositions près de mon **hôtel** : la première, c'est de la **peinture**. La deuxième, ce sont des **sculptures**. Et **demain** , je vais aller au cinéma.
+
+
+
+Révisez la conjugaison des verbes du premier groupe. Conjuguez les verbes *changer* et *décider* au présent. Trouvez la particularité du verbe *changer*.
+
+Changer
+
+* Je change
+* Tu changes
+* Il change
+* Nous changeons
+* Vous changez
+* Ils changent 
+
+Décider:
+
+* Je décide
+* Tu décides
+* Il décide
+* Nous décidons
+* Vous décidez
+* Ils décident
