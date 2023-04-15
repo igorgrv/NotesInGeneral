@@ -26,9 +26,9 @@ Quando é instalado a dependencia do spring-boot-security, automaticamente um fo
 </dependency>
 ```
 
-![Screenshot 2023-04-12 at 20.50.51](/Users/igorgomesromerovilela/Development/NotesInGeneral/Java/Spring/spring-security/readmeResources/springPassConsole.png)
+![Screenshot 2023-04-12 at 20.50.51](./readmeResources/springPassConsole.png)
 
-<img src="/Users/igorgomesromerovilela/Development/NotesInGeneral/Java/Spring/spring-security/readmeResources/securityForm.png" alt="Screenshot 2023-04-12 at 20.51.42" style="zoom:33%;" /> usuário é sempre `user`
+<img src="./readmeResources/securityForm.png" alt="Screenshot 2023-04-12 at 20.51.42" style="zoom:33%;" /> usuário é sempre `user`
 
 * Caso seja acessado via postman, será retornado HTTP 401
 
@@ -49,7 +49,7 @@ spring.security.user.name=XXX
 
 # Spring Security Flow
 
-![Screenshot 2023-04-12 at 22.12.23](/Users/igorgomesromerovilela/Development/NotesInGeneral/Java/Spring/spring-security/readmeResources/securityFlow.png)
+![Screenshot 2023-04-12 at 22.12.23](./readmeResources/securityFlow.png)
 
 1. Usuário entra com as credentials
 2. **`Spring Security Filters`**: Módulo que intercepta todo request ao app e verifica se é necessário autenticação (se sim, direciona o usuário para um form, se não permite a entrada);
@@ -58,18 +58,18 @@ spring.security.user.name=XXX
 5. **`Authentication Providers`:** É onde ficarão as lógicas de como add/update/delete dos usuários e também onde fica a lógica de fazer o hash das senhas
 6. **`Security Context`:** Armazena em uma thread o usuário autenticado, ajudando em próximos requests do mesmo usuário
 
-![Screenshot 2023-04-12 at 22.32.02](/Users/igorgomesromerovilela/Development/NotesInGeneral/Java/Spring/spring-security/readmeResources/securityFlowDetails.png)
+![Screenshot 2023-04-12 at 22.32.02](./readmeResources/securityFlowDetails.png)
 
 # JSESSIONID
 
 Como o Spring faz para não ficar autenticando o usuário no browser?
 
-<img src="/Users/igorgomesromerovilela/Development/NotesInGeneral/Java/Spring/spring-security/readmeResources/jsessionId.png" alt="jsessionId" style="zoom:50%;" />
+<img src="./readmeResources/jsessionId.png" alt="jsessionId" style="zoom:50%;" />
 
 1. Quando acessamos a aplicação, o spring irá gravar um `JSESSIONID` - nesse exemplo iniciou-se com `F0E61E3A4F1ECA6A2D481051458A949E`.
 2. Quando logamos na aplicação, o Spring irá **gerar um novo JSESSIONID**, e este ficará **gravado em memória**, desta forma o Spring irá saber que esse token/value ja é autorizado - `B1BF57ED30E9A7C87BA65F7AD8F04C21`
 
-<img src="/Users/igorgomesromerovilela/Development/NotesInGeneral/Java/Spring/spring-security/readmeResources/jsessionAuth.png" alt="jsessionAuth" style="zoom:50%;" />
+<img src="./readmeResources/jsessionAuth.png" alt="jsessionAuth" style="zoom:50%;" />
 
 # SecurityFilterChain
 
@@ -146,7 +146,7 @@ public class SecurityConfig {
 
 **CORS**: **C**ross-**O**rigin **R**esource **S**haring
 
-![corsExample](/Users/igorgomesromerovilela/Development/NotesInGeneral/Java/Spring/spring-security/readmeResources/corsExample.png)
+![corsExample](./readmeResources/corsExample.png)
 
 ```bash
 Access to XMLHttpRequest at 'http://localhost:8080/notices' from origin 'http://localhost:4200' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: It does not have HTTP ok status.
@@ -243,9 +243,9 @@ SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Excepti
 
 CSRF é um tipo de ataque a segurança (diferente de CORS que é uma proteção).
 
-![csrf1](/Users/igorgomesromerovilela/Development/NotesInGeneral/Java/Spring/spring-security/readmeResources/csrf1.png)
+![csrf1](./readmeResources/csrf1.png)
 
-![csrf2](/Users/igorgomesromerovilela/Development/NotesInGeneral/Java/Spring/spring-security/readmeResources/csrf2.png)
+![csrf2](./readmeResources/csrf2.png)
 
 ## Handling CSRF
 
