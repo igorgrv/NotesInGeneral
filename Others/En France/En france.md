@@ -449,6 +449,41 @@ Pour example les:
 * Sous -> Embaixo
 * Sur -> Em cima
 
+## C'est!
+
+C'est (C' = Ce) est utilisé avec un substantif
+
+* C'est la Tout Eiffel!
+* C'est bien.
+
+C'est est aussi utilisé avec les **pronoms tonitique**:
+
+* C'est **toi** qui décides.
+* C'est **moi** qui parle en premier 
+
+La negation - **Ce + n'est + pas** \\ **Ce + ne + sont + pas**:
+
+* Ce n'est pas ma valise!
+* Ce ne sont pas mes bagages
+
+La interrogation:
+
+* C'est qui?
+  * C'est mon ami Stéphanie
+* C'est quoi?
+  * C'est la Tour Eiffel
+* C'est quand?
+  * C'est aujourd'hui
+* C'est où?
+  * C'est à Paris
+
+La interrogation avec 'est-ce que':
+
+* Qui est-ce que c'est?
+* Qu'est-ce que c'est?
+* Quand est-ce que c'est?
+* Où est-ce que c'est?
+
 # La conjugaison *(conjuguezon)* des verbes
 
 ## Régulier (1º grupo)
@@ -552,7 +587,19 @@ Les verbs: **Apprendre, Comprendre et surprendre** suivent la même conjugaison
 * Tu apprends l'anglais dans quelle école?
 * Il comprend l'espagnol mais il ne parle pas
 * Elles ne comprend pas la phrase
-* 
+
+
+
+### Faire (fazer)
+
+* Je fais (fé) de la natation
+* Tu fais (fé) un thé pour ton papa?
+* Il fait (fé) / on fait
+* Nous faisons (fozon)
+* Vous faites (féte)
+* Ils font (fon
+
+
 
 # Exercices
 
@@ -560,7 +607,7 @@ Les verbs: **Apprendre, Comprendre et surprendre** suivent la même conjugaison
 
 * Trouvez [*encontre*] les dix mots cachés [*escondida*] dans la grille [*grade*]
 
-<img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/Screen Shot 2021-06-20 at 17.12.12.png" alt="Screen Shot 2021-06-20 at 17.12.12" style="zoom: 25%;" />
+<img src="./En france.assets/Screen Shot 2021-06-20 at 17.12.12.png" alt="Screen Shot 2021-06-20 at 17.12.12" style="zoom: 25%;" />
 
 * Texte à trous [lacuna]:
   * Pour aller en `France`, Je mets dans ma valise, deux `blousons` et un pull. Je mets une `écharpe` et un bonnet pour le `froid`. Je mets aussi un `parapluie`. Ah! Et `dix` paires de chaussettes.
@@ -621,7 +668,7 @@ Les verbs: **Apprendre, Comprendre et surprendre** suivent la même conjugaison
 
 ## Classe 2.1
 
-<img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/Screen Shot 2021-06-23 at 23.57.51-4503767.png" alt="Screen Shot 2021-06-23 at 23.57.51" style="zoom: 50%;" />
+<img src="./En france.assets/Screen Shot 2021-06-23 at 23.57.51-4503767.png" alt="Screen Shot 2021-06-23 at 23.57.51" style="zoom: 50%;" />
 
 1. Pour aller en France, je mets mon ***passeport*** dans mon bagage à main.
 2. Bonjour. Le ***vol*** pour Paris, s’il vous plaît ?
@@ -654,7 +701,7 @@ Les verbs: **Apprendre, Comprendre et surprendre** suivent la même conjugaison
 
 * Cochez la bonne case (marque a caixa correta)
 
-<img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/Screen Shot 2021-06-29 at 22.21.56-5016255.png" alt="Screen Shot 2021-06-29 at 22.21.56" style="zoom:33%;" />
+<img src="./En france.assets/Screen Shot 2021-06-29 at 22.21.56-5016255.png" alt="Screen Shot 2021-06-29 at 22.21.56" style="zoom:33%;" />
 
 
 
@@ -688,7 +735,7 @@ Les verbs: **Apprendre, Comprendre et surprendre** suivent la même conjugaison
 
 * Assoiciez les questions aux réponses:
 
-  <img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/Screen Shot 2021-06-29 at 23.37.35-5020744.png" alt="Screen Shot 2021-06-29 at 23.37.35" style="zoom:33%;" />
+  <img src="./En france.assets/Screen Shot 2021-06-29 at 23.37.35-5020744.png" alt="Screen Shot 2021-06-29 at 23.37.35" style="zoom:33%;" />
 
 
 ## Classe 3.1
@@ -711,9 +758,9 @@ Les verbs: **Apprendre, Comprendre et surprendre** suivent la même conjugaison
   - Plus que tout!
   ```
 
-  <img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/Screen Shot 2021-07-03 at 00.29.30.png" alt="Screen Shot 2021-07-03 at 00.29.30" style="zoom:40%;" />
+  <img src="./En france.assets/Screen Shot 2021-07-03 at 00.29.30.png" alt="Screen Shot 2021-07-03 at 00.29.30" style="zoom:40%;" />
 
-  <img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/Screen Shot 2021-07-03 at 00.42.40.png" alt="Screen Shot 2021-07-03 at 00.42.40" style="zoom: 33%;" />
+  <img src="./En france.assets/Screen Shot 2021-07-03 at 00.42.40.png" alt="Screen Shot 2021-07-03 at 00.42.40" style="zoom: 33%;" />
 
 ## Classe 3.2
 
@@ -787,7 +834,7 @@ Lui aussi aime voyager. Plus que tout !
 
 
 
-<img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/Screen Shot 2021-11-08 at 23.40.06-6425879.png" alt="Screen Shot 2021-11-08 at 23.40.06" style="zoom:50%;" />
+<img src="./En france.assets/Screen Shot 2021-11-08 at 23.40.06-6425879.png" alt="Screen Shot 2021-11-08 at 23.40.06" style="zoom:50%;" />
 
 Compléte:
 
@@ -917,9 +964,9 @@ Ah! Une taxi arrive...
 
 
 
-<img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/Capture d’écran 2021-11-15 à 23.00.32.png" alt="Capture d’écran 2021-11-15 à 23.00.32" style="zoom:50%;" />
+<img src="./En france.assets/Capture d’écran 2021-11-15 à 23.00.32.png" alt="Capture d’écran 2021-11-15 à 23.00.32" style="zoom:50%;" />
 
-<img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/Capture d’écran 2021-11-15 à 23.04.16.png" alt="Capture d’écran 2021-11-15 à 23.04.16" style="zoom: 33%;" />
+<img src="./En france.assets/Capture d’écran 2021-11-15 à 23.04.16.png" alt="Capture d’écran 2021-11-15 à 23.04.16" style="zoom: 33%;" />
 
 ## Classe 5.2
 
@@ -985,9 +1032,9 @@ Phrases à traduire
 
 ## Classe 6.1
 
-<img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/6.1.png" alt="6.1" style="zoom:50%;" />
+<img src="./En france.assets/6.1.png" alt="6.1" style="zoom:50%;" />
 
-<img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/6.1.2.png" alt="6.1.2" style="zoom:50%;" />
+<img src="./En france.assets/6.1.2.png" alt="6.1.2" style="zoom:50%;" />
 
 
 
@@ -1150,7 +1197,7 @@ Ajoutez les accents. *Acrescente os acentos.*
 
 
 
-<img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/7.1.png" alt="7.1" style="zoom:50%;" />
+<img src="./En france.assets/7.1.png" alt="7.1" style="zoom:50%;" />
 
 
 
@@ -1204,7 +1251,7 @@ Les dix phrases pour écoutez:
 9.  Comme vous voulez? 
 10.  Je n'aime pas être près de la fenêtre 
 
-<img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/Screen Shot 2022-10-11 at 21.53.29.png" alt="Screen Shot 2022-10-11 at 21.53.29" style="zoom:50%;" />
+<img src="./En france.assets/Screen Shot 2022-10-11 at 21.53.29.png" alt="Screen Shot 2022-10-11 at 21.53.29" style="zoom:50%;" />
 
 
 
@@ -1444,7 +1491,7 @@ La conjugaison de le verb Prendre:
 
 
 
-<img src="/Users/igorromero/NotesInGeneral/Others/En France/En france.assets/Screen Shot 2022-10-30 at 20.48.01.png" alt="Screen Shot 2022-10-30 at 20.48.01" style="zoom:50%;" />
+<img src="./En france.assets/Screen Shot 2022-10-30 at 20.48.01.png" alt="Screen Shot 2022-10-30 at 20.48.01" style="zoom:50%;" />
 
 
 
@@ -1609,3 +1656,43 @@ Décider:
 * Nous décidons
 * Vous décidez
 * Ils décident
+
+
+
+## Classe 10.2
+
+
+
+<img src="./En france.assets/10.2.png" alt="Screenshot 2023-01-04 at 21.14.45" style="zoom:50%;" />
+
+
+
+Complétez avec les pronoms sujets manquants (je, tu, il, elle, nous, vous, ils, elles) ou avec le verbe “faire” conjugué.
+
+* Aujourd'hui, je **fais** une visite. Ensuite, je vais voir mon ami Antoine. Il est artiste, il **fait** des peintures abstraites.
+* Elle **fait** de la natation. Elle adore le sport !
+* **Nous** faisons un dessin de la Tour Eiffel.
+* **Vous** faites quoi demain ? Vous voulez visiter Paris ?
+* Le mardi, tu **fais** du sport ? Moi, **Je** fais de la danse africaine.
+* Qu'est-ce qu'ils **font** ici ? Ce sont tes amis ?
+* Véronique et Amandine ? **Elles** font un gâteau au chocolat dans la cuisine.
+
+
+
+Transformez la question en ajoutant (acrescentando) “est-ce que”.
+
+* La visite du musée, quand c'est ?
+  * La visite du musée, **quand est-ce que c'est?**
+* Tu vas au cinéma ?
+  * **Est-ce que tu** vas au cinéma ?
+* Où vous allez aujourd'hui ?
+  * **Où est-ce que** vous allez aujourd'hui?
+* C'est quoi comme exposition ?
+  * **Qu'est-ce que c'est** comme exposition?
+* Quel sport tu fais ?
+  * Quel spot **est-ce que** tu fais?
+
+
+
+## Classe 10.3
+

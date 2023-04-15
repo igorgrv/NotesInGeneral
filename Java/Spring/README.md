@@ -1275,5 +1275,3 @@ Métodos:
         .thenAccept((result) -> sysout(resultOfMyService.call))
         .join();
       ```
-
-      
