@@ -6,7 +6,7 @@ React é uma biblioteca javascript para construção de interfaces, que roda no 
 
 ### Como React atualiza o DOM?
 
-Através de comparação entre o **Antigo virtual Dom** vs **Re-rendered virtual Dom** <img src="/Users/igorromero/NotesInGeneral/React/images/reactUpdateDom.png" alt="reactUpdateDom" style="zoom:50%;" />
+Através de comparação entre o **Antigo virtual Dom** vs **Re-rendered virtual Dom** <img src="./images/reactUpdateDom.png" alt="reactUpdateDom" style="zoom:50%;" />
 
 ## Getting started
 
@@ -182,7 +182,7 @@ myFnc('hello world');
 
 ### Import / Export
 
-<img src="/Users/igorromero/NotesInGeneral/React/images/react2.png" alt="react2" style="zoom:50%;" />
+<img src="./images/react2.png" alt="react2" style="zoom:50%;" />
 
 Existem dois tipos de **export**:
 
@@ -194,7 +194,7 @@ Existem dois tipos de **export**:
 
 ### Class
 
-<img src="/Users/igorromero/NotesInGeneral/React/images/reactClass.png" alt="reactClass" style="zoom:50%;" />
+<img src="./images/reactClass.png" alt="reactClass" style="zoom:50%;" />
 
 ```javascript
 class Human {
@@ -225,7 +225,7 @@ igor.displayGender();
 
 Com Babel, não é necessário passar o `constructor` nem mesmo `this` !
 
-<img src="/Users/igorromero/NotesInGeneral/React/images/reactClass2.png" alt="reactClass2" style="zoom:50%;" />
+<img src="./images/reactClass2.png" alt="reactClass2" style="zoom:50%;" />
 
 ```javascript
 class Human {
@@ -251,7 +251,7 @@ igor.displayGender();
 
 ### ... 3 dots
 
-<img src="/Users/igorromero/NotesInGeneral/React/images/react3dots.png" alt="react3dots" style="zoom:50%;" />
+<img src="./images/react3dots.png" alt="react3dots" style="zoom:50%;" />
 
 O operator `...` possui dois tipos de uso:
 
@@ -1599,7 +1599,7 @@ export default LandingPage;
 
 Através do chrome → Dev Tools → Source → conseguimos colocar break points na aplicação (linha 10)
 
-<img src="/Users/igorromero/NotesInGeneral/React/images/reactChrome1.png" alt="reactChrome1" style="zoom:50%;" />
+<img src="./images/reactChrome1.png" alt="reactChrome1" style="zoom:50%;" />
 
 
 
@@ -1634,9 +1634,9 @@ O Chrome possui outra extensão chamada [React Developer Tools](https://chrome.g
 
 
 
-<img src="/Users/igorromero/NotesInGeneral/React/images/reactDevTool1.png" alt="reactDevTool1" style="zoom:50%;" />
+<img src="./images/reactDevTool1.png" alt="reactDevTool1" style="zoom:50%;" />
 
-<img src="/Users/igorromero/NotesInGeneral/React/images/reactDevTools2.png" alt="reactDevTools2" style="zoom:50%;" />
+<img src="./images/reactDevTools2.png" alt="reactDevTools2" style="zoom:50%;" />
 
 ## Ex. Refatorando
 
@@ -1861,7 +1861,7 @@ export default Cockpit;s
 
 Classes que extendem Component ou React Hooks?
 
-<img src="/Users/igorromero/NotesInGeneral/React/images/reactClassBasedvsFunct.png" alt="reactClassBasedvsFunct" style="zoom:50%;" />
+<img src="./images/reactClassBasedvsFunct.png" alt="reactClassBasedvsFunct" style="zoom:50%;" />
 
 ### this.props - Class
 
@@ -1902,7 +1902,7 @@ O LifeCycle Hooks é utilizado para o tipo `class` , não exitindo para `functio
 
 ### LifeCycle - creation
 
-<img src="/Users/igorromero/NotesInGeneral/React/images/reactLifecycle.png" alt="reactLifecycle" style="zoom:50%;" />
+<img src="./images/reactLifecycle.png" alt="reactLifecycle" style="zoom:50%;" />
 
 #### constructor
 
@@ -1943,7 +1943,7 @@ componentDidMount() {
 
 ### LifeCycle - update
 
-<img src="/Users/igorromero/NotesInGeneral/React/images/reactLifeCycleUpdate.png" alt="reactLifeCycleUpdate" style="zoom:50%;" />
+<img src="./images/reactLifeCycleUpdate.png" alt="reactLifeCycleUpdate" style="zoom:50%;" />
 
 #### shouldComponentUpdate
 
@@ -2165,7 +2165,7 @@ const emailChangeHandler = (event) => {
 
 O `useReducer` serve principalmente para os casos acima, onde um state depende de outro, ou com um state está relacionado com o outro!
 
-<img src="/Users/igorromero/NotesInGeneral/React/images/reactUseReducer.png" alt="reactUseReducer" style="zoom: 25%;" />
+<img src="./images/reactUseReducer.png" alt="reactUseReducer" style="zoom: 25%;" />
 
 * `state` → é o nome do state comum;
 * `dispatchFn` → funciona como um `setState`, será utilizado para despachar o valor do `state`;
@@ -2609,7 +2609,7 @@ Nesse caso, devemos utilizar `Forward Refs`!
 
 ## Prop Chain - Comunicação entre múltiplos componentes
 
-<img src="/Users/igorromero/NotesInGeneral/React/images/reactPropChain.png" alt="reactPropChain" style="zoom:48%;" />
+<img src="./images/reactPropChain.png" alt="reactPropChain" style="zoom:48%;" />
 
 App.js importa:
 
@@ -3908,9 +3908,9 @@ Para simular o backend com autenticação, será utilizado o [FireBase Auth API]
 
 * `API_KEY` → Acesse o Projeto → Authentication → Sign-in method → Email/Senha → Enable → Visão geral do projeto (settings) → Configurações do projeto → Chave de API Web (copy value)
 
-![Screen Shot 2021-06-28 at 09.01.23](/Users/igorromero/NotesInGeneral/React/README.assets/Screen Shot 2021-06-28 at 09.01.23.png)
+![Screen Shot 2021-06-28 at 09.01.23](./README.assets/Screen Shot 2021-06-28 at 09.01.23.png)
 
-<img src="/Users/igorromero/NotesInGeneral/React/README.assets/Screen Shot 2021-06-28 at 09.03.00.png" alt="Screen Shot 2021-06-28 at 09.03.00" style="zoom:50%;" />
+<img src="./README.assets/Screen Shot 2021-06-28 at 09.03.00.png" alt="Screen Shot 2021-06-28 at 09.03.00" style="zoom:50%;" />
 
 ## SignUp
 
@@ -4362,7 +4362,7 @@ Context nos ajuda a evitar `props chain` ou seja, propriedade sendo passada entr
 
 ## How Redux works
 
-<img src="/Users/igorromero/NotesInGeneral/React/README.assets/Screen Shot 2021-07-23 at 15.52.17.png" alt="Screen Shot 2021-07-23 at 15.52.17" style="zoom:50%;" />
+<img src="./README.assets/Screen Shot 2021-07-23 at 15.52.17.png" alt="Screen Shot 2021-07-23 at 15.52.17" style="zoom:50%;" />
 
 * **`store`** → Redux possui um **único** `store`  chamado de `state` (armazenamos os dados no state)
   * `state.user`

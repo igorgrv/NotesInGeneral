@@ -1,5 +1,563 @@
 
 # Spring
+# Spring Initializer
+
+https://start.spring.io/
+
+Atraves do initializer, podemos montar o projeto com as dependencias:
+
+* **DevTools** -> faz com que as changes sejam atualizadas automáticas;
+  *  **LiveReload** -> faz com que a pagina mesmo se atualize sozinha;
+* **Web**
+* **Security**
+* **Lombok**
+* **Spring JPA** -> Dependencias do JPA, para conexão e gestão do banco de dados;
+
+# Set-ups
+
+## Changing Port
+
+application.properties:
+
+```properties
+# Changing the server port
+server.port=9000
+```
+
+## Working with JSP
+
+Para utilizar a JSP é necessário adicionar as dependencias abaixo:
+
+```xml
+<dependency>
+	<groupId>org.apache.tomcat.embed</groupId>
+	<artifactId>tomcat-embed-jasper</artifactId>
+	<scope>provided</scope>
+</dependency>
+
+<dependency>
+	<groupId>javax.servlet</groupId>
+	<artifactId>jstl</artifactId>
+</dependency>
+```
+
+Adicionar ao arquivo `application.properties`
+
+```properties
+spring.mvc.view.prefix=/WEB-INF/views/
+spring.mvc.view.suffix=.jsp
+```
+
+
+
+## Tomcat vs Jetty
+
+Para utilizar Jetty:
+
+```xml
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-web</artifactId>
+	<exclusions>
+		<exclusion>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+		</exclusion>
+	</exclusions>
+</dependency>
+
+<!-- Jetty Dependency -->
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-jetty</artifactId>
+</dependency>
+```
+
+## @ComponentScan - Packages diferentes níveis
+
+Quando os packages não ficam no mesmo nível do SpringApplication.java é necessário declarar alguns componentes:
+
+* `@ComponentScan`: is used to map the Controller/Service
+* `@EntityScan`: to map the Entity
+* `@EnableJpaRepositories`: to map the Repository
+
+```java
+@SpringBootApplication
+@ComponentScan({"com.vipguestlist.controller", "com.vipguestlist.service"})
+@EntityScan({"com.vipguestlist.model"})
+@EnableJpaRepositories({"com.vipguestlist.repository"})
+public class Configuration {
+
+	public static void main(String[] args) {
+		SpringApplication.run(Configuration.class, args);
+	}
+}
+```
+
+
+
+## Configurando Databases
+
+É possível via application.properties ou via código:
+
+```java
+@SpringBootApplication
+public class Configuration {
+
+	public static void main(String[] args) {
+		SpringApplication.run(Configuration.class, args);
+	}
+	
+	/** JPA ConfigurationS
+	 *  @bean it's necessary for Spring to "manage" the class
+	 *  DriverManagerDataSource returns DataSource
+	 */
+	@Bean
+	public DataSource dataSource() {
+		DriverManagerDataSource driver = new DriverManagerDataSource();
+		driver.setDriverClassName("com.mysql.cj.jdbc.Driver");
+		driver.setUrl("jdbc:mysql://localhost/viplist?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC");
+		driver.setUsername("root");
+		driver.setPassword("");
+		return driver;
+	}
+}
+```
+
+
+
+### DB2
+
+pom.xml
+
+```xml
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+<dependency>
+  <groupId>com.ibm.db2</groupId>
+  <artifactId>jcc</artifactId>
+  <version>11.5.0.0</version>
+</dependency>
+```
+
+application.properties:
+
+```properties
+# DATABASE CONNECTION
+spring.datasource.url=jdbc:db2://host.databases.appdomain.cloud:32224/BLUDB:sslConnection=true;sslTrustStoreLocation=/tmp/cpc-cert.jk
+spring.datasource.username=your-user
+spring.datasource.password=your-pass
+
+# SPRING CONFIGS TO NOT SHOW ERRORS
+spring.jpa.open-in-view = false
+logging.level.org.hibernate=ERROR
+```
+
+
+
+### MySQL
+
+pom.xml:
+
+```xml
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+<dependency>
+	<groupId>mysql</groupId>
+	<artifactId>mysql-connector-java</artifactId>
+</dependency>
+```
+
+application.properties:
+
+```properties
+#Spring
+spring.mvc.view.prefix= /WEB-INF/views/
+spring.mvc.view.suffix= .jsp
+
+#DataSource
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.url=jdbc:mysql://localhost/XXXXXXX?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=
+
+#JPA
+spring.jpa.hibernate.ddl-auto = update
+spring.jpa.properties.hibernate.format_sql = true
+spring.jpa.properties.hibernate.show_sql = true
+```
+
+### H2
+
+Application.properties
+
+```properties
+#DataSource
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.url=jdbc:h2:mem:forum
+spring.datasource.username=sa
+spring.datasource.password=
+
+#JPA
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.hibernate.ddl-auto = update
+spring.jpa.properties.hibernate.format_sql = true
+spring.jpa.properties.hibernate.show_sql = true
+
+#H2
+# console.enabled allow us to have a h2 console
+# console.path is how we're going to access the h2 interface
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+```
+
+* Open the console by: `http://localhost:8080/h2-console`
+
+<img src="https://github.com/igorgrv/ForumAPI/blob/master/readmeImage/m2.PNG?raw=true" width=370 height=300>
+
+<img src="https://github.com/igorgrv/ForumAPI/blob/master/readmeImage/m22.PNG?raw=true" width=550 height=300>
+
+# Annotations
+
+## @ResponseBody
+
+`@ResponseBody` é utilizado para informar o Spring que ele irá farzer o parse de um objeto para um JSON
+
+```java
+@Controller
+public class TopicController {
+
+	@RequestMapping("/firstEndPoint")
+	@ResponseBody
+	public List<Topic> list(){
+		Topic topic = new Topic("Doubt", "API Doubt", new Course("Java", "API"));
+		
+		return Arrays.asList(topic, topic, topic);
+	}
+}
+```
+
+
+
+### @RestController
+
+Se é esperado que o response seja um JSON e não quer q todo método tenha o `@ResponseBody`, então anotamos a controller com o `@RestController`
+
+```java
+@RestController
+public class TopicController {
+
+	@RequestMapping("/firstEndPoint")
+	// @ResponseBody
+	public List<Topic> list(){
+		Topic topic = new Topic("Doubt", "API Doubt", new Course("Java", "API"));
+		
+		return Arrays.asList(topic, topic, topic);
+	}
+}
+```
+
+## @RequestBody
+
+Se o `@ResponseBody` é para dizer ao Spring que queremos que seja parcionado o Objeto -> JSON no Response, o `RequestBody` fará o mesmo para o Request recebido
+
+```java
+@PostMapping
+@Transactional
+public ResponseEntity<TopicDTO> save(@RequestBody TopicForm form, UriComponentsBuilder uriBuilder) {
+	Topic topic = form.toTopic(courseRepository);
+	topicRepository.save(topic);
+	
+	URI uri = uriBuilder.path("/topic/{id}").buildAndExpand(topic.getId()).toUri();
+	
+	return ResponseEntity.created(uri).body(new TopicDTO(topic));
+}
+```
+
+
+
+## @Valid / BeanValidation
+
+* DOC OFICIAL: https://jakarta.ee/specifications/bean-validation/3.0/jakarta-bean-validation-spec-3.0.html#builtinconstraints
+
+`@Valid` é utilizado para fazer a validação dos campos que estão vindo no request! Mas para isso é necessário o uso de algumas outra annotations:
+
+* `@NotNull @NotEmpty @Length(min = 5) @Size @Enumerated`
+
+```java
+public class TopicForm {
+
+	@NotNull @NotEmpty
+  @NotBlank(message = "Sender ID is mandatory")
+	@Size(min = 2, max = 20, message = "Sender ID minimum size is 2 and maximum is 20")
+	private String title, senderId;
+	
+	@NotNull(message = "Blocked is mandatory - True or False")
+	private Boolean blocked;
+  
+  @Email
+  private String email;
+  
+  @Enumerated(EnumType.STRING)
+	private VendorProfileTypeEnum vendorType;
+  
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+	private LocalDateTime fixDate;
+  
+  @ApiModelProperty(value = "Specific days notification will not trigger", example = "2020-01-01", required = true)
+	@NotNull(message = "Day is mandatory")
+	private LocalDate day;
+}
+```
+
+
+
+### @RestControllerAdvice / @ExceptionHandler
+
+Utilizado para fazer o **handle das exceptions**, dessa forma falamos para o Spring como queremos controlar cada tipo de Exception
+
+```java
+@RestControllerAdvice
+public class ValidationErrorHandler {
+	
+	@Autowired
+	private MessageSource messageSource;
+
+	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public List<ErrorDTO> handle(MethodArgumentNotValidException exception) {
+		List<ErrorDTO> dto = new ArrayList<>();
+		List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
+		fieldErrors.forEach(e -> {
+			ErrorDTO error = new ErrorDTO(e.getField(), messageSource.getMessage(e, LocaleContextHolder.getLocale()));
+			dto.add(error);
+		});
+		return dto;
+	}
+}
+
+// DTO
+public class ErrorDTO {
+
+	private String field;
+	private String exception;
+
+	public ErrorDTO(String field, String exception) {
+		this.field = field;
+		this.exception = exception;
+	}
+	//Getters and Setters
+}
+```
+
+## @JsonProperty
+
+Utilizado para fazer o *bind* das propriedades da classe
+
+* **SEM O @JsonProperty PRECISAMOS TER OS GETTERS**
+
+Errado:
+
+```java
+// Jackson não vai conseguir fazer o bind por não ter os GETTERS nem o @JsonProperty
+public class User {
+  private String name;
+  private int age;
+}
+```
+
+Correto:
+
+```java
+public class User {
+  @JsonProperty
+  private String name;
+	@JsonProperty
+  private int age;
+}
+```
+
+ou
+
+```java
+@Getter
+public class User {
+  private String name;
+  private int age;
+}
+```
+
+
+
+## @PathVariable
+
+Utilizado quando queremos pegar um argumento do `path`:
+
+Exemplo, path com valor `1`:
+
+```http
+http://localhost:3000/1
+```
+
+```java
+@DeleteMapping("/{id}")
+@Transactional
+public void getId(@PathVariable Long id) {}
+```
+
+## @RequestParam
+
+`@RequestParam` deve ser declarada antes do parâmetro do método e determina que a API deve receber esse parâmetro como tipo URL Query Strings ao ser chamada
+
+```http
+http://localhost:3000/user/name=Igor&age=27
+```
+
+```java
+@RequestController
+@RestMapping("user")          
+public class ContaCorrenteController { 
+
+	@GetMapping
+  public String getUser( 
+   @RequestParam(name = "name") String name,  
+   @RequestParam(name = "age") String age
+	){ 
+   return String.format("Name %s, Age %s", name, age); 
+ 	} 
+} 
+```
+
+
+
+# DTO vs Record
+
+A partir do java 16, foi criado um novo recurso, o **`record`** , para:
+
+* Classe imutável
+* Apenas atributos
+* Construtor
+* Somente leitura
+
+ou seja, perfeito para DTOs!
+
+DTO + Lombok:
+
+```java
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public MyDto() {
+  
+  @NotNull
+  private String name;
+
+  @NotNull
+  @Email
+  private String email;
+}
+```
+
+Com Record:
+
+```java
+public record MyDto(
+  @NotNull
+  String name,
+  @NotNull
+  String email){
+}
+```
+
+
+
+## Record to Entity
+
+Record por ser muito usado como DTO é preciso fazer a conversão para entidade pai
+
+Exemplo:
+
+* DTO:
+
+  ```java
+  public record DoctorDto(Long id, String nome, String email, String crm) {}
+  ```
+
+* Entity:
+
+  ```java
+  @Table(name = "doctors")
+  @Entity(name = "Doctor")
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public class Doctor {
+  
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String nome;
+    private String email;
+    private String telefone;
+    private String crm;
+  }
+  ```
+
+Para converter de Entity para DTO, basta instanciarmos um controller no DTO:
+
+```java
+public record DoctorDto(Long id, String nome, String email, String crm) {
+
+  public DoctorDto(Doctor doctor) {
+    this(doctor.getId(), doctor.getNome(), doctor.getEmail(), doctor.getCrm());
+  }
+
+}
+```
+
+Controller
+
+```java
+@GetMapping("/findAll")
+public List<DoctorDto> getAllDoctors() {
+  return repository.findAll().stream().map(DoctorDto::new).toList();
+}
+```
+
+
+
+## Record & Controller
+
+Podemos manipular o que recebemos no record também!
+
+```java
+public record MyRequest(@JsonProperty("PART_NUMBER") String partNumber) {
+
+  public MyRequest(String partNumber) {
+    this.partNumber = addZeroInPartNumber(partNumber);
+  }
+
+  // Add zero in the Part Number if the length < 12
+  private String addZeroInPartNumber(String partNumber) {
+    return ("000000000000" + partNumber).substring(partNumber.length());
+  }
+}
+```
+
+Quando chamarmos, teremos um retorno do record alterado:
+
+```java
+String partNumber = "123";
+MyRequest myRequest = new MyRequest(partNumber);
+// myRequest.partNumber = "000000000123"
+```
+
+
+
 # Reactive Microservices
 
 Pacotes comuns Spring Init:
@@ -1235,6 +1793,12 @@ Métodos:
   * Chama uma thread no background e retorna imediatamente
   * Retorna: `CompletableFuture<T>`
 
+*  `.runAsync()`
+
+  * Faz o memso que o supply mas não devolve nada;
+
+  * Retorna: `CompletableFuture<Void>`
+
 * `.thenAccept()`
 
   * Espera a chamada terminar para ter o resultado;
@@ -1275,3 +1839,44 @@ Métodos:
         .thenAccept((result) -> sysout(resultOfMyService.call))
         .join();
       ```
+
+## CompletableFuture within Loop
+
+```java
+List<CompletableFuture<Object>> listFutureObject = new ArrayList<>();
+
+for (int i = 0; i < myArrayList.size(); i++) {
+
+    Object object = myArrayList.get(i);
+
+
+    CompletableFuture<Defect> future = getCompetableFutureResult();
+    listFutureObject.add(future);
+}
+
+// .allOf will wait for all Apars to be process
+// join stop the main thread
+return CompletableFuture
+      .allOf(listFutureObject.toArray(new CompletableFuture[listFutureObject.size()]))
+      .thenApply(defect -> listFutureObject.stream()
+              .map(CompletableFuture::join)
+              .collect(Collectors.toList()))
+      .join(); // join() return List<Object>
+```
+
+
+
+Com executor:
+
+```java
+private CompletableFuture<Defect> getCompetableFutureResult() throws InterruptedException {
+
+    ExecutorService executorService = Executors.newFixedThreadPool(20);
+
+    Thread.sleep(2000);
+    return CompletableFuture
+            .supplyAsync(() -> importApar(), executorService)
+            .whenComplete((defect, throwable) -> executorService.shutdownNow());
+}
+```
+

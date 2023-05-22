@@ -241,7 +241,14 @@ SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Excepti
 
 **CSRF**: **C**ross-**S**ite **R**equest **F**orgery
 
-CSRF é um tipo de ataque a segurança (diferente de CORS que é uma proteção).
+* CSRF é um tipo de ataque a segurança (diferente de CORS que é uma proteção).
+
+Exemplo:
+
+1. usuário acessa o site X, site X que não possui proteção ao CSRF, irá gerar um cookie com as informações de auth.
+2. Após alguns minutos, o mesmo usuário acessa o site Y, que possui um formulário para roubar informações de cookies.
+3. Quando o usuário clica no formulário, o site Y rouba o cookie do browser com as infos de auth do site X e realiza requests no site X.
+4. Uma vez q o site X não está protegido para CSRF, hackers podem fazer alterações de um outro origin
 
 ![csrf1](./readmeResources/csrf1.png)
 
@@ -252,6 +259,8 @@ CSRF é um tipo de ataque a segurança (diferente de CORS que é uma proteção)
 * Por default o Spring habilita o CSRF, não permitindo que nenhuma requisição (POST/DELETE/PUT) ao servidor altere dados/acesse banco e etc;
 * Métodos GET são permitidos (por fazerem fetch do dado);
 
+### Disabling CSRF for all routes
+
 Para desativá-lo (**NÃO RECOMENDADO**) dentro da configuração do `SecurityFilterChain` usamos o **`csrf().disable()`**:
 
 ```java
@@ -259,5 +268,149 @@ Para desativá-lo (**NÃO RECOMENDADO**) dentro da configuração do `SecurityFi
 SecurityFilterChain securityConfig (HttpSecurity http) throws Exception {
   return http.csrf().disable()....
 }
+```
+
+### Disabling only public routes
+
+Com `ignoringRequestMatchers` podemos passar a rota que não queremos validar CSRF (geralmente são rotas publicas)
+
+```java
+@Bean
+SecurityFilterChain securityConfig (HttpSecurity http) throws Exception {
+  return http.csrf(csrf -> csrf.ignoringRequestMatchers("/publicRoute"))
+}
+```
+
+
+
+### Using tokens [TODO]
+
+Para rotas que não queremos bloquear, precisamos gerar um token para diferentes requisições
+
+
+
+# JWT (JSON Web Token)
+
+JWT Libraries
+
+```xml
+<dependency>
+  <groupId>io.jsonwebtoken</groupId>
+  <artifactId>jjwt-api</artifactId>
+  <version>0.11.5</version>
+</dependency>
+<dependency>
+  <groupId>io.jsonwebtoken</groupId>
+  <artifactId>jjwt-impl</artifactId>
+  <version>0.11.5</version>
+  <scope>runtime</scope>
+</dependency>
+<dependency>
+  <groupId>io.jsonwebtoken</groupId>
+  <artifactId>jjwt-jackson</artifactId> 
+  <version>0.11.5</version>
+  <scope>runtime</scope>
+</dependency>
+```
+
+
+
+![jwt1](./readmeResources/jwt1.png)
+
+![jwtHeaderBody](./readmeResources/jwtHeaderBody.png)
+
+![jwtValidation](./readmeResources/jwtValidation.png)
+
+## Removing JSESSSIONID
+
+* **JSESSIONID é um token** gerado automáticamente pelo Spring Security, mas nele não temos nenhuma informação do usuário. Utilizamos JSESSIONID somente para dizer ao Spring Security que determinado user está autenticado e não precisamos ficar mais pedindo credentials a todo momento
+
+Problema do JSESSIONID:
+
+* Não possui nenhum dado do usuário;
+* É salvo como cookie no browser para que toda requisição leve ele ao server;
+* É passível de ser 'roubado' através de javascript;
+* Se o usuário não fechar o browser, o JSESSIONID continua sendo válido até que o server seja reiniciado;
+
+
+
+Para remover o JSESSIONID:
+
+1. Necessário informar o spring security que não precisamos mais do JSESSIONID, para isso, iremos utilizar do **`SessionCreationPolicy.STATELESS`**
+
+   ```java
+   @Bean
+   SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+     return http
+         .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // setando stateless
+         .authorizeHttpRequests(auth -> {
+           auth.requestMatchers("/notices").permitAll();
+           auth.requestMatchers("/myAccount").authenticated();
+         })
+         .cors(cors -> cors.configurationSource(corsConfig()))
+         .csrf(csrf -> csrf.ignoringRequestMatchers("contactForm"))
+         .httpBasic(Customizer.withDefaults())
+         .build();
+   }
+   ```
+
+2. Permitir que o Cors receba o header `**Authorization**`:
+
+   ```java
+   @Bean
+     CorsConfigurationSource corsConfig() {
+       List<String> allowedOrigins = new ArrayList<>();
+       allowedOrigins.add("http://localhost:4200");
+   
+       CorsConfiguration cors = new CorsConfiguration();
+       cors.setAllowedOrigins(allowedOrigins);
+   
+       cors.setAllowedMethods(Arrays.asList("GET", "POST"));
+       cors.setAllowedHeaders(Arrays.asList("Authorization")); // Setando header
+       cors.setAllowCredentials(true);
+       cors.setMaxAge(3600L);
+       UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+       source.registerCorsConfiguration("/**", cors);
+       return source;
+     }
+   ```
+
+   
+
+## Creating JWT
+
+Necessário:
+
+1. Criar um **`JWTTokenGeneratorFilter extends OncePerRequestFilter`**
+   1. Irá gerar o JWT baseado em uma SECRET + HEADER;
+2. Criar um **`JWTValidatorFilter extends OncePerRequestFilter`**
+   1. Irá validar o token toda vez q houver uma requisição;
+3. Alterar o front/client para sempre passar o Header nas requisições;
+
+### JWTTokenGeneratorFilter
+
+Através do `OncePerRequestFilter`, conseguimos filtrar as requisições, mas para isso precisamos declarar na classe `SecurityJavaConfig` o `addFilterAfter` 
+
+```java
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  return http
+      .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+      .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class) // adicionando filtro
+      .authorizeHttpRequests(auth -> {
+        auth.anyRequest().permitAll();
+      })
+      .csrf(csrf -> csrf.disable())
+      .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+      .httpBasic(withDefaults())
+      .build();
+}
+```
+
+Agora na classe **`JWTTokenGeneratorFilter`**:
+
+1. Extender a classe **`OncePerRequestFilter`** - iremos implementar os métodos default
+
+```java
 ```
 

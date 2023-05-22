@@ -136,13 +136,17 @@ idade = 37 //Não compila!
 int idade = 37 //Agora o Java entende o que é a 'idade'
 ```
 * **bity** -> para números muito pequeno (até 127);
+
 * **short** -> para números pequenos (até 32mil);
+
 * **int** -> para números inteiros (até 2 bilhões);
+
 * **long** -> para números GIGANTES, necessário declar um `L` no final;
 	
 	```java
 	long numeroGrande = 33238929838L;
 	```
+	
 * **double** -> para números decimais/com ponto flutuante;
 	```java
 	//Atenção ao uso do double
@@ -169,15 +173,103 @@ int idade = 37 //Agora o Java entende o que é a 'idade'
   valorIntalterado = 13; // → irá gerar um erro de compilação
   ```
 
-* **Enum** -> Define valores que podem ser escolhidos:
-
-  ```java
-  enum Tamanhos = { PEQUENO, MEDIO, GRANDE};
   
-  Tamanhos p = Tamanhos.PEQUENO;
-  ```
 
-  
+## Enum
+
+Enum Define valores que podem ser escolhidos:
+
+```java
+enum Tamanhos = { PEQUENO, MEDIO, GRANDE};
+
+Tamanhos p = Tamanhos.PEQUENO;
+```
+
+
+
+Mas também podemos colocar que um Enum recebe parâmetros!
+
+```java
+public enum Status {
+    OPEN("Open"),
+    IN_PROGRESS("In Progress"),
+    RESOLVED("Resolved"),
+    CLOSED("Closed");
+
+    private String label;
+
+    private Status(String label) {
+        this.label = label;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+}
+```
+
+```java
+Status status = Status.OPEN;
+String statusLabel = status.getLabel(); // retorna "Open"
+```
+
+
+
+### Enum + Abstract 
+
+Imagine que queíramos representar os tipos de **Operação de uma conta corrente**.
+
+* Usando Classes + herança, poderíamos ter algo como:
+
+  * ```java
+    public interface Operacoes {
+      BigDecimal executar(BigDecimal saldo, BigDecimal valor);
+    }
+    ```
+
+  * ```java
+    public class Sacar implements Operacoes {
+      
+      @Override
+      public BigDecimal executar(BigDecimal saldo, BigDecimal valor) {
+        saldo.subtract(valor);
+      }
+    }
+    
+    public class Deposito implements Operacoes {
+      
+      @Override
+      public BigDecimal executar(BigDecimal saldo, BigDecimal valor) {
+        saldo.add(valor);
+      }
+    }
+    ```
+
+
+
+Com o uso de ENUM + métodos **`Abstract`** podemos evitar a criação de 1 interface + 2 classes:
+
+```java
+public enum Operacao {
+    DEPOSITO{
+        @Override
+        public BigDecimal executar(BigDecimal saldo, BigDecimal valor) {
+            return saldo.add(valor);
+        }
+    }, SAQUE{
+        @Override
+        public BigDecimal executar(BigDecimal saldo, BigDecimal valor) {
+            return saldo.subtract(valor);
+        }
+    };
+
+    public abstract BigDecimal executar(BigDecimal saldo, BigDecimal valor);
+}
+```
+
+
+
+
 
 ## Operadores matemáticos
 
@@ -633,7 +725,24 @@ public static void main(String[] args) {
 }
 ```
 
+### Init no construtor
+
+O `static` também nos permite iniciar valores quando a classe é criada!
+
+```java
+public class WwdcSoftClient {
+
+  private final WebClientHelper webClient;
+  private static final ObjectMapper mapper = new ObjectMapper();
+  static {
+    mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+  }
+```
+
+
+
 ## <a name="herenca"></a>Herença
+
 Imagine uma classe que represente o tipo `Funcionario`:
 ```java
 public class Funcionario {
@@ -1222,7 +1331,10 @@ A classe Object, é a **CLASSE MÃE**, todas as classes do Java provém dela!
 	}
 	```
 
-# <a name="util"></a>Java.util
+# <a name="util"></a>Collections
+
+![collections](./PósGraduação/imageResource/collections.png)
+
 ## <a name="array"></a>Array
 O Array **é um objeto** que representa um **conjunto de dados**! <br>Ex. **_sem array_**: Imagine ter de representar um conjunto com 5 idades:
 ```java
@@ -1297,7 +1409,7 @@ sysout(contas[0].getNumero); //irá imprimir 22
 		guardador.adiciona(cc2);
 	}
 	```
-## <a name="arraylist"></a>ArrayList/List
+## <a name="arraylist"></a>List
 O `ArrayList` é o **mais utilizado nos dias de hoje**.  ArrayList, implementa a interface `List`;
 * Por padrão o ArrayList não tem limite de posições (depende somente do limite de memoria da JVM), ou seja, não precisamos definir a quantidade;
 	* Caso deseje, é possível definir o tamanho através do construtor `new ArrayList(x)`
@@ -1363,8 +1475,10 @@ O problema de se criar um ArrayList Genérico, é de que qualquer tipo poderá s
 
 Agora que conhecemos o ArrayList e a Interface List, podemos **transformar** um Array em um List, através da classe **_java.util.Arrays_**.<br>`List<String> argumentos = Arrays.asList(args);`
 
-## <a name="orderlist"></a>Ordenando Lista
-### Com Collections - Para Strings
+### <a name="orderlist"></a>Ordenando Lista
+
+#### Com Collections - Para Strings
+
 A Classe `Collections`, possui o método `sort` que irá utilizar por padrão o **alfabeto** para ordernar os valores:
 ```java
 String java = "Java";
@@ -1385,7 +1499,8 @@ aulas.forEach(aula -> {
 	System.out.println("Aula: " + aula);
 });
 ```
-### Com ComparaBLE - Para Classes criadas
+#### Com ComparaBLE - Para Classes criadas
+
 A Interface `Comparable`, possui o método `compareTo`, onde poderemos passar o objeto para realizar a comparação.
 ```java
 public class Aula implements Comparable<Aula>{
@@ -1409,7 +1524,8 @@ aulas.forEach(aula -> {
 	System.out.println(aula);
 });
 ```
-### Com ComparaTOR - Para Classes criadas
+#### Com ComparaTOR - Para Classes criadas
+
 Utilizando a classe List, temos como ordernar os valores da lista, utilizando o método `sort`, porém este método irá requerer um `Comparator`;
 * **Comparator** é uma interface que implementa o método `compare`. Este método é responsável por receber o "tipo" de comparação, ou seja, **_eu vou comparar o que com o que?_**
 ```java
@@ -1461,7 +1577,8 @@ public static void main (String[] args){
 	}
 }
 ```
-### Com Comparator & Comparable
+#### Com Comparator & Comparable
+
 Com a classe implemetando o `Comparable`, podemos implementar também a interface `Comparator`;
 ```java
 Curso java = new Curso("Java");
@@ -1501,7 +1618,8 @@ Curso: Spring - Duracao: 40
 Curso: Angular - Duracao: 60
 ```
 
-### <a name="lambda"></a>Java 8 - Lambda/ForEach
+#### <a name="lambda"></a>Java 8 - Lambda/ForEach
+
 O uso do lambda, vem para simplificar métodos! Mas como? Utilizando `->`<br> <br>Ordenando lista:<br> 
 * Com **for**:
 	```java
@@ -1527,70 +1645,75 @@ O uso do lambda, vem para simplificar métodos! Mas como? Utilizando `->`<br> <b
 		System.out.println(conta)
 	});
 	```
-	<br>Adicionando total:<br> 
-* Com **for**:
-	```java
-	//Classe curso
-	private List<Aula> listaAulas = new ArrayList<Aula>();
-	
-	public int getDuracaoTotal() {
-		for(Aula aula: listaAulas) {
-			this.duracaoTotal += aula.getDuracao();
-		}
-		return duracaoTotal;
-	}
-	```
-* Com **forEach + Lambda**:
-	```java
-	//Classe curso
-	private List<Aula> listaAulas = new ArrayList<Aula>();
-	
-	public int getDuracaoTotal() {
-		return this.listaAulas.stream().mapToInt(Aula::getDuracao).sum();
-	}
-	```
 
+### <a name="linkedlist"></a>LinkedList vs ArrayList
 
-## <a name="linkedlist"></a>LinkedList vs ArrayList
+**Precisa remove / add? Use linkedlist!** 
+
+**Precisa get / set? Use ArrayList!**
+
 A LinkedList também implementa a interface `List`, então qual é a **diferença entre a LinkedList e ArrayList?**
+
 * A LinkedList utiliza pontos flutuantes, ou seja, quando adicionamos/removemos um elemento da lista, **automaticamente as posições se ordenam**;
 	* O ArrayList,  quando adicionamos/removemos um elemento da lista ele irá mover cada posição, ou seja, **se removermos a posição 10** a ArrayList, irá jogar o array 11 para posição 10, o 12 para 11 e assim em diante...
 * O LinkedList quando queremos "procurar" uma posição, irá verificar posição a posição, ou seja, se queremos dar um `get(10)`, ele irá verificar a posição 1, depois 2, depois 3 e assim em diante.
 	* O ArrayList, por implementar Arrays, irá direto até a posição 10;
 
 ## <a name="set"></a>Set (Conjunto)
-O `Set`é uma interface que herda de `Collection`, assim como o `List`!
-* A implementação do Set, é feita através do `HashSet<>()`;
-	```java
-	Set<String> testes = new HahSet<>();
-	```
-* Por herdar a interface `Collection`, possui o métodos como `contains` - igual a um List;
-	```java
-	Set<String> testes = new HahSet<>();
-	testes.add("Teste A");
-	testes.add("Teste B");
-	
-	boolean contains = aulasSet.contains("Teste A");
-	System.out.println(contains); //TRUE
-	```
-* Pode se **adicionar elementos** ao Set, assim como é feito na List;
-	```java
-	Set<String> testes = new HahSet<>();
-	testes.add("Teste A");
-	testes.add("Teste B");
-	testes.add("Teste C");
-	testes.add("Teste C");
-	sysout(testes);
-	
-	//irá imprimir:
-	C
-	A
-	B
-	```
-	O que houve com a order do `add` ? Por que não foi exibido o segundo elemento `Teste C`? A **diferença** entre um `List` e um `Set`:
-* O Set não adiciona os elementos a uma lista, ele simplesmente os "joga em um saco" de elementos do mesmo tipo, ou seja, ele não se preocupa com ordenação;
+O `Set`é uma interface que herda de `Collection`, assim como o `List`! Sendo dividido em 3 tipos:
+
+* **`HashSet<>`**
+
+  * O Set não permite que elementos **repetidos** sejam adicionados! 
+
+  * O Set é **muito mais rápido para efetuar buscas** do que uma Lista;
+
+  * "joga os elementos em um saco" - não se preocupa com ordenação;
+
+  * ```java
+    Set<String> testes = new HahSet<>();
+    ```
+
+* **`TreeSet<>b`**j
+
+  * **Possui ordenação** default dos tipos primitivos (String e etc) - mas **não ordena por Objeto**!
+  * Mais devagar que o **HashSet<>**
+
+* **`LinkedHashSet<>`**
+
+  * **Equilibrio** entre **HashSet + TreeSet**;
+  * Utiliza de uma LinkedList + HashTable - assim os elementos são inseridos já em ordem
+
+Característica em geral:
+
 * O Set não permite que elementos **repetidos** sejam adicionados! 
-* O Set é **muito mais rápido para efetuar buscas** do que uma Lista;
+* **É NECESSÁRIO TER UM HASHCODE E EQUALS()** caso seja utilizado em Classes para armazenamento. Caso contrário não consiguirá remover por exemplo
+
+* Por herdar a interface `Collection`, possui o métodos como `contains` - igual a um List;
+  ```java
+  Set<String> testes = new HahSet<>();
+  testes.add("Teste A");
+  testes.add("Teste B");
+  
+  boolean contains = aulasSet.contains("Teste A");
+  System.out.println(contains); //TRUE
+  ```
+
+* Pode se **adicionar elementos** ao Set, assim como é feito na List;
+  ```java
+  Set<String> testes = new HahSet<>();
+  testes.add("Teste A");
+  testes.add("Teste B");
+  testes.add("Teste C");
+  testes.add("Teste C");
+  sysout(testes);
+  
+  //irá imprimir:
+  C
+  A
+  B
+  ```
+  O que houve com a order do `add` ? Por que não foi exibido o segundo elemento `Teste C`? A **diferença** entre um `List` e um `Set`:
 
 ### <a name="aplicandoset"></a>Aplicando Set a um Modelo
 Um exemplo de uso do `Set` em uma classe!
@@ -1604,7 +1727,8 @@ public class Aluno {
 		this.nome = nome;
 		this.numeroMatricula = numeroMatricula;
 	}
-	//getters, setters e toString
+	//getters, setters
+  // HASHCODE + EQUALS
 }
 
 //--------------------------------------------
@@ -2289,7 +2413,141 @@ Quando utilizamos o `stream()`, ele não afeta a lista, ou seja, caso seja feito
   });
   ```
 
-  
+
+
+### FlatMap
+
+1. Obter uma lista de pares de números cuja soma é um número específico:
+
+```java
+int targetSum = 10;
+List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
+
+List<int[]> pairs = numbers.stream()
+    .flatMap(i -> numbers.stream()
+        .filter(j -> i + j == targetSum)
+        .map(j -> new int[]{i, j}))
+    .collect(Collectors.toList());
+
+for (int[] pair : pairs) {
+    System.out.println(pair[0] + " + " + pair[1] + " = " + targetSum);
+}
+// Output:
+// 1 + 9 = 10
+// 2 + 8 = 10
+// 3 + 7 = 10
+// 4 + 6 = 10
+// 5 + 5 = 10
+// 6 + 4 = 10
+// 7 + 3 = 10
+// 8 + 2 = 10
+// 9 + 1 = 10
+```
+
+2. Obter uma lista de palavras distintas de um conjunto de frases:
+
+```java
+List<String> phrases = Arrays.asList(
+    "the quick brown fox",
+    "jumps over the lazy dog",
+    "the quick brown cat"
+);
+
+List<String> uniqueWords = phrases.stream()
+    .flatMap(phrase -> Arrays.stream(phrase.split(" ")))
+    .distinct()
+    .collect(Collectors.toList());
+
+System.out.println(uniqueWords); // Output: [the, quick, brown, fox, jumps, over, lazy, dog, cat]
+```
+
+
+
+
+
+### FlatMap + Map
+
+E se tivessemos que iterar dentro de listas e listas?
+
+Exemplo: Some o valor de quantidade se o partNumber for igual ao orderPartNumber:
+
+```json
+[
+  {
+    "_PN": [
+      {
+        "INVT": [
+          { "QTOH": "00002", "ORDERING_PN": "000PC550" },
+          { "QTOH": "00003", "ORDERING_PN": "U00PC550" }
+        ],
+        "PN": "000PC550"
+      },
+      {
+        "INVT": [{ "QTOH": "00003", "ORDERING_PN": "003T7041" }],
+        "PN": "003T7041"
+      }
+    ],
+    "OPEN": "O"
+  },
+  {
+    "_PN": [
+      {
+        "INVT": [{ "QTOH": "00001", "ORDERING_PN": "000PC550" }],
+        "PN": "000PC550"
+      }
+    ],
+    "OPEN": "O"
+  }
+]
+```
+
+```java
+public class Test {
+
+  public static void main(String[] args) {
+    String json = "[{\"_PN\":[{\"INVT\":[{\"QTOH\":\"00002\",\"ORDERING_PN\":\"000PC550\"},{\"QTOH\":\"00003\",\"ORDERING_PN\":\"U00PC550\"}],\"PN\":\"000PC550\"},{\"INVT\":[{\"QTOH\":\"00003\",\"ORDERING_PN\":\"003T7041\"}],\"PN\":\"003T7041\"}],\"OPEN\":\"O\"},{\"_PN\":[{\"INVT\":[{\"QTOH\":\"00001\",\"ORDERING_PN\":\"000PC550\"}],\"PN\":\"000PC550\"}],\"OPEN\":\"O\"}]";
+
+    Map<String, Integer> inventory = parseJson(json)
+        .flatMap(option -> option._PN.stream())
+        .flatMap(pn -> pn.INVT.stream().filter(invt -> invt.ORDERING_PN.equalsIgnoreCase(pn.PN))
+            .map(invt -> new Inventory(pn.PN, Integer.parseInt(invt.QTOH))))
+        .collect(Collectors.groupingBy(Inventory -> Inventory.pn, Collectors.summingInt(pimsInventory -> pimsInventory.qtoh)));
+
+    System.out.println(inventory);
+  }
+
+  static class Options {
+    List<PN> _PN;
+    String OPEN;
+  }
+
+  static class PN {
+    List<Invt> INVT;
+    String PN;
+  }
+
+  static class Invt {
+    String QTOH;
+    String ORDERING_PN;
+  }
+
+  static class Inventory {
+    String pn;
+    int qtoh;
+
+    public Inventory(String pn, int qtoh) {
+      this.pn = pn;
+      this.qtoh = qtoh;
+    }
+  }
+
+  public static Stream<Options> parseJson(String json) {
+    return Arrays.stream(new Gson().fromJson(json, Options[].class));
+  }
+}
+```
+
+
 
 ### <a name="optional"></a>Optional
 
@@ -2386,5 +2644,4 @@ DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyy");
 System.out.println(copa.format(formatador));
 //01/05/2020 -> data formatada
 ```
-
 
