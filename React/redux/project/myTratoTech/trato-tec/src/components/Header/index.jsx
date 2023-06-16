@@ -1,14 +1,19 @@
 import styles from "./Header.module.scss";
+import HeaderWithImage from "./HeaderWithImage";
+import HeaderWithoutImage from "./HeaderWithoutImage";
+
 export default function Header({ title, description, image, className = "" }) {
   return (
-    <header className={`${styles.header} ${className}`}>
-      <div className={styles["header-text"]}>
-        <h1>{title}</h1>
-        <h2>{description}</h2>
-      </div>
-      <div className={styles["header-image"]}>
-        <img src={image} alt={title} className={className} />
-      </div>
+    <header className={styles.header}>
+      {image && (
+        <HeaderWithImage
+          title={title}
+          description={description}
+          image={image}
+          className={className}
+        />
+      )}
+      {!image && <HeaderWithoutImage title={title} description={description} />}
     </header>
   );
 }
