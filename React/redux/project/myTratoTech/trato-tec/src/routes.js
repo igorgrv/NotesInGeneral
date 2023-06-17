@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import LandingPage from "components/LandingPage";
 import Home from "pages/Home";
 import Category from "pages/Category";
-import Cart from "pages/cart";
+import Cart from "pages/Cart";
 
 export default function Router() {
   return (

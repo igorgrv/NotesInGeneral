@@ -1,13 +1,15 @@
 import { configureStore } from "@reduxjs/toolkit";
 import categoriesSlice from "./reducers/categories";
-import itemSlice from "./reducers/items";
+import itemSlicer from "./reducers/items";
 import cartSlicer from "./reducers/cart";
+import searchSlicer from "./reducers/search";
 
 const store = configureStore({
   reducer: {
     categories: categoriesSlice,
-    items: itemSlice,
-    cart: cartSlicer
+    items: itemSlicer,
+    cart: cartSlicer,
+    search: searchSlicer
   },
 });
 

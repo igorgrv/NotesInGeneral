@@ -19,17 +19,14 @@ const cartSlicer = createSlice({
         id: payload,
         quantity: 1,
       });
-      // return [
-      //   ...state,
-      //   {
-      //     id: payload,
-      //     quantity: 1,
-      //   },
-      // ];
+    },
+    changeQuantity(state, { payload }) {
+      const item = state.find((item) => item.id === payload.id);
+      if (item.quantity >= 0) item.quantity += payload.quantity;
     },
   },
 });
 
-export const { changeCart } = cartSlicer.actions;
+export const { changeCart, changeQuantity } = cartSlicer.actions;
 
 export default cartSlicer.reducer;
