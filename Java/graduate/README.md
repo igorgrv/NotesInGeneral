@@ -2,16 +2,43 @@
 
 ## Lives
 
-* Canivete Suiço? Quais ferramentas escolher para o dia a dia de um backend.
+* Canivete Suiço? Quais ferramentas escolher para o dia a dia de um backend. :heavy_check_mark:
   *  https://zoom.us/rec/share/yyeoHiEZ6clMt3Qi4to4hJwRLxnJOkVdpBDQmQECiW5W8NCELYBLLsR7ex1t59lz.CJ0xaB8vht5RSf3A  
   * `7h3\*Xm@N`
-* SOAP vs REST vs gRPC: Qual devo usar para criar a API
+* SOAP vs REST vs gRPC: Qual devo usar para criar a API :heavy_check_mark:
   * https://zoom.us/rec/share/tQEJjH2DdiQ0IxkkOg_rEv7SPNdKzQegzsauiQXj5VsxtxluTD7s6lSYQcw2OX59.eElEMw44ytxmQIAI  
   * `!R2B4H%$`
+* LIVE EXTRA - Projeto Coda Comigo -  Utilização do Lombok/Validação com Bean Validation :heavy_check_mark:
+  * https://zoom.us/rec/share/lhQpqQa31owzO6Qta7jZxUQAci7FcpoomeSa6iH7GMm40rMgPfLGrpEjCKVTv3D3.dFGDEikLo7AjRaqk?startTime=1686783690000
+  * `$=AZ6&.H`
+*  LIVE EXTRA - Projeto Coda Comigo - DTO/Records :heavy_check_mark:
+  * https://zoom.us/rec/share/u0cY9y-15Qfm7E_iqotPxzdG5Q73fjwWEeHMa15W0LjZv9LKqDlPIEL3mpXXuble.82l50Sh6L0hFEKDw?startTime=1687387944000
+  * `8&7%wd#O`
+
+* LIVE EXTRA - Projeto Coda Comigo - Testes Unitários e Validação de Beans :heavy_check_mark:
+  * https://zoom.us/rec/share/vhCyPyXU6B6TAxdHAiXIsJsQgqf3cluIjkWWBnAwfB4cOkVByDABprKLz7suL3kl.BtvHrx32KkWvbp7b 
+  * `8*%SH^HE`
+
+* Live de Persistência 1: Introdução ao SQL e PostgresSQL :heavy_check_mark:
+  * https://zoom.us/rec/share/XO_PSbk7B6JdkGTgvP8c2JgheEntsnKkokjdb4X-dTPfYvX9P1D0TkyS-yDZfIo0.Pl_H1WY4q-VOA7dq 
+  * `28cC+%x0`
+
+* Live de Persistência 2: Mapeamento de Entidades JDBC :heavy_check_mark:
+  * https://zoom.us/rec/share/Jr92C0GFQ_RaTXi61m4kxzPNVvPSXoFGyNOQvPJqU6vfQOvGiI3hTXdflvlexu4R.p_zpC_r38RoSjcwj 
+  * `Q3.j@rqa`
+* Live de Persistência 3 + 4: Consultas com Spring JPA + Relacionamentos :heavy_check_mark:
+  * [https://zoom.us/rec/share/1rzC337hD5Xwo-CpstiaHAaNA3Ml_lieRx-9ZdgJnqmvlAY4l3JrRj4ccP6qMqHR.Iqj0gaZqqu9Dw13_](https://zoom.us/rec/share/1rzC337hD5Xwo-CpstiaHAaNA3Ml_lieRx-9ZdgJnqmvlAY4l3JrRj4ccP6qMqHR.Iqj0gaZqqu9Dw13_)
+  * `=aq!B2Y9`
+
+* Live de Persistência 5: Relacionamentos One to One e One to Many no JPA
+  * https://zoom.us/rec/share/HSUMl9Jsz1cO74hl799NmphzDKgAsu6EM4Fn2ZzjDY31ppChhwnDKv8rNxkn59D_.S8DqwjyPY1J7Ld3i 
+  * `g4c!dS?Z`
+
+
 
 ## April 27 - Aula Inaugural 00
 
-* Gustavo Genari - CEO FIAP)
+* Gustavo Genari - CEO FIAP
 * Paulo Vieira - CEO Alura
 * Adriano Almeida - COO Alura
 * Andrea Paiva - Head/Diretora MBA On
@@ -48,7 +75,7 @@ Notas:
 
 
 
-### Desafio 1
+**Desafio 1**
 
 https://forms.office.com/pages/responsepage.aspx?id=4r_bEbiJSUW-EM7DZOWVUcuxE3m2i81CkgE7F-PZ4k5UMFY4RTVZR0FKTlNKN1IwRTUzMVdLREkzRi4u
 
@@ -395,7 +422,7 @@ dependencies {
 * Lógica de negócio **DEVE ficar na classe de domínio!**
 * Lógica de tecnologia, deve ficar nas classes Services/Controllers
 
-# Fase 2 - Criação de API Rest w/ SpringBoot
+# Fase 1 - Criação de API Rest w/ SpringBoot
 
 ## Aula 1 - Chamando a API
 
@@ -536,4 +563,436 @@ public class User {
 ```
 
 
+
+
+
+# Fase 2 - DDD e Tests
+
+Fast-test:
+
+1. E
+2. E
+3. E
+4. E
+5. B
+
+## Aula 1 - Intro Domain Driven Design
+
+* DDD (*Domain Driven Design*) é uma **padrão de design de software**.
+* **NÃO PRECISAMOS USAR TUDO DO DDD**;
+* Nos ajuda **não sair escrevendo código SEM PLANEJAMENTOS**; (**GOHORSE!**)
+* Enfatiza a colaboração com um **domain expert** (uma ou mais pessoas) e um time de desenvolvedores, **para entender o domínio/goal** do projeto;
+
+<img src="./imageResource/subDomain.png" alt="subDomain" style="zoom:50%;" />
+
+
+
+### Design Estratégico
+
+* Por quê?
+  * Por que fazer XPTO?
+* O quê?
+  * O quê vamos fazer?
+* Como?
+  * Último step, no como fazer...
+
+### Subdomínio Principal
+
+*Heart of the business* / *core do negócio*
+
+* Em uma *escola* o **domínio é a educação!** é o Foco, missão principal da escola
+* É o que faz o seu projeto **ser** **diferente**;
+
+
+
+### Subdomínio de Genérico
+
+É todo **processo em comum com o resto do mercado**, é algo que **não fará diferença** no seu projeto, como:
+
+* Folha de pagamento;
+* Contabilidade;
+* Autenticação;
+
+É onde fica uma lógica complexa, **mas** que não é a principal...
+
+
+
+### Subdomínio de Suporte
+
+* Não afeta teu projeto se isso der problema...
+  * O software de Folha de pagamento está fora do ar, **podemos fazer via Excel**;
+
+
+
+## Aula 2 & 3 - Storytelling
+
+* Nada melhor do que entender o que **há de ser feito** com um conto de histórias!
+* Nada melhor do que uma história escutada por diferentes perspectivas, traga pessoas para contar sobre X assunto;
+
+**Todo domínio** começa com um *conto de histórias*, que contém **atores, objetos e ações**
+
+* **atores:** são as peças fundamentais do domínio; *Cliente, usuário, atendente*
+* **objetos**: é o meio, pode ser físico ou digital; *planilha, ticket, sistema de vendas*
+* **ação**: é a interação entre **atores e objetos**; Cliente acessa o sistema de vendas;
+  * usamos verbos!
+
+
+
+
+Quando usamos *storytelling*, é importante **numerarmos as ações**, para que exista uma ordem naquela história.
+
+* É o caminho feliz, ***sem if-else***
+* Utilize **pictogramas**, imagens que ilustram como objetos / ações agem
+
+<img src="./imageResource/ddd2.png" alt="ddd2" style="zoom:50%;" />
+
+**ATENÇÃO:** quando escutamos a história de um ***domain expert***, temos que separar:
+
+* ***AS IS***: como é hoje / realidade atual
+* ***TO BE***: como será / desejo / realidade futura
+
+
+
+Contar histórias nos ajuda:
+
+* Entender o domínio;
+* Estabeler uma linguagem em comum com o Domain Expert e o IT Expert;
+* Esclarescer mal entendido;
+* Desenhar processos de negócio;
+
+
+
+Integrantes principais:
+
+* **Domain expert**: quem irá contar a história
+* **Ouvintes:** todos que estão disponíveis a aprender a história (developers);
+* **Moderador**: quem irá fazer as perguntas ao domain expert e n deixar o assunto correr;
+* **Modelador**: quem irá fazer os pictogramas e fazer as anotações
+
+
+
+Outro exemplo com numerações, atores, ações e objetos:
+
+![storytelling](/./imageResource/storytelling.png)
+
+* Precisa descrever um ***if else*** dentro desse fluxo? **CRIE UM NOVO CENÁRIO!**
+
+
+
+Novo cenário na visão do **time de admissão**
+
+![storytelling2](./imageResource/storytelling2.png)
+
+* Com anotações/dicionário para entender a linguagem do time!
+
+
+
+Mesmo cenário, porém na visão do **time de marketing**
+
+![storytelling3](./imageResource/storytelling3.png)
+
+* Leads = Responsáveis = Pais = Prospects
+  * ![storytelling 4](./imageResource/storytelling 4.png)
+
+
+
+* É de extrema importância que haja um **a linguagem ubíqua** / linguagem em comum entre os envolvidos de diferentes áreas
+
+Existem ferramentas **WiKi** para nos ajudar a mapear  / catalogar os modelos
+
+* Notion.io
+
+O que é importante de se ter na **WiKi**:
+
+* Wiki central do projeto, que consolida todas as demais wikis;
+* Wiki com descrição do projeto;
+* Uma página para cada subdomínio (um para cada time do projeto);
+* Seção na wiki para **linguagem ubíqua**/**dicionário**;
+* Seção para os cenários que criamos, premissas e limitações;
+* Link para os repositórios
+* Link para ferramenta de gestão do projeto;
+
+
+
+## Aula 4 - Contexto Delimitados
+
+Existem diversos modelos de contextos delimitados e como eles se interagem:
+
+* **Parceria**
+  * Trabalham juntos, uma mudança é conversada com o outro
+  * Em microserviços trabalham com contratos
+  * <img src="./imageResource/parceria.png" alt="parceria" style="zoom:50%;" />
+* **Kernel Compartilhado:**
+  * **Se evite ao máximo!** É quando 2 times trabalham em uma mesma função de sub-domínios/contextos diferentes
+  * Comunicação é essencial! Para evitar código duplicado, ou quebrar algo do outro lado
+    * <img src="./imageResource/kernel.png" alt="kernel" style="zoom: 50%;" />
+* **Cliente Fornecedor**
+  * Aceita o que o fornecedor (upstream) faz, se ele altera, o cliente (downstream) altera
+    * <img src="./imageResource/clientFornecedor.png" alt="clientFornecedor" style="zoom:50%;" />
+* **Camada Anti-Corrupção (ACL)**
+  * Faz uma interface de meio de campo, entre o client e o fornecedor, assim se alguma alteração acontece no fornecedor, não precisam todos os sistemas serem alterados
+  * Como um JDBC para o Banco
+  * <img src="./imageResource/acl.png" alt="acl" style="zoom: 50%;" />
+    * AWS possui o Keyclock, que se integra com Google, Facebook e etc, fazendo o. trabalho de ACL para os times
+* **Linguagem Publicada (PL)**
+  * É o oposto do que acontece com o Cliente Fornecedor. Neste modelo o fornecedor se adequa ao cliente
+* **Caminho Separado**
+  * Muitas vezes apesar dos contextos terem algo em comum, pode acontecer do business ou time técnico decidirem cada um seguir com o seu desenvolvimento
+
+
+
+No Final, iremos ter um **MAPA DE CONTEXTO**, onde se junta diversas camadas e tipos de Contextos (junção de PL, ACL e etc)
+
+![mapa de contexto](./imageResource/mapa de contexto.png)
+
+
+
+## Aula 5 - Arquitetura e Lógica
+
+![arqLogica](./imageResource/arqLogica.png)
+
+* **Designed Tático**:
+
+  * É onde fica o `como` do DDD, é a parte prática, aqui definimos a linguagem, tecnologia, tipos de banco de dados (relacionao ou não), microserviços ou barramento e como se interagem
+
+* **Camada de interface de usuário (GUI)**:
+
+  * É onde fica a interface do usuário, interface de comando (CLI) e as APIs
+
+* **Camada de aplicação**:
+
+  * Aqui não fica a lógica de negócio e tbm n se altera estado de objetos, mas fica a parte de monitoramento que irá reportar as mudanças a outras camadas.
+  * Aqui ficam os gatilhos de atualização do sistema. (***cronjob***)
+
+* **Camada de Domínio**:
+
+  * É o core da aplicação (conceitos de negócio), aqui ficam os objetos e onde eles são alterados (é oq diferencia a aplicação, ***o segredo***).
+    * Exemplo: onde fica a lógica da nota dos alunos, planos de aula e etc
+
+* **Camada de Infra**:
+
+  * É a camada que da suporte as camadas superiores, é onde fica a mensageria por exemplo
+
+  
+
+  ![arqLogica2](./imageResource/arqLogica2.png)
+
+  
+
+## Aula 6 - Event Storming
+
+O Event Storming é a atividade prática, onde chamamos:
+
+* Domain Experts: irá descrever as atividades
+* Ouvintes: querem aprender sobre a história (developers)
+* Facilitador: que vai conduzir
+
+
+
+Nela iremos preencher:
+
+* **EV** -> Eventos (atividades **escritas no passado**);
+* **CM** -> Comandos (o que triga o evento, **escrita no presente**);
+* **AT** -> Atores (pessoas que executam Comandos);
+  * **PL** -> Política (sistema que faz o papel do ator, de trigar algum comando);
+* **PA** -> Ponto de Atenção (são as perguntas relacionada ao evento);
+* **ML** -> Modelo de Leitura (é a interface)<img src="./imageResource/eventStorming.png" alt="eventStorming" style="zoom: 50%;" />
+
+
+
+Dessa forma podemos criar os **agregados**, que são como as entidades irão se conversar
+
+![eventStormingContexto](/Users/igorgomesromerovilela/Development/NotesInGeneral/Java/graduate/imageResource/eventStormingContexto.png)
+
+
+
+# Fase 2 - Docker
+
+* O Docker surgiu como uma melhoria da então chamada **Maquina Virtual**
+* Para criar uma máquina virtual, é necessário fazer toda a instalação do Sistema Operacional (40 minutos no mínimo);
+* Docker vem com o conceito de **container**, onde permite **executar um sistema** de forma isolada com **somente as dependência/bibliotecas daquele sistema**.
+* Para configurar um container usamos **Dockerfile**, ali ficará instruções para criação do container!
+* **Docker Hub** é o **repositório de imagens**, ali nós podemos subir até mesmo **imagens personalizadas**, ou usar imagens que empresas fornecem (openjdk, python e etc);
+
+
+
+## Entendendo comandos
+
+* **`FROM`** -> aqui referenciamos a imagem que vamos usar
+* **`WORKDIR`** -> Definimos o diretório que iremos partir (igual ao `cd /folderX`)
+* **`RUN`** -> Executa em **tempo de criação da <u>imagem</u>**, qualquer comando, como se estivessemos no terminal
+* **`CMD`** -> Executa em **tempo de criação do <u>container</u>** - permite que o comando seja sobreescrito
+* **`ENTRYPOINT`** -> Executa em **tempo de criação do <u>container</u>** - NÃO permite que o comando seja sobreescrito
+* **`EXPOSE`** -> Utilizado para expor uma porta
+* **`COPY`** -> Copia arquivos ou pastas na criação da imagem
+* **`VOLUME`** -> Na criação da imagem referenciamos onde irá ficar os metadados;
+
+```dockerfile
+FROM ubuntu:22.10
+
+RUN apt-get update
+RUN apt-get install nginx -y
+
+VOLUME ["/var/www/html"]
+
+WORKDIR "/var/www/html/"
+
+COPY "index.html" "index.html"
+
+ADD "https://images.pexels.com/photos/1521304/pexels-photo1521304.jpeg" "foto.jpeg"
+# Como baixamos o arquivo precisamos alterar a
+# permissão para que seja possível acessá-lo
+RUN chmod 644 foto.jpeg
+
+ENTRYPOINT ["/usr/sbin/nginx", "-g", "daemon off;"]
+
+EXPOSE 80
+```
+
+
+
+## Docker Compose
+
+* Precisa gerenciar +1 container?
+* Precisa rodar +1 container junto?
+
+Use o **Docker Compose!**
+
+O Docker Compose é configurado **atarvés de um arquivo `docker-compose.yml`**, onde podemos declarar:
+
+* Serviços (db, APIs, frontend, backend) -> aqui vão as imagens do Docker/Dockerfile;
+* Volumes
+* Secrets
+* Portas
+
+### Comandos
+
+| Descrição comando                                        | Comando                                |
+| -------------------------------------------------------- | -------------------------------------- |
+| Executar Docker Compose com arquivo `docker-compose.yml` | `docker compose up`                    |
+| Para não segurar o terminal na execução                  | `docker compose up -d`                 |
+| Executar Docker Compose com arquivo customizado          | `docker compose -f FILENAME.yml up -d` |
+| Parar Docker Compose                                     | `docker compose down`                  |
+
+
+
+### Exemplo
+
+```yaml
+services:
+  db:
+    # We use a mariadb image which supports both amd64 & arm64 architecture
+    image: mariadb:10.6.4-focal
+    # If you really want to use MySQL, uncomment the following line
+    #image: mysql:8.0.27
+    command: '--default-authentication-plugin=mysql_native_password'
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=somewordpress
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=wordpress
+      - MYSQL_PASSWORD=wordpress
+    expose:
+      - 3306
+      - 33060
+  wordpress:
+    image: wordpress:latest
+    volumes:
+      - wp_data:/var/www/html
+    ports:
+      - 80:80
+    restart: always
+    environment:
+      - WORDPRESS_DB_HOST=db
+      - WORDPRESS_DB_USER=wordpress
+      - WORDPRESS_DB_PASSWORD=wordpress
+      - WORDPRESS_DB_NAME=wordpress
+volumes:
+  db_data:
+  wp_data:
+```
+
+
+
+## Docker Network
+
+Como trabalhar compartilhar uma rede entre containers???
+
+* O Docker fornece um driver padrão de rede, chamado **bridge**. Quando não especificamos o tipo de rede, o Docker irá automaticamente criar os containers e associara mesma rede.
+
+
+
+Devemos sempre ter alguns cuidados com network:
+
+* Mapear portas iguais! -> irá dar conflito
+* Esquecer de mapear as portas! 
+
+
+
+### Comandos
+
+Para criar uma rede customizada:
+
+```bash
+docker network create my-test
+```
+
+Para associar um container já existente a uma rede
+
+```bash
+docker network connect minha-rede meu-container
+# docker netword connect my-test frontend-app
+```
+
+
+
+### Exemplo
+
+```bash
+#irá criar uma rede chamada 'shared-network'
+docker network create shared-network
+
+#irá iniciar um BancoDeDados na rede 'shared-network'
+docker run --name db --network shared-network -e POSTGRES_PASSWORD=password -d postgres
+
+#irá iniciar um App Python  na rede 'shared-network'
+docker run --name python-app --network shared-network -d python:3.8 bash
+
+#Acessa o app python e instala as libs
+docker exec -it python-app bash
+pip install psycopg2-binary
+```
+
+De dentro do container `python-app` iremos criar um código python que irá **acessar o container `db`**
+
+```python
+import psycopg2
+
+conn = psycopg2.connect(
+    host="database",
+    database="postgres",
+    user="postgres",
+    password="password")
+
+cursor = conn.cursor()
+cursor.execute("SELECT * FROM <table_name>")
+rows = cursor.fetchall()	
+
+for row in rows:
+    print(row)
+
+conn.close()
+```
+
+Com arquivo criado:
+
+```bash
+python <nomedoarquivo>.py
+```
+
+
+
+## 
 

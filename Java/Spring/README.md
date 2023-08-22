@@ -221,6 +221,138 @@ spring.h2.console.path=/h2-console
 
 <img src="https://github.com/igorgrv/ForumAPI/blob/master/readmeImage/m22.PNG?raw=true" width=550 height=300>
 
+#### Carregar dados
+
+Com o H2 em memória, é possível criar um arquivo `import.sql` dentro da folder `src/resources` para que H2 faça os inserts automaticamente!
+
+
+
+### PostgreSQL
+
+```bash
+docker run --name postgres -e POSTGRES_PASSWORD=123 -e POSTGRES_USER=user -p 5432:5432 -d postgres:15.3-alpine3.18
+```
+
+
+
+### Múltiplos Databases
+
+E se precisarmos nos conectar em diferentes databases? servidores?
+
+* Com Spring, precisamos mapear utilizando o **`JDBC Template`**
+
+
+
+Se conecte em 2 diferentes servidores:
+
+```yaml
+# application.yml
+spring:
+  jpa.open-in-view: false
+	datasource:
+    server1:
+      jdbc-url: ${DB2_BASEURL_SERVER1}
+      username: ${DB2_USERNAME_SERVER1}
+      password: ${DB2_PASSWORD_SERVER1}
+    server2:
+      jdbc-url: ${DB2_BASEURL_SERVER2}
+      username: ${DB2_USERNAME_SERVER2}
+      password: ${DB2_PASSWORD_SERVER2}
+```
+
+
+
+Criar os Beans para o Spring:
+
+```java
+// src/main/configuration
+@Configuration
+public class DataSourceConfig {
+
+  @Bean(name = "server1")
+  @ConfigurationProperties(prefix = "spring.datasource.server1")
+  public DataSource dataSource1() {
+    return DataSourceBuilder.create().build();
+  }
+
+  @Bean(name = "jdbcTemplateServer1")
+  public JdbcTemplate jdbcTemplate1(@Qualifier("server1") DataSource ds) {
+    return new JdbcTemplate(ds);
+  }
+
+  @Bean(name = "server2")
+  @ConfigurationProperties(prefix = "spring.datasource.server2")
+  public DataSource dataSource2() {
+    return DataSourceBuilder.create().build();
+  }
+
+  @Bean(name = "jdbcTemplateServer2")
+  public JdbcTemplate jdbcTemplate2(@Qualifier("server2") DataSource ds) {
+    return new JdbcTemplate(ds);
+  }
+}
+```
+
+
+
+Para executar SQLs:
+
+```java
+// src/main/configuration
+@Slf4j
+@Component
+public class JdbcTemplateUtils {
+
+  private static final String SELECT_COUNT = "SELECT COUNT(*) FROM ";
+  private static final String GET_ALL_TABLES = "SELECT NAME FROM SYSIBM.SYSTABLES WHERE CREATOR = '";
+
+  public static List<String> queryForListOfStrings(JdbcTemplate jdbcTemplate, String sql) {
+    try {
+      return jdbcTemplate.query(sql, new RowMapper<String>() {
+        @Override
+        public String mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+          return resultSet.getString("NAME");
+        }
+      });
+    } catch (Exception e) {
+      throw new RuntimeException(e.getMessage());
+    }
+  }
+
+  public List<String> getAllTablesFrom(JdbcTemplate server1, String schemaName) {
+    String sql = GET_ALL_TABLES + schemaName + "' ORDER BY CARD DESC";
+    return executeTablesQuery(server1, sql);
+  }
+
+  private String getCountSql(String schemaName, String tableName) {
+    return SELECT_COUNT + schemaName + "." + tableName;
+  }
+
+  private Integer executeIntegerQuery(JdbcTemplate jdbcTemplate, String sql) {
+    try {
+      return jdbcTemplate.queryForObject(sql, Integer.class);
+    } catch (Exception e) {
+      log.error("QREP MONITOR - ERROR: {}", e.getMessage());
+      throw new RuntimeException(e.getMessage());
+    }
+  }
+
+  private List<String> executeTablesQuery(JdbcTemplate jdbcTemplate, String sql) {
+    try {
+      return JdbcTemplateUtils.queryForListOfStrings(jdbcTemplate, sql);
+    } catch (Exception e) {
+      log.error("QREP MONITOR - ERROR: {}", e.getMessage());
+      throw new RuntimeException(e.getMessage());
+    }
+  }
+}
+
+```
+
+
+
+
+
 # Annotations
 
 ## @ResponseBody
@@ -555,6 +687,37 @@ String partNumber = "123";
 MyRequest myRequest = new MyRequest(partNumber);
 // myRequest.partNumber = "000000000123"
 ```
+
+
+
+# Pageable
+
+Por default o `findAll` pode receber um `PageRequest`, e um `PageRequest` recebe 2 parâmetros:
+
+* `page` -> initial page
+* `size`-> quantidade de páginas
+
+```java
+@GetMapping
+  public ResponseEntity<Page<ProdutoDTO>> findAll(
+      @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
+      @RequestParam(value = "tamanho", defaultValue = "10") Integer tamanho) {
+
+    PageRequest pageRequest = PageRequest.of(pagina, tamanho);
+    Page<ProdutoDTO> produtos = produtoService.findAll(pageRequest);
+    return ResponseEntity.ok(produtos);
+  }
+```
+
+
+
+Por default, um `findAll(pageRequest)` devolve um tipo `Page`, que irá conter diversas inforções...
+
+
+
+# JPA - FOREIGN KEYS
+
+
 
 
 

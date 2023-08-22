@@ -297,7 +297,7 @@ export default function ItemComponent(props) {
 
 
 
-#### Push/Filter/Delete state
+#### Push/Filter state
 
 ```bash
 [Immer] An immer producer returned a new value *and* modified its draft. Either return a new value *or* modify the draft.
@@ -363,7 +363,370 @@ const seuSlice = createSlice({
 
 
 
-# Tópicos Adicionais <a href="adicionais"/>
+### CRUD (actions)
+
+Dado o `initialState` abaixo:
+
+```javascript
+const initialState = [
+  {
+    {
+    title: "XBOX",
+    description: 'Description',
+    id: uuid(),
+  },
+  {
+    {
+    title: "Playstation",
+    description: 'Description 2',
+    id: uuid(),
+  }
+]
+```
+
+* **Add**
+
+```react
+const mySlicer = createSlice({
+  name: 'mySlice',
+  reducers: {
+    // adicionamos ao state atual um objeto novo
+    addAction: (state, { payload }) => {
+      state.push( {...payload, id: uuid() })
+    }
+  }
+})
+```
+
+* **Update**
+
+```react
+const mySlicer = createSlice({
+  name: 'mySlice',
+  reducers: {
+    
+    // payload = { id: 123, title: 'newTitle', description: 'newDesc' }
+    updateAction: (state, { payload }) => {
+      // Encontramos o index do objeto a ser atualizado
+			const index = state.findIndex(item => item.id === payload.id)
+      
+      // Com o uso do Object.assign, atualizamos o valor desejado
+      Object.assign(state[index], {...payload} )
+    }
+  }
+})
+```
+
+* **Delete**
+
+```react
+const mySlicer = createSlice({
+  name: 'mySlice',
+  reducers: {
+    
+    // payload = "123"
+    updateAction: (state, { payload }) => {
+			const index = state.findIndex(item => item.id === payload)
+      
+      // Com o uso do Splice, iremos remover o elemento do array
+			state.splice(index, 1);
+    }
+  }
+})
+```
+
+
+
+
+
+# Middlewares - Chamando APIs
+
+<img src="https://redux.js.org/assets/images/ReduxAsyncDataFlowDiagram-d97ff38a0f4da0f327163170ccc13e80.gif" style="zoom:30%;" />
+
+* O Middleware fica **depois da execução da action**!
+* Middleware **escuta** que a **action foi executado** e faz o que deve ser feito
+* `configureStore` possui por padrão um middleware, chamado **`Thunk`** (mas existem outros como o **`Saga`**)
+
+
+
+## Redux Thunk
+
+Thunk **é um middleware** nos ajuda com as chamadas assíncronas no backend!
+
+### Axios
+
+```bash
+yarn add axios
+```
+
+Para configurar uma rota default no axios:
+
+```javascript
+// src/common/config
+import axios from 'axios';
+
+const api = axios.create({
+    baseURL: 'http://localhost:3001'
+});
+
+export default api;
+```
+
+
+
+### GET ALL
+
+* Criar `src/services/seuService.js`
+
+```javascript
+// src/services/itemService.js
+import api from '/common/config/api'
+
+const itemService = {
+  buscar: await () => {
+    const response = api.get('/items');
+    return response;
+  }
+}
+
+export default itemService;
+```
+
+* No Reducer `src/store/reducers/items.js`:
+
+  * Exportar uma constante que será utilizada pela `view` usando **`createAsyncThunk`**
+
+    ```react
+    const initialState = []
+    
+    export const searchItems = createAsyncThunk(
+      "items/search",
+      itemsService.search
+    );
+    ```
+
+  * Com o **`extraReducers`**, iremos usar o `builder` para definir os status que o Thunk devolve:
+
+    * `pending` -> carregando
+    * `fulfilled` -> then
+    * `rejected` -> catch
+
+    ```react
+    const itemSlice = createSlice({
+      name: 'itemSlice',
+      initialState,
+      
+      // criar o builder
+     extraReducers: builder => {
+        builder
+        .addCase(
+          buscarItens.fulfilled,
+          (state, { payload }) => {
+            console.log('itens carregados!');
+            return payload;
+          }
+        )
+        .addCase(
+          buscarItens.pending,
+          (state, { payload }) => {
+            console.log('carregando itens');
+          }
+        )
+        .addCase(
+          buscarItens.rejected,
+          (state, { payload }) => {
+            console.log('busca de itens rejeitada!');
+          }
+        )
+      }
+    })
+    ```
+
+
+
+## Listener
+
+* Listener é um middleware também já instalado do **react-toolkit**;
+* Como nome diz, podemos **escutar uma action** e então fazer algo!
+* Podemos usar **Listener + Thunk**;
+
+Para **criar um Listener** precisamos:
+
+1. Criar uma folder que irá ficar o listener `src/store/middlewares/` -> `items.js`
+
+2. Criar um `createListenerMiddleware` e exporta-lo
+
+   1. ```react
+      // src/store/middlewares/items.js
+      export const categoriaListener = createListenerMiddleware();
+      ```
+
+3. Importa-lo no `configureStore` (`/src/store/index.js`)
+
+   1. ```react
+      const store = configureStore({
+        reducer: {
+          categories: categoriesSlice,
+          items: itemSlicer,
+          cart: cartSlicer,
+          search: searchSlicer,
+        },
+        
+        // aqui adicionamos todos os liteners
+       middleware:
+          getDefaultMiddleware =>
+            getDefaultMiddleware().prepend(
+              categoriasListener.middleware,
+              itensListener.middleware
+            ),
+      });
+      ```
+
+
+
+Voltando ao `categoriaListener`, temos a opção:
+
+* ***clearListeners\***, que limpa os *listeners* já existentes;
+* ***middleware\***, que precisamos adicionar no `configureStore`, e faremos isso ainda nesse vídeo;
+* ***startListening\***, para começarmos a escutar algo;
+* ***stopListening\***, para parar de escutar algo;
+
+
+
+### StartListening & Get All
+
+Esse é o método que iremos escutar quando uma action acontece, e então executar algo.
+
+Exemplo base:
+
+1. Criamos uma `action` para o Listener:
+
+   ```react
+   // src/store/reducers/categories
+   import { createAction, createSlice } from "@reduxjs/toolkit";
+   
+   export const searchCategoryListener = createAction('categories/getOne')
+   ```
+
+2. Criamos o Listener com o `createListenerMiddleware`
+
+   ```react
+   // src/store/middleware/categories
+   
+   import categoriesService from "services/categories";
+   import { loadAllCategories, searchCategoriesListener } from "store/reducers/categories";
+   
+   export const categoryListener = createListenerMiddleware();
+   
+   categoryListener.startListening({
+     actionCreator: searchCategoriesListener, // quando alguém fizer o disptach dessa action
+     // o effect será chamado
+     effect: async (action, { dispatch, fork }) => {
+   
+       const categories = fork(async api => {
+         return await categoriesService.search();
+       })
+   
+       const result = await categories.result
+       if (result.status === 'ok')
+         dispatch(loadAllCategories(result.value))
+     }
+   })
+   ```
+
+   * `fork` 
+     * Fork é utilizado para realizar ***mini tarefas no middleware***
+     * Trata erros (**try/catch) de forma automática**
+     * Podemos **pausar, cancelar, por delay** na chamada
+     * Recebemos do fork um `cancel` ou `result`
+   * `dispatch` -> funciona igual ao `useDispatch` para chamar uma `action` do reducer
+
+3. Fazemos o `dispatch ` com o `useEffect` no component que irá carregar o `state:
+
+   ```react
+   export default function Home() {
+     const navigate = useNavigate();
+     const dispatch = useDispatch();
+     const categories = useSelector((state) => state.categories);
+   
+     useEffect(() => {
+       dispatch(searchCategoriesListener());
+     }, [dispatch]);
+   ```
+
+   
+
+### Unsubscribe
+
+Vamos dizer que **ao acessar** a página inicial o **Listener carregue algo**, e após acessarmos outra página e voltarmos para inicial **não queiramos carregar novamente** o que já foi carregado pelo Listener...
+
+* `unsubscribe` -> importado do `effect` do `startListening`, nos permite **PARAR O LISTENER**
+
+```react
+export const itemListener = createListenerMiddleware();
+
+itemListener.startListening({
+  actionCreator: searchItemsListener,
+  
+  // pegamos o unsubscribe
+  effect: async (action, { dispatch, fork, unsubscribe }) => {
+
+    const items = fork(async api => {
+      await api.delay(1000)
+      return await itemsService.search()
+    })
+
+    const result = await items.result;
+
+    // se sucesso, pararmos o Listener de escutar
+    if (result.status === 'ok') {
+      dispatch(loadItems(result.value))
+      unsubscribe()
+    }
+
+  }
+```
+
+
+
+### getState
+
+De dentro de um startListening também podemos recuperar o state!
+
+```react
+// src/store/middleware/item.js
+
+export const itemListener = createListenerMiddleware();
+
+itemListener.startListening({
+  actionCreator: loadCategory,
+  effect: async (action, { dispatch, fork, getState }) => {
+
+    const categoryName = action.payload
+    
+    // pegamos items do state
+    const { items } = getState();
+
+    const hasItemAlreadyLoad = items.some(item => item.category === categoryName);
+
+    if (hasItemAlreadyLoad) return;
+
+    await createTask({
+      fork,
+      dispatch,
+      action: loadAllItems,
+      service: () => itemsService.getItemByCategory(categoryName),
+      textLoading: `Loading items from ${categoryName}`,
+      textSuccess: `Items from ${categoryName} loaded with success!`,
+      textError: `Error while trying to load items from ${categoryName}`,
+    });
+  }
+})
+```
+
+
+
+# Tópicos Adicionais <a href="adicionais"/> :book:
 
 ## Classnames
 
@@ -409,6 +772,20 @@ return
     Página Inicial
   </a>
 ```
+
+
+
+PS: Se a classe tiver `-` , é necessário por entre `[]`:
+
+* Exemplo, para class `input-error`:
+
+```react
+className={classNames({
+    [styles["input-error"]]: errors.description,
+})}
+```
+
+
 
 
 
@@ -646,3 +1023,206 @@ console.log(reduce)
 */
 ```
 
+
+
+## React Hook Form
+
+```shell
+yarn add react-hook-form
+```
+
+O React Hook Form nos ajuda **com formulários,** onde não **precisamos** **declarar um state** para cada **input!**
+
+Como usar:
+
+* `useForm` -> é o hook que irá retornar as funções necessárias como:
+  * `register` -> que armazena o state
+  * `handleSubmit` -> que recebe os valores de `register`
+
+
+
+* **Sem** react-hook-form:
+
+```react
+export function default MyForm() {
+  const [name, setName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phoneNumber, setphoneNumber] = useState('');
+  const [email, setEmail] = useState('');
+  
+  function handleSubmit() {
+    console.log('Do something with all the forms')
+  }
+  
+  return (
+  	<form onSubmit={handleSubmit}>
+      <input type="text" placeholder="name" />
+      <input type="text" placeholder="lastName" />
+      <input type="text" placeholder="phoneNumber" />
+      <input type="email" placeholder="email" />
+    </form>
+  )
+}
+```
+
+* **Com** react-hook-form:
+
+```react
+import { useForm } from 'react-hook-form';
+
+export function default MyForm() {
+  
+  const { register, handleSubmit } = useForm();
+  
+  function cadastrar(params) {
+    console.log('states', params) // {name, lastName ...}
+  }
+  
+  return (
+  	<form onSubmit={handleSubmit(cadastrar)}>
+      <input {...register('name')} type="text" placeholder="name" />
+      <input {...register('lastName')} type="text" placeholder="lastName" />
+      <input {...register('phoneNumber')} type="text" placeholder="phoneNumber" />
+      <input {...register('email	')} type="email" placeholder="email" />
+    </form>
+  )
+}
+```
+
+### Validando campos
+
+O `react-hook-form` também nos permite marcar o campo com required, ou até mesmo por outras validações!
+
+* Dentro do `register`, coloque `,` e adicione as validações necessárias:
+
+```react
+<form onSubmit={handleSubmit(cadastrar)}>
+  <input {...register('name', { required: true })} type="text" placeholder="name" />
+  <input {...register('lastName', { required: true })} type="text" placeholder="lastName" />
+  <input {...register('phone', { required: true })} type="text" placeholder="phone" />
+  <input {...register('email	', { required: true })} type="email" placeholder="email" />
+</form>
+```
+
+* Existem diversas outra validações, com `maxLength`, `minLength` e etc;
+* O `required` **automaticamente da onBlur** no elemento faltante!
+
+
+
+### Default values
+
+Caso queira que um valor seja pré-selecionado:
+
+* dentro do `useForm`, crie um objeto do tipo `defaultValues` e passe o nome que colocamos no `register`
+
+```react
+import { useForm } from 'react-hook-form';
+
+export function default MyForm() {
+  
+  // defaultValues
+  const { register, handleSubmit } = useForm({
+    defaultValues: {
+      name: 'Igor'
+    }
+  });
+  
+  return (
+  	<form onSubmit={handleSubmit(cadastrar)}>
+      <input {...register('name')} type="text" placeholder="name" />
+      <input {...register('lastName')} type="text" placeholder="lastName" />
+      <input {...register('phoneNumber')} type="text" placeholder="phoneNumber" />
+      <input {...register('email	')} type="email" placeholder="email" />
+    </form>
+  )
+}
+```
+
+
+
+### Capturando errors
+
+O `react-hook-form` também pode capturar os errors do formulário!
+
+* `formState` -> capture do `useForm`
+* Extrai para uma constante `errors` o valor retornado de `formState`
+* Com o `classNames` faça a validação para exibir outro css caso tenha erro
+
+```react
+const { register, handleSubmit, formState } = useForm({
+    defaultValues: {
+      category: "",
+    },
+  });
+
+const { errors } = formState;
+
+return (
+  	<form onSubmit={handleSubmit(cadastrar)}>
+      <input 
+         className={classNames({
+            [styles["input-error"]]: errors.name,
+          })}
+        {...register('name')} type="text" placeholder="name" />
+    </form>
+)
+```
+
+
+
+## Component genéricos & forwardRef
+
+Quando temos um **componente genérico do HTML** precisamos utilizar o **`forwardRef`**!
+
+```react
+import { forwardRef } from 'react';
+import styles from './Input.module.scss';
+
+// Aqui passamos a ref como props
+function Input({ value, onChange, ...outrosProps }, ref) {
+  return (
+    <input
+      ref={ref}
+      value={value}
+      onChange={onChange}
+      {...outrosProps}
+      className={styles.input}
+    />
+  )
+}
+
+// Exportamos o componente
+export default forwardRef(Input);
+```
+
+
+
+## JSON-Server
+
+```bash
+npm install -g json-server
+```
+
+```json
+// package.json -> adicionar 'server'
+ "scripts": {
+    "server": "json-server --watch db.json --port 3001"
+  },
+```
+
+```json
+// db.json -> root do projeto
+{
+  "categorias":[], // -> cada array será uma rota
+  "items":[], // -> /items/{id} | /items
+}
+```
+
+
+
+Com o `db.json` acima teríamos:
+
+```  http
+  http://localhost:3001/categorias
+  http://localhost:3001/itens
+```

@@ -1,4 +1,5 @@
 # JUnit & TDD
+
 Testar é chato. Testar não avança o projeto. Vale a pena ficar testando tudo? Essa é uma das perguntas e afirmações mais feitas entre desenvolvedores, porém **infelizmente** muito bugs não surgem na hora de desenvolvimento, vão surgir no futuro…<br><br>
 
 Será que o método que foi criado agora não afeta outro método? Com um **teste automatizado**, podemos ter mais segurança de que nosso sistema esteja funcionando corretamente!<br>
@@ -708,6 +709,186 @@ public class LanceTeste{
 }
 
 ```
+
+
+
+# Repository (@DataJpaTest)
+
+Para testar uma repository, podemos usar do `@DataJpaTest`
+
+* Dado uma interface `IProdutoRepository` - faça um test que valide:
+
+  *  `findById`
+  * `save`
+
+  ```java
+  // src/test/java/...
+  package com.igor.product.repository;
+  
+  @DataJpaTest
+  public class ProductRepositoryTests {
+    
+    @Autowired
+    private IProductRepository productRepository;
+    
+    @Test
+    public void findByIdMustReturnProductIfexists() {
+      UUID id = new UUID.fromString("fdfe49fe-5be4-46ff-8fbe-e35b28b258e1");
+      Optional<Product> product = productRepository.findById(id);
+      
+      Assertions.assertTrue(product.isPresent());
+    }
+    
+    @Test
+    public void saveProductIfValid() {
+      Product product = new Product()
+        .setName("test")
+        .setPrice(3000)
+        .setDescription("description value")
+        .builder()
+        
+      var savedProduct = productRepository.save(product);
+      Assertions.assetNotNull(savedProduct);
+    }
+  }
+  ```
+
+
+
+## @BeforeEach
+
+```java
+@DataJpaTest
+public class ProdutoRepositoryTests {
+  @Autowired
+  private IProdutoRepository produtoRepository;
+
+  private UUID idExistente;
+  private UUID idNaoExistente;
+  private PageRequest pageRequest;
+  private long countTotalProdutos;
+  private String nomeAtualizado;
+
+  @BeforeEach
+  void setuUp() throws Exception {
+    idExistente = UUID.fromString("fdfe49fe-5be4-46ff-8fbe-e35b27b257e1");
+    idNaoExistente = UUID.fromString("fdfe49fe-5be4-46ff-8fbe-e35b27b25750");
+    pageRequest = PageRequest.of(10, 10);
+    countTotalProdutos = 5L;
+    nomeAtualizado = "Atualização nome do produto";
+  }
+
+  @Test
+  public void findAllDeveRetornarListaDeObjetosCadastrados() {
+    Page produtos = produtoRepository.findAll(this.pageRequest);
+    Assertions.assertEquals(produtos.getTotalElements(), countTotalProdutos);
+  }
+
+  @Test
+  public void findByIdDeveRetornarObjetoCasoIdExista() {
+    Optional<Produto> result = produtoRepository.findById(this.idExistente);
+    Assertions.assertTrue(result.isPresent());
+  }
+
+  @Test
+  public void findByIdDeveRetornarControllerNotFoundExcelptionCasoIdNaoExista() {
+    Assertions.assertThrows(ControllerNotFoundException.class, () -> {
+      produtoRepository.findById(this.idNaoExistente)
+          .orElseThrow(() -> new ControllerNotFoundException("Produto não encontrado"));
+    });
+  }
+```
+
+
+
+
+
+# Service (@ExtendWith) + Mock
+
+*  `@ExtendedWith` = iremos falar para o Spring que iremos Expandir as classes de configuração do Spring
+* `@InjectMocks` = funcionará como o `@autowired` para tests;
+* `@Mock` = irá simular a repository
+
+
+
+* Teste o `findById` do service
+
+```java
+@ExtendWith(SpringExtensions.class)
+public class ProductServiceTests {
+  
+  @InjectMocks
+  private ProductService service;
+  
+  @Mock
+  private IProductRepository productRepository;
+  
+  @Test
+  public void findByIdMustReturnProductDTO() {
+    UUID id = new UUID.fromString("fdfe49fe-5be4-46ff-8fbe-e35b28b258e1");
+
+    Product product = new Product()
+      .setName("test")
+      .setPrice(3000)
+      .setDescription("description value")
+      .builder()
+         
+    // Quando o service chamar repository.findBy o Mockito irá simular o retorno!
+    Mockito.when(productRepository.findById(id)).thenReturn(Optional.of(produto));
+
+    ProductDto productDto = service.findById(id);
+    Assertions.assertNotNull(productDto);
+  }
+}
+```
+
+
+
+# Controller (@WebMvcTest)
+
+* `@WebMvcTest` = espera uma controller para ser anotada, e irá simular as requisições HTTP;
+* `@MockBean` = para simular a service;
+* `MockMvc` = para simular o `path` da controller;
+
+* `get` = método static do `MockMvcRequestBuilders` para simular um GET request;
+* `status` = método static do `MockMvcResultMatchers` para simular o http status;
+
+```java
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(ProdutoController.class)
+public class ProdutoControllerTest {
+
+    @Autowired
+    MockMvc mockMvc;
+
+    @MockBean
+    ProdutoService produtoService;
+
+    @Test
+    public void findByIdDeveRetornarUmProdutoDTOCasoIdExista() throws Exception {
+        UUID id = UUID.fromString("fdfe49fe-5be4-46ff-8fbe-e35b27b257e1");
+
+        ProdutoDTO produto = new ProdutoDTO();
+        produto.setNome("PC");
+        produto.setPreco(3000.65);
+        produto.setDescricao("Pc Gammer");
+        produto.setUrlImagem("url 1");
+        produto.setId(id);
+
+        Mockito.when(produtoService.findById(id)).thenReturn(produto);
+
+        ResultActions result = mockMvc.perform(get("/produtos/{id}", id).accept(MediaType.APPLICATION_JSON));
+
+        result.andExpect(status().isOk());
+    }
+}
+```
+
+
+
+
 
 # TDD
 
