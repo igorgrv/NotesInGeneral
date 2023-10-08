@@ -2616,24 +2616,42 @@ A API de Datas do Java, foi implementada após anos utiliznado JODA (**_Java Obj
 
 ### Métodos
 * `LocalDate.now()` -> retorna a data de hoje - formato ISO;
+
 * `LocalDate.of(year, month, dayOfMonth)` -> utilizada para criar uma data com determinado ano, mês e dia;
-	
-	* `LocalDate.of(2020, Month.MAY, 1)`;
+
+  * `LocalDate.of(2020, Month.MAY, 1)`;
+
 * `LocalDate.getYear()` -> retorna o ano da variável
-	```java
-	LocalDate hoje = LocalDate.now(); //2020-05-01
-	LocalDate copa = LocalDate.of(2022, Month.JULY, 2);
-	
-	int anosFaltantesParaCopa = copa.getYear() - hoje.getYear();
-	System.out.println(anosFaltantesParaCopa); //2
-	```
+  ```java
+  LocalDate hoje = LocalDate.now(); //2020-05-01
+  LocalDate copa = LocalDate.of(2022, Month.JULY, 2);
+  
+  int anosFaltantesParaCopa = copa.getYear() - hoje.getYear();
+  System.out.println(anosFaltantesParaCopa); //2
+  ```
+
+* `LocalDate.minus(long, ChronoUnit)`
+
+  ```java
+  LocalDateTime value = ldt.minus(200, ChronoUnit.DAYS);
+  ```
+
+* Diferença entre 2 `LocalDateTime`:
+
+  ```java
+  long minutes = ChronoUnit.MINUTES.between(fromDate, toDate);
+  ```
+
+  
+
 * `Period.between(LocalDateOld, LocalDateNew)` -> retorna a quantidade de dias, meses e anos entre duas datas;
-	
-	* `Period.between(hoje, copa) -> ira retornar P2Y2M1D` 
+
+  * `Period.between(hoje, copa) -> ira retornar P2Y2M1D` 
+
 * `Period.getYear()` -> retorna o ano dentre o periodo dado
-	```java
-	System.out.println(periodo.getYears() + " anos e " + periodo.getMonths() + " meses");
-	```
+  ```java
+  System.out.println(periodo.getYears() + " anos e " + periodo.getMonths() + " meses");
+  ```
 
 ### Formatador de Datas
 Para formatar Datas, utilizamos a Classe `DateTimeFormatter`, que possui inumeros métodos, porém o mais utilizado é o `ofPattern`>
@@ -2643,5 +2661,8 @@ LocalDate copa = LocalDate.of(2022, Month.JULY, 2);
 DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyy");
 System.out.println(copa.format(formatador));
 //01/05/2020 -> data formatada
+
+// se for um timestamp 2023-09-11T15:05:47.000+0000
+DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssX");
 ```
 

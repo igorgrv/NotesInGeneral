@@ -1,38 +1,52 @@
 # Pós - Arquitetura e Desenvolvimento Java
 
+Matrícula: **RM430091** (vi96)
+
+Email: rm430091@fiap.com.br **(DtNasc#080396)**
+
+
+
 ## Lives
 
-* Canivete Suiço? Quais ferramentas escolher para o dia a dia de um backend. :heavy_check_mark:
+* Canivete Suiço? **Quais ferramentas escolher para o dia a dia de um backend**. :heavy_check_mark:
   *  https://zoom.us/rec/share/yyeoHiEZ6clMt3Qi4to4hJwRLxnJOkVdpBDQmQECiW5W8NCELYBLLsR7ex1t59lz.CJ0xaB8vht5RSf3A  
   * `7h3\*Xm@N`
-* SOAP vs REST vs gRPC: Qual devo usar para criar a API :heavy_check_mark:
+* SOAP vs REST vs gRPC: **Qual devo usar para criar a API** :heavy_check_mark:
   * https://zoom.us/rec/share/tQEJjH2DdiQ0IxkkOg_rEv7SPNdKzQegzsauiQXj5VsxtxluTD7s6lSYQcw2OX59.eElEMw44ytxmQIAI  
   * `!R2B4H%$`
-* LIVE EXTRA - Projeto Coda Comigo -  Utilização do Lombok/Validação com Bean Validation :heavy_check_mark:
+* LIVE EXTRA - Projeto Coda Comigo -  **Utilização do Lombok/Validação com Bean Validation** :heavy_check_mark:
   * https://zoom.us/rec/share/lhQpqQa31owzO6Qta7jZxUQAci7FcpoomeSa6iH7GMm40rMgPfLGrpEjCKVTv3D3.dFGDEikLo7AjRaqk?startTime=1686783690000
   * `$=AZ6&.H`
-*  LIVE EXTRA - Projeto Coda Comigo - DTO/Records :heavy_check_mark:
+*  LIVE EXTRA - Projeto Coda Comigo - **DTO/Records** :heavy_check_mark:
   * https://zoom.us/rec/share/u0cY9y-15Qfm7E_iqotPxzdG5Q73fjwWEeHMa15W0LjZv9LKqDlPIEL3mpXXuble.82l50Sh6L0hFEKDw?startTime=1687387944000
   * `8&7%wd#O`
 
-* LIVE EXTRA - Projeto Coda Comigo - Testes Unitários e Validação de Beans :heavy_check_mark:
+* LIVE EXTRA - Projeto Coda Comigo - **Testes Unitários e Validação de Beans** :heavy_check_mark:
   * https://zoom.us/rec/share/vhCyPyXU6B6TAxdHAiXIsJsQgqf3cluIjkWWBnAwfB4cOkVByDABprKLz7suL3kl.BtvHrx32KkWvbp7b 
   * `8*%SH^HE`
 
-* Live de Persistência 1: Introdução ao SQL e PostgresSQL :heavy_check_mark:
+* Live de Persistência 1: **Introdução ao SQL e PostgresSQL** :heavy_check_mark:
   * https://zoom.us/rec/share/XO_PSbk7B6JdkGTgvP8c2JgheEntsnKkokjdb4X-dTPfYvX9P1D0TkyS-yDZfIo0.Pl_H1WY4q-VOA7dq 
   * `28cC+%x0`
 
-* Live de Persistência 2: Mapeamento de Entidades JDBC :heavy_check_mark:
+* Live de Persistência 2: **Mapeamento de Entidades JDBC** :heavy_check_mark:
   * https://zoom.us/rec/share/Jr92C0GFQ_RaTXi61m4kxzPNVvPSXoFGyNOQvPJqU6vfQOvGiI3hTXdflvlexu4R.p_zpC_r38RoSjcwj 
   * `Q3.j@rqa`
-* Live de Persistência 3 + 4: Consultas com Spring JPA + Relacionamentos :heavy_check_mark:
+* Live de Persistência 3 + 4: **Consultas com Spring JPA + Relacionamentos :heavy_check_mark:**
   * [https://zoom.us/rec/share/1rzC337hD5Xwo-CpstiaHAaNA3Ml_lieRx-9ZdgJnqmvlAY4l3JrRj4ccP6qMqHR.Iqj0gaZqqu9Dw13_](https://zoom.us/rec/share/1rzC337hD5Xwo-CpstiaHAaNA3Ml_lieRx-9ZdgJnqmvlAY4l3JrRj4ccP6qMqHR.Iqj0gaZqqu9Dw13_)
   * `=aq!B2Y9`
 
-* Live de Persistência 5: Relacionamentos One to One e One to Many no JPA
+* Live de Persistência 5: **Relacionamentos One to One e One to Many no JPA** :heavy_check_mark:
   * https://zoom.us/rec/share/HSUMl9Jsz1cO74hl799NmphzDKgAsu6EM4Fn2ZzjDY31ppChhwnDKv8rNxkn59D_.S8DqwjyPY1J7Ld3i 
   * `g4c!dS?Z`
+
+* Live de Persistência 6: **Introdução ao JPQL** :heavy_check_mark:
+  * https://zoom.us/rec/share/dMcCbmBfJTvDED9F5QDmWijctCMPBtnAl7TiHsXxeS6A2eTqQHubMbr7AvN_Nyes.nlQ-y-TERsZKPnV3 
+  * `asUpp0?3`
+
+* Live: Dominando Deploys
+  * https://zoom.us/rec/play/TwpDfRDBo3ECl3J4UFoJc2hdHHfzqYgnhgQV0ec5PkSImaeIm83kVUyD-HipTwqZ3GF1d1-kaeJWBERZ.b7JBnJoQutf1xOJW?canPlayFromShare=true&from=recording_mg&continueMode=true&iet=ufWhVy3WaurrlpCIYANb5ax-FTSSDdnlG1kkpA6QOD4.AG.Bj1-tP8zJFxVljFA9-mnrldGsUCrXfxZ9Y1i3FrzJHh7FfjSZJ-UlCyLrybNz0m_qyXRC46PIpqM5JNcM9waiQPEyhWCSX2uAwGnwWjiJ3bCfs1AuxvOE4eMSEG9kvkvBKxmQVjn5g.4TlXsoAuySS4zLN_ogqquw.CsN21ab7qbfZg2mb&componentName=rec-play&originRequestUrl=https://zoom.us/rec/share/gtYrKfGvrrSnbxHec20p2mORi-EF4wi7WMltwgCgPAlZ0ZYGhQKimp1B1t3hQTeq.dlkP-LeQ00jU0ckW?iet=ufWhVy3WaurrlpCIYANb5ax-FTSSDdnlG1kkpA6QOD4.AG.Bj1-tP8zJFxVljFA9-mnrldGsUCrXfxZ9Y1i3FrzJHh7FfjSZJ-UlCyLrybNz0m_qyXRC46PIpqM5JNcM9waiQPEyhWCSX2uAwGnwWjiJ3bCfs1AuxvOE4eMSEG9kvkvBKxmQVjn5g.4TlXsoAuySS4zLN_ogqquw.CsN21ab7qbfZg2mb
+  * `8#N#wy@!`
 
 
 
@@ -994,5 +1008,1107 @@ python <nomedoarquivo>.py
 
 
 
-## 
+# Fase 3 - Deploys
+
+
+
+## Deploy local
+
+No java, o deploy local se dá pelo `jar` file, gerado pelo `mvn build` (dentro da pasta `target`).
+
+* Executando o programa (necessário java instalado):
+
+```java
+java -jar nomeDoSeuJar.jar
+```
+
+* O `war` é para subir no Tomcat;
+
+
+
+Com Docker:
+
+```dockerfile
+FROM maven:3.8.4-openjdk-17-slim AS build
+
+WORKDIR /app
+
+COPY . /app
+
+RUN mvn package
+
+FROM openjdk:17-jdk-slim
+
+COPY --from=build /app/target/*.jar /app/app.jar
+
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./unrandom", "-jar", "/app/app.jar"]
+```
+
+
+
+```bash
+docker build -t nomeDaImagem .
+docker run -d -p 3000:80 nomeDaImagem
+docker logs serieDoContainer
+```
+
+
+
+## Deploy no ECS (AWS)
+
+ECS (**Elastic Container Service**) é um serviço de container da AWS (SaaS - não precisamos gerenciar containers e etc, ele faz para nós) .
+
+* Para subir a imagem a AWS também oferece o ECR (**Elastic Container Registry**), funciona igual ao **Docker Hub**
+
+
+
+### Clusters
+
+O Cluster é um grupo que iremos ter:
+
+* Tipo de EC2 (tipo daque mina)
+* Networking
+
+
+
+### Task Definition
+
+Aqui vinculamos qual a imagem que será utilizada para criar o app.
+
+* Clique em ***Create Task Definition***
+  * **Fargate** -> Para trabalhar com serveless (por requisição)
+  * **EC2** -> sobe uma máquina (até 750h sem custo) - mais comum de uso
+* Clique em EC2;
+* Clique em Add Container;
+  * Preencha o nome do container
+  * Nome da imagem no docker hub ou no ECR;
+  * Mínimo de memória utilizado
+  * Portas
+  * Variável de ambiente
+  * Política de reinicialização
+
+
+
+### Service
+
+O Service precisa de uma task, é onde iremos declarar:
+
+* número de Tasks que serão executadas em paralelo
+* LoadBalancer
+
+É onde se faz o link entre a Task e o Cluster.
+
+
+
+No Service a gente pode configurar o tipo de `Capacity Provider`:
+
+* FARGATE_SPOT é 5x mais barato que o FARGATE, porém a AWS pode matar o serviço a qualquer momento (mas sobe outro), como se fosse um leilão -> **indicado para DEV/STG**
+
+
+
+## Deploy Azure (Microsoft)
+
+Conta: https://azure.microsoft.com/pt-br/free/students/ (100$ disponível)
+
+
+
+### Web App for Containers
+
+Serviço feito implantar e executar aplicativos em containers.
+
+Possui algumas facilidades:
+
+* Fácil implantação
+* Escalabilidade automática
+* Integra com outros services da Azure
+* Para container simples ou docker-compose
+
+
+
+### Azure Container Instance (ACI)
+
+Serviço também de implementar container, porém sem a necessidade de gerenciar a infra (como no ***Web App For Containers***).
+
+Este serviço é ideal para:
+
+* Apps com curta duração;
+* Executar de forma isolada;
+* Processamento de eventos;
+* Apps que não exigem escalabilidade
+
+
+
+### Azure Container Apps (ACA)
+
+Cria containers sem um servidor, e se integra com Docker Hub e outros repositórios.
+
+* Não exige necessidade de gerenciar infra
+* Serviço serveless da Azure
+* App baseado em container
+
+
+
+## Deploy Cloud Gratuita
+
+### Render
+
+https://dashboard.render.com/
+
+Render possibilita nos integrarmos com um repositório do GitHub e a partir dele realizar o deploy!
+
+* Necessário ter o Dockerfile
+
+<img src="./imageResource/render.png" alt="render" style="zoom: 33%;" />
+
+**Camada Free**: 512mb / 0.1CPU
+
+* Projeto vinculado com o git, então a todo commit, irá gerar um update na imagem
+
+Projeto ficará com a URL: https://nomedoprojeto.onrender.com
+
+
+
+### Heroku
+
+https://www.heroku.com/
+
+
+
+### Supabase
+
+https://supabase.com/
+
+É um servidor free para banco de dados
+
+# Fase 3 - Serverless
+
+Ter um servidor on-premisses, significa ter que cuidar de diversas coisas:
+
+* Garantir escalabilidade
+* Segurança
+* Infraestrutura (times e times de DevOps)
+* MUITA PREOCUPAÇÃO
+
+Como começar? com POCs, migrando em partes!
+
+
+
+## Serviços Serverless AWS
+
+**IAM**
+
+É onde a gente cria usuário que irão trabalhar em nossos projetos
+
+* Não é uma boa prática usar o usuário root criando instancias e etc
+* Cada usuário irá ter uma `access key` , usada para se autenticar
+
+**AWS Lambda:**
+
+* Executa código sem a necessidade de gerenciar servidores;
+* Executa pequenas funções criadas por nós
+* Executa tarefa que tem curta duração
+* Consultar banco, consultar cache
+* Funciona com diversas linguagens;
+* Invés de deixar um app que irá executar uma função somente um horário (cronjob), pode ser usado Lambdas;
+* **Limitado a 15 minutos de execução** por função;
+  * Limitado a 3GB de memória;
+
+**AWS Fargate:**
+
+* Executa containers sem a necessidade de servidor;
+* **ECS** (Elastic Container Service):
+  * Usa o Fargate para executar containers;
+  * ou usa o EC2 para executar containers;
+  * Mais caro do que EKS, por ser mais prático e fazer coisas para você
+* **EKS** (Elastice Kubernetes Service)
+
+**AWS EventBridge:**
+
+* Serviço de integração;
+* Step Functions:
+  * Pode se criar flows, de uma lambda para S3 e etc
+
+**AWS AppSync**:
+
+* App que possibilita o frontend consumir direto do banco (sem precisar do backend)
+* Baseado GraphQL:
+  * Funciona com Pub/Sub, mandamos um request e escutamos uma resposta
+  * Houve change no banco, recebemos na hora e avisamos o user;
+
+**AWS SQS (Simple Queue Service)**
+
+* Recebe uma mensagem, poem na fila e o consumidor consome;
+* Parecido com MQ;
+
+**AWS SNS (Simple Notification Service)**
+
+* Recebe uma notificação e possui vários consumidores consumindo ou também transmite para outra notificação;
+* Cria tópicos e pode publicar para um SQS
+* Pub/Sub
+
+**AWS API Gateway**:
+
+* Cria endpoints RESTFul para apps sem a necessidade de servidor;
+* Executa funções criadas por nós
+* Porta de entrada da aplicação
+* HTTP API - gerencia as rotas do app
+* WebSocket - fica em tempo real rodando
+* Por padrão e segurança, se deixa somente o API Gateway público e os demais serviços privados;
+
+
+
+Armazenamento:
+
+**AWS EFS (Elastic File System)**:
+
+* Serverless;
+* Escalável;
+* Volume -> Compartilha informações entre containers;
+* Arquivos temporários;
+
+**AWS S3**:
+
+* Escalável;
+* Para guardar arquivos como fotos, site estático;
+* Fornece APIs para poder armazenar files;
+
+
+
+Banco de dados:
+
+**AWS DynamoDB (NoSQL)**:
+
+* Escalável;
+* Serverless;
+* Se adapta ao fluxo (conexão disponível);
+* Parecido com o MongoDB (NoSQL);
+
+**AWS RDS (Relational Data Service)**:
+
+* Pode ser Serverless ou podemos setar as configs do banco de dados;
+* Podemos configurar o mínimo;
+
+**AWS Neptune (Graph Database)**:
+
+* É o Banco de dados feito com a idéia de gráficos;
+* Relacionamento são criados conforme criação do banco;
+
+
+
+Análise de Dados:
+
+**AWS RedShift**
+
+
+
+## Custos
+
+Quando migramos do on-premisses para Cloud, **precisamos fazer uma POC para estimar custos**.
+
+Exemplo - ***Empresa de venda de ingressos:***
+
+<img src="./imageResource/awsLambda.png" alt="awsLambda" style="zoom:50%;" />
+
+* API Gateway filtra a req da internet e direciona para Lambda (meio de campo)
+  * Faz autenticação e etc
+* Lambda irá executar uma função, q pode ser o GET no banco;
+* DynamoDB é o Banco que ajusta automaticamente os recursos;
+
+
+
+### Lamda
+
+Gratuito:
+
+* 1MM Requests por mês;
+* 400GB-seg de tempo computação por mês;
+
+Demais cobranças:
+
+* Por segundo baseado na memória/recurso disponibilizado;
+  * Dividido em ARM ou X86
+* Armazenamento temporário outros preços;
+
+
+
+Para Lamda, o ideal que seja um procssamento rápido, se for demorar, ideal é utilizar containers;
+
+* 15 Min limite;
+
+
+
+### API Gateway
+
+Gratuito:
+
+* 1MM de chamadas API por 12 meses;
+
+Custos:
+
+* Divididos em:
+  * API RESTFul
+  * Websocket
+* Baseado na região o preço irá mudar também
+* Cobrado por numero de requisições ou **por tempo de execução**
+* Armazenamento em Cache, cobrado por GB/hora
+
+
+
+### DynamoDB
+
+Gratuito:
+
+* 25GB de armazenamento
+
+Tipos de cobrança:
+
+* On demand: será cobrado por demanda, pode ser baixa ou alta
+* Provisionado: já sabemos o quanto iremos usar, mais barato
+
+
+
+### AWS Pricing Calculator
+
+É uma calculadora que dá estimativas de preço, nela podemos:
+
+* Selecionar o serviço (lambda, api gateway);
+  * Estipular a região;
+* número de requisições mês;
+* Tipo de máquina (arm/x86);
+* Tempo de cada requisição (ms);
+
+
+
+## AWS CLI
+
+Além da opção via UI, a AWS fornece meios de criarmos/manipularmos os recursos via CLI: https://aws.amazon.com/pt/cli/
+
+Para utilizar, primeiro precisamos configurar as credenciais:
+
+* Vá para o https://aws.amazon.com/ -> Sign in
+* Clique no profile -> Security Credentials
+* Create access key
+* No Terminal -> `aws configure` e coloque o access key com a chave
+
+
+
+## Containers na AWS
+
+Quando temos alguma execução que irá levar mais de 15 minutos, **não podemos usar Lambda**, e para isso a Amazon oferece:
+
+* ECS
+* ECR
+
+Junto com o API Gateway podemos expor esse serviço do ECS (que estará rodando com um container)
+
+### ECR
+
+O ECR nos permite subir uma imagem Docker para um registry da amazon, facilitando nossa vida para fazer depois o deplou no ECS
+
+* Com terminal aberto e o AWS CLI configurado:
+
+```bash
+aws ecr --region us-east-1 create-repository --repository-name test
+```
+
+* O comando irá devolver a URL com o repository, agora basta subirmos no Docker Hub
+
+```bash
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin pasteHereURl
+```
+
+```bash
+docker tag nomeDaImagemBuildada pastHereECRURL/nomeDaImagemBuildada
+docker push pastHereECRURL/nomeDaImagemBuildada
+```
+
+
+
+### ECS
+
+ECS serve para **Orquestrar a execução de tarefas em containers de forma serverless.**
+
+1. Criar um cluster (conjunto de recursos operacionais)
+2. Criar uma task definition (é onde configuramos os recursos/parametros do container)
+   1. Configuramos:
+      1. URL da imagem (ECR)
+      2. Porta
+      3. Variável de ambiente
+      4. Recurso de ram e cpu
+      5. Arquitetura do build da imagem Docker (atenção ao tipo, no mac é ARM64)
+      6. Número de containers
+      7. HealthChecks
+3. Criar um Service (é onde de fato irá publicar/expor o container com os valores definidos na Task Definition)
+   1. Configuramos:
+      1. Network
+      2. LoadBalancer
+      3. Replicas
+      4. AutoScaling
+
+Com um Service criado, será exposto um IP Publico de acesso ao ECS!
+
+* Task Execution Role é a função do agente que orquestra/gerencia o container
+
+
+
+### API Gateway
+
+Para expor uma API precisamos levar em conta algumas coisas, como:
+
+* Auth
+* Rotas/Direcionar rotas
+
+Para iniciar com o API Gateway, precisamos primeiro entender sobre **VPC (Virtual Private Cloud)**
+
+
+
+#### VPC (Virtual Private Cloud)
+
+* VPC funciona como uma rede privada da nossa casa, onde teríamos um roteador e vários outros computadores se conectariam via LAN
+
+Exemplo completo:
+
+<img src="./imageResource/vpc.png" alt="vpc" style="zoom:50%;" />
+
+**Criando uma VPC**
+
+1. Iremos precisar informar:
+   1. Qual region iremos ter a VPC (us-east-1a/b/c)
+   2. Número de subnets público e privado
+   3. Se queremos uma VPC exclusiva (placa de rede física dedicada)
+
+**Security Group**
+
+Para controlar o range de IP ou quem acessa tanto o LoadBalancer quanto os clusters, criamos o chamado **Security Group**, e dessa forma mapeamos como componentes se comunicar dentro de uma VPC!
+
+EXEMPLO:
+
+1. Criar um Security Group para LoadBalancer (tudo que for loadbalancer usaria o mesmo grupo)
+   1. Em **Inbound rules**, permitiríamos que todo mundo entrasse *Anywhere-ipv4
+   2. En **Outbound rules**, permitiríamos que todo mundo entrasse *Anywhere-ipv4
+2. Agora para o **Security Group do Cluster**, não permitiríamos o **Inbound** para anywhere, e sim para o **SecurityGroup do LoadBalancer**, assim, garantíamos que somente o loadbalancer acesse os cluters
+
+
+
+#### Target Group
+
+Para criarmos um LoadBalancer, precisamos primeiro de um TargetGroup.
+
+Para criar um Target Group precisamos ir em EC2, e ali iremos configurar para `IP Addresses` (uma vez que o ECS se comunica via IP).
+
+
+
+#### LoadBalancer
+
+Por se tratar de um uso para o API Gateway, devemos configurar **como Interno**
+
+#### Cluster
+
+Como uma Security Group ja criado, iremos **criar um Cluster** **usando o Security Group do cluster.**
+
+Com o Cluster criado, podemos **aproveitar a Task Definition** que já tivemos e **criar um Service**, também usando a subnet e vpc privada, feita usando os security group do Cluster VPC, e também usando o loadbalancer já criado
+
+#### Criando API Gateway
+
+Com VPC + Security Group (p/ LB e Cluster) + Target Group + LoadBalancer + Cluster/Services criados, está na hora de mapearmos um API Gateway!
+
+* Em **API Gateway**, vamos em `buil` um **HTTP API**, e colocamos o nome da API Name, e `create` -> irá já expor uma URL pública
+* Em **Routes**, iremos mapear um ANY -> `/{proxy+}` - dessa forma qualquer nova rota irá usar essa integração.
+* Em **Integrations**, iremos criar um `Private Resource` -> Target service como **ALB/NLB** (appliacation lb e network lb)
+
+
+
+## Autenticação
+
+### Amazon Cognito
+
+* 50K users ativos por ano é gratuito
+* Permite MFA
+* Acesso via redes sociais (google, Facebook e etc)!
+* Disponibiliza formulário de preenchimento
+* Pode segregar usuários (admins e users comuns)
+* Possibilita migração
+* Escalável
+
+
+
+**Criando User Pools**
+
+User Pools é onde colocamos as configs de cadastro dos usuários.
+
+1. **Provider Types**: Cognito user Pool + Federated identify (acesso com Google etc)
+2. **Sign in options**: Tipos de sign in, como **por email/usuários/phone**;
+3. **Password policy**: Podemos configurar qual tipo de senha;
+4. **MFA**: por ou não por MFA
+5. **Recover**: podemos setar como recuperar a senha;
+6. **Self signup**: permitir que o usuário se cadastre;
+   1. Aqui podemos colocar até 50 tipos de atributos do usuário;
+7. **Domain**: podemos integrar uma tela ja existente, ou criar uma do cognito do zero
+
+<img src="./imageResource/cognito.png" alt="cognito" style="zoom:30%;" />
+
+
+
+## Lambda
+
+Lambda não cobra, mas conforme o uso, ele cobra pelo uso de RAM e CPU
+
+* Lambda recomendado para coisas que não tem uso contínuo!
+  * Fez uma chamada, ela retorna de forma rápida algo, não é para ser usado para grande processamento
+
+
+
+No lambda iremos colocar **literamente um código!** e este código será executado pela AWS
+
+
+
+**Criando Lamda**:
+
+* **Create function**:
+  * **Blueprint**, a AWS dá diversos exemplos prontos (chamados **blueprints**) que são códigos prontos para serem executados
+
+<img src="./imageResource/lambdablueprint.png" alt="lambdablueprint" style="zoom:50%;" />
+
+* ​	**Author from scratch**: colocamos a linguagem
+
+* Selecionamos o tipo de arquitetura que será utilizado
+* **Lambda function code**, é onde ficará o lamda q será executado
+
+<img src="./imageResource/lambdafunction.png" alt="lambdafunction" style="zoom:50%;" />
+
+
+
+## SAM
+
+Deseja testar, criar e implantar aplicativos serverless? AWS oferece o SAM (**Serverless Application Model**)!
+
+* Através de um YAML é possível configurar o ambiente
+
+
+
+
+
+# Fase 3 - NoSQL MongoDB
+
+* **NoSql** = ***Not Only SQL***
+* O MongoDB é um sistema NOSQL
+* Ao invés de utilizar dados relacionais, é utilizado o formato JSON ou BSON (binary Json);
+* Orientado a Documentos;
+* Fornece alta disponibilidade/tolerância falhas;
+* Suporta QREP;
+* Suporta consulta avançada, incides;
+
+**Estrutura:**
+
+```
+Da		tabase
+		|_______ Colections
+									|_______ Documents
+```
+
+
+
+## NoSql X Sql
+
+* Quando queremos mais desempenho? 
+
+* O NOSQL NÃO SUBSTITUI O SQL;
+
+* Precisa lidar com dados não estruturados ou semi estruturados?
+
+* Precisa de uma alta velocidade de leitura e gravação?
+
+* Precisa de flexibilidade?
+
+  * Um Documento pode conter:
+
+    * ```json
+      {
+        "_id":"123",
+        "name":"Igor",
+        "age":27
+      }
+      ```
+
+  * Como pode ter:
+
+    * ```json
+      {
+        "_id":"123",
+        "age":27
+      }
+      ```
+
+
+
+### Vantagens NoSql
+
+A maior vantagem do NoSql em relação SQL se dará muito em **como o dado foi estruturado usando NoSql**!
+
+Vamos imaginar a página abaixo:
+
+<img src="./imageResource/nosqlarticle.png" alt="nosqlarticle" style="zoom:30%;" />
+
+* Podemos ter:
+  * Autor
+  * Artigo
+  * Categoria
+  * Comentários
+
+Utilizando o SQL teríamos:
+
+<img src="./imageResource/sqlArticle.png" alt="sqlArticle" style="zoom:50%;" />
+
+* Para exibir uma tela, teríamos que realizar pelo menos 3 consultas!
+
+```sql
+SELECT artigos.*, autor.name FROM artigos
+INNER JOIN autor ON autor.autor_id = artigos.audtor_id
+WHERE artigo_url = 'xyz';
+
+SELECT categoria.*, autor.name FROM categoria
+INNER JOIN artigo_categoria ON artigo_categoria.idCategoria = categoria.id
+WHERE artigo_categoria.id = 'xyz';
+
+SELECT comentario.* FROM comentario
+WHERE comentario.artigo_id = 'xyz';
+```
+
+
+
+Com **NoSql os dados podem e devem ser duplicados em um único documento**!
+
+* Pelo NoSql ser muito performático, o melhor uso dele é colocar tudo que uma tela precisa em um único documento
+  * **ATENÇÃO!** quando for atualizar o nome do Autor por exemplo, precisará atualizar todos documentos de outras collections que possuem o nome daquele Autor!
+
+```json
+{
+    _id: ObjectId("64a495d6896e49abd95879e8"),
+    title: 'Title do artigo',
+    categoria: "Categoria x", 
+    author: {
+      "_id": ObjectId("123")
+       "name": "Igor Romero",
+       "email": "igorgrv@hotmail.com"
+ 		},
+    comentarios: [
+      {
+	      "_id": ObjectId("123"),
+        "body":"meu comentario"
+      }
+    ]
+}
+```
+
+
+
+## Tipos de relacionamentos
+
+Sim, Nosql tem relacionamentos!
+
+* Incorporação
+* Referência (referencia chave valor, um documento vai ter a chave do outro)
+* Desnormalização
+
+### Incorporação
+
+Quando um Documento incorpora/possui outro documento
+
+Exemplo - **Usuário vs Postagens**
+
+```json
+{
+  "_id": ObjectId("user1"),
+  "nome": "João",
+  "idade": 25,
+  "postagens": [
+    {
+      "_id": ObjectId("post1"),
+      "titulo": "Primeira postagem",
+      "conteudo": "Conteúdo da primeira postagem"
+    },
+    {
+      "_id": ObjectId("post2"),
+      "titulo": "Segunda postagem",
+      "conteudo": "Conteúdo da segunda postagem"
+    }
+  ]
+}
+```
+
+
+
+### Referência:
+
+Como o nome diz, um documento referencia o outro por Id:
+
+```json
+{
+  "_id": ObjectId("user1"),
+  "nome": "João",
+  "idade": 25,
+  "postagens": [
+    ObjectId("post1"),
+    ObjectId("post2")
+  ]
+}
+```
+
+
+
+### Desnormalização
+
+Basicamente se trata de **duplicar dados** de um documento em vários, para melhorar o desempenho das consultas (evitando buscas em diversos documentos)
+
+* Usado quando pensamos no que uma página irá exibir (trazemos somente as informações q a página precisa);
+* Útil quando se tem consultas frequentes, que exigem acesso rápido aos dados;
+* Melhora o desempenho das consultas
+* **Contras: ocupa mais espaço no banco e cria redundância de dados**
+
+Exemplo - trazer a última postagem do usuário:
+
+```json
+{
+  "_id": ObjectId("user1"),
+  "nome": "João",
+  "idade": 25,
+  "ultimaPostagem": {
+    "_id": ObjectId("post2"),
+    "titulo": "Segunda postagem",
+    "conteudo": "Conteúdo da segunda postagem"
+  }
+}
+```
+
+
+
+## Instalando CLI
+
+MongoDb Community Server: https://www.mongodb.com/try/download/community
+
+Mac: 
+```shell
+$ brew install mongodb-atlas
+$ atlas setup
+```
+
+Depois de instalar, tente:
+
+```bash
+mongosh
+```
+
+Se retornar
+```bash
+➜  /usr mongosh
+Current Mongosh Log ID:	651f5f0ce4f49732716ff4f7
+Connecting to:		mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.1
+MongoNetworkError: connect ECONNREFUSED 127.0.0.1:27017
+```
+
+Tente pausar e restartar:
+
+```bash
+brew services stop mongodb-community
+brew services start mongodb-community
+```
+
+Resultado esperado:
+
+```bash
+➜  /usr mongosh
+Current Mongosh Log ID:	651f5f27e507f33d557300d4
+Connecting to:		mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.1
+Using MongoDB:		7.0.2
+Using Mongosh:		2.0.1
+
+For mongosh info see: https://docs.mongodb.com/mongodb-shell/
+
+------
+   The server generated these startup warnings when booting
+   2023-10-05T22:13:11.933-03:00: Access control is not enabled for the database. Read and write access to data and configuration is unrestricted
+------
+
+test> show databases
+admin   40.00 KiB
+config  12.00 KiB
+local   40.00 KiB
+```
+
+
+
+## Instalando MongoDb Compass
+
+Link: https://www.mongodb.com/try/download/compass
+
+<img src="./imageResource/mongodbCompass.png" alt="mongodbCompass" style="zoom:80%;" />
+
+## Comandos
+
+* Iniciar servidor mongo: **`mongod`**
+
+* Mostrar banco: **`show databases`**
+
+* Selecionar o banco: **`use nomeDoBanco`**
+
+* Criar collection: **`db.createCollection("nomeColecao")`**
+
+  * Precisa estar no banco, com o `use`
+
+* Mostrar colections: **`show collections`**
+
+* Deletar collection: **`db.nomeCollec.drop()**
+
+* Count documentos de uma collection: **`db.nomeCollection.countDocuments()`**
+
+* Listar documentos: **`db.nomeCollection.find()`**
+
+* Listar com filtro: **`db.nomeCollection.find({},{})`**
+
+  * Find recebe 2 parâmetros:
+
+    * 1. parâmetro: se `{}` irá trazer todos os documentos, seria nosso `WHERE` 
+      2. parâmetro: é o que queremos ver, seria nosso `SELECT`
+
+    ```json
+    db.customers.find({}, {"_id": 0})
+    // significa que queremos todos documentos
+    // mas que não mostre o _id
+    
+    db.customers.find({}, {"_id": 1})
+    // irá exibir somente o _id
+    ```
+
+  * `LIKE` no NoSql é feito pelo `//`
+
+    ```json
+    db.customers.find({nome: '/I/'})
+    // podemos por 'i' ao final, para ignorar camelCase
+    db.customers.find({nome: '/I/i'})
+    ```
+
+  * StartsWith é feito pelo `/^/`
+
+    ```json
+    db.customers.find({nome: '/^Ig/i'})
+    ```
+
+  * `>=` -> Greater than
+
+    ```json
+    db.customers.find({idade: {$gte: 18}})
+    ```
+
+  * `AND` por mais de uma busca
+
+    ```json
+    db.customers.find( { idade: {$gte: 18}, nome: {$regex: /i/} })
+    ```
+
+  * Baseado em um objeto dentro de um **objeto**
+
+    ```json
+    // dado: { _id: 123, autor: { nome: igor} } -> busque este elemento
+    db.customers.find( {"autor.nome": "igor" })
+    ```
+
+  * Baseado em um objeto de um **array**:
+
+    ```json
+    // dado: { _id: 123, tags: ["tag1","tag2"] } -> busque tag2
+    db.customers.find( {tags: "tag2"})
+    ```
+
+* Count + Find: **`db.nomeCollec.find( {atributo: valor} ).count()`**
+
+```json
+db.customers.find( {idade: {$gt: 40} } ).count()
+```
+
+* Find + Range: **`db.nomeCollec.find({atributo: {$ind:[x,u]} })`**
+
+```json
+db.customers.find({idade: {$in:[1,4]} })
+```
+
+* Add um documento: **`db.nomeCollection.insertOne({ nome: "test" })`**
+
+* Add vários documentos: **`db.nomeCollection.insertMany([{ nome: "test" },{ nome: "test2" }])`**
+
+  * MongoDb permite criar variáveis temporárias:
+
+    ```bash
+    custArray = [{ nome: "test" },{ nome: "test2" }]
+    db.customers.insertMany(custArray)
+    ```
+
+* Ordernar um documento: **`db.nomeCollection.find().sort({atributo: 1})`**
+
+  * se `1` -> ASC
+
+  * se `-1` -> DESC
+
+    ```json
+    db.nomeCollection.find().sort( {nome: 1} )
+    ```
+
+* Atualizar um doc: **`db.nomeCollection.replaceOne( {atributo: 'valorAntigo'}, {atributo: 'valornovo'})`**
+
+```json
+db.nomeCollection.replaceOne( {nome: 'Igor'}, {nome: 'Igor2', idade: 23})
+```
+
+*PERIGOSO! O ideal é fazer um **UPDATE com WHERE***
+
+* Atualizar doc pela chave: **`db.nomeCollection.updateOne( {_id: 123}, {$set: {atrib: valor} })`**
+
+```json
+// $set -> altera o dado do elemento/ou inclui caso n exista
+// dado: { _id: 123, nome: Tiago }
+db.customer.updateOne( {_id: ObjectId("123")}, {$set: {nome: "Igor", Idade: 2} })
+// após o set: { _id: 123, nome: Igor, idade: 2}
+```
+
+* Atualiza o subdocumento
+
+  ```json
+  // dado: { _id: 123, autor: {nome: Igor} } -> troque nome do autor
+  db.customer.updateOne( {_id: ObjectId("123")}, {$set: {"autor.nome": "Tiago"} })
+  ```
+
+  
+
+* Atualizar TODOS doc: **`db.nomeCollec.update( {}, {$set: {att: valor}}, {multi:true})`**
+
+```json
+db.customers.update( {}, {$set: {idade: 0}}, {multi:true})
+```
+
+* Remover um campo: **`db.nomeCollection.updateOne( {_id: 123}, {$unset: {atrib: "valor"}})`**
+
+```json
+// $unset -> remove o atributo
+db.customer.updateOne( {_id: 123}, {$unset: {cidade: "rj"}})
+```
+
+* Adicionar um objeto a um array: **`db.nomCol.updateOne( {_id: 123}, {$push: {atrib: "valor"}})`**
+
+```json
+// push add objeto a um array
+// dado: { title: test, comentario: [] }
+// add um objeto array 'comentario'
+db.post.updateOne( {_id: 123}, {$push: {comentario : {title: comentTitle} } })
+```
+
+* Remover um objeto de um array: **`db.nomCol.updateOne( {_id: 123}, {$pull: {atrib: "valor"}})`**
+
+```json
+// $pull remove objeto de um array
+// dado: { title: test, comentario: [ { title: comentTitle} ] }
+// remova o comentario 'comentTitle'
+db.nomeCollection.updateOne( {_id: 123}, {$pull: {comentario : {title: comentTitle} } })
+```
+
+* Deletar um doc: **`db.nomeCollection.deleteOne( {atributo: valor} )`**
+
+```json
+db.customers.deleteOne( {_id: ObjectId("id")} )
+```
+
+* Distinct: **`db.nomeCollec.distinct("atributo")`**
+
+```json
+db.customers.distinct("nome")
+```
+
+* Count Docs if Exists: **`db.customers.find( {attr: {$exists:true} }).count()`**
+
+```json
+db.customers.find( {"nome":{$exists:true}} ).count()
+```
+
+* Data: **`ISODate("2023-10-01T01:00:00.00Z")`**
+
+* GROUP BY: **`db.nomeCollec.agregate(operations)`**
+
+  * No exemplo abaixo iremos agregar pelo nome, e queremos fazer uma soma dos counts
+
+    * ```json
+      db.customers.agregate( [ {$group: {_id: "name", num_tutorial: {$sum: 1} } } ] )
+      ```
+
+  * Se quiseremos somar pelo field `likes`:
+
+    * ```json
+      db.customers.agregate([{$group: {_id: "name", num_tutorial: {$sum: "$likes"} }}])
+      ```
+
+* INNER JOIN: **`db.nomeCollec.agregate([{ $lookup:{} }])`**
+
+  ```json
+  // dado as 2 collections: ORDERS & PRODUCTS faça o innerJoin
+  // Order: { _id: 1, productId: 101}
+  // Product: { _id: 101, name: "xbox", category: "eletronic"}
+  
+  db.orders.agregate([{
+    $lookup: {
+      from: "products",
+      localfield: "productId",
+      foreignField: "_id",
+      as: "product"
+    }
+  }])
+  ```
+
+  * `$project` -> serve para filtrar o que queremos ver do `$lookup`:
+
+    ```json
+    db.orders.agregate([{
+      $lookup: {
+        from: "products",
+        localfield: "productId",
+        foreignField: "_id",
+        as: "product"
+      }
+    }, {
+      $project: {
+        _id: 0,
+        productName: "$product.name"
+      }
+    }])
+    ```
+
+  * `$match` -> serve para fazer um filtro (`WHERE`) no INNER JOIN:
+
+    ```json
+    db.orders.agregate([{
+      $lookup: {
+        from: "products",
+        localfield: "productId",
+        foreignField: "_id",
+        as: "product"
+      }
+    },
+    {
+      $match: {
+        "product.category":"eletronics"
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        productName: "$product.name"
+      }
+    }])
+    ```
+
+
+
+
+
+
+
+
+
+
 

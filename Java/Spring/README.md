@@ -233,6 +233,29 @@ Com o H2 em memória, é possível criar um arquivo `import.sql` dentro da folde
 docker run --name postgres -e POSTGRES_PASSWORD=123 -e POSTGRES_USER=user -p 5432:5432 -d postgres:15.3-alpine3.18
 ```
 
+`application.yml` com config do Postgres
+
+```yaml
+spring:
+    datasource:
+        url: jdbc:postgresql://localhost:5432/energy-monitor
+        driverClassName: org.postgresql.Driver
+        username: ${DBUSER:user}
+        password: ${DBPASS:123}
+```
+
+Importante ter no pom:
+
+```xml
+<dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <version>42.6.0</version>
+</dependency>
+```
+
+
+
 
 
 ### Múltiplos Databases
@@ -566,6 +589,49 @@ public class ContaCorrenteController {
 
 
 
+## @Transactional
+
+Toda vez que **vamos salvar algo no DB**, estamos **abrindo uma conexão**, quando o `open-view` está habilitado, o JPA **mantêm a** **conexão com o DB aberta**!
+
+Quando setamos no `application.properties/yaml` o atributo como `false`, estamos falando para o JPA fechar a conexão para cada requisição
+
+```yaml
+spring.jpa.open-in-view: false
+```
+
+**Problema:**
+
+* **Se a entidade tiver relacionamento com outra entidade** e formos salvar algo **irá dar erro**, pois a JPA irá encerrar a conexão assim que salvar na primeira tabela, e não consiguirá salvar na segunda tabela (irá dar erro 500).
+
+Adicionando o `@Transactional` falamos para o **Spring criar uma transação!**, ou seja, quando vamos salvar algo, o Spring cria uma transação, que só é comitada quando todo processo for finalizado.
+
+* Caso aconteça um problema dentro desta transação, **será feito um ROLLBACK** de tudo que foi feito
+
+```java
+@Transactional
+public ProdutoDTO save(ProdutoDTO produto) {
+    Produto entity = new Produto();
+    mapperDtoToEntity(produto, entity);
+    var produtoSaved = repo.save(entity);
+    return new ProdutoDTO(produtoSaved, produtoSaved.getCategorias());
+}
+```
+
+
+
+Também é possível declarar o transactional como `readonly = true` para aumentar a performance
+
+```java
+@Transactional(readOnly = true)
+public Page<ProdutoDTO> findAll(PageRequest pagina) {
+    var produtos = repo.findAll(pagina);
+
+    return produtos.map(prod ->  new ProdutoDTO(prod, prod.getCategorias()));
+}
+```
+
+
+
 # DTO vs Record
 
 A partir do java 16, foi criado um novo recurso, o **`record`** , para:
@@ -717,7 +783,377 @@ Por default, um `findAll(pageRequest)` devolve um tipo `Page`, que irá conter d
 
 # JPA - FOREIGN KEYS
 
+Por padrão a JPA entende que se **uma entidade referencia outra entidades**, deve existir **um relacionamento entre elas!** podendo ser:
 
+* `@ManyToMany`
+* `@ManyToOne` / `@OneToMany`
+* `@OneToOne`
+
+
+
+## Many To One
+
+Considerando que teremos o tipo **ManyToOne**:
+
+* **N Produtos** podem ter **1 Categoria** (Many To One)
+* **1 Categoria** pode ter **N Produtos** (One To Many)
+
+Precisaremos declarar em uma delas o relacionamento, seja **ManyToOne**, ou **OneToMany**.
+
+Se formos fazer baseado na table de `Produtos`:
+
+```java
+@Entity
+@Table(name = "PRODUTOS")
+public class Produto {
+  
+  @Id
+  @GeneratedValue(strategy = GenrationType.IDENTITY)
+  private Long id;
+  
+  @ManyToOne
+  private Categoria categoria;
+}
+```
+
+* Com **H2** a JPA irá criar uma **foreign key** na table `Produtos`, algo como:
+
+  ```sql
+  alter table produtos
+  add constraint fk_produto_categoria
+  foreign key (categoria_id) references categorias (id);
+  ```
+
+### OneToMany (Relacionamento Bidirecional)
+
+Na tabela de `Categoria` teríamos
+
+```java
+@Entity
+@Table(name = "CATEGORIAS")
+public class Categoria {
+  
+  @Id
+  @GeneratedValue(strategy = GenrationType.IDENTITY)
+  private Long id;
+  
+  @OneToMany
+  private List<Produtos> produtos = new ArrayList<>();
+}
+```
+
+**PORÉM,** se não informarmos a JPA que se trata de um **relacionamento bidirecional**, será criado **outra tabela de joins**, por isso usamos o atributo **`mappedBy`** do `@OneToMany`
+
+* `mappedBy` recebe o nome da tabela que possui o relacionamento
+  * No exemplo abaixo, `mappedBy = "categoria"` porque na entidade `Produto` foi mapeado o `@ManyToOne` de com o nome `categoria`
+
+* `cascade` informa ao JPA que se algo acontecer naquela entidade, irá propagar para as demais
+  * Nesse exemplo, se uma categoria for deletada, será deletado os produtos que pertencem aquela categoria!
+
+
+```java
+// Produto.java
+@Entity
+@Table(name = "PRODUTOS")
+public class Produto {
+  
+  @Id
+  @GeneratedValue(strategy = GenrationType.IDENTITY)
+  private Long id;
+  
+  @ManyToOne
+  private Categoria categoria;
+}
+
+// Categoria.java
+@Entity
+@Table(name = "CATEGORIAS")
+public class Categoria {
+  
+  @Id
+  @GeneratedValue(strategy = GenrationType.IDENTITY)
+  private Long id;
+  
+  @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL)
+  private List<Produtos> produtos = new ArrayList<>();
+}
+```
+
+### Set vs List 
+
+Temos que ter um cuidado ao utilizar `Set` na entidade, e retornar um `List` ao usar o `findAll` da `Repository`!
+
+Para que o `Set` funcione, é necessário ter implementado um `Equals` e `HasCode`, ou usar o `@EqualsAndHashCode(callSuper = true)` do Lombok:
+
+```java
+// User.java
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "USERS")
+@Entity
+public class User {
+  
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private Set<Resident> residents = new HashSet<>();
+
+}
+
+
+// Resident.java
+@Data
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "RESIDENT")
+public class Resident {
+  
+	@ManyToOne
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
+  
+  @Override
+  public boolean equals(Object o) {
+      if (this == o) return true;
+      if (!(o instanceof Resident resident)) return false;
+
+      return getId().equals(resident.getId());
+  }
+
+  @Override
+  public int hashCode() {
+      return getId().hashCode();
+  }
+}
+```
+
+
+
+
+
+### Boa Prática
+
+Sempre se intancia uma List / Collection!
+
+```java
+@OneToMany(mappedBy = "produto")
+private List<Produtos> produtos = new ArrayList<>();
+```
+
+
+
+## Many To Many
+
+Considerando que teremos o tipo **ManyToMany**:
+
+* **1 Pedido** pode ter **N Produtos**
+* **1 Produto** pode ter **N Pedidos**
+
+
+
+Por padrão a JPA iria criar a **TABELA DE JOIN** (`itens_pedido`)
+
+<img src="./resources/manyToMany.png" alt="manyToMany" style="zoom:50%;" />
+
+Precisaremos declarar na entidade:
+
+* `@ManyToMany` para uma das `Collections` (`Set<>` , `List<>`)
+  * Mas caso queiremos fazer algo customizável, precisamos usar o `@JoinTable`
+
+* `@JoinTable` para informar qual vai ser a table que conterá os IDs de Produto e Categoria
+  * Parâmetros:
+    * `name` - nome da tabela que será referenciada
+    * `joinColumns` - qual a coluna da tabela `Produto` que irá conter o ID
+    * `inverseJoinColumns` - qual a coluna da tabela `Categoria` que irá conter o ID
+
+```java
+// src/main/entities/Produto
+
+@Entity
+@Table(name="tb_produto")
+public class Produto {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id
+
+    @ManyToMany
+    @JoinTable(
+            name = "tb_produto_categoria",
+            joinColumns = @JoinColumn(name = "produto_id"),
+            inverseJoinColumns = @JoinColumn(name = "categoria_id")
+    )
+    Set<Categoria> categorias = new HashSet<>();
+}
+```
+
+Agora na entidade `Categoria`, iremos apenas:
+
+* `@ManyToMany` + `mappedBy` -> Como foi referenciado na entidade `Produto` só precisamos referenciar na `Categoria`
+
+```java
+// src/main/entities/Categoria
+  
+@Entity
+@Table(name = "tb_categoria")
+public class Categoria {
+
+    @Id
+    @GeneratedValue(strategy =  GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToMany(mappedBy = "categorias")
+    private Set<Produto> produtos = new HashSet<>();
+```
+
+
+
+**OPCIONAL PARA ALGUNS DATABASES**:
+
+Para funcionar, é preciso criar o script SQL que terá a table auxiliar com as referências:
+
+```sql
+CREATE TABLE tb_produto(
+		id UUID PRIMARY KEY,
+  	name VARCHAR(255) NOT NULL
+)
+
+CREATE TABLE tb_categoria(
+		id SERIAL PRIMARY KEY,
+	  name VARCHAR(255) NOT NULL
+)
+
+# Table de referencia
+CREATE TABLE tb_produto_categoria(
+		produto_id UUID NOT NULL,
+  	categoria_id SERIAL NOT NULL,
+  	PRIMARY KEY (produto_id, categoria_id),
+  	FOREIGN KEY (produto_id) REFERENCES tb_produto (id) ON DELETE CASCADE,
+    FOREIGN KEY (categoria_id) REFERENCES tb_categoria (id) ON DELETE CASCADE
+)
+```
+
+
+
+### Tabela de Join
+
+As vezes a tabela default de `itens_pedido` precisa ter mais dados, neste caso, é ideal **criamos uma nova entidade!**
+
+<img src="./resources/manyToMany2.png" alt="manyToMany2" style="zoom:50%;" />
+
+
+
+### Cuidados
+
+Em um relacionamento ManyToMany, **não basta somente adicionar de um lado os valores**, é necessário ambas entidades receber a lista de uma e de outra (a JPA não faz isso automaticamente.)
+
+* Caso na entidade A seja passados os valores da entidade B, mas na entidade B não seja passado os valores da entidade A, **não será criado o relacionamento manyToMany**.
+
+Exemplo:
+
+* Entidade Location, pode ter N Residents;
+* Entidade Residents, pode ter N Locations;
+
+Crie um serviço, que ao adicionar um `Location`, seja passado uma lista de IDs de `Residents`, e com isso seja criado o relacionamento `ManyToMany`.
+
+Entidades:
+
+```java
+// Resident.java
+@Data
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "RESIDENTS")
+public class Resident {
+  
+  @ManyToMany
+  private List<Location> locations = new ArrayList<>();
+  
+  
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Resident resident))
+            return false;
+
+        return getId().equals(resident.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
+}
+```
+
+```java
+// Location.java
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "LOCATIONS")
+@Entity
+public class Location {
+  
+  @ManyToMany(mappedBy = "locations")
+  private List<Resident> residents = new ArrayList<>();
+  
+  @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Location location))
+            return false;
+
+        return getId().equals(location.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
+
+}
+```
+
+
+
+Service + DTO
+
+```java
+// LocationService
+@Transactional
+public LocationResidentResponse addLocation(LocationResidentRequest request) {
+    Location location = request.toLocation();
+
+  	// Mapeia os Residents em Location
+    List<Resident> residents = request.residentIds().stream().map(residentService::findById)
+            .collect(Collectors.toList());
+    location.setResidents(residents);
+
+    Location locationCreated = repository.save(location);
+    return LocationResidentResponse.fromEntity(locationCreated);
+}
+
+// DTO -> LocationResidentResponse.java
+public static LocationResidentResponse fromEntity(Location location) {
+  
+  	// Mapeia as Locations em Residents
+    location.getResidents().forEach(resident -> resident.getLocations().add(location));
+
+    List<ResidentResponse> residents = new ArrayList<>();
+    if (location.getResidents() != null && !location.getResidents().isEmpty()) {
+        residents = location.getResidents()
+          .stream()
+          .map(ResidentResponse::fromEntity)
+          .collect(Collectors.toList());
+    }
+
+    return new LocationResidentResponse(location.getAddress(), location.getNeighborhood(), location.getCity(),
+            location.getState(), location.getNumber(), residents);
+}
+```
 
 
 
