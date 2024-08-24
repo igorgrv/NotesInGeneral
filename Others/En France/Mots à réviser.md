@@ -2,32 +2,32 @@
 
 | Portuguese      | Français                | Nombre de réponses Correctes |
 | :-------------- | ----------------------- | ---------------------------- |
-| Café da manhã   | Petit-Déjeneur          | **                           |
-| Ontem           | Hier                    | X                            |
-| Amanhã          | Demain                  | X                            |
-| De nada         | De rien/Je vous en prie | X                            |
-| Saudade de você | Tu me manques           | X                            |
-| Como se diz X?  | Comment dit-on X?       | X                            |
-| Abaixo          | Ci-dessous / en bas     | X                            |
-| Seguinte        | Suivantes               | X                            |
-| País            | Pays                    | X                            |
-| Distrito        | Arrondissement          | X                            |
+| Café da manhã   | Petit-Déjeneur          |                              |
+| Ontem           | Hier                    |                              |
+| Amanhã          | Demain                  |                              |
+| De nada         | De rien/Je vous en prie |                              |
+| Saudade de você | Tu me manques           |                              |
+| Como se diz X?  | Comment dit-on X?       |                              |
+| Abaixo          | Ci-dessous / en bas     |                              |
+| Seguinte        | Suivantes               |                              |
+| País            | Pays                    |                              |
+| Distrito        | Arrondissement          |                              |
 
 
 
 # Verbe à conjuguer
 
-| Verbe   | Je               | Tu      | Il/elle/on       | nous                    | Vous                        | Ils/Elles               |
-| ------- | ---------------- | ------- | ---------------- | ----------------------- | --------------------------- | ----------------------- |
-| Mettre  | mets             | mets    | met              | mettons                 | mettez                      | Mettent                 |
-| Aller   | ~~Vais~~ **Vas** | Vas     | Va               | allons                  | allez                       | ~~ont~~ Vont            |
-| Avoir   | J'a              | as      | a                | avons                   | avez                        | Ont                     |
-| Faire   | Fais (fé)        | Fais    | Fait             | ~~Faisons~~ **Faisons** | ~~Fainez~~ **Faites** (fét) | ~~faint~~ **Font**      |
-| Prendre | Prend            | Prends  | Prend            | Prenons                 | Prenez                      | ~~Prenent~~ **Present** |
-| Voir    | Vois (vua)       | Vois    | ~~Voit~~ **Voi** | Voyons (vuaions)        | Voyez (Vuaie)               | ~~Voient~~ **Voitent**  |
-| Être    | Suis             | Es      | Est              | Sommes                  | Etês                        | Sont                    |
-| Habiter | Habite           | Habites | Habite           | Habitons                | Habitez                     | Habitent                |
-|         |                  |         |                  |                         |                             |                         |
+| Verbe                | Je     | Tu      | Il/elle/on | nous     | Vous    | Ils/Elles |
+| -------------------- | ------ | ------- | ---------- | -------- | ------- | --------- |
+| Mettre (por/colocar) | Mets   | Mets    | Met        | Mettons  | Mettez  | Mettent   |
+| Aller (ir)           |        |         |            |          |         |           |
+| Avoir (ter)          | A      | As      | Il as      | avons    | avez    |           |
+| Faire (fazer)        | Fais   | Fais    | Fait       | Fazons   | Fait    | Faitent   |
+| Prendre (pegar)      |        |         |            |          |         |           |
+| Voir (ver)           | Vois   | Vois    | Voi        | Voyons   | Voyez   | Viotent   |
+| Être (ser)           | Suis   | Es      | Est        | Somme    | Etês    | Sont      |
+| Habiter (viver)      | Habite | Habites | Habite     | Habitons | Habitez | Habitent  |
+|                      |        |         |            |          |         |           |
 
 
 

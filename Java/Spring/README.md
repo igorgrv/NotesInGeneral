@@ -52,7 +52,7 @@ spring.mvc.view.suffix=.jsp
 
 ## Tomcat vs Jetty
 
-Para utilizar Jetty:
+Para utilizar Jetty (para servidores reativos):
 
 ```xml
 <dependency>
@@ -159,6 +159,12 @@ logging.level.org.hibernate=ERROR
 
 ### MySQL
 
+Para rodar com container:
+
+```bash
+podman run --name mysql-spring-security -e MYSQL_DATABASE=YOURDATA -e MYSQL_USER=igor -e MYSQL_PASSWORD=igor@123 -e MYSQL_ROOT_PASSWORD=igor@123 -d -p 3306:3306 mysql
+```
+
 pom.xml:
 
 ```xml
@@ -175,7 +181,7 @@ pom.xml:
 application.properties:
 
 ```properties
-#Spring
+#Spring with JSP (optional)
 spring.mvc.view.prefix= /WEB-INF/views/
 spring.mvc.view.suffix= .jsp
 

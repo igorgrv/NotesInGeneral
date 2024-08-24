@@ -297,7 +297,7 @@ Link: https://www.mongodb.com/try/download/compass
 
 <img src="/Users/igorgomesromerovilela/Development/NotesInGeneral/Java/graduate/imageResource/mongodbCompass.png" alt="mongodbCompass" style="zoom:80%;" />
 
-## Comandos
+## Comandos NoSql
 
 * Iniciar servidor mongo: **`mongod`**
 
@@ -307,7 +307,7 @@ Link: https://www.mongodb.com/try/download/compass
 
 * Criar collection: **`db.createCollection("nomeColecao")`**
 
-  * Precisa estar no banco, com o `use`
+  * ###### Precisa estar no banco, com o `use`
 
 * Mostrar colections: **`show collections`**
 
@@ -558,11 +558,662 @@ db.customers.find( {"nome":{$exists:true}} ).count()
 
 
 
+## Spring + MongoDB
+
+Spring boot provê:
+
+```xml
+<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+</dependency>
+```
+
+Entidade -> usar `@Document` ao invés do `@Entity`:
+
+```java
+@Data
+@Document
+public class Article {}
+```
+
+Repository -> usar `MongoRepository`
+
+```java
+public interface ArticleRepository extends MongoRepository<Article, String>
+```
+
+
+
+### Conexão com o banco
+
+* Por default, quando iniciamos o `mongosh` temos o banco de dados `test`:
+
+  ```bash
+  ➜  ~ mongosh
+  Current Mongosh Log ID:	65232a607cbb8899b6df4cf2
+  Connecting to:		mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.1
+  Using MongoDB:		7.0.2
+  Using Mongosh:		2.0.1
+  
+  For mongosh info see: https://docs.mongodb.com/mongodb-shell/
+  
+  ------
+     The server generated these startup warnings when booting
+     2023-10-05T22:13:11.933-03:00: Access control is not enabled for the database. Read and write access to data and configuration is unrestricted
+  ------
+  
+  test>
+  ```
+
+Então se subirmos nosso app e adicionar um novo documento, será armazenado no DB `test`!
+
+**Personalizando conexão**
+
+```yaml
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost/blog
+      port: 27017
+      username:
+      password:
+```
+
+acessando via `mongsh` após inserir um documento
+
+```bash
+test> use blog
+switched to db blog
+
+blog> show collections
+article
+
+blog> db.article.find()
+[
+  {
+    _id: ObjectId("65232e6dc8431b18d6db52d0"),
+    title: 'Exemplo de Título',
+    text: 'Aqui está o texto da entidade.',
+    url: 'https://www.exemplo.com',
+    createdDate: ISODate("2023-10-08T03:00:00.000Z"),
+    status: 1,
+    _class: 'com.igor.blognosql.entity.Article'
+  }
+]
+```
+
+
+
+### DBRef - Objeto usando outro Objeto
+
+É comum no java um objeto referenciar outro objeto, mas com o MongoDB precisamos anotar com **`@DBRef`**.
+
+Exemplo - Crie a estrutura do documento abaixo:
+
+```json
+{
+  "title": "Exemplo de Título 2",
+  "text": "Aqui está o texto da entidade2.",
+  "url": "https://www.exemplo2.com",
+  "createdDate": "2023-10-08",
+  "status": 1,
+  "author": {
+    "name": "Igor",
+    "biography": "A developer that loves what he does",
+    "image": "jpg"
+  }
+}
+```
+
+Entidade `Author`:
+
+```java
+@Data
+@Document
+public class Author {
+  
+  @Id
+  private String id;
+  private String name;
+  private String biography;
+  private String image;
+
+}
+```
+
+Entidade `Article`:
+
+```java
+@Data
+@Document
+public class Article {
+  
+  @Id
+  private String id;
+  private String title;
+  private String text;
+  private String url;
+  private LocalDate createdDate;
+  private Integer status;
+
+  @DBRef
+  private Author author;
+
+}
+```
+
+
+
+### CRUD básico
+
+```java
+// Repository
+public interface ArticleRepository extends MongoRepository<Article, String> {}
+
+// Service
+@Service
+@RequiredArgsConstructor
+public class ArticleService {
+
+  private final ArticleRepository articleRepository;
+  private final AuthorService authorService;
+  
+  public List<Article> findAll() {
+    return articleRepository.findAll();
+  }
+
+  public Article findById(String articleId) {
+    return articleRepository
+        .findById(articleId)
+        .orElseThrow(() -> new IllegalArgumentException("Could not find article"));
+  }
+
+  public Article create(Article article) {
+    if (article.getAuthor() != null) {
+      Author author = authorService.findById(article.getAuthor().getId());
+      article.setAuthor(author);
+    } else {
+      article.setAuthor(null);
+    }
+    return articleRepository.save(article);
+  }
+  
+  public Article update(Article article) {
+    return articleRepository.save(article);
+  }
+  
+  public void delete(String articleId) {
+    Article article = findById(articleId);
+    articleRepository.delete(article);
+  }
+
+}
+
+
+// Controller
+@RestController
+@RequestMapping("/articles")
+class ArticleController {
+
+  @Autowired
+  private ArticleService service;
+
+  @GetMapping
+  public ResponseEntity<List<Article>> getAll() {
+    List<Article> items = new ArrayList<>();
+    service.findAll().forEach(items::add);
+    if (items.isEmpty())
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+    return new ResponseEntity<>(items, HttpStatus.OK);
+  }
+
+  @GetMapping("{id}")
+  public ResponseEntity<Article> getById(@PathVariable("id") String articleId) {
+    Article existingItemOptional = service.findById(articleId);
+    return new ResponseEntity<>(existingItemOptional, HttpStatus.OK);
+  }
+
+  @GetMapping("findByDate")
+  public ResponseEntity<List<Article>> getByDateGreaterThan(@RequestParam LocalDate date) {
+    List<Article> articles = new ArrayList<>();
+    service.findByDateGreaterThan(date).forEach(articles::add);
+    if (articles.isEmpty())
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    return new ResponseEntity<>(articles, HttpStatus.OK);
+  }
+
+  @PostMapping
+  public ResponseEntity<Article> create(@RequestBody Article article) {
+    Article savedItem = service.create(article);
+    return new ResponseEntity<>(savedItem, HttpStatus.CREATED);
+  }
+
+  @PutMapping
+  public ResponseEntity<Article> update(@RequestBody Article article) {
+    Article updatedItem = service.update(article);
+    return new ResponseEntity<>(updatedItem, HttpStatus.OK);
+  }
+  
+  @DeleteMapping("{id}")
+  public ResponseEntity<Article> delete(@PathVariable("id") String articleId) {
+    service.delete(articleId);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+}
+```
 
 
 
 
 
+### MongoTemplate - Queries customizadas
+
+E se quisermos fazer queries customizadas, igual temos com:
+
+```bash
+db.nomeCollection.find( {createdDate: {$gte: 2023-10-08}} )
+```
+
+Para isso usamos do **`MongoTemplate`**!
+
+```java
+private final MongoTemplate mongoTemplate;
+
+public List<Article> findByDateGreater(LocalDate date) {
+    Query query = new Query(Criteria.where("createdDate").gt(date));
+    return mongoTemplate.find(query, Article.class);
+}
+```
+
+Update:
+
+```java
+public void updateArticleUrl(String id, Article article) {
+    Query query = new Query(Criteria.where("id").is(id));
+    Update update = new Update().set("url", article.getUrl());
+    mongoTemplate.updateFirst(query, update, Article.class);
+}
+```
+
+
+
+#### Criteria + Query + MongoTempl
+
+```java
+// Find using mongoTemplate
+public List<Article> findByStatusDateAndTitle(String status, LocalDate date, String title) {
+  Criteria criteria = new Criteria();
+  
+  criteria.and("date").lte(date);
+  if (status != null) criteria.and("status").is(status);
+  if (title != null && !title.isEmpty()) criteria.and("title").is(title);
+  
+  Query query = new Query(criteria);
+  return mongoTemplate.find(query, Article.class);
+}
+```
+
+
+
+### @Query
+
+Assim como no SQL, o MongoDb também permite queries customizadas com o **`@Query`**:
+
+* Exemplo: retorne articles de dentro de um range:
+  * Com o uso `?X` passamos a sequência dos parâmetros
+
+```java
+// repository
+public interface ArticleRepository extends MongoRepository<Article, String> {
+
+  @Query("{ $and: [ { 'createdDate': {$gte: ?0}}, { 'createdDate': {$lte: ?1} } ]}")
+  List<Article> findByCreatedDateGreaterThanAndLessThan(LocalDate stars, LocalDate ends);
+}
+```
+
+Simple query com `$eq`:
+
+```java
+@Query(value = "{ 'title': { $eq: ?0 } }")
+List<Article> findByTitleWithQuery(String title);
+```
+
+
+
+### Pageable
+
+Funciona igual a como é feito com JPA clássica:
+
+```java
+// service
+public Page<Article> findAll(Pageable pageable) {
+  return articleRepository.findAll(pageable);
+}
+
+// Controller
+@GetMapping("page")
+public ResponseEntity<Page<Article>> getAll(Pageable pageable) {
+  Page<Article> articles = service.findAllPageble(pageable);
+  return new ResponseEntity<>(articles, HttpStatus.OK);
+}
+```
+
+Requisição do `Pageable` espera `page=0&size=5`
+
+```http
+GET -> http://localhost:8080/pageable?page=0&size=5
+```
+
+
+
+### OrderBy
+
+Funciona da mesma forma como na JPA:
+
+```java
+// repository
+public interface ArticleRepository extends MongoRepository<Article, String> {
+  
+	List<Article> findByStatusOrderByTitleAsc(String title);
+}
+```
+
+ou com `@Query` podemos passar o `sort`:
+
+```java
+@Query(value = "{ 'title': /?0/i }", sort = "{ 'title' : 1 }")
+List<Article> findByTitleWithQuery(String title);
+```
+
+
+
+#### Pageable + Order
+
+Para fazer o sort dentro de um Pageable, faremos uso do objeto `Sort`:
+
+```java
+@GetMapping("pageable")
+public ResponseEntity<Page<Article>> getAll(Pageable pageable) {
+  Sort sort = Sort.by("titles").ascending();
+  Pageable pageableSorted = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+  Page<Article> articles = service.findAllPageble(pageableSorted);
+  return new ResponseEntity<>(articles, HttpStatus.OK);
+}
+```
+
+
+
+### Group By - Aggregation
+
+Dado os documentos:
+
+```json
+[
+  {
+    "id": "65233c5af93a492cece07770",
+    "title": "Exemplo updated",
+    "text": "Aqui está o texto updated",
+    "url": "https://www.exemplo.com",
+    "createdDate": "2023-09-30",
+    "status": 0,
+    "author": {
+      "id": "6523640a2fad9b797e73cd26",
+      "name": "Tiago",
+      "biography": "A developer that loves what he does",
+      "image": "jpg"
+    }
+  },
+  {
+    "id": "652a9b66776b9336fb8aadd2",
+    "title": "A title",
+    "text": "Aqui está o texto da entidade2.",
+    "url": "https://www.exemplo2.com",
+    "createdDate": "2023-10-08",
+    "status": 1,
+    "author": {
+      "id": "65233c3bf93a492cece0776f",
+      "name": "Igor",
+      "biography": "A developer that loves what he does",
+      "image": "jpg"
+    }
+  }
+]
+```
+
+Vamos agrupar por `status` e exibir uma quantidade do agrupamento
+
+1. Precisamos criar uma classe DTO que irá representar o resultado:
+
+   ```java
+   @Data
+   public class ArticleStatusCount {
+     
+     private String status;
+     private int count;
+   }
+   ```
+
+2. Com o uso do `TypedAggregation` e `Aggregation`:
+
+   1. `TypedAggregation` espera 3 parâmetros:
+      1. Classe base que contém os dados;
+      2. O tipo de agregação, usando o `Aggregation` , ou seja, qual field será o `GROUP BY`;
+      3. Saída dos dados, como se fosse os campos que ficariam no `SELECT`;
+   2. Com o `MongoTemplate` usamos a função `aggregate` que recebe:
+      1.  `TypedAggregation` 
+      2. Classe DTO de saída
+
+   ```java
+   public List<ArticleStatusCount> getStatusCount() {
+       TypedAggregation<Article> typedAggregation = 
+         	Aggregation.newAggregation(
+             Article.class,
+             Aggregation.group("status").count().as("quantity"),
+             Aggregation.project("quantity").and("status").previousOperation()
+       		);
+   
+       AggregationResults<ArticleStatusCount> result = mongoTemplate.aggregate(typedAggregation, ArticleStatusCount.class);
+       return result.getMappedResults();
+    }
+   ```
+
+   
+
+**Find + Agregação**
+
+Em muitos cenários precisamos fazer um FIND antes de fazer um GROUP BY, no NoSql usamos **Criteria + Aggregation**
+
+1. Crie um DTO que representará a saída
+2. Faça o Filtro com Criteria;
+3. Crie o `AggregationTyped`
+4. Use `MongoTemplate` para agregar o valor e converter o resultado no DTO;
+
+```java
+public List<AuthorArticleCount> getArticlesGroupedByAuthorFrom(LocalDate startDate, LocalDate endDate) {
+  Criteria criteria = Criteria.where("createdDate")
+    .gte(startDate.atStartOfDay())
+    .lt(endDate.plusDays(1).atStartOfDay());
+
+  AggregationOperation match = Aggregation.match(criteria);
+  AggregationOperation group = Aggregation.group("author").count().as("totalArticles");
+
+  AggregationOperation project = 
+    Aggregation.project("totalArticles")
+    	.and("author").previousOperation();
+
+  TypedAggregation<Article> typedAggregation = Aggregation.newAggregation(
+      Article.class,
+      match,
+      group,
+      project);
+
+  AggregationResults<AuthorArticleCount> result = 
+    	mongoTemplate.aggregate(typedAggregation, AuthorArticleCount.class);
+  return result.getMappedResults();
+}
+```
+
+
+
+### Concorrência no Mongo
+
+Para lidar com concorrência no mongo, precisamos incluir a dependência:
+
+```xml
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
+  <version>3.1.4</version>
+</dependency>
+```
+
+Adicionar nas entidades um **`@Version`**
+
+```java
+@Version
+private Long version;
+```
+
+E adicionar com **`@Transactional`** todos os métodos de CRUD do Service:
+
+* Se for métodos de find, basta colocarmos `@Transactional(readOnly = true)`
+
+```java
+@Transactional(readOnly = true)
+public List<Article> findAll() {
+  return articleRepository.findAll();
+}
+```
+
+* Métodos de Update, Delete, Insert:
+
+```java
+@Transactional
+public Article create(Article article) {
+  if (article.getAuthor() != null) {
+    Author author = authorService.findById(article.getAuthor().getId());
+    article.setAuthor(author);
+  } else {
+    article.setAuthor(null);
+  }
+  return articleRepository.save(article);
+}
+```
+
+
+
+#### OptimisticLockingFailureException
+
+Quando passamos a utilizar o `version` no body, o Mongo irá lidar com as versões do documento, onde se algo for alterado no documento, será incrementado o `version`.
+
+* Com o uso do `version` podemos lidar com diferentes usuários alterando o mesmo documento!
+* Caso um usuário altere o mesmo documento, com a mesma `version`, será lançado uma excessão, **`OptimisticLockingFailureException`**
+
+Para lidar com este problema, precisamos criar um handler para exception!
+
+```java
+@RestControllerAdvice
+public class CustomExceptionHandler {
+
+  @ExceptionHandler(OptimisticLockingFailureException.class)
+  public ResponseEntity<Object> handleException(OptimisticLockingFailureException ex) {
+    Error error = new Error(HttpStatus.CONFLICT.value(),
+        "Error: this document was already changed by another user. Please try again");
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+  }
+
+  private record Error(int statusCode, String message) {}
+}
+```
+
+
+
+#### Optimistic handle
+
+Retornar a exception para o usuário não é o ideal, podemos:
+
+1. Verificar com `try/catch` se houve a exception;
+2. Se houve a exception, podemos recuperar o documento com a version mais atualizada;
+3. Alterar os dados que foram passados pelo usuário;
+4. Salvar o documento com a version atualizada manualmente;
+
+```java
+public Article update(Article article) {
+  try {
+    return articleRepository.save(article);
+  } catch (OptimisticLockingFailureException e) {
+    Article articleUpdated = findById(article.getId());
+    articleUpdated.setAuthor(article.getAuthor());
+    articleUpdated.setCreatedDate(article.getCreatedDate());
+    articleUpdated.setStatus(article.getStatus());
+    articleUpdated.setVersion(articleUpdated.getVersion() + 1);
+
+    return articleRepository.save(article);
+  }
+}
+```
+
+
+
+### Bean Validation
+
+Assim como um banco SQL, no MongoDB Podemos continuar fazendo as validações dos atributos que vão em um documento:
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
+```
+
+E nas classes podemos ter os validadores:
+
+```java
+@Data
+@Document
+public class Article {
+
+  @Id
+  private String id;
+
+  @NotBlank(message = "Title is required")
+  private String title;
+
+  @NotBlank(message = "Text is required")
+  private String text;
+
+  @NotBlank(message = "url is required")
+  private String url;
+
+  @NotNull(message = "createdDate is mandatory")
+  @DateTimeFormat(pattern = "YYYY-MM-dd")
+  @Past
+  private LocalDate createdDate;
+
+  @NotNull(message = "Status is required")
+  private Integer status;
+
+  @DBRef
+  private Author author;
+
+  @Version
+  private Long version;
+
+}
+```
+
+E na controller precisamos sempre por **`@Valid`**:
+
+```java
+@PostMapping
+public ResponseEntity<Article> create(@Valid @RequestBody Article article) {
+  Article savedItem = service.create(article);
+  return new ResponseEntity<>(savedItem, HttpStatus.CREATED);
+}
+```
 
 
 

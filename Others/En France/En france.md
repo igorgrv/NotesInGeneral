@@ -87,7 +87,7 @@ Le nombres ordinaux utilise le 'nombre' + 'ième'
 **noun** (*Substitantivo*) **singulier** (*singular [sangulie]*) + **est dans** + **emplacement** (*lugar*)
 
 * Le fleur est dans le salon → *A flor está na sala*
-* Le lettre est dans le tiroir → *A carta está na gaveta*
+* La lettre est dans le tiroir → *A carta está na gaveta*
 
 ## Les voyelles :a: :b:
 
