@@ -1157,3 +1157,212 @@ public class SecureController {
 }
 ```
 
+
+
+# Passwords - Encryption vs Hashing
+
+Existem 2 tipos de processos para lidar com senhas:
+
+* **Encryption**: Através de uma secret key, transformamos o texto em um formato unreadable, tbm conhecido como **ciphertext**. É um processo **two-ways**, onde a senha pode ser recuperada usando a mesma key.
+* **Hashing**: É um processo **one way**, onde o texto é transformado em um hash (número delimitado de length) com um processo matemático **(hash algorithm)** - não é possível recriar o valor
+  * ***ESTE É O MELHOR PROCESSO PAR PASSWORDS!***
+
+## Password Hashs - tipos
+
+Existem algumas foras de fazer o encrypt de passwords de forma segura com Java, onde se segue o padrão:
+
+* **Salt:** adiciona uma string única em cada senha
+* **Pepper:** adiciona uma string (não única) na senha
+* **Work Factors:** exige GPU da máquina para fazer o processo de senha
+
+Algumas classes do Java já lidam com o padrão acima:
+
+* Argon2
+* Bcrypt
+* PBKDF2
+
+### Argon2
+
+```java
+PasswordEncoder hasher = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_80);
+String passwordHash = hasher.encode(password);
+
+// example
+@Bean
+public PasswordEncoder passwordEncoder() {
+	return Argon2PasswordEncoder.defaultsForSpringSecurity_v5_80);
+}
+
+public String hashPassword(String password) {
+	return passwordEncoder().encode(password);
+}
+
+// Full Example
+@Configuration
+@EnableWebSecurity
+public class PasswordConfig {
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+       String idForEncode = "argon2";
+       Map<String,PasswordEncoder> encoders = new HashMap<>();
+       encoders.put(idForEncode, Argon2PasswordEncoder.defaultsForSpringSecurity_v5_80);
+       encoders.put("noop", NoOpPasswordEncoder.getInstance());
+
+			return new DelegatingPasswordEncoder(idForEncode, encoders);
+    }
+}
+
+public class AuthenticationProvider implements AuthenticationProvider {
+  private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
+  
+  public AuthenticationProvider(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+  }
+  
+  @Override
+  public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+      var filledInName = authentication.getName();
+      var user = userRepository.findVikingBankUserByEmail(filledInName);
+      // if user password does not starts with a prefix nooper/argon2, then it has to be hashed
+			String password = user.getPassword();
+    	if(!password.matches("{{(nooper|argon2)}}")) {
+         user.setPassword("{nooper}" + password)
+         userRepository.save(user);
+      }
+
+        List<SimpleGrantedAuthority> authorities = user.getPrivileges()
+                .stream()
+                .map(p -> new SimpleGrantedAuthority(p.getName()))
+                .toList();
+
+        UserDetails userDetails = new User(
+                user.getEmail(),
+                password,
+                true,
+                true,
+                true,
+                true,
+                authorities
+        );
+
+        if (passwordEncoder.matches((String)authentication.getCredentials(), password)) {
+            // if starts with nooper, it has to be hashed to argon2
+            if(password.startsWith("{nooper}")) {
+              user.setPassword(passwordEncoder.encode(password))
+             userRepository.save(user);
+            }
+            return new UsernamePasswordAuthenticationToken(userDetails, authentication.getCredentials(), authorities);
+        }
+
+        throw new BadCredentialsException("Invalid credentials");
+    }
+
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return authentication.equals(UsernamePasswordAuthenticationToken.class);
+    }
+}
+```
+
+### bcrypt
+
+```java
+PasswordEncoder hasher = new BCryptPasswordEncoder®;
+String passwordHash = hasher.encode(password);
+```
+
+### PBKDF2
+
+```java
+PasswordEncoder hasher = Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_80);
+String passwordHash = hasher. encode(password);
+```
+
+
+
+# SQL Injection
+
+SQL injection como o nome menciona é passar um comando SQL que burla o sistema.
+
+Exemplo:
+
+```JAVA
+String query = "SELECT balance FROM user_account ua WHERE ua.name = '" + request.getParameter("customerName") + '";
+```
+
+Se um hacker aproveitasse que não estamos tratando os valores provenientes do GET Request, ele poderia forçar um:
+
+```
+tom OR '1'='1'
+```
+
+## Tipos de injection
+
+* **Tautology attack:** força uma condicional que retornará true, para poder acessar o dado;
+* **Union-based attack**: através de UNION extrai mais dados do que o necessário;
+* **Error-based attack:** força erros para revelar mais dados da estrutura do banco de dados;
+* **Blind SQL Injection attack:** 
+* **Inferential SQL Injection attack:**
+* **Second-order SQL injection attack:**
+
+Em geral o SQL injection acontece quando usamos queries customizadas em nossa aplicação e não tratamos corretamente os parâmetros
+
+Exemplo **INSEGURO** com Spring `@Query`:
+
+```java
+@Repository
+public interface ContactRepository extends JpaRepository<Contact, Long> {
+	@Query (value = "SELECT * FROM contacts WHERE message LIKE '%' || :searchTerm |1 '%'", nativeQuery = true)
+	List<Contact> findBySearchTerm(@Param("searchTerm") String searchTerm);
+}
+```
+
+* Operator || concatena a String, e neste momento um attacker poderia injetar SQL
+
+Exemplo **SEGURO** com `@Query`:
+
+```java
+@Repository
+public interface ContactRepository extends JpaRepository<Contact, Long> {
+	@Query (value = "SELECT * FROM contacts WHERE message LIKE %:searchTerm%", nativeQuery = true)
+	List<Contact> findBySearchTerm(@Param("searchTerm") String searchTerm);
+}
+```
+
+
+
+Exemplo **INSEGURO** usando `EntityManager`:
+
+```java
+@Service
+public class TransactionService {
+    @Autowired
+    private EntityManager entityManager;
+
+    public List<Transaction> searchTransactions(Long accountId, String searchTerm) {
+
+
+        String query = "SELECT T FROM Transactions T WHERE T.ownerAccountid = " + accountId;
+
+        if (!StringUtils.isEmpty(searchTerm)) {
+            query += " AND T.description LIKE '%" + searchTerm + "%'";
+        }
+      
+      return entityManager.createQuery(query, Transaction.class).getResultList();
+    }
+}
+```
+
+* Quando usamos o LIKE dessa forma, o attacker poderia utilizar um `'--` para comentar o `searchterm`:
+
+Se digitarmos `' OR  T.OwnerAccountId = 1 --` fecharemos a primeira `%` e poderemos depois comentar o segundo `%` com `--`
+
+```sql
+SELECT *
+FROM Transactions T
+WHERE T.ownerAccountId = 2
+AND T.description LIKE '%' OR  T.OwnerAccountId = 1 --%'
+```
+
