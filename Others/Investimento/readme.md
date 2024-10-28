@@ -1,20 +1,4 @@
-| Tipo de Investimento    | Imposto de Renda (IR)                 | IOF         | Custos Adicionais      | Liquidez                                                |
-| ----------------------- | ------------------------------------- | ----------- | ---------------------- | ------------------------------------------------------- |
-| CDB                     | Sim, tabela regressiva                | Até 30 dias | Não                    | Diária (alguns) ou no vencimento                        |
-| LCI e LCA               | Isento                                | Até 30 dias | Não                    | Diária (raro) ou no vencimento                          |
-| LC                      | Sim, tabela regressiva                | Não         | Não                    | Geralmente, no vencimento                               |
-| Debêntures Comuns       | Sim, tabela regressiva                | Não         | Não                    | Geralmente, no vencimento                               |
-| Debêntures Incentivadas | Isento                                | Não         | Não                    | Geralmente, no vencimento                               |
-| CRI e CRA               | Isento                                | Não         | Não                    | No vencimento                                           |
-| Fundos de Renda Fixa    | Sim, tabela regressiva com come-cotas | Não         | Taxa de Adm.           | Diária (D+1 a D+30)                                     |
-| Poupança                | Isento                                | Não         | Não                    | Diária, mas rendimento mensal                           |
-| Tesouro Selic           | Sim, tabela regressiva                | Até 30 dias | Custódia (0,2% ao ano) | Diária, com baixa volatilidade                          |
-| Tesouro IPCA+           | Sim, tabela regressiva                | Até 30 dias | Custódia (0,2% ao ano) | Resgate no vencimento recomendado; pode ter perda antes |
-| Tesouro Prefixado       | Sim, tabela regressiva                | Até 30 dias | Custódia (0,2% ao ano) | Resgate no vencimento recomendado; pode ter perda antes |
-
 # Investimento
-
-
 
 ## FAQ
 
@@ -125,6 +109,20 @@ xx
 
 ### Renda Fixa
 
+| Tipo de Investimento    | Imposto de Renda (IR)                 | IOF         | Custos Adicionais      | Liquidez                                                |
+| ----------------------- | ------------------------------------- | ----------- | ---------------------- | ------------------------------------------------------- |
+| CDB                     | Sim, tabela regressiva                | Até 30 dias | Não                    | Diária (alguns) ou no vencimento                        |
+| LCI e LCA               | Isento                                | Até 30 dias | Não                    | Diária (raro) ou no vencimento                          |
+| LC                      | Sim, tabela regressiva                | Não         | Não                    | Geralmente, no vencimento                               |
+| Debêntures Comuns       | Sim, tabela regressiva                | Não         | Não                    | Geralmente, no vencimento                               |
+| Debêntures Incentivadas | Isento                                | Não         | Não                    | Geralmente, no vencimento                               |
+| CRI e CRA               | Isento                                | Não         | Não                    | No vencimento                                           |
+| Fundos de Renda Fixa    | Sim, tabela regressiva com come-cotas | Não         | Taxa de Adm.           | Diária (D+1 a D+30)                                     |
+| Poupança                | Isento                                | Não         | Não                    | Diária, mas rendimento mensal                           |
+| Tesouro Selic           | Sim, tabela regressiva                | Até 30 dias | Custódia (0,2% ao ano) | Diária, com baixa volatilidade                          |
+| Tesouro IPCA+           | Sim, tabela regressiva                | Até 30 dias | Custódia (0,2% ao ano) | Resgate no vencimento recomendado; pode ter perda antes |
+| Tesouro Prefixado       | Sim, tabela regressiva                | Até 30 dias | Custódia (0,2% ao ano) | Resgate no vencimento recomendado; pode ter perda antes |
+
 
 
 #### Tesouro Direto
@@ -136,7 +134,7 @@ xx
 
 **O que é?**
 
-O tesouro direto são títulos públicos que funcionam como **empréstimos ao Governo** (é como se emprestassemos dinheiro ao Governo, e o Governo irá usar para pagar dívidas, saúde, infra e etc), e existem diversos tipos:
+O tesouro direto é **uma ferramenta** para compra de títulos públicos que funcionam como **empréstimos ao Governo** (é como se emprestassemos dinheiro ao Governo, e o Governo irá usar para pagar dívidas, saúde, infra e etc), e existem diversos tipos:
 
 * **Tesouro SELIC:** 
   * Baixo Risco
