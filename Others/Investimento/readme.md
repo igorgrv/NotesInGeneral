@@ -2,13 +2,20 @@
 
 O guia abaixo se trata de um estudo feito por mim (Igor), no intuito de aprender sobre investimentos.
 
+# Taxas
 
+Nov/2024:
+
+* **[SELIC](https://www.bcb.gov.br/controleinflacao/historicotaxasjuros)**: 10,75% (18/09/2024)
+* **[IPCA](https://www.ibge.gov.br/explica/inflacao.php)**:  4,42% (Set/2024)
+* **[CDI](https://investidor10.com.br/indices/cdi/#:~:text=Qual%20valor%20do%20CDI%20hoje,com%20a%20infla%C3%A7%C3%A3o%20do%20pa%C3%ADs.)**: 11,05%
+  * Acumulado 2024: 8,99% (até Oct)
+  * Acumulado 2024: 13,04%
 
 # Cursos/Pessoas
 
 * [Leonardo Baldochi](https://ibm-learning.udemy.com/user/leonardo-baldochi/) - Aprenda a Investir Seu dinheiro (Udemy)
 * Bruno Perini - Criador do site Você Mais Rico e do curso [Viver De Renda](https://pc.cursoviverderenda.com/vr0028/index/?pmp=LAN-LEX-YTB-X-BVMR-20240801-ORG-VR0010-VR-CAPTACAO&utm_source=YOUTUBE&utm_campaign=VR0010&utm_medium=BASEVOCEMAISRICO&utm_content=ORGANICO&utm_term=LAN-LEX-YTB-X-BVMR-20240801-ORG-VR0010-VR-CAPTACAO&src=LAN-LEX-YTB-X-BVMR-20240801-ORG-VR0010-VR-CAPTACAO&sck=LAN-LEX-YTB-X-BVMR-20240801-ORG-VR0010-VR-CAPTACAO)
-* Thiago Nigro (O Primo Rico) - dono da [Portfel](https://portfel.com.br/?gad_source=1&gclid=CjwKCAjwg-24BhB_EiwA1ZOx8ueL7GCHUzDFOGb_74dwkbdsfcG78jSdC5lDi6Tf_m098-y93rEWLRoCg3sQAvD_BwE) (consultoria financeira)
 * Charles - [Economista Sincero](https://www.youtube.com/@economistasincero) - Comunidade Evolução
 * [Os Economistas Podcast](https://www.youtube.com/@oseconomistas)
 * Professor Mira - analista CNPI
@@ -51,7 +58,7 @@ Helpful Sites:
   * É o índice de inflação
 * Boa líquidez diária?
   * Poupança? que podemos tirar a qualquer momento?
-* BBAS**3** -> o que é o 3?
+* BBAS**3**
 
 
 
@@ -146,6 +153,69 @@ IGP-M, ou **Indice geral de preços pelo mercado**, apurado pela FGV, levando em
 
 
 
+## CDI
+
+CDI, ou Certificado de depósito Interbancário, é um título de empréstimo emitido entre os bancos, e o CDI serve como uma taxa base que acompanha a SELIC.
+
+Índice CDI hoje -> https://investidor10.com.br/indices/cdi/
+
+Se o CDI ao longo de 2024 ficar em média **13%**, um investimento de R$ 1.000,00 com taxa **CDI + 1,80%** renderá:
+
+1. **CDI base**: 13% ao ano.
+2. **Rentabilidade total**: 13% + 1,80% = 14,80% ao ano.
+3. **Rendimento bruto após 1 ano**: R$ 1.000 × 14,80% = R$ 148,00.
+
+
+
+## Pré/Pós fixado + Indexado
+
+Alguns investimentos de renda fixa, apresentam os tipos:
+
+* **Pré Fixado:**
+  * A taxa de juros é determinado no momento da contração, ou seja, você sabe exatamente quanto vai receber no final (descontando custos caso seja CDB por exemplo).
+  * Vantagem: caso os juros estejam em baixa, ter um juros maior já definido pode ajudar
+  * Desvantagem: os juros podem subir e seu investimento não ser tão rentável
+* **Pós Fixado:**
+  * A taxa de juros varia com o tempo, como seguindo o CDI ou SELIC;
+  * Exemplo: CDB com 100% de CDI = significa que se o CDI for de 13% no Ano, irá render 13%
+  * Vantagem: o investimento acompanha o mercado, se o juros subir, o investimento sobe junto
+  * Desvantagem: se houver queda nas taxas, o rendimento também cai
+* **Indexado:** ou atrelado a inflação
+  * A taxa de juros possui parte fixa e parte variável que acompanha o IPCA/Inflação
+  * Exemplo: Tesouro IPCA+ 5%, ou seja, se a inflação for de 4%, o rendimento será 4% + 5% = 9%
+  * Vantagem: Protege contra a inflação
+
+
+
+| Tipo       | Exemplo de Rentabilidade | Vantagem                    | Risco                                           |
+| ---------- | ------------------------ | --------------------------- | ----------------------------------------------- |
+| Pré-Fixado | 10% a.a.                 | Previsibilidade e segurança | Perda de oportunidade se a taxa de juros subir  |
+| Pós-Fixado | 100% do CDI              | Acompanha o mercado         | Menor rendimento em cenário de juros em queda   |
+| Indexado   | IPCA + 5% a.a.           | Proteção contra inflação    | Pode render menos em períodos de baixa inflação |
+
+
+
+## Marcação a mercado
+
+* Na renda fixa, a marcação a mercado **principalmente em investimentos longos** (Tesouro Direto IPCA+, PREFIXADO);
+
+Exemplo:
+
+* Tesouro Prefixado - taxa juros 7,93% - preço unitário de R$ 802,63 - Vencimento 01/01/2022
+  * Esse título irá valer no final do vencimento exatos **mil reais;**
+  * O **problema é que a taxa de juros** varia a longo dos dias! Caso aconteça algum problema no governo, a taxa pode **subir ou abaixar**.
+  * O preço unitário de 802,63 com taxa de 7,93, pode no dia seguinte, ter a taxa de 8%, oq significa **irá dar + de mil reais**.
+    * Como o título **TEM QUE valer R$ 1000** no final do vencimento, quando a **taxa:**
+      * **sobe = PU (preço unitário) desce** 
+      * **desce = PU sobe**
+
+Para investir em um Tesouro IPCA, temos que visar que a taxa irá DESCER, já que queremos que o PU vá valer mais!
+
+Calculadoras que ajudam com a marcação:
+
+* https://www.tesourodireto.com.br/titulos/calculadora.htm
+* https://www.calculadorarendafixa.com.br/#/navbar/calculadora
+
 # Tipos de Investimento
 
 ## Renda Fixa
@@ -184,15 +254,22 @@ O tesouro direto é **uma ferramenta** para compra de títulos públicos que fun
   * Boa Líquidez (resgata a qualquer momento - 1 dia útil)
   * Como funciona: Segue a taxa SELIC, ou seja, varia conforme a taxa de juros
   * Recomendado para Reserva de emergência!
-
+  * Exemplo:
+    * Tesouro SELIC c/ Taxa de Juros: **0,12% a.a** = SELIC (10,75%) + 0,12% = 10,9%
+    * Lembrando que há a custódia + IR
+  
 * **Tesouro IPCA+:**
   * Líquidez sofre alteração se vender antes do vencimento
   * É composto por uma taxa fixa + uma parte que acompanha a inflação
   * Indicado para aposentadoria e longos prazos
-
+  * Exemplo:
+    * Tesouro IPCA+ c/ taxa de juros 6,99% = Inflação (4,42%) + 6,99% = 11,4%
+  
 * **Tesouro Prefixado:**
   * Líquidez sofre alteração se vender antes do vencimento
   * Taxa de juros fixa, ie, sabe quanto vai ganhar no final.
+  * Exemplo:
+    * Tesouro PREFIXADO 13,18% = valor pré definido
 
 
 É um dos investimentos mais seguros, já q é vinculado ao governo, e permite valores baixos.
@@ -226,17 +303,96 @@ Características:
 
 
 
+#### CDB vs IR
+
+Exemplo de Cálculo com R$ 1.000 Investidos em um CDB de 13,90% a.a. (ao ano)
+
+**Investimento por 1 ano (IR de 20%)**
+
+1. **Rendimento bruto**: R$ 1.000 × 13,90% = R$ 139
+2. **IR a pagar**: 20% de R$ 139 = R$ 27,80
+3. **Rendimento líquido**: R$ 139 - R$ 27,80 = R$ 111,20
+4. **Valor final após 1 ano**: R$ 1.111,20
+
+
+
+**Investimento por 2 anos (IR de 17,5%)**
+
+1. Rendimento composto bruto após 2 anos:
+   - Valor no primeiro ano: R$ 1.000 × 1,139 = R$ 1.139
+   - Valor no segundo ano: R$ 1.139 × 1,139 ≈ R$ 1.299,32
+2. **Rendimento total bruto**: R$ 1.299,32 - R$ 1.000 = R$ 299,32
+3. **IR a pagar**: 17,5% de R$ 299,32 ≈ R$ 52,38
+4. **Rendimento líquido**: R$ 299,32 - R$ 52,38 ≈ R$ 246,94
+5. **Valor final após 2 anos**: R$ 1.246,94
+
+ 
+
+**Investimento por 3 anos (IR de 15%)**
+
+1. Rendimento composto bruto após 3 anos:
+   - Valor no primeiro ano: R$ 1.000 × 1,139 = R$ 1.139
+   - Valor no segundo ano: R$ 1.139 × 1,139 ≈ R$ 1.299,32
+   - Valor no terceiro ano: R$ 1.299,32 × 1,139 ≈ R$ 1.479,50
+2. **Rendimento total bruto**: R$ 1.479,50 - R$ 1.000 = R$ 479,50
+3. **IR a pagar**: 15% de R$ 479,50 = R$ 71,93
+4. **Rendimento líquido**: R$ 479,50 - R$ 71,93 ≈ R$ 407,57
+5. **Valor final após 3 anos**: R$ 1.407,57
+
+
+
+Resumo dos Resultados
+
+| Período Investido | Rendimento Bruto (%) | Rendimento Líquido (%) | Valor Final (Líquido) |
+| ----------------- | -------------------- | ---------------------- | --------------------- |
+| 1 ano             | 13,90%               | 11,12%                 | R$ 1.111,20           |
+| 2 anos            | 29,93%               | 24,69%                 | R$ 1.246,94           |
+| 3 anos            | 47,95%               | 40,76%                 | R$ 1.407,57           |
+
+
+
 ### LCI/LCA
+
+**Custos**
+
+* Nenhum! - porém a rentabilidade nem sempre é melhor do que o CDB com o IR!
+
+**O que é?**
+
+LCI/LCA, ou Letras de Crédito Imobiliário / Agronegócio, também é emitido pelo Banco.
+
+Existem os tiops:
+
+* Pré-fixado;
+* Pós-fixado;
+* Indexado;
+
+Características:
+
+* Possui segurança do FGC;
+* Menos liquidez (3 meses no mínimo)
+* Mínimo de investimento é alto
+
+
+
+### Debêntures
+
+**Custos**
+
+* Nenhum! - porém a rentabilidade nem sempre é melhor do que o CDB com o IR!
+
+**O que é?**
+
+São títulos de dívidas emitidos por empresas!
+
+* Não tem cobertudo do FGC;
+
+* Possui os tipos pré/pós fixado + outros tipos;
+* Amortização mensal
 
 
 
 ## Renda Variável
-
-### Fundo Imobiliário
-
-xx
-
-
 
 ### Ações
 
@@ -244,7 +400,7 @@ xx
 
 
 
-### Ativos no Exterior
+### Fundo Imobiliário
 
 xx
 
